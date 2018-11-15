@@ -15,8 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=R
-from typing import Dict, List, Optional
 import hashlib
+from typing import Dict, List, Optional
 
 import simplejson as json
 
