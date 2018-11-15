@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=R
-from typing import Dict, List,
+from typing import Dict, List
 
 from superset import db
 from superset.connectors.connector_registry import ConnectorRegistry
