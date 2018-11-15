@@ -156,7 +156,7 @@ class QueryContext:
 
     @property
     def cache_timeout(self):
-        if self.custom_cache_timeout not None:
+        if self.custom_cache_timeout is not None:
             return self.custom_cache_timeout
         if self.datasource.cache_timeout is not None:
             return self.datasource.cache_timeout
