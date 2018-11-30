@@ -79,7 +79,7 @@ export default class DisplayQueryButton extends React.PureComponent {
     });
     SupersetClient.post({
       url,
-      postPayload: { form_data: payload },
+      postPayload: { ...payload },
     })
       .then(({ json }) => {
         this.setState({

@@ -58,6 +58,9 @@ export function getURIDirectory(formData, endpointType = 'base') {
   if (['json', 'csv', 'query', 'results', 'samples'].indexOf(endpointType) >= 0) {
     directory = '/superset/explore_json/';
   }
+  if (formData.viz_type === 'word_cloud') {
+    directory = '/api/v1/query/';
+  }
   return directory;
 }
 
@@ -148,7 +151,13 @@ export function getExploreUrlAndPayload({
     });
   }
   uri = uri.search(search).directory(directory);
-  const payload = { ...formData };
+  let payload = { form_data: { ...formData } };
+
+  const buildQuery = getChartBuildQueryRegistry().get(formData.viz_type);
+  if (buildQuery) {
+    console.log(formData);
+    payload = { query_context: buildQuery(formData) };
+  }
 
   return {
     url: uri.toString(),
