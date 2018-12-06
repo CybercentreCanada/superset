@@ -18,6 +18,7 @@
  */
 /* eslint camelcase: 0 */
 import URI from 'urijs';
+import { getChartBuildQueryRegistry } from '@superset-ui/chart';
 import { availableDomains } from '../utils/hostNamesConfig';
 import { safeStringify } from '../utils/safeStringify';
 
