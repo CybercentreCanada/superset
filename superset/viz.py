@@ -124,11 +124,6 @@ class BaseViz(object):
                     label = utils.get_metric_name(o)
                     if isinstance(o, dict):
                         o['label'] = label
-                    else:
-                        o = {
-                            'label': o,
-                            'expressionType': 'BUILTIN',
-                        }
                     self.metric_dict[label] = o
 
         # Cast to list needed to return serializable object in py3
@@ -208,6 +203,20 @@ class BaseViz(object):
             query_obj = self.query_obj()
         if not query_obj:
             return None
+
+        metrics = query_obj.get('metrics')
+        formatted_metrics = []
+        for metric in metrics:
+            if not isinstance(metric, dict):
+                metric = {
+                    'label': metric,
+                    'expressionType': 'BUILTIN',
+                }
+            formatted_metrics.append(metric)
+        query_obj.update({
+            'metrics': formatted_metrics,
+        })
+        
 
         self.error_msg = ''
 
