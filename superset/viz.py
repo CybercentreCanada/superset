@@ -1808,7 +1808,7 @@ class FilterBoxViz(BaseViz):
         return None
 
     def run_extra_queries(self):
-        qry = self.filter__query_obj()
+        qry = self.filter_query_obj()
         filters = self.form_data.get('filter_configs') or []
         qry['row_limit'] = self.filter_row_limit
         self.dataframes = {}
@@ -1823,7 +1823,7 @@ class FilterBoxViz(BaseViz):
             df = self.get_df_payload(query_obj=qry).get('df')
             self.dataframes[col] = df
 
-    def filter__query_obj(self):
+    def filter_query_obj(self):
         qry = super(FilterBoxViz, self)._query_obj()
         groupby = self.form_data.get('groupby')
         if len(groupby) < 1 and not self.form_data.get('date_filter'):
@@ -2118,7 +2118,7 @@ class BaseDeckGLViz(BaseViz):
         self.metric = self.form_data.get('size')
         return [self.metric] if self.metric else []
 
-    def process_spatial__query_obj(self, key, group_by):
+    def process_spatial_query_obj(self, key, group_by):
         group_by.extend(self.get_spatial_columns(key))
 
     def get_spatial_columns(self, key):
@@ -2216,7 +2216,7 @@ class BaseDeckGLViz(BaseViz):
         gb = []
 
         for key in self.spatial_control_keys:
-            self.process_spatial__query_obj(key, gb)
+            self.process_spatial_query_obj(key, gb)
 
         if fd.get('dimension'):
             gb += [fd.get('dimension')]

@@ -326,7 +326,7 @@ class TableVizTestCase(SupersetTestCase):
         self.assertEqual('(value3 in (\'North America\'))', query_obj['extras']['where'])
         self.assertEqual('', query_obj['extras']['having'])
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_merges_percent_metrics(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {
@@ -342,9 +342,9 @@ class TableVizTestCase(SupersetTestCase):
         self.assertEqual([
             'sum__A', 'count', 'avg__C',
             'avg__B', 'max__Y',
-        ], query_obj['metrics'])
+        ], [metric['label'] for metric in query_obj['metrics']])
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_throws_columns_and_metrics(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {
@@ -361,7 +361,7 @@ class TableVizTestCase(SupersetTestCase):
         with self.assertRaises(Exception):
             test_viz.query_obj()
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_merges_all_columns(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {
@@ -378,7 +378,7 @@ class TableVizTestCase(SupersetTestCase):
         self.assertEqual([], query_obj['groupby'])
         self.assertEqual([['colA', 'colB'], ['colC']], query_obj['orderby'])
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_uses_sortby(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {
@@ -392,7 +392,7 @@ class TableVizTestCase(SupersetTestCase):
         query_obj = test_viz.query_obj()
         self.assertEqual([
             'colA', 'colB', '__time__',
-        ], query_obj['metrics'])
+        ], [metric['label'] for metric in query_obj['metrics']])
         self.assertEqual([(
             '__time__', True,
         )], query_obj['orderby'])
@@ -539,7 +539,7 @@ class PairedTTestTestCase(SupersetTestCase):
 
 class PartitionVizTestCase(SupersetTestCase):
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_time_series_option(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {}
@@ -866,7 +866,7 @@ class TimeSeriesTableVizTestCase(SupersetTestCase):
         }
         self.assertEqual(expected, data['records'])
 
-    @patch('superset.viz.BaseViz.query_obj')
+    @patch('superset.viz.BaseViz._query_obj')
     def test_query_obj_throws_metrics_and_groupby(self, super_query_obj):
         datasource = self.get_datasource_mock()
         form_data = {
