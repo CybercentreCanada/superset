@@ -22,8 +22,8 @@ describe('WordCloud buildQuery', () => {
   const formData = {
     datasource: '5__table',
     granularity: 'ds',
-    series: 'foo',
     metric: 'simpleMetric',
+    series: 'foo',
   };
 
   it('should build groupby with series in form data', () => {
