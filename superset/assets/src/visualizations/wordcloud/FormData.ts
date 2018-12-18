@@ -22,7 +22,7 @@ import { FormData as GenericFormData } from 'src/query';
 interface WordCloudFormData {
   series: string;
   metric: string;
-  time_range: string;
+  time_range?: string;
 }
 
 // FormData for wordcloud contains both common properties of all form data
