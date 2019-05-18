@@ -78,14 +78,14 @@ First you need to setup a few things. This is a one-off and doesn't
 need to be done at every release.
 
 ```bash
-    # Create PGP Key
+    # Create PGP Key, and use your @apache.org email address
     gpg --gen-key
      
     # Checkout ASF dist repo
 
     svn checkout https://dist.apache.org/repos/dist/dev/incubator/superset/ ~/svn/superset_dev
 
-    svn checkout https://dist.apache.org/repos/dist/incubator/superset/ ~/svn/superset
+    svn checkout https://dist.apache.org/repos/dist/release/incubator/superset/ ~/svn/superset
     cd ~/svn/superset
  
   
