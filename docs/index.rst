@@ -93,6 +93,30 @@ Features
 - Integration with most SQL-speaking RDBMS through SQLAlchemy
 - Deep integration with Druid.io
 
+The following RDBS are currently suppored:
+
+- `Amazon Athena <https://aws.amazon.com/athena/>`_
+- `Amazon Redshift <https://aws.amazon.com/redshift/>`_
+- `Apache Drill <https://drill.apache.org/>`_
+- `Apache Druid <http://druid.io/>`_
+- `Apache Hive <https://hive.apache.org/>`_
+- `Apache Kylin <http://kylin.apache.org/>`_
+- `BigQuery <https://cloud.google.com/bigquery/>`_
+- `ClickHouse <https://clickhouse.yandex/>`_
+- `Google Sheets <https://www.google.com/sheets/about/>`_
+- `IBM Db2 <https://www.ibm.com/analytics/db2/>`_
+- `Apache Impala <https://impala.apache.org/>`_
+- `MySQL <https://www.mysql.com/>`_
+- `Oracle <https://www.oracle.com/database/>`_
+- `Pinot <https://dbdb.io/db/pinot>`_
+- `PostgreSQL <https://www.postgresql.org/>`_
+- `Presto <http://prestodb.github.io/>`_
+- `Snowflake <https://www.snowflake.com/>`_
+- `SQLite <https://www.sqlite.org/>`_
+- `SQL Server <https://www.microsoft.com/en-us/sql-server/>`_
+- `Teradata <https://www.teradata.com/>`_
+- `Vertica <https://www.vertica.com/>`_
+
 Screenshots
 -----------
 
