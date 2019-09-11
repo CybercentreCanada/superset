@@ -70,7 +70,7 @@ class Kepler extends React.PureComponent {
   addDataToMap(props, useControlConfig = true) {
     let config = props.config;
     if (!config) {
-      config = null;
+      config = {};
     } else {
       config = useControlConfig ? JSON.parse(config) : this.getCurrentConfig();
     }
@@ -97,6 +97,7 @@ class Kepler extends React.PureComponent {
         <KeplerGl
           id={this.state.keplerId}
           onSaveMap={this.setMapConfig}
+          theme="light"
           {...this.props}
         />
       </div>);

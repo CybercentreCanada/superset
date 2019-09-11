@@ -17,7 +17,7 @@
  * under the License.
  */
 export default function transformProps(chartProps) {
-  const { formData, height, width, queryData, setControlValue } = chartProps;
+  const { formData, height, width, queryData, hooks } = chartProps;
   const { mapboxApiAccessToken, features } = queryData.data;
   const { config, autozoom, readonly } = formData;
   return {
@@ -27,7 +27,7 @@ export default function transformProps(chartProps) {
     autozoom,
     readonly,
     features,
-    setControlValue,
+    setControlValue: hooks.setControlValue,
     mapboxApiAccessToken,
   };
 }
