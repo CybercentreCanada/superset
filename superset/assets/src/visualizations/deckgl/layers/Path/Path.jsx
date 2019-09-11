@@ -55,6 +55,9 @@ export function getLayer(formData, payload, onAddFilter, setTooltip) {
   return new PathLayer({
     id: `path-layer-${fd.slice_id}`,
     data,
+    getColor: d => d.color,
+    getPath: d => d.path,
+    getWidth: d => d.width,
     rounded: true,
     widthScale: 1,
     ...commonLayerProps(fd, setTooltip, setTooltipContent),

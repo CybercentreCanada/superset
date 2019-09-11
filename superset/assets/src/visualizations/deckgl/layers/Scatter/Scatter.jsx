@@ -56,11 +56,13 @@ export function getLayer(formData, payload, onAddFilter, setTooltip) {
     const color = [c.r, c.g, c.b, c.a * 255];
     return { ...d, radius, color };
   });
-
   return new ScatterplotLayer({
     id: `scatter-layer-${fd.slice_id}`,
     data: dataWithRadius,
     fp64: true,
+    getFillColor: d => d.color,
+    getPosition: d => d.position,
+    getRadius: d=> d.radius,
     radiusMinPixels: fd.min_radius || null,
     radiusMaxPixels: fd.max_radius || null,
     outline: false,
