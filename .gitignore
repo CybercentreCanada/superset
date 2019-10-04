@@ -24,7 +24,6 @@
 .coverage
 .DS_Store
 .eggs
-.envrc
 .idea
 .mypy_cache
 .python-version
