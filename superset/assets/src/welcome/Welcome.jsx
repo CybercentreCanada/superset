@@ -20,7 +20,6 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Panel, Row, Col, Tabs, Tab, FormControl } from 'react-bootstrap';
 import { t } from '@superset-ui/translation';
-import URI from 'urijs';
 import { useQueryParam, StringParam } from 'use-query-params';
 import RecentActivity from '../profile/components/RecentActivity';
 import Favorites from '../profile/components/Favorites';
