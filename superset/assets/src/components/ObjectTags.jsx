@@ -85,7 +85,7 @@ export default class ObjectTags extends React.Component {
     const Tag = props => (
       <Label bsStyle="info">
         <a
-          href={`/superset/welcome?tags=${props.tag.name}#tags`}
+          href={`/superset/welcome?filters=%5B%5D&pageIndex=0&search=${props.tag.name}&sortColumn=changed_on&sortOrder=desc`}
           className="deco-none"
         >
           {props.tag.name}
@@ -124,7 +124,7 @@ export default class ObjectTags extends React.Component {
         {this.state.tags.map(tag => (
           <Label bsStyle="info">
             <a
-              href={`/superset/welcome?tags=${tag.name}#tags`}
+              href={`/superset/welcome?filters=%5B%5D&pageIndex=0&search=${props.tag.name}&sortColumn=changed_on&sortOrder=desc`}
               className="deco-none"
             >
               {tag.name}

@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import json
 import re
 
 from flask import g, redirect, request, Response
@@ -24,16 +25,18 @@ from flask_appbuilder.security.decorators import has_access
 from flask_babel import gettext as __, lazy_gettext as _
 
 import superset.models.core as models
-from superset import appbuilder, db, event_logger
+from superset import db, event_logger
 from superset.utils import core as utils
 
 from ..base import (
     BaseSupersetView,
     check_ownership,
+    common_bootstrap_payload,
     DeleteMixin,
     generate_download_headers,
     SupersetModelView,
 )
+from ..utils import bootstrap_user_data
 from .mixin import DashboardMixin
 
 
@@ -43,9 +46,23 @@ class DashboardModelView(
     route_base = "/dashboard"
     datamodel = SQLAInterface(models.Dashboard)
 
+    @has_access
+    @expose("/list/")
+    def list(self):
+        payload = {
+            "user": bootstrap_user_data(g.user),
+            "common": common_bootstrap_payload(),
+        }
+        return self.render_template(
+            "superset/welcome.html",
+            entry="welcome",
+            bootstrap_data=json.dumps(
+                payload, default=utils.pessimistic_json_iso_dttm_ser
+            ),
+        )
+
     @action("mulexport", __("Export"), __("Export dashboards?"), "fa-database")
-    @staticmethod
-    def mulexport(items):
+    def mulexport(self, items):  # pylint: disable=no-self-use
         if not isinstance(items, list):
             items = [items]
         ids = "".join("&id={}".format(d.id) for d in items)
@@ -84,9 +101,6 @@ class DashboardModelView(
         check_ownership(item)
         self.pre_add(item)
 
-    def pre_delete(self, item):  # pylint: disable=no-self-use
-        check_ownership(item)
-
 
 class Dashboard(BaseSupersetView):
     """The base views for Superset!"""
@@ -101,9 +115,6 @@ class Dashboard(BaseSupersetView):
         db.session.add(new_dashboard)
         db.session.commit()
         return redirect(f"/superset/dashboard/{new_dashboard.id}/?edit=true")
-
-
-appbuilder.add_view_no_menu(Dashboard)
 
 
 class DashboardModelViewAsync(DashboardModelView):  # pylint: disable=too-many-ancestors
@@ -126,9 +137,6 @@ class DashboardModelViewAsync(DashboardModelView):  # pylint: disable=too-many-a
     }
 
 
-appbuilder.add_view_no_menu(DashboardModelViewAsync)
-
-
 class DashboardAddView(DashboardModelView):  # pylint: disable=too-many-ancestors
     route_base = "/dashboardaddview"
     list_columns = [
@@ -142,6 +150,3 @@ class DashboardAddView(DashboardModelView):  # pylint: disable=too-many-ancestor
         "changed_by_name",
     ]
     show_columns = list(set(DashboardModelView.edit_columns + list_columns))
-
-
-appbuilder.add_view_no_menu(DashboardAddView)
