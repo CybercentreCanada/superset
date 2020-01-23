@@ -19,7 +19,6 @@ import logging
 import re
 from contextlib import closing
 from datetime import datetime, timedelta
-from enum import Enum
 from typing import Any, cast, Dict, List, Optional, Union
 from urllib import parse
 
@@ -61,6 +60,7 @@ from superset import (
     event_logger,
     get_feature_flags,
     is_feature_enabled,
+    result_set,
     results_backend,
     results_backend_use_msgpack,
     security_manager,
@@ -77,6 +77,9 @@ from superset.exceptions import (
     SupersetTimeoutException,
 )
 from superset.jinja_context import get_template_processor
+from superset.models.dashboard import Dashboard
+from superset.models.datasource_access_request import DatasourceAccessRequest
+from superset.models.slice import Slice
 from superset.models.sql_lab import Query, TabState
 from superset.models.user_attributes import UserAttribute
 from superset.sql_parse import ParsedQuery
@@ -84,6 +87,7 @@ from superset.sql_validators import get_validator_by_name
 from superset.utils import core as utils, dashboard_import_export
 from superset.utils.dates import now_as_float
 from superset.utils.decorators import etag_cache, stats_timing
+from superset.views.chart import views as chart_views
 
 from .base import (
     api,
@@ -103,7 +107,6 @@ from .base import (
     SupersetModelView,
 )
 from .dashboard import views as dash_views
-from .dashboard.filters import DashboardFilter
 from .database import views as in_views
 from .utils import (
     apply_display_max_row_limit,
@@ -117,7 +120,7 @@ config = app.config
 CACHE_DEFAULT_TIMEOUT = config["CACHE_DEFAULT_TIMEOUT"]
 SQLLAB_QUERY_COST_ESTIMATE_TIMEOUT = config["SQLLAB_QUERY_COST_ESTIMATE_TIMEOUT"]
 stats_logger = config["STATS_LOGGER"]
-DAR = models.DatasourceAccessRequest
+DAR = DatasourceAccessRequest
 QueryStatus = utils.QueryStatus
 
 DATABASE_KEYS = [
@@ -232,10 +235,10 @@ def _deserialize_results_payload(
             ds_payload = msgpack.loads(payload, raw=False)
 
         with stats_timing("sqllab.query.results_backend_pa_deserialize", stats_logger):
-            df = pa.deserialize(ds_payload["data"])
+            pa_table = pa.deserialize(ds_payload["data"])
 
-        # TODO: optimize this, perhaps via df.to_dict, then traversing
-        ds_payload["data"] = dataframe.SupersetDataFrame.format_data(df) or []
+        df = result_set.SupersetResultSet.convert_table_to_df(pa_table)
+        ds_payload["data"] = dataframe.df_to_records(df) or []
 
         db_engine_spec = query.database.db_engine_spec
         all_columns, data, expanded_columns = db_engine_spec.expand_data(
@@ -253,202 +256,25 @@ def _deserialize_results_payload(
             return json.loads(payload)  # type: ignore
 
 
-class SliceFilter(BaseFilter):
-    def apply(self, query, func):  # noqa
-        if security_manager.all_datasource_access():
-            return query
-        perms = security_manager.user_view_menu_names("datasource_access")
-        schema_perms = security_manager.user_view_menu_names("schema_access")
-        return query.filter(
-            or_(self.model.perm.in_(perms), self.model.schema_perm.in_(schema_perms))
-        )
-
-
-if config["ENABLE_ACCESS_REQUEST"]:
-
-    class AccessRequestsModelView(SupersetModelView, DeleteMixin):
-        datamodel = SQLAInterface(DAR)
-        list_columns = [
-            "username",
-            "user_roles",
-            "datasource_link",
-            "roles_with_datasource",
-            "created_on",
-        ]
-        order_columns = ["created_on"]
-        base_order = ("changed_on", "desc")
-        label_columns = {
-            "username": _("User"),
-            "user_roles": _("User Roles"),
-            "database": _("Database URL"),
-            "datasource_link": _("Datasource"),
-            "roles_with_datasource": _("Roles to grant"),
-            "created_on": _("Created On"),
-        }
-
-    appbuilder.add_view(
-        AccessRequestsModelView,
-        "Access requests",
-        label=__("Access requests"),
-        category="Security",
-        category_label=__("Security"),
-        icon="fa-table",
-    )
-
-
-class SliceModelView(SupersetModelView, DeleteMixin):
-    route_base = "/chart"
-    datamodel = SQLAInterface(models.Slice)
-
-    list_title = _("Charts")
-    show_title = _("Show Chart")
-    add_title = _("Add Chart")
-    edit_title = _("Edit Chart")
-
-    can_add = False
-    search_columns = (
-        "slice_name",
-        "description",
-        "viz_type",
-        "datasource_name",
-        "owners",
-    )
-    list_columns = ["slice_link", "viz_type", "datasource_link", "creator", "modified"]
-    order_columns = ["viz_type", "datasource_link", "modified"]
-    edit_columns = [
-        "slice_name",
-        "description",
-        "viz_type",
-        "owners",
-        "dashboards",
-        "params",
-        "cache_timeout",
-    ]
-    base_order = ("changed_on", "desc")
-    description_columns = {
-        "description": Markup(
-            "The content here can be displayed as widget headers in the "
-            "dashboard view. Supports "
-            '<a href="https://daringfireball.net/projects/markdown/"">'
-            "markdown</a>"
-        ),
-        "params": _(
-            "These parameters are generated dynamically when clicking "
-            "the save or overwrite button in the explore view. This JSON "
-            "object is exposed here for reference and for power users who may "
-            "want to alter specific parameters."
-        ),
-        "cache_timeout": _(
-            "Duration (in seconds) of the caching timeout for this chart. "
-            "Note this defaults to the datasource/table timeout if undefined."
-        ),
-    }
-    base_filters = [["id", SliceFilter, lambda: []]]
-    label_columns = {
-        "cache_timeout": _("Cache Timeout"),
-        "creator": _("Creator"),
-        "dashboards": _("Dashboards"),
-        "datasource_link": _("Datasource"),
-        "description": _("Description"),
-        "modified": _("Last Modified"),
-        "owners": _("Owners"),
-        "params": _("Parameters"),
-        "slice_link": _("Chart"),
-        "slice_name": _("Name"),
-        "table": _("Table"),
-        "viz_type": _("Visualization Type"),
-    }
-
-    add_form_query_rel_fields = {"dashboards": [["name", DashboardFilter, None]]}
-
-    edit_form_query_rel_fields = add_form_query_rel_fields
-
-    def pre_add(self, obj):
-        utils.validate_json(obj.params)
-
-    def pre_update(self, obj):
-        utils.validate_json(obj.params)
-        check_ownership(obj)
-
-    def pre_delete(self, obj):
-        check_ownership(obj)
-
-    @expose("/add", methods=["GET", "POST"])
-    @has_access
-    def add(self):
-        datasources = ConnectorRegistry.get_all_datasources(db.session)
-        datasources = [
-            {"value": str(d.id) + "__" + d.type, "label": repr(d)} for d in datasources
-        ]
-        return self.render_template(
-            "superset/add_slice.html",
-            bootstrap_data=json.dumps(
-                {"datasources": sorted(datasources, key=lambda d: d["label"])}
-            ),
-        )
-
-
-appbuilder.add_view(
-    SliceModelView,
-    "Charts",
-    label=__("Charts"),
-    icon="fa-bar-chart",
-    category="",
-    category_icon="",
-)
-
-
-class SliceAsync(SliceModelView):
-    route_base = "/sliceasync"
+class AccessRequestsModelView(SupersetModelView, DeleteMixin):
+    datamodel = SQLAInterface(DAR)
     list_columns = [
-        "id",
-        "slice_link",
-        "viz_type",
-        "slice_name",
-        "creator",
-        "modified",
-        "icons",
-        "changed_on_humanized",
-    ]
-    label_columns = {"icons": " ", "slice_link": _("Chart")}
-
-
-appbuilder.add_view_no_menu(SliceAsync)
-
-
-class SliceAddView(SliceModelView):
-    route_base = "/sliceaddview"
-    list_columns = [
-        "id",
-        "slice_name",
-        "slice_url",
-        "edit_url",
-        "viz_type",
-        "params",
-        "description",
-        "description_markeddown",
-        "datasource_id",
-        "datasource_type",
-        "datasource_name_text",
+        "username",
+        "user_roles",
         "datasource_link",
-        "owners",
-        "modified",
-        "changed_on",
-        "changed_on_humanized",
+        "roles_with_datasource",
+        "created_on",
     ]
-
-
-appbuilder.add_view_no_menu(SliceAddView)
-
-
-appbuilder.add_view(
-    dash_views.DashboardModelView,
-    "Dashboards",
-    label=__("Dashboards"),
-    icon="fa-dashboard",
-    category="",
-    category_icon="",
-)
+    order_columns = ["created_on"]
+    base_order = ("changed_on", "desc")
+    label_columns = {
+        "username": _("User"),
+        "user_roles": _("User Roles"),
+        "database": _("Database URL"),
+        "datasource_link": _("Datasource"),
+        "roles_with_datasource": _("Roles to grant"),
+        "created_on": _("Created On"),
+    }
 
 
 @talisman(force_https=False)
@@ -499,9 +325,6 @@ class KV(BaseSupersetView):
         return Response(kv.value, status=200, content_type="text/plain")
 
 
-appbuilder.add_view_no_menu(KV)
-
-
 class R(BaseSupersetView):
 
     """used for short urls"""
@@ -535,9 +358,6 @@ class R(BaseSupersetView):
             ),
             mimetype="text/plain",
         )
-
-
-appbuilder.add_view_no_menu(R)
 
 
 class Superset(BaseSupersetView):
@@ -612,9 +432,7 @@ class Superset(BaseSupersetView):
         datasources = set()
         dashboard_id = request.args.get("dashboard_id")
         if dashboard_id:
-            dash = (
-                db.session.query(models.Dashboard).filter_by(id=int(dashboard_id)).one()
-            )
+            dash = db.session.query(Dashboard).filter_by(id=int(dashboard_id)).one()
             datasources |= dash.datasources
         datasource_id = request.args.get("datasource_id")
         datasource_type = request.args.get("datasource_type")
@@ -762,7 +580,7 @@ class Superset(BaseSupersetView):
         force=False,
     ):
         if slice_id:
-            slc = db.session.query(models.Slice).filter_by(id=slice_id).one()
+            slc = db.session.query(Slice).filter_by(id=slice_id).one()
             return slc.get_viz()
         else:
             viz_type = form_data.get("viz_type", "table")
@@ -1155,7 +973,7 @@ class Superset(BaseSupersetView):
         if action in ("saveas"):
             if "slice_id" in form_data:
                 form_data.pop("slice_id")  # don't save old slice_id
-            slc = models.Slice(owners=[g.user] if g.user else [])
+            slc = Slice(owners=[g.user] if g.user else [])
 
         slc.params = json.dumps(form_data, indent=2, sort_keys=True)
         slc.datasource_name = datasource_name
@@ -1173,7 +991,7 @@ class Superset(BaseSupersetView):
         dash = None
         if request.args.get("add_to_dash") == "existing":
             dash = (
-                db.session.query(models.Dashboard)
+                db.session.query(Dashboard)
                 .filter_by(id=int(request.args.get("save_to_dashboard_id")))
                 .one()
             )
@@ -1204,7 +1022,7 @@ class Superset(BaseSupersetView):
                     status=400,
                 )
 
-            dash = models.Dashboard(
+            dash = Dashboard(
                 dashboard_title=request.args.get("new_dashboard_name"),
                 owners=[g.user] if g.user else [],
             )
@@ -1388,7 +1206,7 @@ class Superset(BaseSupersetView):
         session = db.session()
         data = json.loads(request.form.get("data"))
         dash = models.Dashboard()
-        original_dash = session.query(models.Dashboard).get(dashboard_id)
+        original_dash = session.query(Dashboard).get(dashboard_id)
 
         dash.owners = [g.user] if g.user else []
         dash.dashboard_title = data["dashboard_title"]
@@ -1433,7 +1251,7 @@ class Superset(BaseSupersetView):
     def save_dash(self, dashboard_id):
         """Save a dashboard's metadata"""
         session = db.session()
-        dash = session.query(models.Dashboard).get(dashboard_id)
+        dash = session.query(Dashboard).get(dashboard_id)
         check_ownership(dash, raise_if_false=True)
         data = json.loads(request.form.get("data"))
         self._set_dash_metadata(dash, data)
@@ -1458,7 +1276,6 @@ class Superset(BaseSupersetView):
                     pass
 
         session = db.session()
-        Slice = models.Slice
         current_slices = session.query(Slice).filter(Slice.id.in_(slice_ids)).all()
 
         dashboard.slices = current_slices
@@ -1517,8 +1334,7 @@ class Superset(BaseSupersetView):
         """Add and save slices to a dashboard"""
         data = json.loads(request.form.get("data"))
         session = db.session()
-        Slice = models.Slice  # noqa
-        dash = session.query(models.Dashboard).get(dashboard_id)
+        dash = session.query(Dashboard).get(dashboard_id)
         check_ownership(dash, raise_if_false=True)
         new_slices = session.query(Slice).filter(Slice.id.in_(data["slice_ids"]))
         dash.slices += new_slices
@@ -1583,9 +1399,9 @@ class Superset(BaseSupersetView):
             limit = 1000
 
         qry = (
-            db.session.query(M.Log, M.Dashboard, M.Slice)
+            db.session.query(M.Log, M.Dashboard, Slice)
             .outerjoin(M.Dashboard, M.Dashboard.id == M.Log.dashboard_id)
-            .outerjoin(M.Slice, M.Slice.id == M.Log.slice_id)
+            .outerjoin(Slice, Slice.id == M.Log.slice_id)
             .filter(
                 and_(
                     ~M.Log.action.in_(("queries", "shortner", "sql_json")),
@@ -1650,13 +1466,13 @@ class Superset(BaseSupersetView):
     @expose("/fave_dashboards/<user_id>/", methods=["GET"])
     def fave_dashboards(self, user_id):
         qry = (
-            db.session.query(models.Dashboard, models.FavStar.dttm)
+            db.session.query(Dashboard, models.FavStar.dttm)
             .join(
                 models.FavStar,
                 and_(
                     models.FavStar.user_id == int(user_id),
                     models.FavStar.class_name == "Dashboard",
-                    models.Dashboard.id == models.FavStar.obj_id,
+                    Dashboard.id == models.FavStar.obj_id,
                 ),
             )
             .order_by(models.FavStar.dttm.desc())
@@ -1681,7 +1497,7 @@ class Superset(BaseSupersetView):
     @has_access_api
     @expose("/created_dashboards/<user_id>/", methods=["GET"])
     def created_dashboards(self, user_id):
-        Dash = models.Dashboard
+        Dash = Dashboard
         qry = (
             db.session.query(Dash)
             .filter(or_(Dash.created_by_fk == user_id, Dash.changed_by_fk == user_id))
@@ -1707,7 +1523,6 @@ class Superset(BaseSupersetView):
         """List of slices a user created, or faved"""
         if not user_id:
             user_id = g.user.id
-        Slice = models.Slice
         FavStar = models.FavStar
         qry = (
             db.session.query(Slice, FavStar.dttm)
@@ -1716,7 +1531,7 @@ class Superset(BaseSupersetView):
                 and_(
                     models.FavStar.user_id == int(user_id),
                     models.FavStar.class_name == "slice",
-                    models.Slice.id == models.FavStar.obj_id,
+                    Slice.id == models.FavStar.obj_id,
                 ),
                 isouter=True,
             )
@@ -1750,7 +1565,6 @@ class Superset(BaseSupersetView):
         """List of slices created by this user"""
         if not user_id:
             user_id = g.user.id
-        Slice = models.Slice
         qry = (
             db.session.query(Slice)
             .filter(or_(Slice.created_by_fk == user_id, Slice.changed_by_fk == user_id))
@@ -1777,13 +1591,13 @@ class Superset(BaseSupersetView):
         if not user_id:
             user_id = g.user.id
         qry = (
-            db.session.query(models.Slice, models.FavStar.dttm)
+            db.session.query(Slice, models.FavStar.dttm)
             .join(
                 models.FavStar,
                 and_(
                     models.FavStar.user_id == int(user_id),
                     models.FavStar.class_name == "slice",
-                    models.Slice.id == models.FavStar.obj_id,
+                    Slice.id == models.FavStar.obj_id,
                 ),
             )
             .order_by(models.FavStar.dttm.desc())
@@ -1827,7 +1641,7 @@ class Superset(BaseSupersetView):
                 status=400,
             )
         if slice_id:
-            slices = session.query(models.Slice).filter_by(id=slice_id).all()
+            slices = session.query(Slice).filter_by(id=slice_id).all()
             if not slices:
                 return json_error_response(
                     __("Chart %(id)s not found", id=slice_id), status=404
@@ -1852,7 +1666,7 @@ class Superset(BaseSupersetView):
                     status=404,
                 )
             slices = (
-                session.query(models.Slice)
+                session.query(Slice)
                 .filter_by(datasource_id=table.id, datasource_type=table.type)
                 .all()
             )
@@ -1912,8 +1726,10 @@ class Superset(BaseSupersetView):
     @expose("/dashboard/<dashboard_id>/published/", methods=("GET", "POST"))
     def publish(self, dashboard_id):
         """Gets and toggles published status on dashboards"""
+        logging.warning(
+            "This API endpoint is deprecated and will be removed in version 1.0.0"
+        )
         session = db.session()
-        Dashboard = models.Dashboard
         Role = ab_models.Role
         dash = (
             session.query(Dashboard).filter(Dashboard.id == dashboard_id).one_or_none()
@@ -1925,16 +1741,14 @@ class Superset(BaseSupersetView):
                 return json_success(json.dumps({"published": dash.published}))
             else:
                 return json_error_response(
-                    "ERROR: cannot find dashboard {0}".format(dashboard_id), status=404
+                    f"ERROR: cannot find dashboard {dashboard_id}", status=404
                 )
 
         else:
             edit_perm = is_owner(dash, g.user) or admin_role in get_user_roles()
             if not edit_perm:
                 return json_error_response(
-                    'ERROR: "{0}" cannot alter dashboard "{1}"'.format(
-                        g.user.username, dash.dashboard_title
-                    ),
+                    f'ERROR: "{g.user.username}" cannot alter dashboard "{dash.dashboard_title}"',
                     status=403,
                 )
 
@@ -1947,7 +1761,7 @@ class Superset(BaseSupersetView):
     def dashboard(self, dashboard_id):
         """Server side rendering for a dashboard"""
         session = db.session()
-        qry = session.query(models.Dashboard)
+        qry = session.query(Dashboard)
         if dashboard_id.isdigit():
             qry = qry.filter_by(id=int(dashboard_id))
         else:
@@ -3008,9 +2822,6 @@ class Superset(BaseSupersetView):
             )
 
 
-appbuilder.add_view_no_menu(Superset)
-
-
 class CssTemplateModelView(SupersetModelView, DeleteMixin):
     datamodel = SQLAInterface(models.CssTemplate)
 
@@ -3029,52 +2840,6 @@ class CssTemplateAsyncModelView(CssTemplateModelView):
     list_columns = ["template_name", "css"]
 
 
-appbuilder.add_separator("Sources")
-appbuilder.add_view(
-    CssTemplateModelView,
-    "CSS Templates",
-    label=__("CSS Templates"),
-    icon="fa-css3",
-    category="Manage",
-    category_label=__("Manage"),
-    category_icon="",
-)
-
-
-appbuilder.add_view_no_menu(CssTemplateAsyncModelView)
-
-appbuilder.add_link(
-    "SQL Editor",
-    label=_("SQL Editor"),
-    href="/superset/sqllab",
-    category_icon="fa-flask",
-    icon="fa-flask",
-    category="SQL Lab",
-    category_label=__("SQL Lab"),
-)
-
-appbuilder.add_link(
-    "Query Search",
-    label=_("Query Search"),
-    href="/superset/sqllab#search",
-    icon="fa-search",
-    category_icon="fa-flask",
-    category="SQL Lab",
-    category_label=__("SQL Lab"),
-)
-
-appbuilder.add_link(
-    "Upload a CSV",
-    label=__("Upload a CSV"),
-    href="/csvtodatabaseview/form",
-    icon="fa-upload",
-    category="Sources",
-    category_label=__("Sources"),
-    category_icon="fa-wrench",
-)
-appbuilder.add_separator("Sources")
-
-
 @app.after_request
 def apply_http_headers(response: Response):
     """Applies the configuration's http headers to all responses"""
@@ -3088,17 +2853,6 @@ def apply_http_headers(response: Response):
         if k not in response.headers:
             response.headers[k] = v
     return response
-
-
-# ---------------------------------------------------------------------
-# Redirecting URL from previous names
-class RegexConverter(BaseConverter):
-    def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
-
-
-app.url_map.converters["regex"] = RegexConverter
 
 
 @app.route('/<regex("panoramix\/.*"):url>')

@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Panel, Row, Col, Tabs, Tab, FormControl } from 'react-bootstrap';
 import { t } from '@superset-ui/translation';
-import URI from 'urijs';
+import { useQueryParam, StringParam } from 'use-query-params';
 import RecentActivity from '../profile/components/RecentActivity';
 import Favorites from '../profile/components/Favorites';
 import DashboardTable from './DashboardTable';
@@ -33,133 +33,122 @@ const propTypes = {
   user: PropTypes.object.isRequired,
 };
 
-export default class Welcome extends React.PureComponent {
-  constructor(props) {
-    super(props);
+function useSyncQueryState(queryParam, queryParamType, defaultState) {
+  const [queryState, setQueryState] = useQueryParam(queryParam, queryParamType);
+  const [state, setState] = useState(queryState || defaultState);
 
-    const parsedUrl = new URI(window.location);
-    const key = parsedUrl.fragment() || 'tags';
-    const searchParams = parsedUrl.search(true);
-    const dashboardSearch = searchParams.search || '';
-    const tagSearch = searchParams.tags || 'owner:{{ current_user_id() }}';
-    this.state = {
-      key,
-      dashboardSearch,
-      tagSearch,
-      tagSuggestions: STANDARD_TAGS,
-    };
+  const setQueryStateAndState = val => {
+    setQueryState(val);
+    setState(val);
+  };
 
-    this.handleSelect = this.handleSelect.bind(this);
-    this.onDashboardSearchChange = this.onDashboardSearchChange.bind(this);
-    this.onTagSearchChange = this.onTagSearchChange.bind(this);
-  }
-  componentDidMount() {
+  return [state, setQueryStateAndState];
+}
+
+function useFetchSuggestions() {
+  const [tagSuggestions, updateTagSuggestions] = useState(STANDARD_TAGS);
+
+  useEffect(() => {
     fetchSuggestions({ includeTypes: false }, suggestions => {
-      const tagSuggestions = [
+      updateTagSuggestions([
         ...STANDARD_TAGS,
         ...suggestions.map(tag => tag.name),
-      ];
-      this.setState({ tagSuggestions });
+      ]);
     });
-  }
-  onDashboardSearchChange(event) {
-    const dashboardSearch = event.target.value;
-    this.setState({ dashboardSearch }, () =>
-      this.updateURL('search', dashboardSearch),
-    );
-  }
-  onTagSearchChange(tags) {
-    const tagSearch = tags.join(',');
-    this.setState({ tagSearch }, () => this.updateURL('tags', tagSearch));
-  }
-  updateURL(key, value) {
-    const parsedUrl = new URI(window.location);
-    parsedUrl.search(data => ({ ...data, [key]: value }));
-    window.history.pushState({ value }, value, parsedUrl.href());
-  }
-  handleSelect(key) {
-    // store selected tab in URL
-    window.history.pushState({ tab: key }, key, `#${key}`);
+  }, []);
 
-    this.setState({ key });
-  }
-  render() {
-    return (
-      <div className="container welcome">
-        <Tabs
-          activeKey={this.state.key}
-          onSelect={this.handleSelect}
-          id="controlled-tab-example"
-        >
-          <Tab eventKey="tags" title={t('Tags')}>
-            <Panel>
-              <Row>
-                <Col md={8}>
-                  <h2>{t('Tags')}</h2>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                  <SelectControl
-                    name="tags"
-                    value={this.state.tagSearch.split(',')}
-                    multi
-                    onChange={this.onTagSearchChange}
-                    choices={this.state.tagSuggestions}
-                  />
-                </Col>
-              </Row>
-              <hr />
-              <TagsTable search={this.state.tagSearch} />
-            </Panel>
-          </Tab>
-          <Tab eventKey="favorites" title={t('Favorites')}>
-            <Panel>
-              <Row>
-                <Col md={8}>
-                  <h2>{t('Favorites')}</h2>
-                </Col>
-              </Row>
-              <hr />
-              <Favorites user={this.props.user} />
-            </Panel>
-          </Tab>
-          <Tab eventKey="recent" title={t('Recently Viewed')}>
-            <Panel>
-              <Row>
-                <Col md={8}>
-                  <h2>{t('Recently Viewed')}</h2>
-                </Col>
-              </Row>
-              <hr />
-              <RecentActivity user={this.props.user} />
-            </Panel>
-          </Tab>
-          <Tab eventKey="dashboards" title={t('Dashboards')}>
-            <Panel>
-              <Row>
-                <Col md={8}>
-                  <h2>{t('Dashboards')}</h2>
-                </Col>
-                <Col md={4}>
-                  <FormControl
-                    type="text"
-                    bsSize="sm"
-                    style={{ marginTop: '25px' }}
-                    placeholder="Search"
-                    value={this.state.dashboardSearch}
-                    onChange={this.onDashboardSearchChange}
-                  />
-                </Col>
-              </Row>
-              <hr />
-              <DashboardTable search={this.state.dashboardSearch} />
-            </Panel>
-          </Tab>
-        </Tabs>
-      </div>
-    );
-  }
+  return tagSuggestions;
+}
+
+export default function Welcome({ user }) {
+  const [activeTab, setActiveTab] = useSyncQueryState(
+    'activeTab',
+    StringParam,
+    'tags',
+  );
+
+  const [searchQuery, setSearchQuery] = useSyncQueryState(
+    'search',
+    StringParam,
+    '',
+  );
+
+  const tagSearch = (searchQuery || 'owner:{{ current_user_id() }}').split(',');
+  const tagSuggestions = useFetchSuggestions();
+
+  return (
+    <div className="container welcome">
+      <Tabs
+        activeKey={activeTab}
+        onSelect={setActiveTab}
+        id="uncontrolled-tab-example"
+      >
+        <Tab eventKey="tags" title={t('Tags')}>
+          <Panel>
+            <Row>
+              <Col md={8}>
+                <h2>{t('Tags')}</h2>
+              </Col>
+              <Col md={12}>
+                <SelectControl
+                  name="tags"
+                  value={tagSearch}
+                  multi
+                  onChange={tags => setSearchQuery(tags.join(','))}
+                  choices={tagSuggestions}
+                />
+              </Col>
+            </Row>
+            <hr />
+            <TagsTable search={tagSearch} />
+          </Panel>
+        </Tab>
+        <Tab eventKey="all" title={t('Dashboards')}>
+          <Panel>
+            <Row>
+              <Col md={8}>
+                <h2>{t('Dashboards')}</h2>
+              </Col>
+              <Col md={4}>
+                <FormControl
+                  type="text"
+                  bsSize="sm"
+                  style={{ marginTop: '25px' }}
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.currentTarget.value)}
+                />
+              </Col>
+            </Row>
+            <hr />
+            <DashboardTable search={searchQuery} />
+          </Panel>
+        </Tab>
+        <Tab eventKey="recent" title={t('Recently Viewed')}>
+          <Panel>
+            <Row>
+              <Col md={8}>
+                <h2>{t('Recently Viewed')}</h2>
+              </Col>
+            </Row>
+            <hr />
+            <RecentActivity user={user} />
+          </Panel>
+        </Tab>
+        <Tab eventKey="favorites" title={t('Favorites')}>
+          <Panel>
+            <Row>
+              <Col md={8}>
+                <h2>{t('Favorites')}</h2>
+              </Col>
+            </Row>
+            <hr />
+            <Favorites user={user} />
+          </Panel>
+        </Tab>
+      </Tabs>
+    </div>
+  );
 }
 
 Welcome.propTypes = propTypes;

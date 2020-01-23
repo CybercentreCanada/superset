@@ -24,7 +24,8 @@ from superset import app, appbuilder, db, security_manager, viz
 from superset.connectors.druid.models import DruidCluster, DruidDatasource
 from superset.connectors.sqla.models import SqlaTable
 from superset.exceptions import SupersetSecurityException
-from superset.models.core import Database, Slice
+from superset.models.core import Database
+from superset.models.slice import Slice
 from superset.utils.core import get_example_database
 
 from .base_tests import SupersetTestCase
@@ -237,7 +238,7 @@ class RolePermissionTests(SupersetTestCase):
         datasource = DruidDatasource(
             datasource_name="tmp_datasource",
             cluster=druid_cluster,
-            cluster_name="druid_test",
+            cluster_id=druid_cluster.id,
         )
         session.add(datasource)
         session.commit()
@@ -457,7 +458,7 @@ class RolePermissionTests(SupersetTestCase):
 
     def test_gamma_user_schema_access_to_dashboards(self):
         self.login(username="gamma")
-        data = str(self.client.get("dashboard/list/").data)
+        data = str(self.client.get("api/v1/dashboard/").data)
         self.assertIn("/superset/dashboard/world_health/", data)
         self.assertNotIn("/superset/dashboard/births/", data)
 

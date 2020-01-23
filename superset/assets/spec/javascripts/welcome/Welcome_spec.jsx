@@ -43,6 +43,6 @@ describe('Welcome', () => {
     const wrapper = shallow(<Welcome {...mockedProps} />);
     expect(wrapper.find(Tab)).toHaveLength(4);
     expect(wrapper.find(Panel)).toHaveLength(4);
-    expect(wrapper.find(Row)).toHaveLength(5);
+    expect(wrapper.find(Row)).toHaveLength(4);
   });
 });
