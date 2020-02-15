@@ -85,7 +85,7 @@ class ChartPostSchema(BaseOwnedSchema):
     viz_type = fields.String(allow_none=True, validate=Length(0, 250))
     owners = fields.List(fields.Integer(validate=validate_owner))
     params = fields.String(allow_none=True, validate=validate_json)
-    cache_timeout = fields.Integer()
+    cache_timeout = fields.Integer(allow_none=True)
     datasource_id = fields.Integer(required=True)
     datasource_type = fields.String(required=True)
     datasource_name = fields.String(allow_none=True)
@@ -110,7 +110,7 @@ class ChartPutSchema(BaseOwnedSchema):
     viz_type = fields.String(allow_none=True, validate=Length(0, 250))
     owners = fields.List(fields.Integer(validate=validate_owner))
     params = fields.String(allow_none=True)
-    cache_timeout = fields.Integer()
+    cache_timeout = fields.Integer(allow_none=True)
     datasource_id = fields.Integer(allow_none=True)
     datasource_type = fields.String(allow_none=True)
     dashboards = fields.List(fields.Integer(validate=validate_dashboard))
@@ -134,15 +134,6 @@ class ChartRestApi(SliceMixin, BaseOwnedModelRestApi):
     allow_browser_login = True
 
     class_permission_name = "SliceModelView"
-    method_permission_name = {
-        "get_list": "list",
-        "get": "show",
-        "post": "add",
-        "put": "edit",
-        "delete": "delete",
-        "info": "list",
-        "related": "list",
-    }
     show_columns = [
         "slice_name",
         "description",
@@ -155,11 +146,16 @@ class ChartRestApi(SliceMixin, BaseOwnedModelRestApi):
         "cache_timeout",
     ]
     list_columns = [
+        "id",
         "slice_name",
+        "url",
         "description",
         "changed_by.username",
         "changed_by_name",
+        "changed_by_url",
         "changed_on",
+        "datasource_name_text",
+        "datasource_link",
         "viz_type",
         "params",
         "cache_timeout",
