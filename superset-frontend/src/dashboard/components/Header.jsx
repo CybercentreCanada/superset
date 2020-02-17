@@ -352,14 +352,16 @@ class Header extends React.PureComponent {
               canSave={userCanSaveAs}
             />
           </span>
-          <span className="favstar">
-            <FaveStar
-              itemId={dashboardInfo.id}
-              fetchFaveStar={this.props.fetchFaveStar}
-              saveFaveStar={this.props.saveFaveStar}
-              isStarred={this.props.isStarred}
-            />
-          </span>
+          {dashboardInfo.userId && (
+            <span className="favstar">
+              <FaveStar
+                itemId={dashboardInfo.id}
+                fetchFaveStar={this.props.fetchFaveStar}
+                saveFaveStar={this.props.saveFaveStar}
+                isStarred={this.props.isStarred}
+              />
+            </span>
+          )}
           <ObjectTags
             fetchTags={this.fetchTags}
             fetchSuggestions={this.fetchSuggestions}
