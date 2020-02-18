@@ -63,6 +63,7 @@ custom_password_store = config["SQLALCHEMY_CUSTOM_PASSWORD_STORE"]
 stats_logger = config["STATS_LOGGER"]
 log_query = config["QUERY_LOGGER"]
 metadata = Model.metadata  # pylint: disable=no-member
+logger = logging.getLogger(__name__)
 
 PASSWORD_MASK = "X" * 10
 DB_CONNECTION_MUTATOR = config["DB_CONNECTION_MUTATOR"]
@@ -160,6 +161,10 @@ class Database(
     @property
     def allows_subquery(self) -> bool:
         return self.db_engine_spec.allows_subqueries
+
+    @property
+    def function_names(self) -> List[str]:
+        return self.db_engine_spec.get_function_names(self)
 
     @property
     def allows_cost_estimate(self) -> bool:
@@ -287,23 +292,24 @@ class Database(
         )
 
         masked_url = self.get_password_masked_url(sqlalchemy_url)
-        logging.info("Database.get_sqla_engine(). Masked URL: %s", str(masked_url))
+        logger.info("Database.get_sqla_engine(). Masked URL: %s", str(masked_url))
 
         params = extra.get("engine_params", {})
         if nullpool:
             params["poolclass"] = NullPool
 
+        connect_args = params.get("connect_args", {})
+        configuration = connect_args.get("configuration", {})
+
         # If using Hive, this will set hive.server2.proxy.user=$effective_username
-        configuration: Dict[str, Any] = {}
         configuration.update(
             self.db_engine_spec.get_configuration_for_impersonation(
                 str(sqlalchemy_url), self.impersonate_user, effective_username
             )
         )
         if configuration:
-            d = params.get("connect_args", {})
-            d["configuration"] = configuration
-            params["connect_args"] = d
+            connect_args["configuration"] = configuration
+            params["connect_args"] = connect_args
 
         params.update(self.get_encrypted_extra())
 
@@ -311,6 +317,7 @@ class Database(
             sqlalchemy_url, params = DB_CONNECTION_MUTATOR(
                 sqlalchemy_url, params, effective_username, security_manager, source
             )
+
         return create_engine(sqlalchemy_url, **params)
 
     def get_reserved_words(self) -> Set[str]:
@@ -320,7 +327,7 @@ class Database(
         return self.get_dialect().identifier_preparer.quote
 
     def get_df(  # pylint: disable=too-many-locals
-        self, sql: str, schema: str, mutator: Optional[Callable] = None
+        self, sql: str, schema: Optional[str] = None, mutator: Optional[Callable] = None
     ) -> pd.DataFrame:
         sqls = [str(s).strip(" ;") for s in sqlparse.parse(sql)]
         source_key = None
@@ -471,7 +478,7 @@ class Database(
                 utils.DatasourceName(table=table, schema=schema) for table in tables
             ]
         except Exception as e:  # pylint: disable=broad-except
-            logging.exception(e)
+            logger.exception(e)
 
     @cache_util.memoized_func(
         key=lambda *args, **kwargs: f"db:{{}}:schema:{kwargs.get('schema')}:view_list",  # type: ignore
@@ -501,7 +508,7 @@ class Database(
             )
             return [utils.DatasourceName(table=view, schema=schema) for view in views]
         except Exception as e:  # pylint: disable=broad-except
-            logging.exception(e)
+            logger.exception(e)
 
     @cache_util.memoized_func(
         key=lambda *args, **kwargs: "db:{}:schema_list", attribute_in_key="id"
@@ -548,7 +555,7 @@ class Database(
             try:
                 extra = json.loads(self.extra)
             except json.JSONDecodeError as e:
-                logging.error(e)
+                logger.error(e)
                 raise e
         return extra
 
@@ -558,7 +565,7 @@ class Database(
             try:
                 encrypted_extra = json.loads(self.encrypted_extra)
             except json.JSONDecodeError as e:
-                logging.error(e)
+                logger.error(e)
                 raise e
         return encrypted_extra
 
@@ -594,7 +601,7 @@ class Database(
         return self.inspector.get_foreign_keys(table_name, schema)
 
     def get_schema_access_for_csv_upload(  # pylint: disable=invalid-name
-        self
+        self,
     ) -> List[str]:
         return self.get_extra().get("schemas_allowed_for_csv_upload", [])
 

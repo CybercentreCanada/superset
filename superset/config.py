@@ -35,8 +35,12 @@ from dateutil import tz
 from flask_appbuilder.security.manager import AUTH_DB
 
 from superset.stats_logger import DummyStatsLogger
+from superset.typing import CacheConfig
 from superset.utils.log import DBEventLogger
 from superset.utils.logging_configurator import DefaultLoggingConfigurator
+
+logger = logging.getLogger(__name__)
+
 
 # Realtime stats logger, a StatsD implementation exists
 STATS_LOGGER = DummyStatsLogger()
@@ -53,9 +57,8 @@ else:
 # ---------------------------------------------------------
 # Superset specific config
 # ---------------------------------------------------------
-PACKAGE_DIR = os.path.join(BASE_DIR, "static", "assets")
-VERSION_INFO_FILE = os.path.join(PACKAGE_DIR, "version_info.json")
-PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "assets", "package.json")
+VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
+PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
@@ -191,11 +194,16 @@ FAB_API_SWAGGER_UI = True
 DRUID_TZ = tz.tzutc()
 DRUID_ANALYSIS_TYPES = ["cardinality"]
 
-# Legacy Druid connector
+# Legacy Druid NoSQL (native) connector
 # Druid supports a SQL interface in its newer versions.
 # Setting this flag to True enables the deprecated, API-based Druid
 # connector. This feature may be removed at a future date.
 DRUID_IS_ACTIVE = False
+
+# If Druid is active whether to include the links to scan/refresh Druid datasources.
+# This should be disabled if you are trying to wean yourself off of the Druid NoSQL
+# connector.
+DRUID_METADATA_LINKS_ENABLED = True
 
 # ----------------------------------------------------
 # AUTHENTICATION CONFIG
@@ -245,6 +253,7 @@ BABEL_DEFAULT_FOLDER = "superset/translations"
 # The allowed translation for you app
 LANGUAGES = {
     "en": {"flag": "us", "name": "English"},
+    "es": {"flag": "es", "name": "Spanish"},
     "it": {"flag": "it", "name": "Italian"},
     "fr": {"flag": "fr", "name": "French"},
     "zh": {"flag": "cn", "name": "Chinese"},
@@ -269,6 +278,7 @@ DEFAULT_FEATURE_FLAGS = {
     "CLIENT_CACHE": False,
     "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": False,
     "PRESTO_EXPAND_DATA": False,
+    "TAGGING_SYSTEM": False,
 }
 
 # This is merely a default.
@@ -295,6 +305,7 @@ GET_FEATURE_FLAGS_FUNC = None
 # ---------------------------------------------------
 # The file upload folder, when using models with files
 UPLOAD_FOLDER = BASE_DIR + "/app/static/uploads/"
+UPLOAD_CHUNK_SIZE = 4096
 
 # The image upload folder, when using models with images
 IMG_UPLOAD_FOLDER = BASE_DIR + "/app/static/uploads/"
@@ -305,8 +316,8 @@ IMG_UPLOAD_URL = "/static/uploads/"
 # IMG_SIZE = (300, 200, True)
 
 CACHE_DEFAULT_TIMEOUT = 60 * 60 * 24
-CACHE_CONFIG: Dict[str, Any] = {"CACHE_TYPE": "null"}
-TABLE_NAMES_CACHE_CONFIG = {"CACHE_TYPE": "null"}
+CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "null"}
+TABLE_NAMES_CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "null"}
 
 # CORS Options
 ENABLE_CORS = False
@@ -565,10 +576,6 @@ SMTP_PORT = 25
 SMTP_PASSWORD = "superset"
 SMTP_MAIL_FROM = "superset@superset.com"
 
-if not CACHE_DEFAULT_TIMEOUT:
-    CACHE_DEFAULT_TIMEOUT = CACHE_CONFIG["CACHE_DEFAULT_TIMEOUT"]
-
-
 ENABLE_CHUNK_ENCODING = False
 
 # Whether to bump the logging level to ERROR on the flask_appbuilder package
@@ -696,6 +703,10 @@ DOCUMENTATION_URL = None
 DOCUMENTATION_TEXT = "Documentation"
 DOCUMENTATION_ICON = None  # Recommended size: 16x16
 
+# Enables the replacement react views for all the FAB views: list, edit, show.
+# This is a work in progress so not all features available in FAB have been implemented
+ENABLE_REACT_CRUD_VIEWS = False
+
 # What is the Last N days relative in the time selector to:
 # 'today' means it is midnight (00:00:00) in the local timezone
 # 'now' means it is relative to the query issue time
@@ -742,7 +753,7 @@ SQLALCHEMY_EXAMPLES_URI = None
 #
 # Note if no end date for the grace period is specified then the grace period is
 # indefinite.
-SIP_15_ENABLED = False
+SIP_15_ENABLED = True
 SIP_15_GRACE_PERIOD_END: Optional[date] = None  # exclusive
 SIP_15_DEFAULT_TIME_RANGE_ENDPOINTS = ["unknown", "inclusive"]
 SIP_15_TOAST_MESSAGE = (
@@ -764,7 +775,7 @@ if CONFIG_PATH_ENV_VAR in os.environ:
 
         print(f"Loaded your LOCAL configuration at [{cfg_path}]")
     except Exception:
-        logging.exception(
+        logger.exception(
             f"Failed to import config for {CONFIG_PATH_ENV_VAR}={cfg_path}"
         )
         raise
@@ -775,5 +786,5 @@ elif importlib.util.find_spec("superset_config"):
 
         print(f"Loaded your LOCAL configuration at [{superset_config.__file__}]")
     except Exception:
-        logging.exception("Found but failed to import local superset_config")
+        logger.exception("Found but failed to import local superset_config")
         raise

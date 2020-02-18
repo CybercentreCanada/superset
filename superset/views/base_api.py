@@ -27,6 +27,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from superset.exceptions import SupersetSecurityException
 from superset.views.base import check_ownership
 
+logger = logging.getLogger(__name__)
 get_related_schema = {
     "type": "object",
     "properties": {
@@ -62,7 +63,17 @@ class BaseSupersetModelRestApi(ModelRestApi):
     Extends FAB's ModelResApi to implement specific superset generic functionality
     """
 
-    logger = logging.getLogger(__name__)
+    method_permission_name = {
+        "get_list": "list",
+        "get": "show",
+        "export": "mulexport",
+        "post": "add",
+        "put": "edit",
+        "delete": "delete",
+        "bulk_delete": "delete",
+        "info": "list",
+        "related": "list",
+    }
 
     order_rel_fields: Dict[str, Tuple[str, str]] = {}
     """
@@ -81,6 +92,18 @@ class BaseSupersetModelRestApi(ModelRestApi):
             "<RELATED_FIELD>": "<RELATED_FIELD_FIELD>", "<asc|desc>")
         }
     """  # pylint: disable=pointless-string-statement
+
+    def _init_properties(self):
+        model_id = self.datamodel.get_pk_name()
+        if self.list_columns is None and not self.list_model_schema:
+            self.list_columns = [model_id]
+        if self.show_columns is None and not self.show_model_schema:
+            self.show_columns = [model_id]
+        if self.edit_columns is None and not self.edit_model_schema:
+            self.edit_columns = [model_id]
+        if self.add_columns is None and not self.add_model_schema:
+            self.add_columns = [model_id]
+        super()._init_properties()
 
     def _get_related_filter(self, datamodel, column_name: str, value: str) -> Filters:
         filter_field = self.filter_rel_fields_field.get(column_name)
@@ -228,7 +251,7 @@ class BaseOwnedModelRestApi(BaseSupersetModelRestApi):
                 200, result=self.edit_model_schema.dump(item.data, many=False).data
             )
         except SQLAlchemyError as e:
-            self.logger.error(f"Error updating model {self.__class__.__name__}: {e}")
+            logger.error(f"Error updating model {self.__class__.__name__}: {e}")
             return self.response_422(message=str(e))
 
     @expose("/", methods=["POST"])
@@ -280,7 +303,7 @@ class BaseOwnedModelRestApi(BaseSupersetModelRestApi):
                 id=item.data.id,
             )
         except SQLAlchemyError as e:
-            self.logger.error(f"Error creating model {self.__class__.__name__}: {e}")
+            logger.error(f"Error creating model {self.__class__.__name__}: {e}")
             return self.response_422(message=str(e))
 
     @expose("/<pk>", methods=["DELETE"])
@@ -321,5 +344,5 @@ class BaseOwnedModelRestApi(BaseSupersetModelRestApi):
             self.datamodel.delete(item, raise_exception=True)
             return self.response(200, message="OK")
         except SQLAlchemyError as e:
-            self.logger.error(f"Error deleting model {self.__class__.__name__}: {e}")
+            logger.error(f"Error deleting model {self.__class__.__name__}: {e}")
             return self.response_422(message=str(e))
