@@ -28,7 +28,6 @@ export const NEW_COMPONENT_SOURCE_TYPE = 'NEW_COMPONENT_SOURCE';
 export const ROW_TYPE = 'ROW';
 export const TABS_TYPE = 'TABS';
 export const TAB_TYPE = 'TAB';
-export const TAGS_TYPE = 'TAGS';
 
 export default {
   CHART_TYPE,
@@ -43,5 +42,4 @@ export default {
   ROW_TYPE,
   TABS_TYPE,
   TAB_TYPE,
-  TAGS_TYPE,
 };

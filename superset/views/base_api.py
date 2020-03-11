@@ -21,7 +21,7 @@ from typing import Dict, Tuple
 from flask import request
 from flask_appbuilder import ModelRestApi
 from flask_appbuilder.api import expose, protect, rison, safe
-from flask_appbuilder.models.filters import Filters
+from flask_appbuilder.models.filters import BaseFilter, Filters
 from sqlalchemy.exc import SQLAlchemyError
 
 from superset.exceptions import SupersetSecurityException
@@ -63,6 +63,7 @@ class BaseSupersetModelRestApi(ModelRestApi):
     Extends FAB's ModelResApi to implement specific superset generic functionality
     """
 
+    csrf_exempt = False
     method_permission_name = {
         "get_list": "list",
         "get": "show",
@@ -89,9 +90,25 @@ class BaseSupersetModelRestApi(ModelRestApi):
     Declare the related field field for filtering::
 
         filter_rel_fields_field = {
-            "<RELATED_FIELD>": "<RELATED_FIELD_FIELD>", "<asc|desc>")
+            "<RELATED_FIELD>": "<RELATED_FIELD_FIELD>")
         }
     """  # pylint: disable=pointless-string-statement
+    filter_rel_fields: Dict[str, BaseFilter] = {}
+    """
+    Declare the related field base filter::
+
+        filter_rel_fields_field = {
+            "<RELATED_FIELD>": "<FILTER>")
+        }
+    """  # pylint: disable=pointless-string-statement
+
+    def __init__(self):
+        super().__init__()
+        self.stats_logger = None
+
+    def create_blueprint(self, appbuilder, *args, **kwargs):
+        self.stats_logger = self.appbuilder.get_app.config["STATS_LOGGER"]
+        return super().create_blueprint(appbuilder, *args, **kwargs)
 
     def _init_properties(self):
         model_id = self.datamodel.get_pk_name()
@@ -108,11 +125,17 @@ class BaseSupersetModelRestApi(ModelRestApi):
     def _get_related_filter(self, datamodel, column_name: str, value: str) -> Filters:
         filter_field = self.filter_rel_fields_field.get(column_name)
         filters = datamodel.get_filters([filter_field])
+        base_filters = self.filter_rel_fields.get(column_name)
+        if base_filters:
+            filters = filters.add_filter_list(base_filters)
         if value:
             filters.rest_add_filters(
                 [{"opr": "sw", "col": filter_field, "value": value}]
             )
         return filters
+
+    def incr_stats(self, action: str, func_name: str) -> None:
+        self.stats_logger.incr(f"{self.__class__.__name__}.{func_name}.{action}")
 
     @expose("/related/<column_name>", methods=["GET"])
     @protect()
