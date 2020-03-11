@@ -214,7 +214,13 @@ class Header extends React.PureComponent {
         interval: 0,
         chartCount: chartList.length,
       });
-      return this.props.fetchCharts(chartList, true);
+
+      return this.props.fetchCharts(
+        chartList,
+        true,
+        0,
+        this.props.dashboardInfo.id,
+      );
     }
     return false;
   }
@@ -232,7 +238,12 @@ class Header extends React.PureComponent {
         interval,
         chartCount: affectedCharts.length,
       });
-      return fetchCharts(affectedCharts, true, interval * 0.2);
+      return fetchCharts(
+        affectedCharts,
+        true,
+        interval * 0.2,
+        dashboardInfo.id,
+      );
     };
 
     this.refreshTimer = setPeriodicRunner({

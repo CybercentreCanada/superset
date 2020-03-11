@@ -70,7 +70,10 @@ initialize development environment: ::
     docker-compose up
 
 After several minutes for superset initialization to finish, you can open
-a browser and view `http://localhost:8088` to start your journey.
+a browser and view `http://localhost:8088` to start your journey. By default
+the system configures an admin user with the username of `admin` and a password
+of `admin` - if you are in a non-local environment it is highly recommended to
+change this username and password at your earliest convenience.
 
 From there, the container server will reload on modification of the superset python
 and javascript source code.
@@ -526,7 +529,11 @@ The role and warehouse can be omitted if defaults are defined for the user, i.e.
 
 Make sure the user has privileges to access and use all required
 databases/schemas/tables/views/warehouses, as the Snowflake SQLAlchemy engine does
-not test for user rights during engine creation.
+not test for user/role rights during engine creation by default. However, when
+pressing the "Test Connection" button in the Create or Edit Database dialog,
+user/role credentials are validated by passing `"validate_default_parameters": True`
+to the `connect()` method during engine creation. If the user/role is not authorized
+to access the database, an error is recorded in the Superset logs.
 
 See `Snowflake SQLAlchemy <https://github.com/snowflakedb/snowflake-sqlalchemy>`_.
 
@@ -718,16 +725,9 @@ parameter ::
 Druid
 -----
 
-* From the UI, enter the information about your clusters in the
-  `Sources -> Druid Clusters` menu by hitting the + sign.
-
-* Once the Druid cluster connection information is entered, hit the
-  `Sources -> Refresh Druid Metadata` menu item to populate
-
-* Navigate to your datasources
-
-Note that you can run the ``superset refresh_druid`` command to refresh the
-metadata from your Druid cluster(s)
+The native Druid connector (behind the ``DRUID_IS_ACTIVE`` feature flag)
+is slowly getting deprecated in favor of the SQLAlchemy/DBAPI connector made
+available in the ``pydruid`` library.
 
 Dremio
 ------

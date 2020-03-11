@@ -27,7 +27,6 @@ import {
   ROW_TYPE,
   TABS_TYPE,
   TAB_TYPE,
-  TAGS_TYPE,
 } from './componentTypes';
 
 import {
@@ -52,7 +51,6 @@ const typeToDefaultMetaData = {
   [ROW_TYPE]: { background: BACKGROUND_TRANSPARENT },
   [TABS_TYPE]: null,
   [TAB_TYPE]: { text: 'New Tab' },
-  [TAGS_TYPE]: { width: 3, height: 30 },
 };
 
 function uuid(type) {

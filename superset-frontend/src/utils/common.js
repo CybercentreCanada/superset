@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/* eslint global-require: 0 */
 import { SupersetClient } from '@superset-ui/connection';
-import URI from 'urijs';
 import getClientErrorObject from './getClientErrorObject';
 
 // ATTENTION: If you change any constants, make sure to also change constants.py
@@ -75,9 +73,11 @@ export function getShortUrl(longUrl) {
 }
 
 export function supersetURL(rootUrl, getParams = {}) {
-  const parsedUrl = new URI(rootUrl).absoluteTo(window.location.origin);
-  parsedUrl.search(getParams);
-  return parsedUrl.href();
+  const url = new URL(rootUrl, window.location.origin);
+  for (const k in getParams) {
+    url.searchParams.set(k, getParams[k]);
+  }
+  return url.href;
 }
 
 export function optionLabel(opt) {
