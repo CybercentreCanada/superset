@@ -76,9 +76,6 @@ export function applyDefaultFormData(inputFormData) {
       formData[controlName] = inputFormData[controlName];
     }
   });
-
-  // always use dynamically generated queryFields
-  formData.queryFields = controlFormData.queryFields;
   return formData;
 }
 

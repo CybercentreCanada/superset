@@ -189,7 +189,7 @@ class TableColumn(Model, BaseColumn):
         """
         db_engine_spec = self.table.database.db_engine_spec
         return db_engine_spec.is_db_column_type_match(
-            self.type, utils.DbColumnType.NUMERIC
+            self.type, utils.GenericColumnType.NUMERIC
         )
 
     @property
@@ -199,7 +199,7 @@ class TableColumn(Model, BaseColumn):
         """
         db_engine_spec = self.table.database.db_engine_spec
         return db_engine_spec.is_db_column_type_match(
-            self.type, utils.DbColumnType.STRING
+            self.type, utils.GenericColumnType.STRING
         )
 
     @property
@@ -214,7 +214,7 @@ class TableColumn(Model, BaseColumn):
             return self.is_dttm
         db_engine_spec = self.table.database.db_engine_spec
         return db_engine_spec.is_db_column_type_match(
-            self.type, utils.DbColumnType.TEMPORAL
+            self.type, utils.GenericColumnType.TEMPORAL
         )
 
     def get_sqla_col(self, label: Optional[str] = None) -> Column:

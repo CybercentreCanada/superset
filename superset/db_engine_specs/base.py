@@ -157,34 +157,28 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     max_column_name_length = 0
     try_remove_schema_from_table_name = True  # pylint: disable=invalid-name
 
-    # default matching patterns for identifying column types
-    db_column_types: Dict[utils.DbColumnType, Tuple[Pattern[Any], ...]] = {
-        utils.DbColumnType.NUMERIC: (
+    # default matching patterns to convert database specific column types to
+    # more generic types
+    db_column_types: Dict[utils.GenericColumnType, Tuple[Pattern[Any], ...]] = {
+        utils.GenericColumnType.NUMERIC: (
             re.compile(r"BIT", re.IGNORECASE),
-            re.compile(r".*DOUBLE.*", re.IGNORECASE),
-            re.compile(r".*FLOAT.*", re.IGNORECASE),
-            re.compile(r".*INT.*", re.IGNORECASE),
-            re.compile(r".*NUMBER.*", re.IGNORECASE),
+            re.compile(
+                r".*(DOUBLE|FLOAT|INT|NUMBER|REAL|NUMERIC|DECIMAL|MONEY).*",
+                re.IGNORECASE,
+            ),
             re.compile(r".*LONG$", re.IGNORECASE),
-            re.compile(r".*REAL.*", re.IGNORECASE),
-            re.compile(r".*NUMERIC.*", re.IGNORECASE),
-            re.compile(r".*DECIMAL.*", re.IGNORECASE),
-            re.compile(r".*MONEY.*", re.IGNORECASE),
         ),
-        utils.DbColumnType.STRING: (
-            re.compile(r".*CHAR.*", re.IGNORECASE),
-            re.compile(r".*STRING.*", re.IGNORECASE),
-            re.compile(r".*TEXT.*", re.IGNORECASE),
+        utils.GenericColumnType.STRING: (
+            re.compile(r".*(CHAR|STRING|TEXT).*", re.IGNORECASE),
         ),
-        utils.DbColumnType.TEMPORAL: (
-            re.compile(r".*DATE.*", re.IGNORECASE),
-            re.compile(r".*TIME.*", re.IGNORECASE),
+        utils.GenericColumnType.TEMPORAL: (
+            re.compile(r".*(DATE|TIME).*", re.IGNORECASE),
         ),
     }
 
     @classmethod
     def is_db_column_type_match(
-        cls, db_column_type: Optional[str], target_column_type: utils.DbColumnType
+        cls, db_column_type: Optional[str], target_column_type: utils.GenericColumnType
     ) -> bool:
         """
         Check if a column type satisfies a pattern in a collection of regexes found in

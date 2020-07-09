@@ -162,6 +162,8 @@ class QueryContext:
         df = payload["df"]
         status = payload["status"]
         if status != utils.QueryStatus.FAILED:
+            payload["columns"] = list(df.columns)
+            payload["column_types"] = utils.serialize_dtypes(df.dtypes)
             payload["data"] = self.get_data(df)
         del payload["df"]
 

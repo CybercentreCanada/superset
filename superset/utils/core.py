@@ -37,7 +37,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from enum import Enum
+from enum import Enum, IntEnum
 from time import struct_time
 from timeit import default_timer
 from types import TracebackType
@@ -1424,6 +1424,19 @@ def get_column_names_from_metrics(metrics: List[Metric]) -> List[str]:
             columns.append(column_name)
     return columns
 
+def serialize_dtypes(dtypes: List[np.dtype]) -> List[GenericColumnType]:
+    """Serialize pandas/numpy dtypes to JavaScript types"""
+    mapping = {
+        'object': GenericColumnType.STRING,
+        'category': GenericColumnType.STRING,
+        'datetime64[ns]': GenericColumnType.TEMPORAL,
+        'int64': GenericColumnType.NUMERIC,
+        'in32': GenericColumnType.NUMERIC,
+        'float64': GenericColumnType.NUMERIC,
+        'float32': GenericColumnType.NUMERIC,
+        'bool': GenericColumnType.BOOLEAN,
+    }
+    return [mapping.get(str(x), GenericColumnType.STRING) for x in dtypes]
 
 def indexed(
     items: List[Any], key: Union[str, Callable[[Any], Any]]
@@ -1483,14 +1496,15 @@ class QuerySource(Enum):
     SQL_LAB = 2
 
 
-class DbColumnType(Enum):
+class GenericColumnType(IntEnum):
     """
-    Generic database column type
+    Generic database column type that fits both frontend and backend.
     """
 
     NUMERIC = 0
     STRING = 1
     TEMPORAL = 2
+    BOOLEAN = 3
 
 
 class QueryMode(str, LenientEnum):
