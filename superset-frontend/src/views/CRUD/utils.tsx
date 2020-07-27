@@ -33,7 +33,7 @@ export const createFetchRelated = (
   try {
     const queryParams = rison.encode({
       ...(pageIndex ? { page: pageIndex } : {}),
-      ...(pageSize ? { page_ize: pageSize } : {}),
+      ...(pageSize ? { page_size: pageSize } : {}),
       ...(filterValue ? { filter: filterValue } : {}),
     });
     const { json = {} } = await SupersetClient.get({
