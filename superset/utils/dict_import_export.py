@@ -17,7 +17,7 @@
 import logging
 import re
 import unicodedata
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from sqlalchemy.orm import Session
 
