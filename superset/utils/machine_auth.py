@@ -17,11 +17,18 @@
 
 import importlib
 import logging
+from tempfile import NamedTemporaryFile
 from typing import Callable, Dict, TYPE_CHECKING
+from urllib.parse import urlparse
 
+import requests
 from flask import current_app, Flask, request, Response, session
 from flask_login import login_user
+from selenium import webdriver
+from selenium.webdriver import FirefoxOptions
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from werkzeug.http import parse_cookie
 
 from superset.utils.urls import headless_url
@@ -49,8 +56,29 @@ class MachineAuthProvider:
         if self._auth_webdriver_func_override:
             return self._auth_webdriver_func_override(driver, user)
 
+        print("\n\n i am user:{}".format(user))
+        with NamedTemporaryFile() as file:
+            file.write(
+                requests.get(
+                    "https://github.com/bewisse/modheader_selenium/blob/master/firefox-modheader/modheader.xpi?raw=true"
+                ).content
+            )
+
+            driver.install_addon(file.name)
+
+        print("\n\n setting header \n\n")
+        driver.get(
+            "https://webdriver.bewisse.com/add?X-Internalauth-Username=svc_di_analytics_products"
+        )
+        WebDriverWait(driver, 10).until(EC.title_is("Done"))
+        print("\n\n installed")
+
         # Setting cookies requires doing a request first
         driver.get(headless_url("/login/"))
+        driver.find_element_by_tag_name("button").click()
+
+        print("\n\n i am url:{}\n\n".format(driver.current_url))
+        print("\n\n i am page source:{}".format(driver.page_source))
 
         if user:
             cookies = self.get_auth_cookies(user)
@@ -59,6 +87,7 @@ class MachineAuthProvider:
         else:
             cookies = {}
 
+        print(f"\n\n i am cookies:{cookies}")
         for cookie_name, cookie_val in cookies.items():
             driver.add_cookie(dict(name=cookie_name, value=cookie_val))
 

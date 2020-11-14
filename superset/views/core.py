@@ -1669,6 +1669,7 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
         # set a default value to appease pylint
         update_log_payload: Callable[..., None] = lambda **kwargs: None,
     ) -> FlaskResponse:
+        print(f"\n\n got headers: {request.headers}\n\n")
         """Server side rendering for a dashboard"""
         session = db.session()
         qry = session.query(Dashboard)
