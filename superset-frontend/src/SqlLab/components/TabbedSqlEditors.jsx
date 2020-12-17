@@ -31,6 +31,7 @@ import { areArraysShallowEqual } from 'src/reduxUtils';
 import * as Actions from '../actions/sqlLab';
 import SqlEditor from './SqlEditor';
 import TabStatusIcon from './TabStatusIcon';
+import { codePointAt } from 'spec/__mocks__/fileMock';
 
 const propTypes = {
   actions: PropTypes.object.isRequired,
@@ -116,6 +117,24 @@ class TabbedSqlEditors extends React.PureComponent {
     }
 
     // merge post form data with GET search params
+    console.log('in tabbedSqlEditors', this.props.requestedQuery);
+    // const appContainer = document.getElementById('app');
+    // const bootstrapData = JSON.parse(
+    //   appContainer?.getAttribute('data-bootstrap') || '{}',
+    // );
+    // let query;
+    // if (bootstrapData.requested_query !== undefined) {
+    //   query = {
+    //     ...bootstrapData.requested_query,
+    //     ...URI(window.location).search(true),
+    //   };
+    // } else {
+    //   query = {
+    //     ...this.props.requestedQuery,
+    //     ...URI(window.location).search(true),
+    //   };
+    // }
+
     const query = {
       ...this.props.requestedQuery,
       ...URI(window.location).search(true),
@@ -412,7 +431,8 @@ class TabbedSqlEditors extends React.PureComponent {
 TabbedSqlEditors.propTypes = propTypes;
 TabbedSqlEditors.defaultProps = defaultProps;
 
-function mapStateToProps({ sqlLab, common, requestedQuery }) {
+function mapStateToProps({ sqlLab, common }) {
+  console.log('in mapStateToProps', sqlLab);
   return {
     databases: sqlLab.databases,
     queryEditors: sqlLab.queryEditors,
@@ -426,7 +446,7 @@ function mapStateToProps({ sqlLab, common, requestedQuery }) {
     maxRow: common.conf.SQL_MAX_ROW,
     saveQueryWarning: common.conf.SQLLAB_SAVE_WARNING_MESSAGE,
     scheduleQueryWarning: common.conf.SQLLAB_SCHEDULE_WARNING_MESSAGE,
-    requestedQuery,
+    requestedQuery: sqlLab.requestedQuery,
   };
 }
 function mapDispatchToProps(dispatch) {

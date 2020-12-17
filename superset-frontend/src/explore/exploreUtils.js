@@ -245,6 +245,7 @@ export function postForm(url, payload, target = '_blank') {
   data.value = safeStringify(payload);
   hiddenForm.appendChild(data);
 
+  console.log(hiddenForm);
   document.body.appendChild(hiddenForm);
   hiddenForm.submit();
   document.body.removeChild(hiddenForm);

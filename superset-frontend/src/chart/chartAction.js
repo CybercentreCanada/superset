@@ -481,6 +481,7 @@ export function postChartFormData(
 }
 
 export function redirectSQLLab(formData) {
+  console.log('formData', formData);
   return dispatch => {
     getChartDataRequest({ formData, resultFormat: 'json', resultType: 'query' })
       .then(({ result }) => {

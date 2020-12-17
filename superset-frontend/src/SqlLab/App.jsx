@@ -49,7 +49,10 @@ const bootstrapData = JSON.parse(appContainer.getAttribute('data-bootstrap'));
 
 initFeatureFlags(bootstrapData.common.feature_flags);
 
+console.log('in App', bootstrapData);
 const initialState = getInitialState(bootstrapData);
+console.log('in App initialState', initialState);
+
 const sqlLabPersistStateConfig = {
   paths: ['sqlLab'],
   config: {

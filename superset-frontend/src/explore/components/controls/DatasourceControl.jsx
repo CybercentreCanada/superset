@@ -144,6 +144,7 @@ class DatasourceControl extends React.PureComponent {
       this.toggleEditDatasourceModal();
     }
     if (key === VIEW_IN_SQL_LAB) {
+      console.log('hitting this line of code');
       const { datasource } = this.props;
       const payload = {
         datasourceKey: `${datasource.id}__${datasource.type}`,

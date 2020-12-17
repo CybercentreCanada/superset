@@ -170,6 +170,7 @@ export default function getInitialState({
     }
   }
 
+  console.log('in initialState', requestedQuery);
   return {
     sqlLab: {
       activeSouthPaneTab: 'Results',
@@ -182,8 +183,8 @@ export default function getInitialState({
       tables,
       queriesLastUpdate: Date.now(),
       user,
+      requestedQuery,
     },
-    requestedQuery,
     messageToasts: getToastsFromPyFlashMessages(
       (common || {}).flash_messages || [],
     ),
