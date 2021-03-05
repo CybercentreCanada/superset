@@ -13,7 +13,7 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '0f6808c3-1749-435d-b894-32e5c4d8e77b'
-  imageRepository: 'cccssuperset'
+  imageRepository: 'cccs/superset'
   containerRegistry: 'uchimera.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
