@@ -90,6 +90,8 @@
     "@superset-ui/legacy-preset-chart-deckgl": "^0.4.1",
     "@superset-ui/legacy-preset-chart-nvd3": "^0.17.5",
     "@superset-ui/plugin-chart-echarts": "^0.17.6",
+    "@superset-ui/plugin-chart-hello-world": "file:./plugins/plugin-chart-hello-world",
+    "@superset-ui/plugin-chart-assemblyline": "file:./plugins/plugin-chart-assemblyline",
     "@superset-ui/plugin-chart-table": "^0.17.6",
     "@superset-ui/plugin-chart-word-cloud": "^0.17.5",
     "@superset-ui/preset-chart-xy": "^0.17.5",

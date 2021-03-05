@@ -65,6 +65,10 @@ import {
 } from 'src/filters/components/';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
+//import { HelloWorldChartPlugin } from '@superset-ui/plugins/plugin-chart-hello-world';
+//import { AssemblylineChartPlugin } from '@superset-ui/plugin-chart-assemblyline';
+import { HelloWorldChartPlugin } from '../../../plugins/plugin-chart-hello-world';
+import { AssemblylineChartPlugin } from '../../../plugin-chart-assemblyline';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -72,6 +76,9 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new HelloWorldChartPlugin().configure({ key: 'hello_world' }),
+        new AssemblylineChartPlugin().configure({key: 'test_assemblyline'}),
+      
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
         new BigNumberChartPlugin().configure({ key: 'big_number' }),
