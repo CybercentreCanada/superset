@@ -31,7 +31,7 @@ stages:
       vmImage: $(vmImageName)
     steps:
     - checkout: self
-    - checkout: git://MyProject/MyRepo
+    - checkout: git://CybercentreCanada/hogwarts-superset-deployment
 
     - task: Npm@1
       inputs:
