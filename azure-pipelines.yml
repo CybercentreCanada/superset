@@ -1,10 +1,4 @@
 # Docker
-resources:
-  repositories:
-  - repository: MyGitHubRepo # The name used to reference this repository in the checkout step
-    type: github
-    endpoint: MyGitHubServiceConnection
-    name:  cccs-jc/superset-ui 
 
 # Build and push an image to Azure Container Registry
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
@@ -37,7 +31,8 @@ stages:
       vmImage: $(vmImageName)
     steps:
     - checkout: self
-    - checkout: MyGitHubRepo
+    - checkout: git://MyProject/MyRepo
+
     - task: Npm@1
       inputs:
         command: 'install'
