@@ -37,8 +37,10 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: $(imageRepository)
+        repository: cccs/superset
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          $(BRANCH_NAME)
+          $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+
