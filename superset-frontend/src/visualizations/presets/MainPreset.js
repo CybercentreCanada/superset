@@ -69,6 +69,8 @@ import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
 import { HelloWorldChartPlugin } from '../../../plugins/plugin-chart-hello-world';
 //import { AssemblylineChartPlugin } from '@superset-ui/plugin-chart-assemblyline';
 import { AssemblylineChartPlugin } from '../../../plugins/plugin-chart-assemblyline';
+//import { DataGridChartPlugin } from '@superset-ui/plugin-chart-data-grid';
+import { DataGridlineChartPlugin } from '../../../plugins/plugin-chart-data-grid';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -78,6 +80,7 @@ export default class MainPreset extends Preset {
       plugins: [
         new HelloWorldChartPlugin().configure({ key: 'hello_world' }),
         new AssemblylineChartPlugin().configure({key: 'test_assemblyline'}),
+        new DataGridChartPlugin().configure({key: 'data_grid'}),
       
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
