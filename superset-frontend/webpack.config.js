@@ -153,7 +153,7 @@ if (isDevMode) {
   // otherwise the websocket client will initialize twice, creating two sockets.
   // Ref: https://github.com/gaearon/react-hot-loader/issues/141
   PREAMBLE.unshift(
-    `webpack-dev-server/client?http://localhost:${devserverPort}`,
+    `webpack-dev-server/client?http://0.0.0.0:${devserverPort}`,
   );
 }
 
