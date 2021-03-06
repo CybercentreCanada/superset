@@ -54,15 +54,16 @@ export default function transformProps(chartProps: ChartProps) {
   const data = queriesData[0].data as TimeseriesDataRecord[];
 
   const columns = datasource?.columns as Column[];
-  
+
   console.log('formData via TransformProps.ts', formData);
 
-  const columnMap = new Map<string, Column>();
-  
-  columns.reduce(function (columnMap, obj: Column) {
-   // columnMap[obj.columnName] = obj;
+  const columnTypeMap = new Map<string, string>();
+
+  columns.reduce(function (columnMap, column: Column) {
+    const name = column['column_name'];
+    columnMap[name] = column.type;
     return columnMap;
-  }, columnMap);
+  }, columnTypeMap);
 
   const formColumns = formData.columns as any;
 
@@ -70,13 +71,15 @@ export default function transformProps(chartProps: ChartProps) {
     return ({
       field: c,
       minWidth: 50,
-      // cellRenderer: columnMap.get(c)?.type == 'IPV4' ? 'ipv4ValueRenderer' : 
-      //             columnMap.get(c)?.type == 'IPV6' ? 'ipv6ValueRenderer' : 
-      //             columnMap.get(c)?.type == 'DOMAIN' ? 'domainValueRenderer' :
-      //               undefined,
+      cellRenderer: columnTypeMap[c] == 'IPV4' ? 'ipv4ValueRenderer' :
+        columnTypeMap[c] == 'IPV6' ? 'ipv6ValueRenderer' :
+          columnTypeMap[c] == 'DOMAIN' ? 'domainValueRenderer' :
+            undefined,
       sortable: true,
     });
   });
+
+  console.log(columnDefs);
 
   return {
     width,
