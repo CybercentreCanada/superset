@@ -18,6 +18,8 @@
  */
 import { ChartProps, Column, TimeseriesDataRecord } from '@superset-ui/core';
 
+
+
 export default function transformProps(chartProps: ChartProps) {
   /**
    * This function is called after a successful response has been
@@ -59,8 +61,10 @@ export default function transformProps(chartProps: ChartProps) {
   const columnTypeMap = new Map<string, string>();
 
   columns.reduce(function (columnMap, column: Column) {
-    //const name = column['column_name'];
-    //columnMap[name] = column.type;
+    // @ts-ignore
+    const name = column['column_name'];
+    // @ts-ignore
+    columnMap[name] = column.type;
     return columnMap;
   }, columnTypeMap);
 
@@ -70,10 +74,13 @@ export default function transformProps(chartProps: ChartProps) {
     return {
       field: c,
       minWidth: 50,
-      // cellRenderer: columnTypeMap[c] == 'IPV4' ? 'ipv4ValueRenderer' :
-      //   columnTypeMap[c] == 'IPV6' ? 'ipv6ValueRenderer' :
-      //     columnTypeMap[c] == 'DOMAIN' ? 'domainValueRenderer' :
-      //       undefined,
+      // @ts-ignore
+      cellRenderer: columnTypeMap[c] == 'IPV4' ? 'ipv4ValueRenderer' :
+      // @ts-ignore
+      columnTypeMap[c] == 'IPV6' ? 'ipv6ValueRenderer' :
+      // @ts-ignore
+      columnTypeMap[c] == 'DOMAIN' ? 'domainValueRenderer' :
+              undefined,
       sortable: true,
     };
   });
