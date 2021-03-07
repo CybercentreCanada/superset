@@ -2502,7 +2502,7 @@
         "affectsGlobalScope": false
       },
       "./src/plugin/transformProps.ts": {
-        "version": "26189ade4aaa23ee8bf2625e217a759deb65eb9872b14edd9a54f82485020453",
+        "version": "3d60ddbcf21a553d1b46dee8c1850523fbd651eba535806d8232437d0d3a9caf",
         "signature": "3173c1fe79a21bf8537b9b8fcd0f727a63f72565ffeeacc41a1c3f62e606aa0d",
         "affectsGlobalScope": false
       },

@@ -66,11 +66,11 @@ import {
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
 //import { HelloWorldChartPlugin } from '@superset-ui/plugin-chart-hello-world';
-import { HelloWorldChartPlugin } from '../../../cccs-vi/plugins/plugin-chart-hello-world';
+import { HelloWorldChartPlugin } from '../../../cccs-viz/plugins/plugin-chart-hello-world';
 //import { AssemblylineChartPlugin } from '@superset-ui/plugin-chart-assemblyline';
-import { AssemblylineChartPlugin } from '../../../cccs-vi/plugins/plugin-chart-assemblyline';
+import { AssemblylineChartPlugin } from '../../../cccs-viz/plugins/plugin-chart-assemblyline';
 //import { DataGridChartPlugin } from '@superset-ui/plugin-chart-data-grid';
-import { DataGridChartPlugin } from '../../../cccs-vi/plugins/plugin-chart-data-grid';
+import { DataGridChartPlugin } from '../../../cccs-viz/plugins/plugin-chart-data-grid';
 
 export default class MainPreset extends Preset {
   constructor() {
