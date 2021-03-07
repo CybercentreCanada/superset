@@ -61,6 +61,11 @@ RUN /frontend-mem-nag.sh \
 
 # Next, copy in the rest and let webpack do its thing
 COPY ./superset-frontend /app/superset-frontend
+# Build cccs-viz
+RUN cd /app/superset-frontend/cccs-viz \
+        && npm install \
+        && yarn build \
+        && rm -rf node_modules
 # This is BY FAR the most expensive step (thanks Terser!)
 RUN cd /app/superset-frontend \
         && npm run ${BUILD_CMD} \
