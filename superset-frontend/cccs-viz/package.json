@@ -107,7 +107,6 @@
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.0",
     "global-box": "^1.2.0",
-    "husky": "^4.2.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.6.3",
     "jest-environment-enzyme": "^7.1.2",
@@ -154,12 +153,6 @@
     "last 3 safari versions",
     "last 3 edge versions"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "./scripts/commitlint.js HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md}": [
       "prettier --write"
