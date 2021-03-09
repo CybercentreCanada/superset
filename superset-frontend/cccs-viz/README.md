@@ -39,7 +39,7 @@ yo @superset-ui/superset
 Modifying your custom viz
 =====================
 
-Edit `superset-build/superset/superset-frontend/package.json` and add the followin line.
+Edit `superset/superset-frontend/package.json` and add the followin line.
 
 ```diff
 
