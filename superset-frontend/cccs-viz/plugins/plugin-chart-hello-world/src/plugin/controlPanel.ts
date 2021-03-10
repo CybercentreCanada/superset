@@ -27,6 +27,7 @@ import {
   ControlStateMapping,
   ControlPanelConfig,
   ControlPanelsContainerProps,
+  sections,
 } from '@superset-ui/chart-controls';
 
 import cidrRegex from 'cidr-regex';
@@ -131,6 +132,7 @@ const config: ControlPanelConfig = {
 
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
+    sections.legacyTimeseriesTime,
     {
       label: t('Query'),
       expanded: true,
