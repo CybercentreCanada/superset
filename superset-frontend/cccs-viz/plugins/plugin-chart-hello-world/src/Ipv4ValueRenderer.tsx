@@ -29,7 +29,10 @@ export default class Ipv4ValueRenderer extends Component<{}, { cellValue: any }>
 
   render() {
 
-    const ipString = this.formatIpV4(this.state.cellValue);
+    let ipString = this.state.cellValue;
+    if (typeof this.state.cellValue == "number") {
+      ipString = this.formatIpV4(this.state.cellValue);
+    }
 
     return (
       <span>
