@@ -17,6 +17,7 @@ variables:
   containerRegistry: 'uchimera.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
+  buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -32,6 +33,9 @@ stages:
     steps:
     - checkout: self
 
+    - bash: |
+        BRANCH_NAME=`echo "$SYSTEM_PULLREQUEST_SOURCEBRANCH $BUILD_SOURCEBRANCH" | sed -r 's/^\s*(refs\/heads\/)?(\S*).*$/\2/' | sed 's/\//_/g'`
+        echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
 
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -41,5 +45,6 @@ stages:
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          latest
+          $(BRANCH_NAME)
+          $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
 
