@@ -113,7 +113,8 @@ Make sure to point package install dir
 
 ```
 
-You can test that the cccs-viz plugins will build in docker.
+It's important to know that the docker-compose uses the files of the host system so you absolutely need to build your cccs-viz inside your git clone.
+
 
 This will create the esm and lib files.
 ```bash
@@ -123,7 +124,7 @@ npm install
 yarn build
 
 ```
-Build the frontend
+The same goes for the frontend it will use those files so you need to build the frontend
 ```
 
 cd superset/superset-frontend
