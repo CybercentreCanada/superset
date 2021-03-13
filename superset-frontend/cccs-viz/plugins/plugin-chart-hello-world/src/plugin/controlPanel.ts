@@ -30,7 +30,7 @@ import {
   sections,
 } from '@superset-ui/chart-controls';
 
-import cidrRegex from 'cidr-regex';
+//import cidrRegex from 'cidr-regex';
 
 
 
@@ -61,15 +61,6 @@ function isQueryMode(mode: QueryMode) {
 const isAggMode = isQueryMode(QueryMode.aggregate);
 const isRawMode = isQueryMode(QueryMode.raw);
 
-function getDataSourceSql(controls: ControlStateMapping): QueryMode {
-  return controls?.datasource?.datasource?.sql;
-}
-
-function datasourceAcceptsParam(paramType: string) {
-  return ({ controls }: ControlPanelsContainerProps) => getDataSourceSql(controls)?.includes(paramType);
-}
-
-const datasourceAcceptsIpParam = datasourceAcceptsParam('_ipv4_parameter_');
 
 
 const queryMode: ControlConfig<'RadioButtonControl'> = {
@@ -93,7 +84,8 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
 
 
 
-
+/*
+keep this code, we will use it in input validators once we know how to hook them into the ad-hoc filter
 
 function isIP(v: unknown) {
   if (typeof v === 'string' && v.trim().length > 0) {
@@ -125,8 +117,7 @@ function validateIP(v: unknown) {
   return ('is expected to be an ip address or cidr');
 }
 
-
-
+*/
 const config: ControlPanelConfig = {
 
 
@@ -137,36 +128,14 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        [
-          {
-            name: '_ipv4_parameter_',
-            config: {
-              type: 'SelectControl',
-              label: t('IP Params'),
-              default: [],
-              multi: true,
-              allowClear: true,
-              freeForm: true,
-              allowAll: true,
-              tokenSeparators: [' ', ',', '\n', '\t', ';'],
-              validators: [validateIP],
-              renderTrigger: false,
-              description: t('The IPs or CIDRs to filter'),
-              visibility: datasourceAcceptsIpParam,
-            }
+      [
+        {
+          name: 'query_mode',
+          config: queryMode,
+        },
+      ],
 
-          },
-
-        ],
-
-        [
-          {
-            name: 'query_mode',
-            config: queryMode,
-          },
-        ],
-
-        [
+      [
           {
             name: 'metrics',
             override: {
@@ -283,6 +252,12 @@ const config: ControlPanelConfig = {
     series: {
       validators: [validateNonEmpty],
       clearable: false,
+    },
+     viz_type: {
+       default: 'hello_world'
+    },
+    time_range: {
+        default: t('Last day'),
     },
     row_limit: {
       default: 100,
