@@ -28,10 +28,11 @@ import {
   ControlPanelConfig,
   ControlPanelsContainerProps,
   sections,
+  ControlState,
 } from '@superset-ui/chart-controls';
 
-//import cidrRegex from 'cidr-regex';
 
+import cidrRegex from 'cidr-regex';
 
 
 
@@ -84,8 +85,6 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
 
 
 
-/*
-keep this code, we will use it in input validators once we know how to hook them into the ad-hoc filter
 
 function isIP(v: unknown) {
   if (typeof v === 'string' && v.trim().length > 0) {
@@ -114,10 +113,51 @@ function validateIP(v: unknown) {
     }
   }
 
-  return ('is expected to be an ip address or cidr');
+  return (' is expected to be an ip address or cidr');
 }
 
-*/
+// filters is an array of adhoc filter with the following attributes
+// f.subject is the column name for example SRC_PORT
+// f.comparator is the value being tested, it can be a single value for operators like !=, >, <= etc
+// or it can be an array of values for example when the IN or NOT IN operator is used.
+// state is the current state of the adhoc filter control it includes
+// a copy of the columns as defined in the dataset model
+function adhocFilterValidator(filters: unknown, state: ControlState) {
+  if (Array.isArray(filters)) {
+    for (let i = 0; i < filters.length; i++) {
+      const filter = filters[i];
+      // Find the corresponding column in the model
+      const column = state.columns.find((c: any) => c.column_name == filter.subject);
+      if (typeof column !== 'undefined' && typeof column.type !== 'undefined') {
+        // Currently supporting 2 types of columns
+        // IPV4
+        // IPV4 FILTER
+        if (column.type.includes('IPV4')) {
+          const v = filter.comparator;
+          // check single value
+          if (typeof v === 'string' && v.trim().length > 0) {
+            const error = validateIP(v.trim());
+            if (error) {
+              return filter.subject + error;
+            }
+          }
+          // check array of values
+          else if (Array.isArray(v)) {
+            for (let index = 0; index < v.length; index++) {
+              const element = v[index];
+              const error = validateIP(element.trim());
+              if (error) {
+                return filter.subject + error;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
 const config: ControlPanelConfig = {
 
 
@@ -128,14 +168,14 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-      [
-        {
-          name: 'query_mode',
-          config: queryMode,
-        },
-      ],
+        [
+          {
+            name: 'query_mode',
+            config: queryMode,
+          },
+        ],
 
-      [
+        [
           {
             name: 'metrics',
             override: {
@@ -180,7 +220,14 @@ const config: ControlPanelConfig = {
           },
         ],
 
-        ['adhoc_filters'],
+        [
+          {
+            name: 'adhoc_filters',
+            override: {
+              validators: [adhocFilterValidator],
+            }
+          }
+        ],
         [
           {
             name: 'row_limit',
@@ -253,11 +300,11 @@ const config: ControlPanelConfig = {
       validators: [validateNonEmpty],
       clearable: false,
     },
-     viz_type: {
-       default: 'hello_world'
+    viz_type: {
+      default: 'hello_world'
     },
     time_range: {
-        default: t('Last day'),
+      default: t('Last day'),
     },
     row_limit: {
       default: 100,
