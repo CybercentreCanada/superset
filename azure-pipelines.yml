@@ -5,7 +5,8 @@
 
 
 trigger:
-- master
+- develop
+- release
 
 resources:
 - repo: self
