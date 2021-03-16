@@ -295,6 +295,7 @@ const config: ControlPanelConfig = {
     },
   ],
 
+  // override controls that are inherited by the default configuration
   controlOverrides: {
     series: {
       validators: [validateNonEmpty],
@@ -305,9 +306,6 @@ const config: ControlPanelConfig = {
     },
     time_range: {
       default: t('Last day'),
-    },
-    row_limit: {
-      default: 100,
     },
   },
 };
