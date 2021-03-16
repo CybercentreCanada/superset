@@ -113,15 +113,18 @@ function validateIP(v: unknown) {
     }
   }
 
-  return (' is expected to be an ip address or cidr');
+  return (' is expected to be an IP address in dotted decimal or CIDR notation');
 }
 
-// filters is an array of adhoc filter with the following attributes
-// f.subject is the column name for example SRC_PORT
-// f.comparator is the value being tested, it can be a single value for operators like !=, >, <= etc
-// or it can be an array of values for example when the IN or NOT IN operator is used.
-// state is the current state of the adhoc filter control it includes
-// a copy of the columns as defined in the dataset model
+/**
+ * Validates the adhoc filter control. Each filter has a subject (the column name for example SRC_PORT) and a comparator (the value being tested),
+ * it can be a single value for operators like !=, >, <= etc
+ * or it can be an array of values for example when the IN or NOT IN operator is used.
+ * 
+ * @param filters an array of adhoc filter with the following attributes
+ * @param state the current state of the adhoc filter control it includes a copy of the columns as defined in the dataset model
+ * @returns a string explaining the reason why the control is in an invalid state or false if there is no errors
+ */
 function adhocFilterValidator(filters: unknown, state: ControlState) {
   if (Array.isArray(filters)) {
     for (let i = 0; i < filters.length; i++) {
@@ -152,6 +155,8 @@ function adhocFilterValidator(filters: unknown, state: ControlState) {
             }
           }
         }
+        // else we assume the value is okay
+        // more type validators can be added here
       }
     }
   }
