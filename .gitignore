@@ -89,3 +89,8 @@ release.json
 messages.mo
 
 docker/requirements-local.txt
+
+
+# ignore cccs-viz built folders
+esm/
+lib/

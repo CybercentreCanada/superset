@@ -61,6 +61,9 @@
   },
   "homepage": "https://superset.apache.org/",
   "dependencies": {
+    "@superset-ui/plugin-chart-hello-world": "file:./cccs-viz/plugins/plugin-chart-hello-world",
+    "@superset-ui/plugin-chart-assemblyline": "file:./cccs-viz/plugins/plugin-chart-assemblyline",
+    "@superset-ui/plugin-chart-data-grid": "file:./cccs-viz/plugins/plugin-chart-data-grid",
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime-corejs3": "^7.12.5",
     "@data-ui/sparkline": "^0.0.84",
