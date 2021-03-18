@@ -44,3 +44,12 @@ superset-frontend/cypress-base/
 superset-frontend/coverage/
 superset/static/assets/
 venv
+
+
+
+
+# cccs-viz customizations
+superset-frontend/node_modules
+superset-frontend/cccs-viz/node_modules
+# cccs-viz customizations
+
