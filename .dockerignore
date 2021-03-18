@@ -49,7 +49,7 @@ venv
 
 
 # cccs-viz customizations
-superset-frontend/node_modules
-superset-frontend/cccs-viz/node_modules
+superset-frontend/node_modules/
+superset-frontend/cccs-viz/node_modules/
 # cccs-viz customizations
 
