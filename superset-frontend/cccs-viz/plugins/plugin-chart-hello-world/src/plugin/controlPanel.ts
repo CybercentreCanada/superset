@@ -85,12 +85,11 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
 
 
 
-
 function isIP(v: unknown) {
   if (typeof v === 'string' && v.trim().length > 0) {
     //console.log(v.trim());
     // Test IP
-    if (/^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/.test(v.trim())) {
+    if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(v.trim())) {
       return true;
     }
     // Test CIDR
