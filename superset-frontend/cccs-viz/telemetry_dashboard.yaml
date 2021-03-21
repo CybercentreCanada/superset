@@ -1,0 +1,1000 @@
+{"dashboards":[
+{
+  "__Dashboard__": {
+    "css": "",
+    "dashboard_title": "CCCS Telemery",
+    "description": null,
+    "json_metadata": "{\"timed_refresh_immune_slices\": [], \"filter_scopes\": {\"469\": {\"IP\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}, \"SRC_IP\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}, \"DST_IP\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}, \"DOMAIN\": {\"scope\": [\"ROOT_ID\"], \"immune\": []}}}, \"expanded_slices\": {}, \"refresh_frequency\": 0, \"default_filters\": \"{}\", \"color_scheme\": null, \"remote_id\": 64}",
+    "position_json": "{\"CHART-0cTCyqArG0\":{\"children\":[],\"id\":\"CHART-0cTCyqArG0\",\"meta\":{\"chartId\":12228,\"height\":50,\"sliceName\":\"AAD Domains\",\"uuid\":\"19fc835a-9d2a-49b4-86a5-ae91e8ae869f\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-vZJo7PML0g\"],\"type\":\"CHART\"},\"CHART-CNPfnEAmfD\":{\"children\":[],\"id\":\"CHART-CNPfnEAmfD\",\"meta\":{\"chartId\":12227,\"height\":50,\"sliceName\":\"Network Traffic\",\"uuid\":\"2738322a-c9dd-4312-80ed-24fd2affb599\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-J2NJoE77g-\"],\"type\":\"CHART\"},\"CHART-EBjm48Yaj7\":{\"children\":[],\"id\":\"CHART-EBjm48Yaj7\",\"meta\":{\"chartId\":12230,\"height\":50,\"sliceName\":\"Http Requests\",\"uuid\":\"a91e34c1-ebc5-47b7-87b0-eb523253dda2\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-J2NJoE77g-\"],\"type\":\"CHART\"},\"CHART-JG6nVj8XBi\":{\"children\":[],\"id\":\"CHART-JG6nVj8XBi\",\"meta\":{\"chartId\":12232,\"height\":50,\"sliceName\":\"Geolocation\",\"uuid\":\"af687448-16fe-46c1-a2f9-8f0b2aff36c3\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-bw2i65eNai\"],\"type\":\"CHART\"},\"CHART-ViKc7xLPK8\":{\"children\":[],\"id\":\"CHART-ViKc7xLPK8\",\"meta\":{\"chartId\":469,\"height\":50,\"sliceName\":\"Filterbox\",\"uuid\":\"76101c03-47bd-4fa3-af0d-f7095992ba44\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-J2NJoE77g-\"],\"type\":\"CHART\"},\"CHART-fQoI75WasX\":{\"children\":[],\"id\":\"CHART-fQoI75WasX\",\"meta\":{\"chartId\":12231,\"height\":50,\"sliceName\":\"Assemblyline\",\"uuid\":\"6f67c803-10dd-456e-8ded-540b38d55c0e\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-vZJo7PML0g\"],\"type\":\"CHART\"},\"CHART-ownj7sVKu4\":{\"children\":[],\"id\":\"CHART-ownj7sVKu4\",\"meta\":{\"chartId\":12229,\"height\":50,\"sliceName\":\"AAD User Actions\",\"uuid\":\"58862f11-e43e-4051-92bb-bbf9621ad57a\",\"width\":4},\"parents\":[\"ROOT_ID\",\"GRID_ID\",\"ROW-vZJo7PML0g\"],\"type\":\"CHART\"},\"DASHBOARD_VERSION_KEY\":\"v2\",\"DIVIDER-3fXM7UYsso\":{\"children\":[],\"id\":\"DIVIDER-3fXM7UYsso\",\"meta\":{},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"DIVIDER\"},\"GRID_ID\":{\"children\":[\"ROW-J2NJoE77g-\",\"ROW-vZJo7PML0g\",\"DIVIDER-3fXM7UYsso\",\"ROW-bw2i65eNai\"],\"id\":\"GRID_ID\",\"parents\":[\"ROOT_ID\"],\"type\":\"GRID\"},\"HEADER_ID\":{\"id\":\"HEADER_ID\",\"meta\":{\"text\":\"CCCS Telemery\"},\"type\":\"HEADER\"},\"ROOT_ID\":{\"children\":[\"GRID_ID\"],\"id\":\"ROOT_ID\",\"type\":\"ROOT\"},\"ROW-J2NJoE77g-\":{\"children\":[\"CHART-ViKc7xLPK8\",\"CHART-CNPfnEAmfD\",\"CHART-EBjm48Yaj7\"],\"id\":\"ROW-J2NJoE77g-\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"},\"ROW-bw2i65eNai\":{\"children\":[\"CHART-JG6nVj8XBi\"],\"id\":\"ROW-bw2i65eNai\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"},\"ROW-vZJo7PML0g\":{\"children\":[\"CHART-ownj7sVKu4\",\"CHART-0cTCyqArG0\",\"CHART-fQoI75WasX\"],\"id\":\"ROW-vZJo7PML0g\",\"meta\":{\"background\":\"BACKGROUND_TRANSPARENT\"},\"parents\":[\"ROOT_ID\",\"GRID_ID\"],\"type\":\"ROW\"}}",
+    "slices": [
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.FilterDataSet",
+          "datasource_type": "table",
+          "id": 469,
+          "params": "{\"adhoc_filters\": [], \"datasource\": \"32__table\", \"date_filter\": false, \"filter_configs\": [{\"asc\": true, \"clearable\": true, \"column\": \"IP\", \"key\": \"a81_z7FHd\", \"multiple\": true, \"searchAllOptions\": false}, {\"asc\": true, \"clearable\": true, \"column\": \"SRC_IP\", \"key\": \"tTcoxtFh5\", \"multiple\": true, \"searchAllOptions\": false}, {\"asc\": true, \"clearable\": true, \"column\": \"DST_IP\", \"key\": \"fY2jJ2R_9\", \"multiple\": true, \"searchAllOptions\": false}, {\"asc\": true, \"clearable\": true, \"column\": \"DOMAIN\", \"key\": \"h15hFIsIp\", \"multiple\": true, \"searchAllOptions\": false}], \"slice_id\": 469, \"time_grain_sqla\": \"P1D\", \"time_range\": \"Last week\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"filter_box\", \"remote_id\": 469, \"datasource_name\": \"FilterDataSet\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "Filterbox",
+          "viz_type": "filter_box"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_flow",
+          "datasource_type": "table",
+          "id": 12227,
+          "params": "{\"adhoc_filters\": [], \"bold_text\": true, \"columns\": [\"src_ip\", \"dst_ip\"], \"datasource\": \"48__table\", \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"granularity_sqla\": \"event_time\", \"groupby\": [], \"header_font_size\": \"xl\", \"header_text\": \"Hello, World!\", \"metrics\": [\"count\"], \"order_by_cols\": [], \"query_mode\": \"raw\", \"row_limit\": 10000, \"slice_id\": 12227, \"time_grain_sqla\": \"P1D\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"hello_world\", \"remote_id\": 12227, \"datasource_name\": \"cccs_flow\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "Network Traffic",
+          "viz_type": "hello_world"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_aad",
+          "datasource_type": "table",
+          "id": 12228,
+          "params": "{\"adhoc_filters\": [], \"color_scheme\": \"supersetColors\", \"datasource\": \"45__table\", \"date_format\": \"smart_date\", \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"granularity_sqla\": \"EVENT_TIME\", \"groupby\": [\"DOMAIN\"], \"innerRadius\": 30, \"label_type\": \"key\", \"labels_outside\": true, \"legendOrientation\": \"top\", \"legendType\": \"scroll\", \"metric\": \"count\", \"number_format\": \"SMART_NUMBER\", \"outerRadius\": 70, \"row_limit\": 10000, \"show_labels\": true, \"show_labels_threshold\": 5, \"slice_id\": 12228, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"pie\", \"remote_id\": 12228, \"datasource_name\": \"cccs_aad\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "AAD Domains",
+          "viz_type": "pie"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_aad",
+          "datasource_type": "table",
+          "id": 12229,
+          "params": "{\"adhoc_filters\": [], \"color_scheme\": \"supersetColors\", \"datasource\": \"45__table\", \"date_format\": \"smart_date\", \"donut\": true, \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"granularity_sqla\": \"EVENT_TIME\", \"groupby\": [\"USERID\"], \"innerRadius\": 64, \"label_line\": true, \"label_type\": \"percent\", \"labels_outside\": true, \"legendOrientation\": \"right\", \"legendType\": \"scroll\", \"metric\": \"count\", \"number_format\": \"SMART_NUMBER\", \"outerRadius\": 84, \"row_limit\": 10, \"show_labels\": true, \"show_labels_threshold\": 5, \"show_legend\": true, \"sort_by_metric\": true, \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"pie\", \"remote_id\": 12229, \"datasource_name\": \"cccs_aad\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "AAD User Actions",
+          "viz_type": "pie"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_http",
+          "datasource_type": "table",
+          "id": 12230,
+          "params": "{\"adhoc_filters\": [], \"bold_text\": true, \"columns\": [\"DST_PORT\", \"DOMAIN\", \"URI\", \"SRC_IP\", \"DST_IP\"], \"datasource\": \"44__table\", \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"granularity_sqla\": \"EVENT_TIME\", \"groupby\": [], \"header_font_size\": \"xl\", \"header_text\": \"Hello, World!\", \"metrics\": [\"count\"], \"order_by_cols\": [], \"query_mode\": \"raw\", \"row_limit\": 10000, \"time_grain_sqla\": \"P1D\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"hello_world\", \"remote_id\": 12230, \"datasource_name\": \"cccs_http\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "Http Requests",
+          "viz_type": "hello_world"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_flow",
+          "datasource_type": "table",
+          "id": 12231,
+          "params": "{\"adhoc_filters\": [], \"bold_text\": true, \"datasource\": \"48__table\", \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"groupby\": [], \"header_font_size\": \"xl\", \"header_text\": \"Hello, World!\", \"metrics\": [\"count\"], \"row_limit\": 10000, \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"test_assemblyline\", \"remote_id\": 12231, \"datasource_name\": \"cccs_flow\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "Assemblyline",
+          "viz_type": "test_assemblyline"
+        }
+      },
+      {
+        "__Slice__": {
+          "cache_timeout": null,
+          "datasource_name": "public.cccs_geo",
+          "datasource_type": "table",
+          "id": 12232,
+          "params": "{\"adhoc_filters\": [], \"bold_text\": true, \"columns\": [\"start_ip_int\", \"end_ip_int\", \"CITY\"], \"datasource\": \"46__table\", \"extra_form_data\": {\"append_form_data\": {}, \"custom_form_data\": {}, \"override_form_data\": {}}, \"granularity_sqla\": \"event_time\", \"groupby\": [], \"header_font_size\": \"xl\", \"header_text\": \"Hello, World!\", \"metrics\": [\"count\"], \"order_by_cols\": [], \"query_mode\": \"raw\", \"row_limit\": 100, \"time_grain_sqla\": \"P1D\", \"time_range\": \"No filter\", \"time_range_endpoints\": [\"inclusive\", \"exclusive\"], \"url_params\": {}, \"viz_type\": \"hello_world\", \"remote_id\": 12232, \"datasource_name\": \"cccs_geo\", \"schema\": \"public\", \"database_name\": \"examples\"}",
+          "slice_name": "Geolocation",
+          "viz_type": "hello_world"
+        }
+      }
+    ],
+    "slug": null
+  }
+}
+], "datasources":[
+{
+  "__SqlaTable__": {
+    "cache_timeout": null,
+    "columns": [
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "event_time",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 891,
+          "is_active": true,
+          "is_dttm": true,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "DATETIME",
+          "uuid": "6bf58744-5d6d-4b1a-8277-8e9c583b9f1d",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "src_ip",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 892,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "IPV4",
+          "uuid": "c43b5fcb-2d3d-493b-9c64-9959a61b8841",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "src_port",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 893,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "FLOAT",
+          "uuid": "fd0d60ed-afe2-467e-a27e-1e8b0d282427",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "dst_port",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 894,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "FLOAT",
+          "uuid": "3887db8a-2e89-4ae4-ac87-116672f7e8ab",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "CITY_DEST",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 895,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "STRING",
+          "uuid": "fedfa980-bf97-401a-8959-0c168738d3eb",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "CITY",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 896,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "STRING",
+          "uuid": "77e68fb6-e309-44e8-ace4-8ad9b01dc443",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "dst_ip",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 897,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "IPV4",
+          "uuid": "666e9b21-6d81-417b-b815-2431b96284c3",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "column_name": "IP",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": false,
+          "id": 898,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 48,
+          "type": "IPV4",
+          "uuid": "85bc8574-b6f8-47cd-98d7-655cea022595",
+          "verbose_name": null
+        }
+      }
+    ],
+    "database_id": 1,
+    "default_endpoint": null,
+    "description": null,
+    "extra": "{ \"certification\": { \"certified_by\": \"Data Platform Team\", \"details\": \"This table is the source of truth.\" }}",
+    "fetch_values_predicate": null,
+    "filter_select_enabled": false,
+    "main_dttm_col": "event_time",
+    "metrics": [
+      {
+        "__SqlMetric__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:31:03"
+          },
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:42:00"
+          },
+          "d3format": null,
+          "description": null,
+          "expression": "COUNT(*)",
+          "extra": "{}",
+          "id": 56,
+          "metric_name": "count",
+          "metric_type": null,
+          "table_id": 48,
+          "uuid": "c70c4ca2-9f14-471e-bbd3-93653bc3281a",
+          "verbose_name": "COUNT(*)",
+          "warning_text": null
+        }
+      }
+    ],
+    "offset": 0,
+    "params": "{\"remote_id\": 48, \"database_name\": \"examples\"}",
+    "schema": "public",
+    "sql": "{\r\n \"mutator_config\": {\r\n \"ipv4_columns\": [\"src_ip\", \"dst_ip\"],\r\n \"filter_any_of\": {\r\n \"column_name\": \"IP\",\r\n \"target_columns\": [\"src_ip\", \"dst_ip\"]\r\n},\r\n \"sql\": \"select \r\n \\\"ds\\\" as event_time, \r\n \\\"AIR_TIME\\\" as SRC_PORT, \r\n \\\"ARRIVAL_TIME\\\" as DST_PORT, \r\n CAST(ABS(\\\"LATITUDE\\\" * \\\"LONGITUDE\\\") as INTEGER) as src_ip, \r\n CAST(ABS(\\\"LATITUDE_DEST\\\" * \\\"LONGITUDE_DEST\\\") as INTEGER ) as dst_ip, \r\n \\\"CITY\\\", \r\n \\\"CITY_DEST\\\" \r\n from \\\"flights\\\"\" \r\n } \r\n }",
+    "table_name": "cccs_flow",
+    "template_params": null
+  }
+}
+,
+{
+  "__SqlaTable__": {
+    "cache_timeout": null,
+    "columns": [
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "SRC_PORT",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 862,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "FLOAT",
+          "uuid": "0dc16b9d-2886-447d-a95c-f7b0bf186461",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "DST_PORT",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 863,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "FLOAT",
+          "uuid": "6f2d5509-fe48-4485-937c-71e692eedd15",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "DOMAIN",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 864,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "DOMAIN",
+          "uuid": "2e0f2b60-fc90-4fcb-925a-fc3c5fbac574",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "URI",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 865,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "STRING",
+          "uuid": "d805c340-73d4-407a-aa0c-9c6147ba4208",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "EVENT_TIME",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 860,
+          "is_active": null,
+          "is_dttm": true,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "DATETIME",
+          "uuid": "eafc2189-82e8-4f8f-b1cd-92c2d906b1a0",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "SRC_IP",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 861,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "IPV4",
+          "uuid": "bad8ec13-7ab7-4ee0-8068-a59ebeb945dc",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:25:35"
+          },
+          "column_name": "DST_IP",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 866,
+          "is_active": null,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "IPV4",
+          "uuid": "0d3d0e94-d318-415a-92c2-bb2052905119",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:29:37"
+          },
+          "column_name": "IP",
+          "created_by_fk": 1,
+          "created_on": {
+            "__datetime__": "2021-03-21T12:29:37"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": false,
+          "id": 900,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 44,
+          "type": "IPV4",
+          "uuid": "06f4a060-c362-4b7e-a1a2-13b2677e2877",
+          "verbose_name": null
+        }
+      }
+    ],
+    "database_id": 1,
+    "default_endpoint": null,
+    "description": null,
+    "extra": "{ \"certification\": { \"certified_by\": \"Data Platform Team\", \"details\": \"This table is the source of truth.\" }, \"warning_markdown\": \"This is a warning.\" }",
+    "fetch_values_predicate": null,
+    "filter_select_enabled": false,
+    "main_dttm_col": "EVENT_TIME",
+    "metrics": [
+      {
+        "__SqlMetric__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:30:11"
+          },
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:14:46"
+          },
+          "d3format": null,
+          "description": null,
+          "expression": "COUNT(*)",
+          "extra": "{}",
+          "id": 52,
+          "metric_name": "count",
+          "metric_type": null,
+          "table_id": 44,
+          "uuid": "404cf701-ca36-4266-a33e-e087a40d9bad",
+          "verbose_name": "COUNT(*)",
+          "warning_text": null
+        }
+      }
+    ],
+    "offset": 0,
+    "params": "{\"remote_id\": 44, \"database_name\": \"examples\"}",
+    "schema": "public",
+    "sql": "{\r\n \"mutator_config\": {\r\n \"ipv4_columns\": [\"SRC_IP\", \"DST_IP\"],\r\n \"filter_any_of\": {\r\n   \"column_name\": \"IP\",\r\n   \"target_columns\": [\"SRC_IP\", \"DST_IP\"]\r\n},\r\n \"sql\": \"select \r\n \\\"ds\\\" as \\\"EVENT_TIME\\\", \r\n \\\"AIR_TIME\\\" as \\\"SRC_PORT\\\", \r\n \\\"ARRIVAL_TIME\\\" as \\\"DST_PORT\\\", \r\n CAST(ABS(\\\"LATITUDE\\\" * \\\"LONGITUDE\\\") as INTEGER) as \\\"SRC_IP\\\", \r\n CAST(ABS(\\\"LATITUDE_DEST\\\" * \\\"LONGITUDE_DEST\\\") as INTEGER ) as \\\"DST_IP\\\", \r\n \\\"CITY\\\" as \\\"DOMAIN\\\", \r\n \\\"CITY_DEST\\\" as \\\"URI\\\" \r\n from \\\"flights\\\"\" \r\n } \r\n }",
+    "table_name": "cccs_http",
+    "template_params": null
+  }
+}
+,
+{
+  "__SqlaTable__": {
+    "cache_timeout": null,
+    "columns": [
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:50:48"
+          },
+          "column_name": "DOMAIN",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:16:15"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 871,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 45,
+          "type": "DOMAIN",
+          "uuid": "a314d4ba-b7e3-4357-bf8d-ab7c377436a7",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:51:03"
+          },
+          "column_name": "ACTION",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:16:15"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 872,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 45,
+          "type": "STRING",
+          "uuid": "f4c1e276-059f-4292-ae5a-0fba19e0a3e2",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:51:53"
+          },
+          "column_name": "USERID",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:16:15"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 869,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 45,
+          "type": "STRING",
+          "uuid": "603b8220-3084-4c79-b3fd-ee51e5f21597",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:55:34"
+          },
+          "column_name": "EVENT_TIME",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:16:15"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 867,
+          "is_active": true,
+          "is_dttm": true,
+          "python_date_format": null,
+          "table_id": 45,
+          "type": "DATETIME",
+          "uuid": "651c3b5b-e407-47a9-915d-dfed566c16e5",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:51:24"
+          },
+          "column_name": "IP",
+          "created_by_fk": 1,
+          "created_on": {
+            "__datetime__": "2021-03-21T11:51:24"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": false,
+          "id": 899,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 45,
+          "type": "IPV4",
+          "uuid": "d530f72c-5573-4569-b0c1-fd1c7fa8f695",
+          "verbose_name": null
+        }
+      }
+    ],
+    "database_id": 1,
+    "default_endpoint": null,
+    "description": null,
+    "extra": "{ \"certification\": { \"certified_by\": \"Data Platform Team\", \"details\": \"This table is the source of truth.\" }}",
+    "fetch_values_predicate": null,
+    "filter_select_enabled": false,
+    "main_dttm_col": "EVENT_TIME",
+    "metrics": [
+      {
+        "__SqlMetric__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T11:50:06"
+          },
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:16:15"
+          },
+          "d3format": null,
+          "description": null,
+          "expression": "COUNT(*)",
+          "extra": "{}",
+          "id": 53,
+          "metric_name": "count",
+          "metric_type": null,
+          "table_id": 45,
+          "uuid": "587aa7e3-dfb6-42ff-bd06-71d74049cc45",
+          "verbose_name": "COUNT(*)",
+          "warning_text": null
+        }
+      }
+    ],
+    "offset": 0,
+    "params": "{\"remote_id\": 45, \"database_name\": \"examples\"}",
+    "schema": "public",
+    "sql": "{\r\n \"mutator_config\": {\r\n \"ipv4_columns\": [\"IP\"],\r\n \"sql\": \"select \r\n \\\"ds\\\" as \\\"EVENT_TIME\\\", \r\n CAST(ABS(\\\"LATITUDE\\\" * \\\"LONGITUDE\\\") as INTEGER) as \\\"IP\\\", \r\n \\\"FLIGHT_NUMBER\\\" as \\\"USERID\\\", \r\n \\\"CITY\\\" as \\\"ACTION\\\", \r\n \\\"CITY_DEST\\\" as \\\"DOMAIN\\\" \r\n from \\\"flights\\\"\r\n \"\r\n }\r\n}",
+    "table_name": "cccs_aad",
+    "template_params": null
+  }
+}
+,
+{
+  "__SqlaTable__": {
+    "cache_timeout": null,
+    "columns": [
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "event_time",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 874,
+          "is_active": true,
+          "is_dttm": true,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "DATETIME",
+          "uuid": "7cbce1d0-a754-4c9f-bef6-59615d952430",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "start_ip_int",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 875,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "IPV4",
+          "uuid": "34689b42-1160-4d95-b5b8-a6fc26e6eef4",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "src_port",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 876,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "FLOAT",
+          "uuid": "635d08b1-1289-4d75-ba7f-f6122cd9d15b",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "dst_port",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 877,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "FLOAT",
+          "uuid": "936f03f6-3b85-4b4d-90d3-7bb9263b874e",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "CITY_DEST",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 878,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "STRING",
+          "uuid": "1b219d0e-834b-4140-a9bf-33d753ca6db8",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "CITY",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 879,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "STRING",
+          "uuid": "43f701c6-691f-4026-8d56-5a9a2600c8e4",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "column_name": "end_ip_int",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": true,
+          "id": 880,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "IPV4",
+          "uuid": "cb716c73-a850-4c90-8bd4-f6b76d7e1aaf",
+          "verbose_name": null
+        }
+      },
+      {
+        "__TableColumn__": {
+          "changed_by_fk": null,
+          "changed_on": {
+            "__datetime__": "2021-03-20T18:22:37"
+          },
+          "column_name": "IP",
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:22:03"
+          },
+          "description": null,
+          "expression": null,
+          "filterable": true,
+          "groupby": false,
+          "id": 881,
+          "is_active": true,
+          "is_dttm": false,
+          "python_date_format": null,
+          "table_id": 46,
+          "type": "IPV4",
+          "uuid": "8215a0a0-cc06-4002-9cb4-488d99b5abc0",
+          "verbose_name": null
+        }
+      }
+    ],
+    "database_id": 1,
+    "default_endpoint": null,
+    "description": null,
+    "extra": "{ \"certification\": { \"certified_by\": \"Data Platform Team\", \"details\": \"This table is the source of truth.\" }}",
+    "fetch_values_predicate": null,
+    "filter_select_enabled": false,
+    "main_dttm_col": "event_time",
+    "metrics": [
+      {
+        "__SqlMetric__": {
+          "changed_by_fk": 1,
+          "changed_on": {
+            "__datetime__": "2021-03-21T12:30:54"
+          },
+          "created_by_fk": null,
+          "created_on": {
+            "__datetime__": "2021-03-20T18:20:53"
+          },
+          "d3format": null,
+          "description": null,
+          "expression": "COUNT(*)",
+          "extra": "{}",
+          "id": 54,
+          "metric_name": "count",
+          "metric_type": null,
+          "table_id": 46,
+          "uuid": "d70c4dca-08a3-4b45-bb0d-bfb4d94129ea",
+          "verbose_name": "COUNT(*)",
+          "warning_text": null
+        }
+      }
+    ],
+    "offset": 0,
+    "params": "{\"remote_id\": 46, \"database_name\": \"examples\"}",
+    "schema": "public",
+    "sql": "{\r\n \"mutator_config\": {\r\n \"ipv4_columns\": [\"start_ip_int\", \"end_ip_int\"],\r\n \"filter_between_range\": { \r\n \"column_name\": \"IP\", \r\n \"low_ip_column\": \"start_ip_int\", \r\n \"high_ip_column\": \"end_ip_int\" \r\n },\r\n \"sql\": \"select \r\n \\\"ds\\\" as event_time, \r\n \\\"AIR_TIME\\\" as SRC_PORT, \r\n \\\"ARRIVAL_TIME\\\" as DST_PORT, \r\n CAST(ABS(\\\"LATITUDE\\\" * \\\"LONGITUDE\\\") as INTEGER) as start_ip_int, \r\n CAST(ABS(\\\"LATITUDE_DEST\\\" * \\\"LONGITUDE_DEST\\\") as INTEGER ) as end_ip_int, \r\n \\\"CITY\\\", \r\n \\\"CITY_DEST\\\" \r\n from \\\"flights\\\"\" \r\n } \r\n }",
+    "table_name": "cccs_geo",
+    "template_params": null
+  }
+}
+]}
