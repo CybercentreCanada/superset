@@ -16,9 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as SelectFilterPlugin } from './Select';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
-export { default as IPv4FilterPlugin } from './IPv4';
+import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
+
+const config: ControlPanelConfig = {
+  // @ts-ignore
+  controlPanelSections: [sections.legacyRegularTime],
+  // TODO: here to add the relevant controls
+};
+
+export default config;

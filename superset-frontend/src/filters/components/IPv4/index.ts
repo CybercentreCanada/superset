@@ -16,9 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as SelectFilterPlugin } from './Select';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
-export { default as IPv4FilterPlugin } from './IPv4';
+import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
+import buildQuery from './buildQuery';
+import controlPanel from './controlPanel';
+import transformProps from './transformProps';
+import thumbnail from './images/thumbnail.png';
+
+export default class IPv4FilterPlugin extends ChartPlugin {
+  constructor() {
+    const metadata = new ChartMetadata({
+      name: t('IPv4 filter'),
+      description: t('IPv4 filter plugin using AntD'),
+      behaviors: [Behavior.CROSS_FILTER, Behavior.NATIVE_FILTER],
+      thumbnail,
+    });
+
+    super({
+      buildQuery,
+      controlPanel,
+      loadChart: () => import('./IPv4FilterPlugin'),
+      metadata,
+      transformProps,
+    });
+  }
+}
