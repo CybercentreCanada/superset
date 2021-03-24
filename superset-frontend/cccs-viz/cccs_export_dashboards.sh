@@ -2,7 +2,7 @@
 
 SOURCE_FILE=dashboards_export.json
 DEST_FILE=telemetry_dashboard.yaml
-DASHBOARDS="CCCS Telemery"
+DASHBOARDS="CCCS Telemetry"
 
 echo "Exporting dashboards"
 docker exec -it superset_app superset export-dashboards --dashboard-file /app/$SOURCE_FILE
