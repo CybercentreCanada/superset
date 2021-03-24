@@ -16,9 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as SelectFilterPlugin } from './Select';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
-export { default as IPv4FilterPlugin } from './IPv4';
+import { ChartProps } from '@superset-ui/core';
+
+export default function transformProps(chartProps: ChartProps) {
+  const { formData, height, hooks, queriesData, width, behaviors } = chartProps;
+  const { setDataMask } = hooks;
+  const { data } = queriesData[0];
+
+  return {
+    data,
+    formData,
+    behaviors,
+    height,
+    setDataMask,
+    width,
+  };
+}
