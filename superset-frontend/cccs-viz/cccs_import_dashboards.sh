@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Import the telemetry_dashboard.yaml file into superset.
+
 DASHBOARD_FILE=telemetry_dashboard.yaml
 
 echo "Copying dashboard file into docker container"
