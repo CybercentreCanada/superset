@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Script to create development superset configuration
+# docker-compose picks up local config in this file
+# docker/pythonpath_dev/superset_config_docker.py
+# This script creates this file by combining the contents of
+# sql_query_mutator.py found in the hogwarts-superset-deployment
+# git repo (you have to clone it beforehand)
+# It combines that file with the configs below "Adding dev configs"
+
+
 # determine directory of this script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
