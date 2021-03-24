@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Export The Telemetry dashboard from superset. Saves it into telemetry_dashboard.yaml file.
+
 SOURCE_FILE=dashboards_export.json
 DEST_FILE=telemetry_dashboard.yaml
 DASHBOARDS="CCCS Telemetry"
