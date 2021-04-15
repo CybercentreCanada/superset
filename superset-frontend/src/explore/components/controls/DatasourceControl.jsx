@@ -28,6 +28,7 @@ import DatasourceModal from 'src/datasource/DatasourceModal';
 import { postForm } from 'src/explore/exploreUtils';
 import Button from 'src/components/Button';
 import ErrorAlert from 'src/components/ErrorMessage/ErrorAlert';
+import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 
 const propTypes = {
   actions: PropTypes.object.isRequired,
@@ -151,7 +152,7 @@ class DatasourceControl extends React.PureComponent {
         datasourceKey: `${datasource.id}__${datasource.type}`,
         sql: datasource.sql,
       };
-      postForm('/superset/sqllab', payload);
+      postForm('/superset/sqllab/', payload);
     }
   }
 
@@ -159,6 +160,9 @@ class DatasourceControl extends React.PureComponent {
     const { showChangeDatasourceModal, showEditDatasourceModal } = this.state;
     const { datasource, onChange } = this.props;
     const isMissingDatasource = datasource.id == null;
+
+    const isSqlSupported = datasource.type === 'table';
+
     const datasourceMenu = (
       <Menu onClick={this.handleMenuItemClick}>
         {this.props.isEditable && (
@@ -167,11 +171,20 @@ class DatasourceControl extends React.PureComponent {
           </Menu.Item>
         )}
         <Menu.Item key={CHANGE_DATASET}>{t('Change dataset')}</Menu.Item>
-        <Menu.Item key={VIEW_IN_SQL_LAB}>{t('View in SQL Lab')}</Menu.Item>
+        {isSqlSupported && (
+          <Menu.Item key={VIEW_IN_SQL_LAB}>{t('View in SQL Lab')}</Menu.Item>
+        )}
       </Menu>
     );
 
     const { health_check_message: healthCheckMessage } = datasource;
+
+    let extra = {};
+    if (datasource?.extra) {
+      try {
+        extra = JSON.parse(datasource?.extra);
+      } catch {} // eslint-disable-line no-empty
+    }
 
     return (
       <Styles className="DatasourceControl">
@@ -194,6 +207,12 @@ class DatasourceControl extends React.PureComponent {
                 color={supersetTheme.colors.warning.base}
               />
             </Tooltip>
+          )}
+          {extra?.warning_markdown && ( // eslint-disable-line camelcase
+            <WarningIconWithTooltip
+              warningMarkdown={extra.warning_markdown} // eslint-disable-line camelcase
+              size={30}
+            />
           )}
           <Dropdown
             overlay={datasourceMenu}

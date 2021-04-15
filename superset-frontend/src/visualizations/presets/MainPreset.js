@@ -63,9 +63,17 @@ import {
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
+  TimeColumnFilterPlugin,
+  TimeGrainFilterPlugin,
+  IPv4FilterPlugin,
 } from 'src/filters/components/';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
+import { 
+  HelloWorldChartPlugin,
+  AssemblylineChartPlugin,
+  DataGridChartPlugin,
+} from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
   constructor() {
@@ -73,6 +81,10 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new HelloWorldChartPlugin().configure({ key: 'hello_world' }),
+        new AssemblylineChartPlugin().configure({key: 'test_assemblyline'}),
+        new DataGridChartPlugin().configure({key: 'data_grid'}),
+      
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
         new BigNumberChartPlugin().configure({ key: 'big_number' }),
@@ -115,6 +127,9 @@ export default class MainPreset extends Preset {
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
+        new TimeColumnFilterPlugin().configure({ key: 'filter_timecolumn' }),
+        new TimeGrainFilterPlugin().configure({ key: 'filter_timegrain' }),
+        new IPv4FilterPlugin().configure({ key: 'filter_ipv4' }),
       ],
     });
   }
