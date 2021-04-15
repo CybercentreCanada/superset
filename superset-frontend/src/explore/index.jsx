@@ -25,9 +25,6 @@ import { initFeatureFlags } from '../featureFlags';
 import { initEnhancer } from '../reduxUtils';
 import getInitialState from './reducers/getInitialState';
 import rootReducer from './reducers/index';
-import initAsyncEvents from '../middleware/asyncEvent';
-import * as actions from '../chart/chartAction';
-
 import App from './App';
 
 const exploreViewContainer = document.getElementById('app');
@@ -52,10 +49,7 @@ const asyncEventMiddleware = initAsyncEvents({
 const store = createStore(
   rootReducer,
   initState,
-  compose(
-    applyMiddleware(thunk, logger, asyncEventMiddleware),
-    initEnhancer(false),
-  ),
+  compose(applyMiddleware(thunk, logger), initEnhancer(false)),
 );
 
 ReactDOM.render(<App store={store} />, document.getElementById('app'));

@@ -47,7 +47,8 @@ print("VERSION: " + version_string)
 print("GIT SHA: " + GIT_SHA)
 print("-==-" * 15)
 
-VERSION_INFO_FILE = os.path.join(BASE_DIR, "superset", "static", "version_info.json")
+VERSION_INFO_FILE = os.path.join(
+    BASE_DIR, "superset", "static", "version_info.json")
 
 with open(VERSION_INFO_FILE, "w") as version_file:
     json.dump(version_info, version_file)
@@ -55,7 +56,8 @@ with open(VERSION_INFO_FILE, "w") as version_file:
 
 setup(
     name="apache-superset",
-    description=("A modern, enterprise-ready business intelligence web application"),
+    description=(
+        "A modern, enterprise-ready business intelligence web application"),
     long_description=long_description,
     long_description_content_type="text/markdown",
     version=version_string,
@@ -75,7 +77,7 @@ setup(
         "cron-descriptor",
         "cryptography>=3.2.1",
         "flask>=1.1.0, <2.0.0",
-        "flask-appbuilder>=3.1.1, <4.0.0",
+        "flask-appbuilder>=3.2.1, <4.0.0",
         "flask-caching",
         "flask-compress",
         "flask-talisman",
@@ -96,7 +98,7 @@ setup(
         "python-dotenv",
         "python-geohash",
         "pyarrow>=3.0.0, <3.1",
-        "pyyaml>=5.1",
+        "pyyaml>=5.4",
         "PyJWT>=1.7.1, <2",
         "redis",
         "retry>=0.9.2",
@@ -118,9 +120,11 @@ setup(
             "pybigquery>=0.4.10",
             "google-cloud-bigquery>=2.4.0",
         ],
-        "clickhouse": ["clickhouse-sqlalchemy>= 0.1.4, <0.2"],
+        "clickhouse": ["clickhouse-sqlalchemy>=0.1.4, <0.2"],
         "cockroachdb": ["cockroachdb>=0.3.5, <0.4"],
         "cors": ["flask-cors>=2.0.0"],
+        "crate": ["crate[sqlalchemy]>=0.26.0, <0.27"],
+        "databricks": ["databricks-dbapi[sqlalchemy]>=0.5.0, <0.6"],
         "db2": ["ibm-db-sa>=0.3.5, <0.4"],
         "dremio": ["sqlalchemy-dremio>=1.1.5, <1.2"],
         "drill": ["sqlalchemy-drill==0.1.dev"],
