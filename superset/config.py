@@ -71,6 +71,11 @@ else:
 VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
 PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
+# ---------------------------------------------------------
+# CCCS Superset specific config
+# ---------------------------------------------------------
+CCCS_BUILD = 'Development'
+
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
 # For example:
@@ -108,8 +113,8 @@ def _try_json_readsha(  # pylint: disable=unused-argument
 # therefore it WILL exist. When unit tests are running, however,
 # it WILL NOT exist, so we fall back to reading package.json
 VERSION_STRING = _try_json_readversion(VERSION_INFO_FILE) or _try_json_readversion(
-    PACKAGE_JSON_FILE
-)
+        PACKAGE_JSON_FILE
+    ) + '-' + CCCS_BUILD
 
 VERSION_SHA_LENGTH = 8
 VERSION_SHA = _try_json_readsha(VERSION_INFO_FILE, VERSION_SHA_LENGTH)
