@@ -46,13 +46,6 @@ stages:
         fileType: 'json'
         targetFiles: './superset/cccs_build_info.json'
 
-    - task: AzureRmWebAppDeployment@4
-      inputs:
-        version: Azure Resource Manager
-        azureSubscription: <Name of the Azure subscription>
-        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-        JSONFiles: './superset/cccs_build_info.json'
-
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
