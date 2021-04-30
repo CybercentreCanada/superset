@@ -72,9 +72,9 @@ VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
 PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
 # ---------------------------------------------------------
-# CCCS Superset specific config
+# CCCS build version file
 # ---------------------------------------------------------
-CCCS_BUILD = 'Development'
+CCCS_BUILD_INFO_FILE = os.path.join(BASE_DIR, "cccs_build_info.json")
 
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
@@ -114,7 +114,11 @@ def _try_json_readsha(  # pylint: disable=unused-argument
 # it WILL NOT exist, so we fall back to reading package.json
 VERSION_STRING = _try_json_readversion(VERSION_INFO_FILE) or _try_json_readversion(
         PACKAGE_JSON_FILE
-    ) + '-' + CCCS_BUILD
+    )
+
+# Add the CCCS touch
+CCCS_BUILD_INFO = _try_json_readversion(CCCS_BUILD_INFO_FILE) or 'unknown'
+VERSION_STRING = VERSION_STRING + '-' + CCCS_BUILD_INFO
 
 VERSION_SHA_LENGTH = 8
 VERSION_SHA = _try_json_readsha(VERSION_INFO_FILE, VERSION_SHA_LENGTH)
