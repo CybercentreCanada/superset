@@ -44,7 +44,7 @@ stages:
       inputs:
         folderPath: '$(System.DefaultWorkingDirectory)'
         fileType: 'json'
-        targetFiles: './superset/cccs_build_info.json'
+        targetFiles: '**/superset/cccs_build_info.json'
 
     - task: Docker@2
       displayName: Build and push an image to container registry
