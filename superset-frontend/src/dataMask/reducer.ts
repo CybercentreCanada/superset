@@ -34,8 +34,11 @@ import {
   Filter,
   FilterConfiguration,
 } from '../dashboard/components/nativeFilters/types';
+<<<<<<< HEAD
 import { areObjectsEqual } from '../reduxUtils';
 import { Filters } from '../dashboard/reducers/types';
+=======
+>>>>>>> bbb1f2d75... perf(native-filters): avoid unnecessary reloading of charts (#14408)
 
 export function getInitialDataMask(id?: string): DataMask;
 export function getInitialDataMask(id: string): DataMaskWithId {
@@ -56,6 +59,7 @@ export function getInitialDataMask(id: string): DataMaskWithId {
 }
 
 function fillNativeFilters(
+<<<<<<< HEAD
   filterConfig: FilterConfiguration,
   mergedDataMask: DataMaskStateWithId,
   draftDataMask: DataMaskStateWithId,
@@ -87,6 +91,23 @@ function fillNativeFilters(
   Object.values(draftDataMask).forEach(filter => {
     if (!String(filter?.id).startsWith(NATIVE_FILTER_PREFIX)) {
       mergedDataMask[filter?.id] = filter;
+=======
+  data: FilterConfiguration,
+  cleanState: DataMaskStateWithId,
+  draft: DataMaskStateWithId,
+) {
+  data.forEach((filter: Filter) => {
+    cleanState[filter.id] = {
+      ...getInitialDataMask(filter.id), // take initial data
+      ...filter.defaultDataMask, // if something new came from BE - take it
+      ...draft[filter.id], // keep local filter data
+    };
+  });
+  // Get back all other non-native filters
+  Object.values(draft).forEach(filter => {
+    if (!String(filter?.id).startsWith(NATIVE_FILTER_PREFIX)) {
+      cleanState[filter?.id] = filter;
+>>>>>>> bbb1f2d75... perf(native-filters): avoid unnecessary reloading of charts (#14408)
     }
   });
 }
@@ -124,12 +145,16 @@ const dataMaskReducer = produce(
         );
         return cleanState;
       case SET_DATA_MASK_FOR_FILTER_CONFIG_COMPLETE:
+<<<<<<< HEAD
         fillNativeFilters(
           action.filterConfig ?? [],
           cleanState,
           draft,
           action.filters,
         );
+=======
+        fillNativeFilters(action.filterConfig ?? [], cleanState, draft);
+>>>>>>> bbb1f2d75... perf(native-filters): avoid unnecessary reloading of charts (#14408)
         return cleanState;
 
       default:
