@@ -101,7 +101,11 @@
     "@superset-ui/legacy-preset-chart-nvd3": "^0.17.41",
     "@superset-ui/plugin-chart-echarts": "^0.17.41",
     "@superset-ui/plugin-chart-pivot-table": "^0.17.41",
+<<<<<<< HEAD
     "@superset-ui/plugin-chart-table": "^0.17.42",
+=======
+    "@superset-ui/plugin-chart-table": "^0.17.41",
+>>>>>>> a75e4af99... fix(viz): bump superset-ui to fix bugs in table and graph chart (#14438)
     "@superset-ui/plugin-chart-word-cloud": "^0.17.41",
     "@superset-ui/preset-chart-xy": "^0.17.41",
     "@vx/responsive": "^0.0.195",
