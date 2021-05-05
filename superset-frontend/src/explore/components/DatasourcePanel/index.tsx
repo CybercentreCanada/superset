@@ -19,12 +19,7 @@
 import React, { useEffect, useState } from 'react';
 import { styled, t } from '@superset-ui/core';
 import Collapse from 'src/components/Collapse';
-import {
-  ColumnOption,
-  MetricOption,
-  ControlConfig,
-  DatasourceMeta,
-} from '@superset-ui/chart-controls';
+import { ControlConfig, DatasourceMeta } from '@superset-ui/chart-controls';
 import { debounce } from 'lodash';
 import { matchSorter, rankings } from 'match-sorter';
 import { FAST_DEBOUNCE } from 'src/constants';
@@ -33,6 +28,7 @@ import { ExploreActions } from 'src/explore/actions/exploreActions';
 import Control from 'src/explore/components/Control';
 import DatasourcePanelDragWrapper from './DatasourcePanelDragWrapper';
 import { DndItemType } from '../DndItemType';
+import { StyledColumnOption, StyledMetricOption } from '../optionRenderers';
 
 interface DatasourceControl extends ControlConfig {
   datasource?: DatasourceMeta;
@@ -214,10 +210,10 @@ export default function DataSourcePanel({
                     value={m}
                     type={DndItemType.Metric}
                   >
-                    <MetricOption metric={m} showType />
+                    <StyledMetricOption metric={m} showType />
                   </DatasourcePanelDragWrapper>
                 ) : (
-                  <MetricOption metric={m} showType />
+                  <StyledMetricOption metric={m} showType />
                 )}
               </LabelContainer>
             ))}
@@ -236,10 +232,10 @@ export default function DataSourcePanel({
                     value={col}
                     type={DndItemType.Column}
                   >
-                    <ColumnOption column={col} showType />
+                    <StyledColumnOption column={col} showType />
                   </DatasourcePanelDragWrapper>
                 ) : (
-                  <ColumnOption column={col} showType />
+                  <StyledColumnOption column={col} showType />
                 )}
               </LabelContainer>
             ))}
