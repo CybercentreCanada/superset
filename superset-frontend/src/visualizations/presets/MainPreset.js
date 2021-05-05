@@ -57,6 +57,7 @@ import {
   EchartsGraphChartPlugin,
   EchartsGaugeChartPlugin,
   EchartsRadarChartPlugin,
+  EchartsFunnelChartPlugin,
   EchartsMixedTimeseriesChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
@@ -108,6 +109,7 @@ export default class MainPreset extends Preset {
         new DualLineChartPlugin().configure({ key: 'dual_line' }),
         new EventFlowChartPlugin().configure({ key: 'event_flow' }),
         new FilterBoxChartPlugin().configure({ key: 'filter_box' }),
+        new EchartsFunnelChartPlugin().configure({ key: 'funnel' }),
         new EchartsGaugeChartPlugin().configure({ key: 'gauge_chart' }),
         new EchartsGraphChartPlugin().configure({ key: 'graph_chart' }),
         new EchartsRadarChartPlugin().configure({ key: 'radar' }),
