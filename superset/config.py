@@ -113,8 +113,8 @@ def _try_json_readsha(  # pylint: disable=unused-argument
 # therefore it WILL exist. When unit tests are running, however,
 # it WILL NOT exist, so we fall back to reading package.json
 VERSION_STRING = _try_json_readversion(VERSION_INFO_FILE) or _try_json_readversion(
-        PACKAGE_JSON_FILE
-    )
+    PACKAGE_JSON_FILE
+)
 
 # Add the CCCS touch
 CCCS_BUILD_INFO = _try_json_readversion(CCCS_BUILD_INFO_FILE) or 'unknown'
