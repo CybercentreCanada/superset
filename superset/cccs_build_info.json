@@ -1,5 +1,5 @@
 {
     "name": "CCCS Build Info",
-    "version": "fhjdshfjsdfh",
+    "buildId": "develop",
     "description": "Build information overriden by Azure pipeline at build time."
 }
