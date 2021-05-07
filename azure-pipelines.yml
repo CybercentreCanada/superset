@@ -24,7 +24,7 @@ variables:
 
   # Build information
   buildSourceHash: '$(Build.SourceVersion)'
-  buildTimestampForUI: $[format('{yyyy-MM-dd HH:mm:ss}', pipeline.startTime)]
+  buildTimestampForUI: $[format('{0:yyyy-MM-dd HH:mm:ss}', pipeline.startTime)]
   buildNumber: '$(Build.BuildNumber)'
 
 stages:
