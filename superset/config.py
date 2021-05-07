@@ -87,10 +87,24 @@ CCCS_BUILD_INFO_FILE = os.path.join(BASE_DIR, "cccs_build_info.json")
 # },
 FAVICONS = [{"href": "/static/assets/images/favicon.png"}]
 
+def _try_json_readsourceversion(filepath: str) -> Optional[str]:
+    try:
+        with open(filepath, "r") as f:
+            return json.load(f).get("buildSourceVersion")
+    except Exception:  # pylint: disable=broad-except
+        return None
+
 def _try_json_readbuildnumber(filepath: str) -> Optional[str]:
     try:
         with open(filepath, "r") as f:
-            return json.load(f).get("buildNumber")
+            return json.load(f).get("buildNumber ")
+    except Exception:  # pylint: disable=broad-except
+        return None
+
+def _try_json_readtimestampforui(filepath: str) -> Optional[str]:
+    try:
+        with open(filepath, "r") as f:
+            return json.load(f).get("buildTimestampForUI")
     except Exception:  # pylint: disable=broad-except
         return None
 
@@ -123,7 +137,9 @@ VERSION_STRING = _try_json_readversion(VERSION_INFO_FILE) or _try_json_readversi
 )
 
 # CCCS build info
-CCCS_BUILD_NUMBER = _try_json_readbuildnumber(CCCS_BUILD_INFO_FILE) or 'unknown'
+BUILD_NUMBER = _try_json_readbuildnumber(CCCS_BUILD_INFO_FILE) or 'unknown'
+BUILD_SOURCE_VERSION = _try_json_readsourceversion(CCCS_BUILD_INFO_FILE) or 'unknown'
+BUILD_TIMESTAMP_FOR_UI = _try_json_readtimestampforui(CCCS_BUILD_INFO_FILE) or 'unknown'
 
 VERSION_SHA_LENGTH = 8
 VERSION_SHA = _try_json_readsha(VERSION_INFO_FILE, VERSION_SHA_LENGTH)

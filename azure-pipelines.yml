@@ -22,9 +22,10 @@ variables:
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
-  # Build ID to be added to the version
-  buildNumber: 'b$(Build.BuildId)'
-  imageTag:  '$(BRANCH_NAME)_$(buildTimestamp)_b$(buildNumber)'
+  # Build information
+  buildSourceHash: '$(Build.SourceVersion)'
+  buildTimestampForUI: $[format('{yyyy-MM-dd HH:mm:ss}', pipeline.startTime)]
+  buildNumber: '$(Build.BuildNumber)'
 
 stages:
 - stage: Build
