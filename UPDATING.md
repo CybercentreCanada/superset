@@ -24,6 +24,15 @@ assists people when migrating to a new version.
 
 ## 1.2.0
 
+<<<<<<< HEAD
+=======
+- [14255](https://github.com/apache/superset/pull/14255): The default `CSV_TO_HIVE_UPLOAD_DIRECTORY_FUNC` callable logic has been updated to leverage the specified database and schema to ensure the upload S3 key prefix is unique. Previously tables generated via upload from CSV with the same name but differ schema and/or cluster would use the same S3 key prefix. Note this change does not impact previously imported tables.
+
+### Breaking Changes
+### Potential Downtime
+- [14234](https://github.com/apache/superset/pull/14234): Adds the `limiting_factor` column to the `query` table. Give the migration includes a DDL operation on a heavily trafficed table, potential service downtime may be required.
+
+>>>>>>> 6871ad15f... docs(UPDATING): Adding downtime for #14234 (#14513)
 ### Deprecations
 
 - [13440](https://github.com/apache/superset/pull/13440): Dashboard/Charts reports and old Alerts is deprecated. The following config keys are deprecated:
