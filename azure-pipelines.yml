@@ -23,8 +23,8 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Build information
-  buildSourceHash: '$(Build.SourceVersion)'
-  buildTimestampForUI: $[format('{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}', pipeline.startTime)],
+  buildSourceHash: '$(Build.SourceVersion)',
+  buildTimestampForUI: '$[format('{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}', pipeline.startTime)]',
   buildNumber: '$(Build.BuildNumber)'
 
 stages:
