@@ -23,7 +23,8 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Build ID to be added to the version
-  buildId: $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+  buildNumber: 'b$(Build.BuildId)'
+  imageTag:  '$(BRANCH_NAME)_$(buildTimestamp)_b$(buildNumber)'
 
 stages:
 - stage: Build
@@ -55,4 +56,4 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(BRANCH_NAME)
-          $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+          $(BRANCH_NAME)_$(buildTimestamp)_$(buildNumber)

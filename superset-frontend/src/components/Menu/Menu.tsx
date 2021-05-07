@@ -40,6 +40,7 @@ interface NavBarProps {
   bug_report_url?: string;
   version_string?: string;
   version_sha?: string;
+  cccs_build_number?: string;
   documentation_url?: string;
   languages: Languages;
   show_language_picker: boolean;
@@ -246,6 +247,11 @@ export function Menu({
                     {navbarRight.version_string && (
                       <li className="version-info">
                         <span>Version: {navbarRight.version_string}</span>
+                      </li>
+                    )}
+                    {navbarRight.cccs_build_number && (
+                      <li className="version-info">
+                        <span>CCCS Build: {navbarRight.cccs_build_number}</span>
                       </li>
                     )}
                     {navbarRight.version_sha && (

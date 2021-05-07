@@ -296,6 +296,7 @@ def menu_data() -> Dict[str, Any]:
             "bug_report_url": appbuilder.app.config["BUG_REPORT_URL"],
             "documentation_url": appbuilder.app.config["DOCUMENTATION_URL"],
             "version_string": appbuilder.app.config["VERSION_STRING"],
+            "cccs_build_number": appbuilder.app.config["CCCS_BUILD_NUMBER"],
             "version_sha": appbuilder.app.config["VERSION_SHA"],
             "languages": languages,
             "show_language_picker": len(languages.keys()) > 1,
