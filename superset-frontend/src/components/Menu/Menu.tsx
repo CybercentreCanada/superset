@@ -42,7 +42,6 @@ interface NavBarProps {
   version_sha?: string;
   build_number?: string;
   build_source_version?: string;
-  build_timestamp_for_ui? :string;
   documentation_url?: string;
   languages: Languages;
   show_language_picker: boolean;
