@@ -24,7 +24,6 @@ variables:
 
   # Build information
   buildSourceVersion: '$(Build.SourceVersion)'
-  buildTimestampForUI: $[format('{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}', pipeline.startTime)]
   buildNumber: '$(Build.BuildNumber)'
 
 stages:
@@ -57,4 +56,4 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(BRANCH_NAME)
-          $(BRANCH_NAME)_$(buildTimestamp)_$(buildNumber)
+          $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)

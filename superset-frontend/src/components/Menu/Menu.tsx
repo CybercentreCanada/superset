@@ -253,17 +253,7 @@ export function Menu({
                     )}
                     {navbarRight.build_number && (
                       <li className="version-info">
-                        <span>CCCS Build Number: {navbarRight.build_number}</span>
-                      </li>
-                    )}
-                    {navbarRight.build_timestamp_for_ui && (
-                      <li className="version-info">
-                        <span>Build Date: {navbarRight.build_timestamp_for_ui}</span>
-                      </li>
-                    )}
-                    {navbarRight.build_source_version && (
-                      <li className="version-info">
-                        <span>Source version: {navbarRight.build_source_version}</span>
+                        <span>Build Number: {navbarRight.build_number}</span>
                       </li>
                     )}
                     {navbarRight.version_sha && (
