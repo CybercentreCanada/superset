@@ -1,6 +1,6 @@
 {
     "name": "CCCS Build Info",
-    "buildNumber": "20210510.4",
+    "buildNumber": "dev",
     "buildSourceVersion": "dev",
     "buildTimestamp": "Unknown",
     "description": "Build information overriden by Azure pipeline at build time."
