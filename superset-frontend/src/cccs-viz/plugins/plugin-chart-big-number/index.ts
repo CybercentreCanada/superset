@@ -16,9 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as BigNumberChartPlugin } from './plugin-chart-big-number/';
-export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
-export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
-export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
+import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import controlPanel from './controlPanel';
+import transformProps, { BigNumberChartProps, BigNumberFormData } from './transformProps';
+import thumbnail from './images/thumbnail.png';
 
+const metadata = new ChartMetadata({
+    description: '',
+    name: t('Big Number with Trendline'),
+    thumbnail,
+    useLegacyApi: true,
+});
 
+export default class BigNumberChartPlugin extends ChartPlugin<
+    BigNumberFormData,
+    BigNumberChartProps
+> {
+    constructor() {
+        super({
+            loadChart: () => import('./BigNumber'),
+            metadata,
+            transformProps,
+            controlPanel,
+        });
+    }
+}
