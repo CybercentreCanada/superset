@@ -82,12 +82,14 @@ PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 # },
 FAVICONS = [{"href": "/static/assets/images/favicon.png"}]
 
+
 def _try_json_readversion(filepath: str) -> Optional[str]:
     try:
         with open(filepath, "r") as f:
             return json.load(f).get("version")
     except Exception:  # pylint: disable=broad-except
         return None
+
 
 def _try_json_readsha(  # pylint: disable=unused-argument
     filepath: str, length: int
