@@ -18,7 +18,7 @@
  */
 import { t } from '@superset-ui/core';
 import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
-import { headerFontSize, subheaderFontSize } from '../sharedControls';
+import { headerFontSize, subheaderFontSize, numberOfDecimalPlaces } from '../sharedControls';
 
 export default {
     controlPanelSections: [
@@ -48,7 +48,7 @@ export default {
         {
             label: t('Chart Options'),
             expanded: true,
-            controlSetRows: [[headerFontSize], [subheaderFontSize]],
+            controlSetRows: [[headerFontSize], [subheaderFontSize], [numberOfDecimalPlaces]],
         },
     ],
     controlOverrides: {
