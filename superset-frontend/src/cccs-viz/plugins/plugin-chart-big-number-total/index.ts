@@ -18,23 +18,26 @@
  */
 import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
 import controlPanel from './controlPanel';
-import transformProps, { BigNumberChartProps, BigNumberFormData } from './transformProps';
+import transformProps, {
+    BigNumberChartProps,
+    BigNumberFormData,
+} from '@superset-ui/legacy-preset-chart-big-number/lib/BigNumber/transformProps';
 import thumbnail from './images/thumbnail.png';
 
 const metadata = new ChartMetadata({
     description: '',
-    name: t('Big Number with Trendline'),
+    name: t('Big Number'),
     thumbnail,
     useLegacyApi: true,
 });
 
-export default class BigNumberChartPlugin extends ChartPlugin<
+export default class BigNumberTotalChartPlugin extends ChartPlugin<
     BigNumberFormData,
     BigNumberChartProps
 > {
     constructor() {
         super({
-            loadChart: () => import('./BigNumber'),
+            loadChart: () => import('@superset-ui/legacy-preset-chart-big-number/lib/BigNumber/BigNumber'),
             metadata,
             transformProps,
             controlPanel,
