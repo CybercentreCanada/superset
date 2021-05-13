@@ -71,13 +71,6 @@ else:
 VERSION_INFO_FILE = os.path.join(BASE_DIR, "static", "version_info.json")
 PACKAGE_JSON_FILE = os.path.join(BASE_DIR, "static", "assets", "package.json")
 
-# *** CCCS Modifications start ***
-# ---------------------------------------------------------
-# CCCS build info file
-# ---------------------------------------------------------
-CCCS_BUILD_INFO_FILE = os.path.join(BASE_DIR, "cccs_build_info.json")
-# *** CCCS Modifications end ***
-
 # Multiple favicons can be specified here. The "href" property
 # is mandatory, but "sizes," "type," and "rel" are optional.
 # For example:
@@ -88,15 +81,6 @@ CCCS_BUILD_INFO_FILE = os.path.join(BASE_DIR, "cccs_build_info.json")
 #     "rel": "icon"
 # },
 FAVICONS = [{"href": "/static/assets/images/favicon.png"}]
-
-# *** CCCS Modifications start ***
-def _try_json_readcccsbuildnumber(filepath: str) -> Optional[str]:
-    try:
-        with open(filepath, "r") as f:
-            return json.load(f).get("buildNumber")
-    except Exception:  # pylint: disable=broad-except
-        return None
-# *** CCCS Modifications end ***
 
 def _try_json_readversion(filepath: str) -> Optional[str]:
     try:
@@ -124,11 +108,6 @@ def _try_json_readsha(  # pylint: disable=unused-argument
 VERSION_STRING = _try_json_readversion(VERSION_INFO_FILE) or _try_json_readversion(
     PACKAGE_JSON_FILE
 )
-
-# *** CCCS Modifications start ***
-# CCCS build info
-CCCS_BUILD_NUMBER = _try_json_readcccsbuildnumber(CCCS_BUILD_INFO_FILE) or 'unknown'
-# *** CCCS Modifications end ***
 
 VERSION_SHA_LENGTH = 8
 VERSION_SHA = _try_json_readsha(VERSION_INFO_FILE, VERSION_SHA_LENGTH)
