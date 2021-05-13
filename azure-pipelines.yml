@@ -20,7 +20,7 @@ variables:
   buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
 
   # Superset config file
-  supersetConfigFile: superset/config.py
+  supersetConfigFile: 'superset/config.py'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
