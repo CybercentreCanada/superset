@@ -41,7 +41,7 @@ stages:
         echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
 
     - bash: |
-        sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection\nBUILD_NUMBER = '$(Build.BuildNumber)'\n' $(System.DefaultWorkingDirectory)/$supersetConfigFile
+        sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection\nBUILD_NUMBER = '$(Build.BuildNumber)'\n' $(System.DefaultWorkingDirectory)/$(supersetConfigFile)
         echo "BUILD_NUMBER variable added to $(supersetConfigFile) with value $(Build.BuildNumber)"
 
     - task: Docker@2
