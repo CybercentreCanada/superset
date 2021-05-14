@@ -21,7 +21,7 @@ import controlPanel from './controlPanel';
 import transformProps, {
     BigNumberChartProps,
     BigNumberFormData,
-} from '@superset-ui/legacy-preset-chart-big-number/lib/BigNumber/transformProps';
+} from '../BigNumber/transformProps';
 import thumbnail from './images/thumbnail.png';
 
 const metadata = new ChartMetadata({
@@ -37,7 +37,7 @@ export default class BigNumberTotalChartPlugin extends ChartPlugin<
 > {
     constructor() {
         super({
-            loadChart: () => import('@superset-ui/legacy-preset-chart-big-number/lib/BigNumber/BigNumber'),
+            loadChart: () => import('../BigNumber/BigNumber'),
             metadata,
             transformProps,
             controlPanel,
