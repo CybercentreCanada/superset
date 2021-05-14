@@ -17,9 +17,6 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import {
-  BigNumberChartPlugin
-} from '@superset-ui/legacy-preset-chart-big-number';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -73,6 +70,7 @@ import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/p
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
 import { 
+  BigNumberChartPlugin,
   BigNumberTotalChartPlugin,
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
