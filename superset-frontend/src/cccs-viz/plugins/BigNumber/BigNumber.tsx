@@ -80,6 +80,7 @@ type BigNumberVisProps = {
   fromDatetime?: number;
   toDatetime?: number;
   headerFontSize: number;
+  numberDecimalPlaces: number;
   subheader: string;
   subheaderFontSize: number;
   showTrendLine?: boolean;
@@ -137,13 +138,39 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   renderHeader(maxHeight: number) {
-    const { bigNumber, formatNumber, width } = this.props;
+    const { bigNumber, formatNumber, numberDecimalPlaces, width } = this.props;
     const text = bigNumber === null ? t('No data') : formatNumber(bigNumber);
+    var finalText: string = '';
+
+    if (text.indexOf('k') > -1)
+    {
+      switch (numberDecimalPlaces)
+      {
+        case 0:
+          finalText = text.replace('k', '');
+          var finalNum = parseFloat(finalText);
+          finalNum = Math.round(finalNum);
+          finalText = finalNum.toString() + 'k';
+          break;
+        case 2:
+          finalText = text.replace('k', '');
+          var finalNum = parseFloat(finalText)
+          var finalNumString = finalNum.toFixed(2);
+          finalText = finalNumString + 'k';
+          break;
+        default:
+          finalText = text.replace('k', '');
+          var finalNum = parseFloat(finalText)
+          var finalNumString = finalNum.toFixed(1);
+          finalText = finalNumString + 'k';
+          break;
+      }
+    }
 
     const container = this.createTemporaryContainer();
     document.body.append(container);
     const fontSize = computeMaxFontSize({
-      text,
+      text: finalText,
       maxWidth: width,
       maxHeight,
       className: 'header-line',
@@ -159,7 +186,7 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
           height: maxHeight,
         }}
       >
-        {text}
+        {finalText}
       </div>
     );
   }

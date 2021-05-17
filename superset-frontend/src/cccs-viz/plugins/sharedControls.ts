@@ -96,7 +96,7 @@ export const numberOfDecimalPlaces: CustomControlItem = {
         label: t('Number of Decimal Places'),
         renderTrigger: true,
         clearable: false,
-        default: 0,
+        default: 1,
         // Value representing the number of decimal places to display
         options: [
             { 
