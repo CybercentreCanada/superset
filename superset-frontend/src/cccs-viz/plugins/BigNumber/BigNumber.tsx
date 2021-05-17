@@ -75,6 +75,7 @@ type BigNumberVisProps = {
   height: number;
   bigNumber?: number | null;
   bigNumberFallback?: TimeSeriesDatum;
+  currency: string;
   formatNumber: NumberFormatter;
   formatTime: TimeFormatter;
   fromDatetime?: number;
@@ -138,7 +139,7 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   renderHeader(maxHeight: number) {
-    const { bigNumber, formatNumber, numberDecimalPlaces, width } = this.props;
+    const { bigNumber, currency, formatNumber, numberDecimalPlaces, width } = this.props;
     const text = bigNumber === null ? t('No data') : formatNumber(bigNumber);
     var finalText: string = '';
 
@@ -150,19 +151,19 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
           finalText = text.replace('k', '');
           var finalNum = parseFloat(finalText);
           finalNum = Math.round(finalNum);
-          finalText = finalNum.toString() + 'k';
+          finalText = currency + finalNum.toString() + 'k';
           break;
         case 2:
           finalText = text.replace('k', '');
-          var finalNum = parseFloat(finalText)
+          var finalNum = parseFloat(finalText);
           var finalNumString = finalNum.toFixed(2);
-          finalText = finalNumString + 'k';
+          finalText = currency + finalNumString + 'k';
           break;
         default:
           finalText = text.replace('k', '');
-          var finalNum = parseFloat(finalText)
+          var finalNum = parseFloat(finalText);
           var finalNumString = finalNum.toFixed(1);
-          finalText = finalNumString + 'k';
+          finalText = currency + finalNumString + 'k';
           break;
       }
     }
