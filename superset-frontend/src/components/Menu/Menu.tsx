@@ -40,6 +40,7 @@ interface NavBarProps {
   bug_report_url?: string;
   version_string?: string;
   version_sha?: string;
+  build_number?: string;
   documentation_url?: string;
   languages: Languages;
   show_language_picker: boolean;
@@ -239,13 +240,18 @@ export function Menu({
                   </DropdownMenu.Item>
                 </DropdownMenu.ItemGroup>,
               ]}
-              {(navbarRight.version_string || navbarRight.version_sha) && [
+              {(navbarRight.version_string || navbarRight.build_number || navbarRight.version_sha) && [
                 <DropdownMenu.Divider key="version-info-divider" />,
                 <DropdownMenu.ItemGroup key="about-section" title={t('About')}>
                   <div className="about-section">
                     {navbarRight.version_string && (
                       <li className="version-info">
                         <span>Version: {navbarRight.version_string}</span>
+                      </li>
+                    )}
+                    {navbarRight.build_number && (
+                      <li className="version-info">
+                        <span>Build Number: {navbarRight.build_number}</span>
                       </li>
                     )}
                     {navbarRight.version_sha && (

@@ -284,6 +284,13 @@ def menu_data() -> Dict[str, Any]:
             **appbuilder.languages[lang],
             "url": appbuilder.get_url_for_locale(lang),
         }
+
+    build_number = ''
+    try:
+        build_number = appbuilder.app.config["BUILD_NUMBER"]
+    except Exception as ex:
+        logger.debug("BUILD_NUMBER is missing from the config", ex)
+
     return {
         "menu": menu,
         "brand": {
@@ -296,6 +303,7 @@ def menu_data() -> Dict[str, Any]:
             "bug_report_url": appbuilder.app.config["BUG_REPORT_URL"],
             "documentation_url": appbuilder.app.config["DOCUMENTATION_URL"],
             "version_string": appbuilder.app.config["VERSION_STRING"],
+            "build_number": build_number,
             "version_sha": appbuilder.app.config["VERSION_SHA"],
             "languages": languages,
             "show_language_picker": len(languages.keys()) > 1,
