@@ -111,37 +111,34 @@ export const numberOfDecimalPlaces: CustomControlItem = {
                 label: '2',
                 value: 2,
             },
+        ],
+    },
+};
+
+export const currency: CustomControlItem = {
+    name: 'currency',
+    config: {
+        type: 'SelectControl',
+        label: t('Currency'),
+        renderTrigger: true,
+        clearable: false,
+        default: '$',
+        options: [
             {
-                label: '3',
-                value: 3,
+                label: '$',
+                value: '$',
             },
             {
-                label: '4',
-                value: 4,
+                label: '£',
+                value: '£',
             },
             {
-                label: '5',
-                value: 5,
+                label: '€',
+                value: '€',
             },
             {
-                label: '6',
-                value: 6,
-            },
-            {
-                label: '7',
-                value: 7,
-            },
-            {
-                label: '8',
-                value: 8,
-            },
-            {
-                label: '9',
-                value: 9,
-            },
-            {
-                label: '10',
-                value: 10,
+                label: '฿',
+                value: '฿',
             },
         ],
     },
