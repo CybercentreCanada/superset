@@ -180,22 +180,19 @@ export default function DataSourcePanel({
     setInputValue('');
   }, [columns, datasource, metrics]);
 
-  const metricSlice = lists.metrics.slice(0, 50);
-  const columnSlice = lists.columns.slice(0, 50);
-
   const mainBody = (
     <>
-      <input
-        type="text"
-        onChange={evt => {
-          setInputValue(evt.target.value);
-          search(evt.target.value);
-        }}
-        value={inputValue}
-        className="form-control input-md"
-        placeholder={t('Search Metrics & Columns')}
-      />
-      <div className="field-selections">
+      <div className="field-selections" style={{overflowY: 'scroll', height: '88%'}}>
+        <input
+          type="text"
+          onChange={evt => {
+            setInputValue(evt.target.value);
+            search(evt.target.value);
+          }}
+          value={inputValue}
+          className="form-control input-md"
+          placeholder={t('Search Metrics & Columns')}
+        />
         <Collapse
           bordered
           defaultActiveKey={['metrics', 'column']}
@@ -207,9 +204,9 @@ export default function DataSourcePanel({
             key="metrics"
           >
             <div className="field-length">
-              {t(`Showing %s of %s`, metricSlice.length, lists.metrics.length)}
+              {t(`Showing %s`, lists.metrics.length)}
             </div>
-            {metricSlice.map(m => (
+            {lists.metrics.map(m => (
               <LabelContainer key={m.metric_name} className="column">
                 {enableExploreDnd ? (
                   <DatasourcePanelDragWrapper
@@ -229,9 +226,9 @@ export default function DataSourcePanel({
             key="column"
           >
             <div className="field-length">
-              {t(`Showing %s of %s`, columnSlice.length, lists.columns.length)}
+              {t(`Showing %s`, lists.columns.length)}
             </div>
-            {columnSlice.map(col => (
+            {lists.columns.map(col => (
               <LabelContainer key={col.column_name} className="column">
                 {enableExploreDnd ? (
                   <DatasourcePanelDragWrapper
