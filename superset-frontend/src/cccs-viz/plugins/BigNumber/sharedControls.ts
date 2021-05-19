@@ -123,6 +123,7 @@ export const currency: CustomControlItem = {
         renderTrigger: true,
         clearable: false,
         default: '$',
+        // Symbol representing the currency to display
         options: [
             {
                 label: '$',
