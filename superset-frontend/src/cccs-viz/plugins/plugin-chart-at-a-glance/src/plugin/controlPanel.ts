@@ -137,14 +137,14 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
-            name: 'IP',
+            name: 'airline',
             config: {
               type: 'TextControl',
-              default: '1.1.1.1',
+              default: 'US',
               renderTrigger: true,
               // ^ this makes it apply instantaneously, without triggering a "run query" button
-              label: t('Header Text'),
-              description: t('The text you want to see in the header'),
+              label: t('SELECT AIRLINE'),
+              description: t('The airline you want flight information on.'),
             },
           },
         ],
