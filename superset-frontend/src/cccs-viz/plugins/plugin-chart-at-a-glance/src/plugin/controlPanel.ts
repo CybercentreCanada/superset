@@ -102,14 +102,14 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         [
-          {
-            name: 'cols',
-            config: {
-              ...sharedControls.groupby,
-              label: t('Columns'),
-              description: t('Columns to group by'),
-            },
-          },
+          // {
+          //   name: 'cols',
+          //   config: {
+          //     ...sharedControls.groupby,
+          //     label: t('Columns'),
+          //     description: t('Columns to group by'),
+          //   },
+          // },
         ],
         [
           {
