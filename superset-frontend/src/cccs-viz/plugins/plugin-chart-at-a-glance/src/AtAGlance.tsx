@@ -19,6 +19,7 @@
 import React, { useEffect, createRef } from 'react';
 import { styled } from '@superset-ui/core';
 import { AtAGlanceProps, AtAGlanceStylesProps } from './types';
+import { TextField } from '@material-ui/core';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
 // For docs, visit https://emotion.sh/docs/styled
@@ -75,7 +76,7 @@ export default function AtAGlance(props: AtAGlanceProps) {
       width={width}
     >
       <h3>{props.headerText}</h3>
-      <pre>${JSON.stringify(data, null, 2)}</pre>
+      <TextField id="Airline" type="string" inputProps={data} />
     </Styles>
   );
 }
