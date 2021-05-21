@@ -33,7 +33,6 @@ import { ExploreActions } from 'src/explore/actions/exploreActions';
 import Control from 'src/explore/components/Control';
 import DatasourcePanelDragWrapper from './DatasourcePanelDragWrapper';
 import { DndItemType } from '../DndItemType';
-import { setState } from 'react-jsonschema-form/lib/utils';
 
 interface DatasourceControl extends ControlConfig {
   datasource?: DatasourceMeta;
@@ -208,23 +207,71 @@ export default function DataSourcePanel({
             header={<span className="header">{t('Metrics')}</span>}
             key="metrics"
           >
-            <div className="field-length">
-              {t(`Showing %s`, lists.metrics.length)}
-            </div>
-            {lists.metrics.map(m => (
-              <LabelContainer key={m.metric_name} className="column">
-                {enableExploreDnd ? (
-                  <DatasourcePanelDragWrapper
-                    value={m}
-                    type={DndItemType.Metric}
-                  >
-                    <MetricOption metric={m} showType />
-                  </DatasourcePanelDragWrapper>
-                ) : (
-                  <MetricOption metric={m} showType />
-                )}
-              </LabelContainer>
-            ))}
+            { lists.metrics.length > 50 ?
+              <>
+                { showAll ?
+                  <>
+                    <div className="field-length">
+                      {t(`Showing %s`, lists.metrics.length)}
+                    </div>
+                    {lists.metrics.map(m => (
+                      <LabelContainer key={m.metric_name} className="column">
+                        {enableExploreDnd ? (
+                          <DatasourcePanelDragWrapper
+                            value={m}
+                            type={DndItemType.Metric}
+                          >
+                            <MetricOption metric={m} showType />
+                          </DatasourcePanelDragWrapper>
+                        ) : (
+                          <MetricOption metric={m} showType />
+                        )}
+                      </LabelContainer>
+                    ))}
+                  </>
+                  :
+                  <>
+                    <div className="field-length">
+                      {t(`Showing %s of %s`, metricSlice.length, lists.metrics.length)}
+                    </div>
+                    {metricSlice.map(m => (
+                      <LabelContainer key={m.metric_name} className="column">
+                        {enableExploreDnd ? (
+                          <DatasourcePanelDragWrapper
+                            value={m}
+                            type={DndItemType.Metric}
+                          >
+                            <MetricOption metric={m} showType />
+                          </DatasourcePanelDragWrapper>
+                        ) : (
+                          <MetricOption metric={m} showType />
+                        )}
+                      </LabelContainer>
+                    ))}
+                  </>
+                }
+              </>
+              :
+              <>
+                <div className="field-length">
+                  {t(`Showing %s`, lists.metrics.length)}
+                </div>
+                {lists.metrics.map(m => (
+                  <LabelContainer key={m.metric_name} className="column">
+                    {enableExploreDnd ? (
+                      <DatasourcePanelDragWrapper
+                        value={m}
+                        type={DndItemType.Metric}
+                      >
+                        <MetricOption metric={m} showType />
+                      </DatasourcePanelDragWrapper>
+                    ) : (
+                      <MetricOption metric={m} showType />
+                    )}
+                  </LabelContainer>
+                ))}
+              </>
+            }
           </Collapse.Panel>
           <Collapse.Panel
             header={<span className="header">{t('Columns')}</span>}
