@@ -33,6 +33,7 @@ import { ExploreActions } from 'src/explore/actions/exploreActions';
 import Control from 'src/explore/components/Control';
 import DatasourcePanelDragWrapper from './DatasourcePanelDragWrapper';
 import { DndItemType } from '../DndItemType';
+import { setState } from 'react-jsonschema-form/lib/utils';
 
 interface DatasourceControl extends ControlConfig {
   datasource?: DatasourceMeta;
@@ -113,6 +114,7 @@ export default function DataSourcePanel({
 }: Props) {
   const { columns, metrics } = datasource;
   const [inputValue, setInputValue] = useState('');
+  const [showAll, setShowAll] = useState(false);
   const [lists, setList] = useState({
     columns,
     metrics,
@@ -180,6 +182,9 @@ export default function DataSourcePanel({
     setInputValue('');
   }, [columns, datasource, metrics]);
 
+  const metricSlice = lists.metrics.slice(0, 50);
+  const columnSlice = lists.columns.slice(0, 50);
+
   const mainBody = (
     <>
       <div className="field-selections" style={{overflowY: 'scroll', height: '88%'}}>
@@ -225,23 +230,77 @@ export default function DataSourcePanel({
             header={<span className="header">{t('Columns')}</span>}
             key="column"
           >
-            <div className="field-length">
-              {t(`Showing %s`, lists.columns.length)}
-            </div>
-            {lists.columns.map(col => (
-              <LabelContainer key={col.column_name} className="column">
-                {enableExploreDnd ? (
-                  <DatasourcePanelDragWrapper
-                    value={col}
-                    type={DndItemType.Column}
-                  >
-                    <ColumnOption column={col} showType />
-                  </DatasourcePanelDragWrapper>
-                ) : (
-                  <ColumnOption column={col} showType />
-                )}
-              </LabelContainer>
-            ))}
+            { lists.columns.length > 50 ? 
+              <>
+                { showAll ?
+                  <>
+                    <div className="field-length">
+                      {t(`Showing %s`, lists.columns.length)}
+                    </div>
+                    {lists.columns.map(col => (
+                      <LabelContainer key={col.column_name} className="column">
+                        {enableExploreDnd ? (
+                          <DatasourcePanelDragWrapper
+                            value={col}
+                            type={DndItemType.Column}
+                          >
+                            <ColumnOption column={col} showType />
+                          </DatasourcePanelDragWrapper>
+                        ) : (
+                          <ColumnOption column={col} showType />
+                        )}
+                      </LabelContainer>
+                    ))}
+                    <button onClick={() => setShowAll(false)}>
+                      Show less...
+                    </button>
+                  </>
+                  :
+                  <>
+                    <div className="field-length">
+                      {t(`Showing %s of %s`, columnSlice.length, lists.columns.length)}
+                    </div>
+                    {columnSlice.map(col => (
+                      <LabelContainer key={col.column_name} className="column">
+                        {enableExploreDnd ? (
+                          <DatasourcePanelDragWrapper
+                            value={col}
+                            type={DndItemType.Column}
+                          >
+                            <ColumnOption column={col} showType />
+                          </DatasourcePanelDragWrapper>
+                        ) : (
+                          <ColumnOption column={col} showType />
+                        )}
+                      </LabelContainer>
+                    ))}
+                    <button onClick={() => setShowAll(true)}>
+                      Show more...
+                    </button>
+                  </>
+                }
+              </>
+              :
+              <>
+                <div className="field-length">
+                  {t(`Showing %s`, lists.columns.length)}
+                </div>
+                {lists.columns.map(col => (
+                  <LabelContainer key={col.column_name} className="column">
+                    {enableExploreDnd ? (
+                      <DatasourcePanelDragWrapper
+                        value={col}
+                        type={DndItemType.Column}
+                      >
+                        <ColumnOption column={col} showType />
+                      </DatasourcePanelDragWrapper>
+                    ) : (
+                      <ColumnOption column={col} showType />
+                    )}
+                  </LabelContainer>
+                ))}
+              </>
+            }
           </Collapse.Panel>
         </Collapse>
       </div>
