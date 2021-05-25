@@ -276,7 +276,7 @@ export default function DataSourcePanel({
               <DisplayMetrics metricList={metricSlice} enableExploreDnd={enableExploreDnd} />
               { lists.metrics.length > 50 ?
                 <button onClick={() => setShowAllMetrics(true)}>
-                  Show more...
+                  Show all...
                 </button> : null
               }
             </>
@@ -304,7 +304,7 @@ export default function DataSourcePanel({
                 <DisplayColumns columnList={columnSlice} enableExploreDnd={enableExploreDnd} />
                 { lists.columns.length > 50 ?
                   <button onClick={() => setShowAllColumns(true)}>
-                    Show more...
+                    Show all...
                   </button> : null
                 }
               </>
