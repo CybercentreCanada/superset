@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Preset } from '@superset-ui/core';
-import { BigNumberTotalChartPlugin } from '@superset-ui/legacy-preset-chart-big-number';
+import { isFeatureEnabled, Preset } from '@superset-ui/core';
+import {
+  BigNumberChartPlugin,
+  BigNumberTotalChartPlugin,
+} from '@superset-ui/legacy-preset-chart-big-number';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -86,6 +89,12 @@ import {
 
 export default class MainPreset extends Preset {
   constructor() {
+    const experimentalplugins = isFeatureEnabled(
+      FeatureFlag.DASHBOARD_FILTERS_EXPERIMENTAL,
+    )
+      ? [new GroupByFilterPlugin().configure({ key: 'filter_groupby' })]
+      : [];
+
     super({
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
@@ -148,8 +157,8 @@ export default class MainPreset extends Preset {
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
         new TimeColumnFilterPlugin().configure({ key: 'filter_timecolumn' }),
         new TimeGrainFilterPlugin().configure({ key: 'filter_timegrain' }),
-        new GroupByFilterPlugin().configure({ key: 'filter_groupby' }),
         new EchartsTreeChartPlugin().configure({ key: 'tree_chart' }),
+        ...experimentalplugins,
       ],
     });
   }
