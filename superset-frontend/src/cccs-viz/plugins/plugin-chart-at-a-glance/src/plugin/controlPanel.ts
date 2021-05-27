@@ -17,7 +17,23 @@
  * under the License.
  */
 import { t, validateNonEmpty } from '@superset-ui/core';
-import { ControlPanelConfig, sections, sharedControls } from '@superset-ui/chart-controls';
+import { ControlConfig, ControlPanelConfig, ControlPanelState, ControlState, sections, sharedControls } from '@superset-ui/chart-controls';
+
+// const airportFilter: ControlConfig<'AdhocFilterControl'> = {
+//   name: "airport_filter",
+//   type: 'AdhocFilterControl',
+//   config: {
+//     label: t('AIRPORT filter'),
+//     default: 'AIRPORT',
+//     mapStateToProps: (
+//       { datasource }: ControlPanelState,
+//       controlState: ControlState,
+//     ) => ({
+//       colums: datasource?.columns.filter(col =>col.filterable ) || [],
+//     }),  
+//     validators: [validateNonEmpty],
+//   }
+// };
 
 const config: ControlPanelConfig = {
   /**
@@ -93,8 +109,8 @@ const config: ControlPanelConfig = {
    * - validateInteger: must be an integer value
    * - validateNumber: must be an intger or decimal value
    */
-
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
+
   controlPanelSections: [
     sections.legacyRegularTime,
     {
@@ -102,14 +118,14 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         [
-          // {
-          //   name: 'cols',
-          //   config: {
-          //     ...sharedControls.groupby,
-          //     label: t('Columns'),
-          //     description: t('Columns to group by'),
-          //   },
-          // },
+          {
+            name: 'cols',
+            config: {
+              ...sharedControls.groupby,
+              label: t('Columns'),
+              description: t('Columns to group by'),
+            },
+          },
         ],
         [
           {
@@ -137,14 +153,14 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
-            name: 'airline',
+            name: 'Text',
             config: {
               type: 'TextControl',
-              default: 'US',
+              default: 'Header Text',
               renderTrigger: true,
               // ^ this makes it apply instantaneously, without triggering a "run query" button
-              label: t('SELECT AIRLINE'),
-              description: t('The airline you want flight information on.'),
+              label: t('Header Text'),
+              description: t('The text you want to see in the header'),
             },
           },
         ],
