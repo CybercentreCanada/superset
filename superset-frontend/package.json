@@ -76,6 +76,7 @@
     "@emotion/core": "^10.0.35",
     "@emotion/react": "^11.1.5",
     "@superset-ui/chart-controls": "0.17.41",
+    "@superset-ui/core": "0.17.40",
     "@superset-ui/legacy-plugin-chart-calendar": "^0.17.41",
     "@superset-ui/legacy-plugin-chart-chord": "^0.17.41",
     "@superset-ui/legacy-plugin-chart-country-map": "^0.17.41",
@@ -114,6 +115,7 @@
     "classnames": "^2.2.5",
     "core-js": "^3.6.5",
     "d3-array": "^1.2.4",
+    "d3-color": "^1.2.3",
     "d3-scale": "^2.1.2",
     "dom-to-image": "^2.6.0",
     "fontsource-fira-code": "^3.0.5",
@@ -183,15 +185,13 @@
     "redux-undo": "^1.0.0-beta9-9-7",
     "regenerator-runtime": "^0.13.5",
     "rison": "^0.1.1",
+    "shortid": "^2.2.14",
     "urijs": "^1.19.6",
     "use-immer": "^0.4.2",
     "use-query-params": "^1.1.9",
     "@data-ui/xy-chart": "^0.0.84",
-    "@superset-ui/core": "0.17.40",
     "@types/d3-color": "^1.2.2",
-    "@types/shortid": "^0.0.29",
-    "d3-color": "^1.2.3",
-    "shortid": "^2.2.14"
+    "@types/shortid": "^0.0.29"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.10",
