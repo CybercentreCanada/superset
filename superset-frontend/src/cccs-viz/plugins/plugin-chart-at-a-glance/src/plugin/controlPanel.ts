@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
-import { ControlConfig, ControlPanelConfig, ControlPanelState, ControlState, sections, sharedControls } from '@superset-ui/chart-controls';
+import { t } from '@superset-ui/core';
+import { ControlPanelConfig, sharedControls } from '@superset-ui/chart-controls';
 
-// const airportFilter: ControlConfig<'AdhocFilterControl'> = {
-//   name: "airport_filter",
+// const flightNumberFilter: ControlConfig<'AdhocFilterControl'> = {
+//   name: "filter",
 //   type: 'AdhocFilterControl',
 //   config: {
-//     label: t('AIRPORT filter'),
-//     default: 'AIRPORT',
+//     label: t('FLIGHT NUMBER FILTER'),
+//     default: 'FLIGHT_NUMBER',
 //     mapStateToProps: (
 //       { datasource }: ControlPanelState,
 //       controlState: ControlState,
 //     ) => ({
-//       colums: datasource?.columns.filter(col =>col.filterable ) || [],
+//       colums: datasource?.columns.filter(col =>col.column_name === "FLIGHT_NUMBER" ) || [],
 //     }),  
 //     validators: [validateNonEmpty],
 //   }
@@ -112,7 +112,7 @@ const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
 
   controlPanelSections: [
-    sections.legacyRegularTime,
+//    sections.legacyRegularTime,
     {
       label: t('Query'),
       expanded: true,
@@ -124,17 +124,6 @@ const config: ControlPanelConfig = {
               ...sharedControls.groupby,
               label: t('Columns'),
               description: t('Columns to group by'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'metrics',
-            config: {
-              ...sharedControls.metrics,
-              // it's possible to add validators to controls if
-              // certain selections/types need to be enforced
-              validators: [validateNonEmpty],
             },
           },
         ],
