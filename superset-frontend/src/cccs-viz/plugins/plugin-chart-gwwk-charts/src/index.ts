@@ -16,9 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as GwwkChartsChartPlugin } from './plugin-chart-gwwk-charts/src/plugin';
-export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
-export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
-export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
-
-
+// eslint-disable-next-line import/prefer-default-export
+export { default as GwwkChartsChartPlugin } from './plugin';
+/**
+ * Note: this file exports the default export from GwwkCharts.tsx.
+ * If you want to export multiple visualization modules, you will need to
+ * either add additional plugin folders (similar in structure to ./plugin)
+ * OR export multiple instances of `ChartPlugin` extensions in ./plugin/index.ts
+ * which in turn load exports from GwwkCharts.tsx
+ */
