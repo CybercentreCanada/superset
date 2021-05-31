@@ -99,7 +99,7 @@ export const numberOfDecimalPlaces: CustomControlItem = {
         default: 1,
         // Value representing the number of decimal places to display
         options: [
-            { 
+            {
                 label: '0',
                 value: 0,
             },
