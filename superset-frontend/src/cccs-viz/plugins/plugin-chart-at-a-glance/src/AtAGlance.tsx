@@ -19,7 +19,7 @@
 import React, { useEffect, createRef } from 'react';
 
 import { AtAGlanceProps, AtAGlanceStylesProps } from './types';
-import { Grid, ListItem, ListItemText, makeStyles, Typography, useTheme, List, CircularProgress  } from '@material-ui/core';
+import { Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { RiGlobalFill } from 'react-icons/ri';
 
 // The following Styles component is a <div> element, which has been styled using Emotion
@@ -128,6 +128,7 @@ export default function AtAGlance(props: AtAGlanceProps) {
         </div>
     );
   })
+
   return (
     <>
     <div className={classes.sectionTitle}>
