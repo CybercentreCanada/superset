@@ -82,6 +82,7 @@ type BigNumberVisProps = {
   toDatetime?: number;
   headerFontSize: number;
   numberDecimalPlaces: number;
+  numberFormat: string;
   subheader: string;
   subheaderFontSize: number;
   showTrendLine?: boolean;
@@ -139,7 +140,14 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   renderHeader(maxHeight: number) {
-    const { bigNumber, currency, formatNumber, numberDecimalPlaces, width } = this.props;
+    const {
+      bigNumber,
+      currency,
+      formatNumber,
+      numberDecimalPlaces,
+      numberFormat,
+      width,
+    } = this.props;
     const text = bigNumber === null ? t('No data') : formatNumber(bigNumber);
     var finalText: string = '';
 

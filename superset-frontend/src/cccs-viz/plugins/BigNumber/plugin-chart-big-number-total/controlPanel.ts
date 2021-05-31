@@ -17,8 +17,9 @@
  * under the License.
  */
 import { t } from '@superset-ui/core';
-import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
+import { ControlPanelConfig, sections, D3_FORMAT_OPTIONS } from '@superset-ui/chart-controls';
 import { headerFontSize, subheaderFontSize, numberOfDecimalPlaces, currency } from '../sharedControls';
+import { DEFAULT_FORM_DATA } from '../../plugin-chart-status-indicator/src/constants';
 
 export default {
     controlPanelSections: [
@@ -42,7 +43,20 @@ export default {
                         },
                     },
                 ],
-                ['y_axis_format'],
+                [
+                    {
+                        name: 'number_format',
+                        config: {
+                            type: 'SelectControl',
+                            label: t('Number format'),
+                            description: t('D3 format syntax: https://github.com/d3/d3-format'),
+                            freeform: true,
+                            renderTrigger: true,
+                            default: DEFAULT_FORM_DATA.number_format,
+                            choices: D3_FORMAT_OPTIONS,
+                        },
+                    },
+                ],
             ],
         },
         {
@@ -51,9 +65,4 @@ export default {
             controlSetRows: [[headerFontSize], [subheaderFontSize], [numberOfDecimalPlaces], [currency]],
         },
     ],
-    controlOverrides: {
-        y_axis_format: {
-            label: t('Number format'),
-        },
-    },
 } as ControlPanelConfig;
