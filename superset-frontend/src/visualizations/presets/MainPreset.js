@@ -77,6 +77,7 @@ import {
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
+  BigNumberCurrencySelectionChartPlugin,
 } from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
@@ -88,10 +89,9 @@ export default class MainPreset extends Preset {
         new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
         new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
         new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
+        new BigNumberCurrencySelectionChartPlugin().configure({key: 'big_number_total'}),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
-        new BigNumberChartPlugin().configure({ key: 'big_number' }),
-        new BigNumberTotalChartPlugin().configure({ key: 'big_number_total' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
         new BubbleChartPlugin().configure({ key: 'bubble' }),
         new BulletChartPlugin().configure({ key: 'bullet' }),

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+export { default as BigNumberCurrencySelectionChartPlugin } from './plugin-chart-big-number-currency-selection/BigNumberTotal';
 export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
 export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
