@@ -609,102 +609,107 @@ class TestDatasetApi(SupersetTestCase):
         db.session.delete(dataset)
         db.session.commit()
 
-    # def test_update_dataset_create_column(self):
-    #     """
-    #     Dataset API: Test update dataset create column
-    #     """
-    #     # create example dataset by Command
-    #     dataset = self.insert_default_dataset()
+    def test_update_dataset_create_column(self):
+        """
+        Dataset API: Test update dataset create column
+        """
+        # create example dataset by Command
+        dataset = self.insert_default_dataset()
 
-    #     new_column_data = {
-    #         "column_name": "new_col",
-    #         "description": "description",
-    #         "expression": "expression",
-    #         "type": "INTEGER",
-    #         "business_type": "BUSINESS_TYPE",
-    #         "verbose_name": "New Col",
-    #     }
-    #     uri = f"api/v1/dataset/{dataset.id}"
-    #     # Get current cols and append the new column
-    #     self.login(username="admin")
-    #     rv = self.get_assert_metric(uri, "get")
-    #     data = json.loads(rv.data.decode("utf-8"))
+        new_column_data = {
+            "column_name": "new_col",
+            "description": "description",
+            "expression": "expression",
+            "type": "INTEGER",
+            "business_type": "BUSINESS_TYPE",
+            "verbose_name": "New Col",
+        }
+        uri = f"api/v1/dataset/{dataset.id}"
+        # Get current cols and append the new column
+        self.login(username="admin")
+        rv = self.get_assert_metric(uri, "get")
+        data = json.loads(rv.data.decode("utf-8"))
 
-    #     for column in data["result"]["columns"]:
-    #         column.pop("changed_on", None)
-    #         column.pop("created_on", None)
+        for column in data["result"]["columns"]:
+            column.pop("changed_on", None)
+            column.pop("created_on", None)
 
-    #     #data["result"]["columns"].append(new_column_data)
-    #     print( data["result"]["columns"])
-    #     rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
+        data["result"]["columns"].append(new_column_data)
         
-    #     assert rv.status_code == 200
+        dataset_data = {
+            "columns": data["result"]["columns"],
+        }
+        uri = f"api/v1/dataset/{dataset.id}?override_columns=true"
+        rv = self.put_assert_metric(uri, dataset_data, "put")
+        #rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
 
-    #     columns = (
-    #         db.session.query(TableColumn)
-    #         .filter_by(table_id=dataset.id)
-    #         .order_by("column_name")
-    #         .all()
-    #     )
-    #     assert columns[0].column_name == "id"
-    #     assert columns[1].column_name == "name"
-    #     assert columns[2].column_name == new_column_data["column_name"]
-    #     assert columns[2].description == new_column_data["description"]
-    #     assert columns[2].expression == new_column_data["expression"]
-    #     assert columns[2].type == new_column_data["type"]
-    #     assert columns[2].verbose_name == new_column_data["verbose_name"]
-    #     assert columns[2].business_type == new_column_data["business_type"]
+        assert rv.status_code == 200
 
-    #     db.session.delete(dataset)
-    #     db.session.commit()
+        columns = (
+            db.session.query(TableColumn)
+            .filter_by(table_id=dataset.id)
+            .order_by("column_name")
+            .all()
+        )
+        assert columns[0].column_name == "id"
+        assert columns[1].column_name == "name"
+        assert columns[2].column_name == new_column_data["column_name"]
+        assert columns[2].description == new_column_data["description"]
+        assert columns[2].expression == new_column_data["expression"]
+        assert columns[2].type == new_column_data["type"]
+        assert columns[2].verbose_name == new_column_data["verbose_name"]
+        assert columns[2].business_type == new_column_data["business_type"]
 
-    # def test_update_dataset_delete_column(self):
-    #     """
-    #     Dataset API: Test update dataset delete column
-    #     """
-    #     # create example dataset by Command
-    #     dataset = self.insert_default_dataset()
+        db.session.delete(dataset)
+        db.session.commit()
 
-    #     new_column_data = {
-    #         "column_name": "new_col",
-    #         "description": "description",
-    #         "expression": "expression",
-    #         "type": "INTEGER",
-    #         "business_type": "BUSINESS_TYPE",
-    #         "verbose_name": "New Col",
-    #     }
-    #     uri = f"api/v1/dataset/{dataset.id}"
-    #     # Get current cols and append the new column
-    #     self.login(username="admin")
-    #     rv = self.get_assert_metric(uri, "get")
-    #     data = json.loads(rv.data.decode("utf-8"))
+    def test_update_dataset_delete_column(self):
+        """
+        Dataset API: Test update dataset delete column
+        """
+        # create example dataset by Command
+        dataset = self.insert_default_dataset()
 
-    #     for column in data["result"]["columns"]:
-    #         column.pop("changed_on", None)
-    #         column.pop("created_on", None)
+        new_column_data = {
+            "column_name": "new_col",
+            "description": "description",
+            "expression": "expression",
+            "type": "INTEGER",
+            "business_type": "BUSINESS_TYPE",
+            "verbose_name": "New Col",
+        }
+        uri = f"api/v1/dataset/{dataset.id}"
+        # Get current cols and append the new column
+        self.login(username="admin")
+        rv = self.get_assert_metric(uri, "get")
+        data = json.loads(rv.data.decode("utf-8"))
 
-    #     data["result"]["columns"].append(new_column_data)
-    #     rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
+        for column in data["result"]["columns"]:
+            column.pop("changed_on", None)
+            column.pop("created_on", None)
 
-    #     assert rv.status_code == 200
+        data["result"]["columns"].append(new_column_data)
+        rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
 
-    #     # Remove this new column
-    #     data["result"]["columns"].remove(new_column_data)
-    #     rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
-    #     assert rv.status_code == 200
+        assert rv.status_code == 200
 
-    #     columns = (
-    #         db.session.query(TableColumn)
-    #         .filter_by(table_id=dataset.id)
-    #         .order_by("column_name")
-    #         .all()
-    #     )
-    #     assert columns[0].column_name == "id"
-    #     assert columns[1].column_name == "name"
-    #     assert len(columns) == 2
+        # Remove this new column
+        data["result"]["columns"].remove(new_column_data)
+        rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
+        assert rv.status_code == 200
 
-    #     db.session.delete(dataset)
-    #     db.session.commit()
+        columns = (
+            db.session.query(TableColumn)
+            .filter_by(table_id=dataset.id)
+            .order_by("column_name")
+            .all()
+        )
+        assert columns[0].column_name == "id"
+        assert columns[1].column_name == "name"
+        assert len(columns) == 2
+
+        db.session.delete(dataset)
+        db.session.commit()
 
     def test_update_dataset_update_column(self):
         """
