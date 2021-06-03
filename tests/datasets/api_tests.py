@@ -635,14 +635,7 @@ class TestDatasetApi(SupersetTestCase):
             column.pop("created_on", None)
 
         data["result"]["columns"].append(new_column_data)
-        
-        dataset_data = {
-            "columns": data["result"]["columns"],
-        }
-        uri = f"api/v1/dataset/{dataset.id}?override_columns=true"
-        rv = self.put_assert_metric(uri, dataset_data, "put")
-        #rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
-
+        rv = self.client.put(uri, json={"columns": data["result"]["columns"]})
         assert rv.status_code == 200
 
         columns = (
