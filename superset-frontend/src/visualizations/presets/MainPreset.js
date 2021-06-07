@@ -17,10 +17,7 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import {
-  BigNumberChartPlugin,
-  BigNumberTotalChartPlugin,
-} from '@superset-ui/legacy-preset-chart-big-number';
+import { BigNumberTotalChartPlugin } from '@superset-ui/legacy-preset-chart-big-number';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -78,6 +75,7 @@ import {
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
   BigNumberCurrencySelectionChartPlugin,
+  BigNumberChartPlugin,
 } from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
@@ -89,6 +87,7 @@ export default class MainPreset extends Preset {
         new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
         new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
         new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
+        new BigNumberChartPlugin().configure({key: 'big_number'}),
         new BigNumberCurrencySelectionChartPlugin().configure({key: 'big_number_total'}),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),

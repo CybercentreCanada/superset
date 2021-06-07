@@ -16,9 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
+import { t, NumberFormats } from '@superset-ui/core';
 import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
 import { headerFontSize, subheaderFontSize } from '../sharedControls';
+
+export const D3_FORMAT_OPTIONS: [string, string][] = [
+  [NumberFormats.SMART_NUMBER, t('Adaptative formating')],
+  ['~g', t('Original value')],
+  [',d', ',d (12345.432 => 12,345)'],
+  ['.1s', '.1s (12345.432 => 10k)'],
+  ['.3s', '.3s (12345.432 => 12.3k)'],
+  [',.1%', ',.1% (12345.432 => 1,234,543.2%)'],
+  ['.3%', '.3% (12345.432 => 1234543.200%)'],
+  ['.4r', '.4r (12345.432 => 12350)'],
+  [',.3f', ',.3f (12345.432 => 12,345.432)'],
+  ['+,', '+, (12345.432 => +12,345.432)'],
+  ['$,.0f', '$,.0f (12345.432 => $12,345)'],
+  ['$,.1f', '$,.1f (12345.432 => $12,345.4)'],
+  ['$,.2f', '$,.2f (12345.432 => $12,345.43)'],
+  ['฿,.0f', '฿,.0f (12345.432 => ฿12,345)'],
+  ['฿,.1f', '฿,.1f (12345.432 => ฿12,345.4)'],
+  ['฿,.2f', '฿,.2f (12345.432 => ฿12,345.43)'],
+  ['€,.0f', '€,.0f (12345.432 => €12,345'],
+  ['€,.1f', '€,.1f (12345.432 => €12,345.4'],
+  ['€,.2f', '€,.2f (12345.432 => €12,345.43'],
+  ['£,.0f', '£,.0f (12345.432 => £12,345'],
+  ['£,.1f', '£,.1f (12345.432 => £12,345.4'],
+  ['£,.2f', '£,.2f (12345.432 => £12,345.43'],
+  ['DURATION', t('Duration in ms (66000 => 1m 6s)')],
+  ['DURATION_SUB', t('Duration in ms (1.40008 => 1ms 400µs 80ns)')],
+];
 
 export default {
   controlPanelSections: [
@@ -54,6 +81,7 @@ export default {
   controlOverrides: {
     y_axis_format: {
       label: t('Number format'),
+      choices: D3_FORMAT_OPTIONS,
     },
   },
 } as ControlPanelConfig;

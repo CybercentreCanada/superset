@@ -20,6 +20,7 @@ import { t } from '@superset-ui/core';
 import { ControlPanelConfig, formatSelectOptions, sections } from '@superset-ui/chart-controls';
 import React from 'react';
 import { headerFontSize, subheaderFontSize } from '../sharedControls';
+import { D3_FORMAT_OPTIONS } from '../BigNumberTotal/controlPanel';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -165,6 +166,7 @@ const config: ControlPanelConfig = {
   controlOverrides: {
     y_axis_format: {
       label: t('Number format'),
+      choices: D3_FORMAT_OPTIONS,
     },
   },
 };
