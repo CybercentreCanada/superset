@@ -48,6 +48,18 @@ export interface Props {
   actions: Partial<ExploreActions> & Pick<ExploreActions, 'setControlValue'>;
 }
 
+const Button = styled.button`
+  background: none;
+  border: none;
+  text-decoration: underline;
+  color: blue;
+`;
+
+const ButtonContainer = styled.div`
+  text-align: center;
+  padding-top: 2px;
+`;
+
 const DatasourceContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.grayscale.light4};
   position: relative;
@@ -264,9 +276,11 @@ export default function DataSourcePanel({
                 {t(`Showing %s of %s`, lists.metrics.length, lists.metrics.length)}
               </div>
               <DisplayMetrics metricList={lists.metrics} enableExploreDnd={enableExploreDnd} />
-              <button onClick={() => setShowAllMetrics(false)}>
-                Show less...
-              </button>
+              <ButtonContainer>
+                <Button onClick={() => setShowAllMetrics(false)}>
+                  Show less...
+                </Button>
+              </ButtonContainer>
             </>
             :
             <>
@@ -275,9 +289,11 @@ export default function DataSourcePanel({
               </div>
               <DisplayMetrics metricList={metricSlice} enableExploreDnd={enableExploreDnd} />
               { lists.metrics.length > 50 ?
-                <button onClick={() => setShowAllMetrics(true)}>
-                  Show all...
-                </button> : null
+                <ButtonContainer>
+                  <Button onClick={() => setShowAllMetrics(true)}>
+                    Show all...
+                  </Button> 
+                </ButtonContainer> : null
               }
             </>
           }
@@ -292,9 +308,11 @@ export default function DataSourcePanel({
                   {t("Showing %s of %s", lists.columns.length, lists.columns.length)}
                 </div>
                 <DisplayColumns columnList={lists.columns} enableExploreDnd={enableExploreDnd} />
-                <button onClick={() => setShowAllColumns(false)}>
-                  Show less...
-                </button>
+                <ButtonContainer>
+                  <Button onClick={() => setShowAllColumns(false)}>
+                    Show less...
+                  </Button>
+                </ButtonContainer>
               </>
               :
               <>
@@ -303,9 +321,11 @@ export default function DataSourcePanel({
                 </div>
                 <DisplayColumns columnList={columnSlice} enableExploreDnd={enableExploreDnd} />
                 { lists.columns.length > 50 ?
-                  <button onClick={() => setShowAllColumns(true)}>
-                    Show all...
-                  </button> : null
+                  <ButtonContainer>
+                    <Button onClick={() => setShowAllColumns(true)}>
+                      Show all...
+                    </Button>
+                  </ButtonContainer> : null
                 }
               </>
             }
