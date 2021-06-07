@@ -18,6 +18,7 @@
  */
 import {
   createDurationFormatter,
+  createD3NumberFormatter,
   getNumberFormatter,
   getNumberFormatterRegistry,
   NumberFormats,
@@ -62,6 +63,105 @@ export default function setupFormatters() {
     .registerValue('$,0', getNumberFormatter('$,.4f'))
     .registerValue('$,0f', getNumberFormatter('$,.4f'))
     .registerValue('$,.f', getNumberFormatter('$,.4f'))
+    .registerValue('฿,.0f',
+      createD3NumberFormatter({
+        formatString: '$,.0f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['฿', ''],
+        },
+      })
+    )
+    .registerValue('฿,.1f',
+      createD3NumberFormatter({
+        formatString: '$,.1f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['฿', ''],
+        },
+      })
+    )
+    .registerValue('฿,.2f', 
+      createD3NumberFormatter({
+        formatString: '$,.2f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['฿', ''],
+        },
+      })
+    )
+    .registerValue('€,.0f',
+      createD3NumberFormatter({
+        formatString: '$,.0f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['€', ''],
+        },
+      })
+    )
+    .registerValue('€,.1f',
+      createD3NumberFormatter({
+        formatString: '$,.1f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['€', ''],
+        },
+      })
+    )
+    .registerValue('€,.2f',
+      createD3NumberFormatter({
+        formatString: '$,.2f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['€', ''],
+        },
+      })
+    )
+    .registerValue('£,.0f',
+      createD3NumberFormatter({
+        formatString: '$,.0f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['£', ''],
+        },
+      })
+    )
+    .registerValue('£,.1f',
+      createD3NumberFormatter({
+        formatString: '$,.1f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['£', ''],
+        },
+      })
+    )
+    .registerValue('£,.2f',
+      createD3NumberFormatter({
+        formatString: '$,.2f',
+        locale: {
+          decimal: '.',
+          thousands: ',',
+          grouping: [3],
+          currency: ['£', ''],
+        },
+      })
+    )
     .registerValue('DURATION', createDurationFormatter())
     .registerValue(
       'DURATION_SUB',
