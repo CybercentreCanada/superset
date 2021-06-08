@@ -21,7 +21,7 @@ import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
 import { headerFontSize, subheaderFontSize } from '../sharedControls';
 
 export const D3_FORMAT_OPTIONS: [string, string][] = [
-  [NumberFormats.SMART_NUMBER, t('Adaptative formating')],
+  [NumberFormats.SMART_NUMBER, t('Adaptative formatting')],
   ['~g', t('Original value')],
   [',d', ',d (12345.432 => 12,345)'],
   ['.1s', '.1s (12345.432 => 10k)'],
