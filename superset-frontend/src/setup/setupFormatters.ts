@@ -28,6 +28,9 @@ import {
 } from '@superset-ui/core';
 
 export default function setupFormatters() {
+  const currencies: Array<string> = ['฿', '€', '£'];
+  const decimals: Array<string> = ['0', '1', '2'];
+
   getNumberFormatterRegistry()
     // Add shims for format strings that are deprecated or common typos.
     // Temporary solution until performing a db migration to fix this.
@@ -63,110 +66,28 @@ export default function setupFormatters() {
     .registerValue('$,0', getNumberFormatter('$,.4f'))
     .registerValue('$,0f', getNumberFormatter('$,.4f'))
     .registerValue('$,.f', getNumberFormatter('$,.4f'))
-    .registerValue('฿,.0f',
-      createD3NumberFormatter({
-        formatString: '$,.0f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['฿', ''],
-        },
-      })
-    )
-    .registerValue('฿,.1f',
-      createD3NumberFormatter({
-        formatString: '$,.1f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['฿', ''],
-        },
-      })
-    )
-    .registerValue('฿,.2f', 
-      createD3NumberFormatter({
-        formatString: '$,.2f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['฿', ''],
-        },
-      })
-    )
-    .registerValue('€,.0f',
-      createD3NumberFormatter({
-        formatString: '$,.0f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['€', ''],
-        },
-      })
-    )
-    .registerValue('€,.1f',
-      createD3NumberFormatter({
-        formatString: '$,.1f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['€', ''],
-        },
-      })
-    )
-    .registerValue('€,.2f',
-      createD3NumberFormatter({
-        formatString: '$,.2f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['€', ''],
-        },
-      })
-    )
-    .registerValue('£,.0f',
-      createD3NumberFormatter({
-        formatString: '$,.0f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['£', ''],
-        },
-      })
-    )
-    .registerValue('£,.1f',
-      createD3NumberFormatter({
-        formatString: '$,.1f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['£', ''],
-        },
-      })
-    )
-    .registerValue('£,.2f',
-      createD3NumberFormatter({
-        formatString: '$,.2f',
-        locale: {
-          decimal: '.',
-          thousands: ',',
-          grouping: [3],
-          currency: ['£', ''],
-        },
-      })
-    )
     .registerValue('DURATION', createDurationFormatter())
     .registerValue(
       'DURATION_SUB',
       createDurationFormatter({ formatSubMilliseconds: true }),
     );
+
+  decimals.forEach(decimal => {
+    currencies.forEach(symbol => {
+      getNumberFormatterRegistry()
+        .registerValue(symbol + ',.' + decimal + 'f',
+          createD3NumberFormatter({
+            formatString: '$,.' + decimal + 'f',
+            locale: {
+              decimal: '.',
+              thousands: ',',
+              grouping: [3],
+              currency: [symbol, ''],
+            },
+          })
+        );
+    });
+  });
 
   getTimeFormatterRegistry()
     .registerValue('smart_date', smartDateFormatter)
