@@ -52,7 +52,7 @@ const Button = styled.button`
   background: none;
   border: none;
   text-decoration: underline;
-  color: blue;
+  color: #1A85A0;
 `;
 
 const ButtonContainer = styled.div`
