@@ -52,7 +52,7 @@ const Button = styled.button`
   background: none;
   border: none;
   text-decoration: underline;
-  color: #1A85A0;
+  color: ${({ theme }) => theme.colors.primary.dark1};
 `;
 
 const ButtonContainer = styled.div`
