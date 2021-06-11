@@ -101,6 +101,7 @@ export default function ErrorAlert({
   const [isBodyExpanded, setIsBodyExpanded] = useState(false);
 
   const isExpandable = ['explore', 'sqllab'].includes(source);
+  const isLongMessage = (subtitle as string).split(/\r\n|\r|\n/).length > 30;
 
   return (
     <ErrorAlertDiv level={level} role="alert">
@@ -113,7 +114,7 @@ export default function ErrorAlert({
           />
           <strong>{title}</strong>
         </LeftSideContent>
-        {!isExpandable && (
+        {(!isExpandable || isLongMessage) && (
           <span
             role="button"
             tabIndex={0}
@@ -124,7 +125,7 @@ export default function ErrorAlert({
           </span>
         )}
       </div>
-      {isExpandable ? (
+      {(isExpandable && !isLongMessage) ? (
         <div className="error-body">
           <p>{subtitle}</p>
           {body && (
