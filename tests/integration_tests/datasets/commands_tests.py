@@ -93,6 +93,7 @@ class TestExportDatasetsCommand(SupersetTestCase):
                     "is_dttm": False,
                     "python_date_format": None,
                     "type": type_map["source"],
+                    "business_type": None,
                     "verbose_name": None,
                 },
                 {
@@ -105,6 +106,7 @@ class TestExportDatasetsCommand(SupersetTestCase):
                     "is_dttm": False,
                     "python_date_format": None,
                     "type": type_map["target"],
+                    "business_type": None,
                     "verbose_name": None,
                 },
                 {
@@ -117,6 +119,7 @@ class TestExportDatasetsCommand(SupersetTestCase):
                     "is_dttm": False,
                     "python_date_format": None,
                     "type": type_map["value"],
+                    "business_type": None,
                     "verbose_name": None,
                 },
             ],
