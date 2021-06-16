@@ -16,39 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormData, SetDataMaskHook, supersetTheme, TimeseriesDataRecord } from '@superset-ui/core';
+import { QueryFormData, supersetTheme, TimeseriesDataRecord } from '@superset-ui/core';
 
-export interface CccsGridStylesProps {
+export interface GwwkChartsStylesProps {
   height: number;
   width: number;
-  headerFontSize?: keyof typeof supersetTheme.typography.sizes;
-  boldText?: boolean;
+  headerFontSize: keyof typeof supersetTheme.typography.sizes;
+  boldText: boolean;
 }
 
-interface CccsGridCustomizeProps {
+interface GwwkChartsCustomizeProps {
   headerText: string;
-  emitFilter: boolean;
-  setDataMask: SetDataMaskHook;
-  selectedValues: Record<number, string>;
-  formData: CccsGridQueryFormData;
 }
 
-export type CccsGridQueryFormData = QueryFormData &
-  CccsGridStylesProps &
-  CccsGridCustomizeProps;
+export type GwwkChartsQueryFormData = QueryFormData &
+  GwwkChartsStylesProps &
+  GwwkChartsCustomizeProps;
 
-export type CccsGridProps = CccsGridStylesProps &
-  CccsGridCustomizeProps & {
+export type GwwkChartsProps = GwwkChartsStylesProps &
+  GwwkChartsCustomizeProps & {
     data: TimeseriesDataRecord[];
-    columnDefs: any;
-    rowData: any;
-    tooltipShowDelay: any;
-    frameworkComponents: any;
-    modules: any;
-    defaultColDef: any;
-    rowSelection: any;
-    filters: any;
+    selected_values: string[];
+    mode: string;
     // add typing here for the props you pass in from transformProps.ts!
   };
-
-export type EventHandlers = Record<string, { (props: any): void }>;
