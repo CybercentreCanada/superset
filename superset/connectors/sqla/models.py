@@ -1425,7 +1425,20 @@ class SqlaTable(  # pylint: disable=too-many-public-methods,too-many-instance-at
 
         return or_(*groups)
 
+    def get_filter_type(self, filter: dict) -> str:
+        for column in self.columns:
+            if filter['col'] == column.column_name:
+                return column.type
+
     def query(self, query_obj: QueryObjectDict) -> QueryResult:
+        # Converts comparator from string to boolean if field type is boolean
+        for i in range(len(query_obj['filter'])):
+            if self.get_filter_type(query_obj['filter'][i]) == 'BOOLEAN':
+                if query_obj['filter'][i]['val'] == 'true':
+                    query_obj['filter'][i]['val'] = True
+                elif query_obj['filter'][i]['val'] == 'false':
+                    query_obj['filter'][i]['val'] = False
+
         qry_start_dttm = datetime.now()
         query_str_ext = self.get_query_str_extended(query_obj)
         sql = query_str_ext.sql
