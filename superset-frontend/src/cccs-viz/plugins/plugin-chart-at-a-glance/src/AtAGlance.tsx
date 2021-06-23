@@ -42,11 +42,11 @@
 import { Chip, Grid, ListItem, ListItemText, makeStyles, Typography, useTheme, List, CircularProgress  } from '@material-ui/core';
 import React, { useEffect, createRef, useState } from 'react';
 
-import { AtAGlanceFarsightProps, AtAGlanceGeoProps } from './types';
+
 import { RiGlobalFill } from 'react-icons/ri';
 import { getChartDataRequest } from 'src/chart/chartAction';
 import { Skeleton } from 'src/common/components';
-import { QueryFormData } from '@superset-ui/core';
+import { AdhocFilter, QueryFormData } from '@superset-ui/core';
 
 const useStyles = makeStyles(theme => ({
   datum: {
@@ -94,32 +94,14 @@ const getPayloadField = (field: string, payload: any) => {
 
 
 function AtAGlanceCore ( formData: QueryFormData) {
+  console.log("In at a glance component");
 
-  const [geoState, setGeoState] = useState<AtAGlanceGeoProps>(
-    {
-      ip: '34.214.200.224' ,
-      country: "", 
-      carrier: "",
-      asn: "",
-      organisation: "",
-      connection_type: "",
-      decimal: "",
-      virusTotalCount: "NotAvailabe",
-      city: ""
-    });
-
-    const [farsightState, setFarsightState] = useState<AtAGlanceFarsightProps>(
-      {
-        associatedHostNames: []
-      });
-
-  const useDataApi = (initalDatasource: string, formData: any) => {
+  const useDataApi = (initalDatasource: string, formData: QueryFormData) => {
     const [data, setData] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
-    const [datasource, setDataSource] = useState(initalDatasource);
-
-  
+    //const [datasource, setDataSource] = useState(initalDatasource);
+      
     useEffect(() => {
       console.log("useDataApi invoked");
       const fetchLookupDetails = async () => {
@@ -148,19 +130,30 @@ function AtAGlanceCore ( formData: QueryFormData) {
       fetchLookupDetails();
     }, [formData]);
   
-    return [{ data, isLoading, isError }, setDataSource];
+    return [{ data, isLoading, isError }] as const;
   };
 
   const theme = useTheme();
   const classes = useStyles();
-  formData.metrics = undefined;
-  const newStarGeoFormData : QueryFormData = formData;
-  newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
-  const farsightFormData : QueryFormData = formData;
-  farsightFormData.columns = ["rrnames"];
+  const [ip, setIp] = useState('34.214.200.224');
+  const [queryFormData, setFormData] = useState(formData);
 
-  const [{ geoData, isGeoLoading, isGeoError }, notUsed] = useDataApi("134__table", newStarGeoFormData);
-  const [{ farsightData, isFarsightLoading, isFarsightError }, unUsed] = useDataApi("134__table", newStarGeoFormData);
+  const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ip] };
+  const queryFormData2 : QueryFormData= JSON.parse(JSON.stringify(queryFormData));
+  queryFormData2.metrics = undefined;
+  queryFormData2.adhoc_filters != null  ? queryFormData2.adhoc_filters.push(filter) : queryFormData2.adhoc_filters = [filter];
+  queryFormData2.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
+  setFormData(queryFormData2);
+
+  //const newStarGeoFormData : QueryFormData = formData;
+  //const farsightFormData : QueryFormData = formData;
+  
+ 
+  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi("60__table", queryFormData);
+  queryFormData2.columns = ["domain_list"];
+  setFormData(queryFormData2);
+  const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi("59__table", queryFormData);
+
   return (
     <>
     <div className={classes.sectionTitle}>
@@ -168,7 +161,8 @@ function AtAGlanceCore ( formData: QueryFormData) {
               <RiGlobalFill /> <span style={{ marginLeft: theme.spacing(1) }}>At a glance</span>
             </Typography>
     </div>
-    <div className={classes.datum}>
+    
+    {/* <div className={classes.datum}>
       <div style={{ padding: theme.spacing(1) }}>
           <Grid container>
             <Grid item xs={12} md={6} lg={4} xl={3}>
@@ -180,7 +174,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                        { isGeoLoading ? state.ip : <Skeleton />}  
+                        { isGeoLoading ? <Skeleton /> : ip}  
                       </Typography>
                     </Grid>
                   </Grid>
@@ -192,7 +186,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : state.decimal }  
+                        { isGeoLoading ? <Skeleton /> : getPayloadField("decimal", geoData) }  
                       </Typography>
                     </Grid>
                   </Grid>
@@ -205,7 +199,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : state.asn }
+                        { isGeoLoading ? <Skeleton /> : getPayloadField("asn", geoData) }
                       </Typography>
                     </Grid>
                   </Grid>
@@ -218,7 +212,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : state.carrier }
+                        { isGeoLoading ? <Skeleton /> : getPayloadField("carrier", geoData) }  
                       </Typography>
                     </Grid>
                   </Grid>
@@ -231,7 +225,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                      { isGeoLoading ? <Skeleton /> : state.country }
+                      { isGeoLoading ? <Skeleton /> : getPayloadField("country", geoData) }
                       </Typography>
                     </Grid>
                   </Grid>
@@ -244,7 +238,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={9}>
                       <Typography color="textSecondary">
-                      {  isGeoLoading ? <Skeleton /> : state.city }
+                      {  isGeoLoading ? <Skeleton /> : getPayloadField("city", geoData) }
                       </Typography>
                     </Grid>
                   </Grid>
@@ -274,10 +268,10 @@ function AtAGlanceCore ( formData: QueryFormData) {
                     </Grid>
                     <Grid item xs={10}>
                     { 
-                     isFarsightLoading ? <CircularProgress/> : 
+                     isFarsightLoading ? <div>Loading ...</div> : 
                     <List className={classes.urlList}>
                       {
-                        state.associatedHostNames.map(name => (
+                        getPayloadField("domain_", farsightData).map(name => (
                         <ListItem button component="a" href="https://www.google.com" key={name} className={classes.urlListItem}>
                           <ListItemText>
                             <Typography color="textSecondary">{name}</Typography>
@@ -304,8 +298,8 @@ function AtAGlanceCore ( formData: QueryFormData) {
             </Grid>
           </Grid>
         </div>
-      </div>
-    </>
+       </div> */ }
+    </> 
   );
 };
 
