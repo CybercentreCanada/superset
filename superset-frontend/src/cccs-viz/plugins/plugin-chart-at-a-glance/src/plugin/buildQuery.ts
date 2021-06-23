@@ -38,7 +38,7 @@ export default function buildQuery(formData: QueryFormData) {
   We fire multiple queries to multiple data sets and collect the results here.
   */
 
-  
+  console.log("in buildQuery");
   return buildQueryContext(formData, baseQueryObject => {
 
     
