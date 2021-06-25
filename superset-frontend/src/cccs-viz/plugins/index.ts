@@ -16,8 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+<<<<<<< .merge_file_sfJmmK
 export { default as BigNumberChartPlugin } from './BigNumber/BigNumber/';
 export { default as BigNumberTotalChartPlugin } from './BigNumber/plugin-chart-big-number-total/';
 export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
 export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
+=======
+export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
+export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
+export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
+
+
+>>>>>>> .merge_file_SUGy1Q
