@@ -464,6 +464,7 @@ class SqlaTable(  # pylint: disable=too-many-public-methods,too-many-instance-at
     metric_class = SqlMetric
     column_class = TableColumn
     owner_class = security_manager.user_model
+    column_types = {}
 
     __tablename__ = "tables"
     __table_args__ = (UniqueConstraint("database_id", "table_name"),)
@@ -1427,19 +1428,18 @@ class SqlaTable(  # pylint: disable=too-many-public-methods,too-many-instance-at
 
         return or_(*groups)
 
-    def get_filter_type(self, filter: dict) -> str:
+    def fill_column_types(self) -> str:
         for column in self.columns:
-            if filter['col'] == column.column_name:
-                return column.type
+            self.column_types[column.column_name] = column.type
 
     def query(self, query_obj: QueryObjectDict) -> QueryResult:
+        if self.column_types == {}:
+            self.fill_column_types()
+
         # Converts comparator from string to boolean if field type is boolean
         for i in range(len(query_obj['filter'])):
-            if self.get_filter_type(query_obj['filter'][i]) == 'BOOLEAN':
-                if query_obj['filter'][i]['val'] == 'true':
-                    query_obj['filter'][i]['val'] = True
-                elif query_obj['filter'][i]['val'] == 'false':
-                    query_obj['filter'][i]['val'] = False
+            if self.column_types[query_obj['filter'][i]['col']] == 'BOOLEAN':
+                query_obj['filter'][i]['val'] = bool(query_obj['filter'][i]['val'].lower())
 
         qry_start_dttm = datetime.now()
         query_str_ext = self.get_query_str_extended(query_obj)
