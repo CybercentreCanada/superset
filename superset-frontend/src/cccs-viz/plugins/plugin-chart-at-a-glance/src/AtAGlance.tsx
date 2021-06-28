@@ -47,6 +47,7 @@ import { RiGlobalFill } from 'react-icons/ri';
 import { getChartDataRequest } from 'src/chart/chartAction';
 import { Skeleton } from 'src/common/components';
 import { AdhocFilter, QueryFormData } from '@superset-ui/core';
+import { data } from 'jquery';
 
 const useStyles = makeStyles(theme => ({
   datum: {
@@ -92,77 +93,86 @@ const getPayloadField = (field: string, payload: any) => {
   return undefined;
 };
 
+const useDataApi = (initialFormData: QueryFormData) => {
+  const [data, setData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+    
+  useEffect(() => {
+    console.log("useDataApi invoked");
+    console.log(formData);
+    const fetchLookupDetails = async () => {
+
+      console.log("Inside use effect");
+      console.log(formData);
+      try {
+        const asyncChartDataRequest = getChartDataRequest({
+          formData: formData,
+          resultFormat: 'json',
+          resultType: 'full',
+          force: false, // when true, bypass the redis cache
+          method: 'POST',
+        });
+        setIsError(false);
+        setIsLoading(true);
+        const response = await asyncChartDataRequest;
+        console.log("New data:");
+        const newData = response.result[0].data[0];
+        console.log(newData)
+        setData(newData);
+      } catch (error) {
+        console.log(error)
+        setIsError(true);
+        setIsLoading(false);
+      }
+      setIsLoading(false);
+    };
+
+    fetchLookupDetails();
+  }, [formData]);
+
+  return [{ data, isLoading, isError }, setFormData] as const;
+};
 
 function AtAGlanceCore ( formData: QueryFormData) {
   console.log("In at a glance component");
 
-  const useDataApi = (initalDatasource: string, formData: QueryFormData) => {
-    const [data, setData] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-    //const [datasource, setDataSource] = useState(initalDatasource);
-      
-    useEffect(() => {
-      console.log("useDataApi invoked");
-      const fetchLookupDetails = async () => {
-        setIsError(false);
-        setIsLoading(true);
   
-        try {
-          const asyncChartDataRequest = getChartDataRequest({
-            formData,
-            resultFormat: 'json',
-            resultType: 'full',
-            force: false, // when true, bypass the redis cache
-            method: 'POST',
-          });
-  
-          const response = await asyncChartDataRequest;
-          const newData = response.result[0].data[0];
-          setData(newData);
-        } catch (error) {
-          setIsError(true);
-        }
-  
-        setIsLoading(false);
-      };
-  
-      fetchLookupDetails();
-    }, [formData]);
-  
-    return [{ data, isLoading, isError }] as const;
-  };
-
   const theme = useTheme();
   const classes = useStyles();
   const [ip, setIp] = useState('34.214.200.224');
-  const [queryFormData, setFormData] = useState(formData);
+
+  const queryFormData2 : QueryFormData= JSON.parse(JSON.stringify(formData));
 
   const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ip] };
-  const queryFormData2 : QueryFormData= JSON.parse(JSON.stringify(queryFormData));
-  queryFormData2.metrics = undefined;
   queryFormData2.adhoc_filters != null  ? queryFormData2.adhoc_filters.push(filter) : queryFormData2.adhoc_filters = [filter];
-  queryFormData2.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
-  setFormData(queryFormData2);
 
-  //const newStarGeoFormData : QueryFormData = formData;
-  //const farsightFormData : QueryFormData = formData;
+  queryFormData2.metrics = undefined;
+  queryFormData2.datasource="60__table";
+
+  queryFormData2.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
+
+  //setFormData(queryFormData2);
+  //const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(formData));;
+  const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(formData));;
   
  
-  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi("60__table", queryFormData);
-  queryFormData2.columns = ["domain_list"];
-  setFormData(queryFormData2);
-  const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi("59__table", queryFormData);
+  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi(queryFormData2);
+  farsightFormData.columns = ["rrname"];
+  farsightFormData.datasource = "58__table";
+  const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
 
   return (
     <>
     <div className={classes.sectionTitle}>
             <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
-              <RiGlobalFill /> <span style={{ marginLeft: theme.spacing(1) }}>At a glance</span>
+              <RiGlobalFill /> <span style={{ marginLeft: theme.spacing(1) }}>At a glance {isFarsightLoading ? "Loading ..." : farsightData.rrname} </span>
             </Typography>
     </div>
     
-    {/* <div className={classes.datum}>
+
+{/*     {<div className={classes.datum}>
       <div style={{ padding: theme.spacing(1) }}>
           <Grid container>
             <Grid item xs={12} md={6} lg={4} xl={3}>
@@ -298,7 +308,7 @@ function AtAGlanceCore ( formData: QueryFormData) {
             </Grid>
           </Grid>
         </div>
-       </div> */ }
+       </div> } */}
     </> 
   );
 };
