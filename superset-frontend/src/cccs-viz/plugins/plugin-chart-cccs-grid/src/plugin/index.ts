@@ -36,7 +36,7 @@ export default class CccsGridChartPlugin extends ChartPlugin {
   constructor() {
     const metadata = new ChartMetadata({
       description: 'CCCS Grid',
-      name: t('CCCS Grid'),
+      name: t('CCCS Grid - jjgrego'),
       thumbnail,
       behaviors: [Behavior.INTERACTIVE_CHART],
    });
