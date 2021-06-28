@@ -17,6 +17,7 @@
  * under the License.
  */
 import { ChartProps, Column, TimeseriesDataRecord } from '@superset-ui/core';
+import { GroupCellRenderer } from "@ag-grid-enterprise/all-modules";
 
 export default function transformProps(chartProps: ChartProps) {
   /**
@@ -82,7 +83,12 @@ export default function transformProps(chartProps: ChartProps) {
       columnTypeMap[c] == 'DOMAIN' ? 'domainValueRenderer' :
       // @ts-ignore
       columnTypeMap[c] == 'COUNTRY' ? 'countryValueRenderer' :
-              undefined,
+      // @ts-ignore
+      // TODO We use the default GroupCellRender here but a unique GroupCellRender
+      // should be used so when a column is expanded, not all columns are expanded
+      // Also, I had some issues if the type was ARRAY, not sure why
+      columnTypeMap[c] == 'COMPLEX' ? 'agGroupCellRenderer' :
+        undefined,
       sortable: true,
     };
   });
