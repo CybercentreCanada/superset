@@ -100,12 +100,7 @@ const useDataApi = (initialFormData: QueryFormData) => {
   const [formData, setFormData] = useState(initialFormData);
     
   useEffect(() => {
-    console.log("useDataApi invoked");
-    console.log(formData);
     const fetchLookupDetails = async () => {
-
-      console.log("Inside use effect");
-      console.log(formData);
       try {
         const asyncChartDataRequest = getChartDataRequest({
           formData: formData,
@@ -114,18 +109,19 @@ const useDataApi = (initialFormData: QueryFormData) => {
           force: false, // when true, bypass the redis cache
           method: 'POST',
         });
+
         setIsError(false);
         setIsLoading(true);
         const response = await asyncChartDataRequest;
-        console.log("New data:");
         const newData = response.result[0].data[0];
-        console.log(newData)
         setData(newData);
       } catch (error) {
+
         console.log(error)
         setIsError(true);
         setIsLoading(false);
       }
+
       setIsLoading(false);
     };
 
@@ -141,26 +137,26 @@ function AtAGlanceCore ( formData: QueryFormData) {
   
   const theme = useTheme();
   const classes = useStyles();
-  const [ip, setIp] = useState('34.214.200.224');
+  const [ipString, setIpString] = useState('34.214.200.224');
 
-  const queryFormData2 : QueryFormData= JSON.parse(JSON.stringify(formData));
+  // Filter that will be applied to all the queries for each datasrouce.
+  const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ipString] };
 
-  const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ip] };
-  queryFormData2.adhoc_filters != null  ? queryFormData2.adhoc_filters.push(filter) : queryFormData2.adhoc_filters = [filter];
+  // Setting up newStarGeo query:
+  const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(formData));
+  newStarGeoFormData.adhoc_filters != null  ? newStarGeoFormData.adhoc_filters.push(filter) : newStarGeoFormData.adhoc_filters = [filter];
+  newStarGeoFormData.metrics = undefined;
+  newStarGeoFormData.datasource="60__table";
+  newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
 
-  queryFormData2.metrics = undefined;
-  queryFormData2.datasource="60__table";
-
-  queryFormData2.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
-
-  //setFormData(queryFormData2);
-  //const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(formData));;
+  // Setting up farsight query:
   const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(formData));;
-  
- 
-  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi(queryFormData2);
   farsightFormData.columns = ["rrname"];
   farsightFormData.datasource = "58__table";
+  farsightFormData.adhoc_filters != null  ? newStarGeoFormData.adhoc_filters.push(filter) : newStarGeoFormData.adhoc_filters = [filter];
+
+  // Query executions:
+  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi(newStarGeoFormData);
   const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
 
   return (
