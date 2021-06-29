@@ -59,6 +59,12 @@ const guessFrame = (timeRange: string): FrameType => {
   if (COMMON_RANGE_VALUES_SET.has(timeRange)) {
     return 'Common';
   }
+  if (timeRange === 'today : tomorrow') {
+    return 'Today';
+  }
+  if (timeRange === 'yesterday : today') {
+    return 'Yesterday';
+  }
   if (CALENDAR_RANGE_VALUES_SET.has(timeRange)) {
     return 'Calendar';
   }
@@ -217,11 +223,13 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
           guessedFrame === 'No filter'
         ) {
           setActualTimeRange(value);
-          setTooltipTitle(
-            type === ('error' as Type)
-              ? t('Default value is required')
-              : actualRange || '',
-          );
+          setTooltipTitle(actualRange || '');
+        } else if (
+          guessedFrame === 'Today' ||
+          guessedFrame === 'Yesterday'
+        ) {
+          setActualTimeRange(guessedFrame);
+          setTooltipTitle(actualRange || '');
         } else {
           setActualTimeRange(actualRange || '');
           setTooltipTitle(value || '');
@@ -282,6 +290,12 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
     if (value === 'No filter') {
       setTimeRangeValue('No filter');
     }
+    if (value === 'Today') {
+      setTimeRangeValue('today : tomorrow');
+    }
+    if (value === 'Yesterday') {
+      setTimeRangeValue('yesterday : today');
+    }
     setFrame(value as FrameType);
   }
 
@@ -296,10 +310,12 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
         value={frame}
         onChange={onChangeFrame}
       />
-      {frame !== 'No filter' && <Divider />}
+      {!['No filter', 'Today', 'Yesterday'].includes(frame) && <Divider />}
       {frame === 'Common' && (
         <CommonFrame value={timeRangeValue} onChange={setTimeRangeValue} />
       )}
+      {frame === 'Today' && <div data-test="today" />}
+      {frame === 'Yesterday' && <div data-test="yesterday" />}
       {frame === 'Calendar' && (
         <CalendarFrame value={timeRangeValue} onChange={setTimeRangeValue} />
       )}
