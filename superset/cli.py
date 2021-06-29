@@ -510,7 +510,7 @@ else:
         default=False,
         help="recursively search the path for yaml files",
     )
-    def import_datasources(path: str, sync: str, recursive: bool) -> None:
+    def import_datasources_yaml(path: str, sync: str, recursive: bool) -> None:
         """Import datasources from YAML"""
         from superset.datasets.commands.importers.v0 import ImportDatasetsCommand
 
@@ -530,7 +530,7 @@ else:
             files.extend(path_object.rglob("*.yml"))
         contents = {path.name: open(path).read() for path in files}
         try:
-            ImportDatasetsCommand(contents, sync_columns, sync_metrics, kwargs=sync_array).run()
+            ImportDatasetsCommand(contents, kwargs=sync_array).run()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error when importing dataset")
 
