@@ -45,9 +45,12 @@ import { areObjectsEqual } from '../reduxUtils';
 import { Filters } from '../dashboard/reducers/types';
 >>>>>>> e8e838e27... feat(native-filters): Auto apply changes in FiltersConfigModal (#14461)
 
-export function getInitialDataMask(id?: string, moreProps?: DataMask): DataMask;
 export function getInitialDataMask(
-  id: string,
+  id?: string | number,
+  moreProps?: DataMask,
+): DataMask;
+export function getInitialDataMask(
+  id: string | number,
   moreProps: DataMask = {},
 ): DataMaskWithId {
   let otherProps = {};
