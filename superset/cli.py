@@ -510,7 +510,7 @@ else:
         default=False,
         help="recursively search the path for yaml files",
     )
-    def import_datasources_yaml(path: str, sync: str, recursive: bool) -> None:
+    def import_datasources(path: str, sync: str, recursive: bool) -> None:
         """Import datasources from YAML"""
         from superset.datasets.commands.importers.v0 import ImportDatasetsCommand
 

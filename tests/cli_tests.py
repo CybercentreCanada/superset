@@ -208,7 +208,7 @@ def test_import_datasets_versioned_export(import_datasets_command, app_context, 
     import_datasets_command.assert_called_with(expected_contents, overwrite=True)
 
 @mock.patch.dict(
-    "superset.config.DEFAULT_FEATURE_FLAGS", {"VERSIONED_EXPORT": True}, clear=True
+    "superset.config.DEFAULT_FEATURE_FLAGS", {"VERSIONED_EXPORT": False}, clear=True
 )
 @mock.patch("superset.datasets.commands.importers.v0.ImportDatasetsCommand")
 def test_import_datasets_sync_argument(import_datasets_command, app_context, fs):
@@ -224,7 +224,7 @@ def test_import_datasets_sync_argument(import_datasets_command, app_context, fs)
         fp.write("hello: world")
 
     runner = app.test_cli_runner()
-    response = runner.invoke(superset.cli.import_datasources_yaml, ["-p", "dataset.yaml", "-s", "metrics,columns"])
+    response = runner.invoke(superset.cli.import_datasources, ["-p", "dataset.yaml", "-s", "metrics,columns"])
     
     assert response.exit_code == 0
 
