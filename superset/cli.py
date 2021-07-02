@@ -530,7 +530,7 @@ else:
             files.extend(path_object.rglob("*.yml"))
         contents = {path.name: open(path).read() for path in files}
         try:
-            ImportDatasetsCommand(contents, kwargs=sync_array).run()
+            ImportDatasetsCommand(contents, sync_columns, sync_metrics).run()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error when importing dataset")
 
