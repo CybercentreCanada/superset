@@ -284,14 +284,14 @@ class ImportDatasetsCommand(BaseCommand):
     """
 
     # pylint: disable=unused-argument
-    def __init__(self, contents: Dict[str, str], sync_columns, sync_metrics):
+    def __init__(self, contents: Dict[str, str], **kwargs: Any):
         self.contents = contents
         self._configs: Dict[str, Any] = {}
 
         self.sync = []
-        if sync_columns:
+        if kwargs['sync_columns']:
             self.sync.append("columns")
-        if sync_metrics:
+        if kwargs['sync_metrics']:
             self.sync.append("metrics")
 
     def run(self) -> None:
