@@ -73,6 +73,7 @@ const DatasourceContainer = styled.div`
   .field-selections {
     padding: ${({ theme }) => `0 0 ${4 * theme.gridUnit}px`};
     overflow: auto;
+    margin-bottom: 20px;
   }
   .field-length {
     margin-bottom: ${({ theme }) => theme.gridUnit * 2}px;
@@ -249,7 +250,7 @@ export default function DataSourcePanel({
 
   const mainBody = (
     <>
-      <div className="field-selections" style={{overflowY: 'scroll', height: '88%'}}>
+      <div className="field-selections">
         <input
           type="text"
           onChange={evt => {
