@@ -51,13 +51,8 @@ import IPAddressUtil from './IpAddressUtil';
 
 const getPayloadField = (field: string, payload: any) => {
   try{
-    console.log("In getPayloadFields");
-    console.log(payload);
-    console.log("field " + field);
     const value = payload[field];
-    console.log("value: " + value);
     if (value !== undefined) {
-        console.log("found it")
         return value;
     }
   } catch (e)
@@ -68,15 +63,37 @@ const getPayloadField = (field: string, payload: any) => {
   return "Unknown";
 };
 
-const useDataApi = (initialFormData: QueryFormData, initialIPString : String) => {
+const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
+  const numericalIP = IPAddressUtil.textToNumericFormatV4(ip);
+  console.log("buildGeoForm - numeric IP:" + numericalIP);
+
+  // Filter that will be applied to all the queries for each datasrouce. Use this statement when ip_string is available in datasource.
+  // const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ipString] };
+  // For now, we are translating the dotted notation back to numerical and casting it into a string as the adhocFilter accepts a string as a comparator but 
+  // for the mvp and when the types are put in place by 2A, the component will most like need to be updated.
+     
+  const startIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'start_ip_int', operator: '<=', comparator: numericalIP.toString(10) };
+  const endIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'end_ip_int', operator: '>=', comparator: numericalIP.toString(10)};
+  // Setting up newStarGeo query:
+  const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
+  newStarGeoFormData.adhoc_filters = [startIPFilter, endIPFilter];
+  newStarGeoFormData.metrics = undefined;
+  newStarGeoFormData.datasource="60__table";
+  newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
+  return newStarGeoFormData;
+}
+
+const useDataApi = (formData: QueryFormData) => {
   const [data, setData] = useState({});
   const [isInit, setIsinit] = useState(true)
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
-    
+
+  console.log("In useDataApi beginning- formData: " + JSON.stringify(formData));
+  console.log("In useDataApi beginning - data: " + JSON.stringify(data));
+   
   useEffect(() => {
-    console.log("initialFormData" + initialFormData);
+    console.log("isInit: " + isInit);
     const fetchLookupDetails = async () => {
       try {
         const asyncChartDataRequest = getChartDataRequest({
@@ -87,46 +104,33 @@ const useDataApi = (initialFormData: QueryFormData, initialIPString : String) =>
           method: 'POST',
         });
         setIsinit(false);
-        setIsError(false);
         setIsLoading(true);
+        setIsError(false);
         const response = await asyncChartDataRequest;
-        console.log("response" + response);
         const newData = response.result[0].data[0];
+        setIsLoading(false);
         setData(newData);
       } catch (error) {
-
-        console.log(error);
-        setIsinit(false);
-        setIsError(true);
-        setIsLoading(false);
+          console.log(error);
+          setIsError(true);
+          setIsLoading(false);
       }
 
       setIsLoading(false);
     };
-
     fetchLookupDetails();
-  }, [initialIPString]);
-  console.log("data in api call" + data);
-  return [{ data, isLoading, isError, isInit }, setFormData] as const;
+    console.log("In useDataApi end - data: " + JSON.stringify(data));
+  }, [formData]);
+  return [{ data, isLoading, isError, isInit }] as const;
 };
 
-function AtAGlanceCore ( formData: QueryFormData) {
+function AtAGlanceCore ( initialFormData: QueryFormData) {
   console.log("In At A Glance");
   const [ipString, setIpString] = useState('34.214.200.224');
-  const numericalIP = IPAddressUtil.textToNumericFormatV4(ipString);
+  const [formData, setFormData] = useState(initialFormData);
+  const [newStarGeoFormData, setNewStarGeoFormData] = useState(buildGeoFormData(formData, ipString));
 
-  // Filter that will be applied to all the queries for each datasrouce. Use this statement when ip_string is available in datasource.
-  // const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ipString] };
-  const startIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'start_ip_int', operator: '<=', comparator: numericalIP.toString(10) };
-  const endIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'end_ip_int', operator: '>=', comparator: numericalIP.toString(10)};
  
-  // Setting up newStarGeo query:
-  const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(formData));
-  newStarGeoFormData.adhoc_filters = [startIPFilter, endIPFilter];
-  newStarGeoFormData.metrics = undefined;
-  newStarGeoFormData.datasource="60__table";
-  newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
-
   // Setting up farsight query:
   // const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(formData));
   // const rdataFilter =  AdhocFilter = {expressionType: 'SQL', clause: 'WHERE', sqlExpression:"where start_ip_int = 217384448 OR end_ip_int = 217384448"};
@@ -136,31 +140,37 @@ function AtAGlanceCore ( formData: QueryFormData) {
   // //farsightFormData.adhoc_filters  = [filter];
 
   // Query executions:
-  const [{ data : geoData, isLoading: isGeoLoading, isInit : isGeoInit, isError: isGeoError}] = useDataApi(newStarGeoFormData, ipString);
+  console.log("newStarGeoForm: " + JSON.stringify(newStarGeoFormData));
+  const [{ data : geoData, isLoading: isGeoLoading, isInit : isGeoInit, isError: isGeoError}] = useDataApi(newStarGeoFormData);
+  console.log("geoData: " + JSON.stringify(geoData));
   //const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
 
-  // const [inputValue, setInputValue] = useState(ipString);
-  // const submit = event => {
-  //   event.preventDefault();
-  //   console.log("event value" + inputValue);
-  //   setIpString(inputValue);
-  //   setInputValue('');
-  // };
+  const [inputIp, setInputIp] = useState(ipString);
+  const submit = event => {
+    if (inputIp == "")  
+       alert("IP can't be empty");
+    else
+      event.preventDefault();
+      console.log("event value: " + inputIp);
+      setNewStarGeoFormData(buildGeoFormData(formData, inputIp));
+      setIpString(inputIp);
+      console.log("ipstring in submit event" + ipString);
+  };
 
   return (
     <>
     <div style={styles.SectionTitle}>
       <RiGlobalFill /> <span> At a Glance </span>
     </div>
-    {/* <div style={styles.Datum}>
+    <div style={styles.Datum}>
       <form autoComplete="off" onSubmit={submit}>
           <label>
             IP:
-            <input type="text" value={ipString} onChange={event => setInputValue(event.target.value)} />
+            <input type="text" value={inputIp} onChange={e => {setInputIp(e.target.value); console.log( "e value" + e.target.value )} }/>
           </label>
           <input type="submit" value="Submit" />
         </form>
-    </div> */}
+    </div>
     <div style={styles.Datum}>
       <Grid fluid >
         <Row >
