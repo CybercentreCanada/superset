@@ -39,67 +39,44 @@
 //     font-weight: ${({ theme, boldText }) => theme.typography.weights[boldText ? 'bold' : 'normal']};
 //   }
 // `;
-import { Chip, Grid, ListItem, ListItemText, makeStyles, Typography, useTheme, List, CircularProgress  } from '@material-ui/core';
-import React, { useEffect, createRef, useState } from 'react';
 
 
+import React, { useEffect, useState } from 'react';
 import { RiGlobalFill } from 'react-icons/ri';
 import { getChartDataRequest } from 'src/chart/chartAction';
-import { Skeleton } from 'src/common/components';
-import { AdhocFilter, QueryFormData } from '@superset-ui/core';
-import { data } from 'jquery';
-
-const useStyles = makeStyles(theme => ({
-  datum: {
-    border: '1px solid',
-    borderColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[300],
-    color: theme.palette.text.secondary,
-    marginBottom: theme.spacing(1),
-    padding: theme.spacing(1)
-  },
-  datumLink: {
-    marginTop: theme.spacing(1)
-  },
-  sectionTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(1)
-  },
-  urlList: {
-    hight: '100%',
-    width: '100%',
-    maxWidth: 360,
-    overflow: 'auto',
-    maxHeight: 100,
-    float: 'left',
-  },
-  urlListItem: {
-    backgroundColor: 'inherit',
-    padding: 0,
-  },
-}));
+import { QueryFormData, AdhocFilter } from '@superset-ui/core';
+import { Row, Col, Grid} from 'react-bootstrap/';
+import styles from './styles';
+import IPAddressUtil from './IpAddressUtil';
 
 const getPayloadField = (field: string, payload: any) => {
   try{
-    const index = payload.columns.findIndex(e => e['name'] === field);
-    if (index !== -1) {
-        console.log("IndexFoundIs")
-        return payload.rows[0][index];
+    console.log("In getPayloadFields");
+    console.log(payload);
+    console.log("field " + field);
+    const value = payload[field];
+    console.log("value: " + value);
+    if (value !== undefined) {
+        console.log("found it")
+        return value;
     }
   } catch (e)
   {
-    return "Unknown"
+    console.log(e);
+    return "Something went wrong";
   }
-  return undefined;
+  return "Unknown";
 };
 
-const useDataApi = (initialFormData: QueryFormData) => {
+const useDataApi = (initialFormData: QueryFormData, initialIPString : String) => {
   const [data, setData] = useState({});
+  const [isInit, setIsinit] = useState(true)
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
     
   useEffect(() => {
+    console.log("initialFormData" + initialFormData);
     const fetchLookupDetails = async () => {
       try {
         const asyncChartDataRequest = getChartDataRequest({
@@ -109,15 +86,17 @@ const useDataApi = (initialFormData: QueryFormData) => {
           force: false, // when true, bypass the redis cache
           method: 'POST',
         });
-
+        setIsinit(false);
         setIsError(false);
         setIsLoading(true);
         const response = await asyncChartDataRequest;
+        console.log("response" + response);
         const newData = response.result[0].data[0];
         setData(newData);
       } catch (error) {
 
-        console.log(error)
+        console.log(error);
+        setIsinit(false);
         setIsError(true);
         setIsLoading(false);
       }
@@ -126,188 +105,95 @@ const useDataApi = (initialFormData: QueryFormData) => {
     };
 
     fetchLookupDetails();
-  }, [formData]);
-
-  return [{ data, isLoading, isError }, setFormData] as const;
+  }, [initialIPString]);
+  console.log("data in api call" + data);
+  return [{ data, isLoading, isError, isInit }, setFormData] as const;
 };
 
 function AtAGlanceCore ( formData: QueryFormData) {
-  console.log("In at a glance component");
-
-  
-  const theme = useTheme();
-  const classes = useStyles();
+  console.log("In At A Glance");
   const [ipString, setIpString] = useState('34.214.200.224');
+  const numericalIP = IPAddressUtil.textToNumericFormatV4(ipString);
 
-  // Filter that will be applied to all the queries for each datasrouce.
-  const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ipString] };
-
+  // Filter that will be applied to all the queries for each datasrouce. Use this statement when ip_string is available in datasource.
+  // const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [ipString] };
+  const startIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'start_ip_int', operator: '<=', comparator: numericalIP.toString(10) };
+  const endIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'end_ip_int', operator: '>=', comparator: numericalIP.toString(10)};
+ 
   // Setting up newStarGeo query:
   const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(formData));
-  newStarGeoFormData.adhoc_filters != null  ? newStarGeoFormData.adhoc_filters.push(filter) : newStarGeoFormData.adhoc_filters = [filter];
+  newStarGeoFormData.adhoc_filters = [startIPFilter, endIPFilter];
   newStarGeoFormData.metrics = undefined;
   newStarGeoFormData.datasource="60__table";
   newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
 
   // Setting up farsight query:
-  const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(formData));;
-  farsightFormData.columns = ["rrname"];
-  farsightFormData.datasource = "58__table";
-  farsightFormData.adhoc_filters != null  ? newStarGeoFormData.adhoc_filters.push(filter) : newStarGeoFormData.adhoc_filters = [filter];
+  // const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(formData));
+  // const rdataFilter =  AdhocFilter = {expressionType: 'SQL', clause: 'WHERE', sqlExpression:"where start_ip_int = 217384448 OR end_ip_int = 217384448"};
+  // farsightFormData.metrics = undefined;
+  // farsightFormData.columns = ["rrname"];
+  // farsightFormData.datasource = "58__table";
+  // //farsightFormData.adhoc_filters  = [filter];
 
   // Query executions:
-  const [{ data : geoData, isLoading: isGeoLoading, isError: isGeoError}] = useDataApi(newStarGeoFormData);
-  const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
+  const [{ data : geoData, isLoading: isGeoLoading, isInit : isGeoInit, isError: isGeoError}] = useDataApi(newStarGeoFormData, ipString);
+  //const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
+
+  // const [inputValue, setInputValue] = useState(ipString);
+  // const submit = event => {
+  //   event.preventDefault();
+  //   console.log("event value" + inputValue);
+  //   setIpString(inputValue);
+  //   setInputValue('');
+  // };
 
   return (
     <>
-    <div className={classes.sectionTitle}>
-            <Typography variant="h5" style={{ display: 'flex', alignItems: 'center' }}>
-              <RiGlobalFill /> <span style={{ marginLeft: theme.spacing(1) }}>At a glance {isFarsightLoading ? "Loading ..." : farsightData.rrname} </span>
-            </Typography>
+    <div style={styles.SectionTitle}>
+      <RiGlobalFill /> <span> At a Glance </span>
     </div>
-    
-
-{/*     {<div className={classes.datum}>
-      <div style={{ padding: theme.spacing(1) }}>
-          <Grid container>
-            <Grid item xs={12} md={6} lg={4} xl={3}>
-              <Grid container spacing={1}>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">IP</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : ip}  
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">Decimal</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : getPayloadField("decimal", geoData) }  
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">ASN</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : getPayloadField("asn", geoData) }
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">Carrier</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                        { isGeoLoading ? <Skeleton /> : getPayloadField("carrier", geoData) }  
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">Country</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                      { isGeoLoading ? <Skeleton /> : getPayloadField("country", geoData) }
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">City</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                      {  isGeoLoading ? <Skeleton /> : getPayloadField("city", geoData) }
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={3}>
-                      <Typography color="textSecondary">Virus Total</Typography>
-                    </Grid>
-                    <Grid item xs={9}>
-                      <Typography color="textSecondary">
-                            <Chip label="Not Yet Available" color="secondary" size="small" /> 
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={8}>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={2}>
-                    <ListItem>
-                          <Typography color="textSecondary">Associated Domain names</Typography>
-                    </ListItem>
-                    </Grid>
-                    <Grid item xs={10}>
-                    { 
-                     isFarsightLoading ? <div>Loading ...</div> : 
-                    <List className={classes.urlList}>
-                      {
-                        getPayloadField("domain_", farsightData).map(name => (
-                        <ListItem button component="a" href="https://www.google.com" key={name} className={classes.urlListItem}>
-                          <ListItemText>
-                            <Typography color="textSecondary">{name}</Typography>
-                          </ListItemText>
-                        </ListItem>
-                        ))
-                      }
-                      </List>
-                    }
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={5}>
-                      <ListItem>
-                          <Typography color="textSecondary">Blocked By</Typography>
-                      </ListItem>
-                    </Grid>
-                    <Grid item xs={6}>
-                    </Grid>
-                  </Grid>
-                </Grid>
-            </Grid>
-          </Grid>
-        </div>
-       </div> } */}
+    {/* <div style={styles.Datum}>
+      <form autoComplete="off" onSubmit={submit}>
+          <label>
+            IP:
+            <input type="text" value={ipString} onChange={event => setInputValue(event.target.value)} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+    </div> */}
+    <div style={styles.Datum}>
+      <Grid fluid >
+        <Row >
+          <Col> ASN: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("asn", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> CARRIER: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("carrier", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> CONNECTION TYPE: {isGeoLoading && !isGeoInit ? "Loading ..." :  getPayloadField("connection_type", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> ORGANIZATION: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("organization", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> CITY: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("city", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> COUNTRY: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("country", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> DECIMAL: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("decimal", geoData)} </Col>
+        </Row>
+        <Row >
+          <Col> VIRUSTOTAL COUNT: {isGeoLoading && !isGeoInit ? "Loading ..." : "Not yet available"} </Col>
+        </Row>
+        <Row >
+          <Col> ASSOCIATED HOSTNAMES: {isGeoLoading && !isGeoInit ? "Loading ..." : "Not yet available"} </Col>
+        </Row>
+      </Grid>
+    </div>   
     </> 
   );
 };
-
 
 export default AtAGlanceCore;
