@@ -24,6 +24,8 @@ import { DataMask, FeatureFlag } from '@superset-ui/core';
 import { NATIVE_FILTER_PREFIX } from 'src/dashboard/components/nativeFilters/FiltersConfigModal/utils';
 import { HYDRATE_DASHBOARD } from 'src/dashboard/actions/hydrate';
 import { isFeatureEnabled } from 'src/featureFlags';
+import { getUrlParam } from 'src/utils/urlUtils';
+import { URL_PARAMS } from 'src/constants';
 import { DataMaskStateWithId, DataMaskWithId } from './types';
 import {
   AnyDataMaskAction,
@@ -114,13 +116,13 @@ function fillNativeFilters(
 =======
 >>>>>>> e8e838e27... feat(native-filters): Auto apply changes in FiltersConfigModal (#14461)
 ) {
+  const dataMaskFromUrl = getUrlParam(URL_PARAMS.nativeFilters) || {};
   filterConfig.forEach((filter: Filter) => {
     mergedDataMask[filter.id] = {
       ...getInitialDataMask(filter.id), // take initial data
       ...filter.defaultDataMask, // if something new came from BE - take it
-      ...draftDataMask[filter.id], // keep local filter data
+      ...dataMaskFromUrl[filter.id],
     };
-    // if we came from filters config modal and particular filters changed take it's dataMask
     if (
       currentFilters &&
       !areObjectsEqual(
