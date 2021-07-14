@@ -289,9 +289,9 @@ class ImportDatasetsCommand(BaseCommand):
         self._configs: Dict[str, Any] = {}
 
         self.sync = []
-        if kwargs['sync_columns']:
+        if kwargs.get("sync_columns"):
             self.sync.append("columns")
-        if kwargs['sync_metrics']:
+        if kwargs.get("sync_metrics"):
             self.sync.append("metrics")
 
     def run(self) -> None:
