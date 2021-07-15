@@ -79,6 +79,7 @@ import {
   StatusIndicatorChartPlugin,
   BigNumberCurrencySelectionChartPlugin,
   BigNumberChartPlugin,
+  AssemblyLineChartPlugin,
 } from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
@@ -87,6 +88,7 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new AssemblyLineChartPlugin().configure({key: 'assembly_line'}),
         new GwwkChartsChartPlugin().configure({key: 'gwwk_charts'}),
         new GwwkDatasetsChartPlugin().configure({key: 'gwwk_datasets'}),
         new GwwkDashboardsChartPlugin().configure({key: 'gwwk_dashboards'}),

@@ -17,6 +17,7 @@
  * under the License.
  */
 
+export { default as AssemblyLineChartPlugin } from './plugin-chart-assembly-line/src/plugin';
 export { default as BigNumberCurrencySelectionChartPlugin } from './plugin-chart-big-number-currency-selection/BigNumberTotal';
 export { default as BigNumberChartPlugin } from './plugin-chart-big-number-currency-selection/BigNumber';
 export { default as GwwkChartsChartPlugin } from './plugin-chart-gwwk-charts/src/Charts';
