@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AssemblyLineProps } from './types';
 import { default as dummy } from './plugin/dummy';
 import GenericComponent from './plugin/GenericComponent';
+import AssemblyLineRobot from './plugin/importImage';
 
 const useDataApi = (initialIP: string, initialData: number | undefined): number | undefined => {
     const [data, setData] = useState(initialData);
@@ -47,7 +48,11 @@ export default function AssemblyLine(props: AssemblyLineProps) {
 
     let finalTotalTimesSeen: number = totalTimesSeen ? totalTimesSeen : 0;
 
+    const result = "Assembly Line has seen this IP " + finalTotalTimesSeen.toString() + " times.";
+    const link = "https://malware.cyber.gc.ca/search?query=" + props.ipAddress;
+    const title = "Assembly Line";
+
     return (
-        <GenericComponent totalTimesSeen={finalTotalTimesSeen} ipAddress={props.ipAddress} />
+        <GenericComponent result={result} image={AssemblyLineRobot} link={link} title={title} />
     );
 }

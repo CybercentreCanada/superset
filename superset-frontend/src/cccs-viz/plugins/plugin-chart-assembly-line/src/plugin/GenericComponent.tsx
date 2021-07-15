@@ -1,6 +1,5 @@
 import React from 'react';
 import { styled } from '@superset-ui/core';
-import AssemblyLineRobot from '../images/Assemblyline_robot.png';
 
 const Container = styled.div`
     border: 2px solid black;
@@ -28,19 +27,21 @@ const ALLink = styled.a`
 `;
 
 interface GenericComponentProps {
-    totalTimesSeen: number;
-    ipAddress: string;
+    result: string;
+    image: any;
+    link: string;
+    title: string;
 }
 
 export default function GenericComponent(props: GenericComponentProps) {
     return (
         <Container>
             <ResultImageContainer>
-                <Result>Assembly Line has seen this IP address {props.totalTimesSeen} times.</Result>
-                <Image src={AssemblyLineRobot} />
+                <Result>{props.result}</Result>
+                <Image src={props.image} />
             </ResultImageContainer>
             <br/><br/>
-            <ALLink href={"https://malware.cyber.gc.ca/search?query=" + props.ipAddress}>Assembly Line</ALLink>
+            <ALLink href={props.link}>{props.title}</ALLink>
         </Container>
     );
 }
