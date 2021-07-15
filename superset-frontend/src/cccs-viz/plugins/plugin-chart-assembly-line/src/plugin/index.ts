@@ -1,6 +1,7 @@
-import { t, ChartPlugin, ChartMetadata } from '@superset-ui/core';
+import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import controlPanel from './controlPanel';
+import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
-import buildQuery from './buildQuery';
 
 export default class AssemblyLineChartPlugin extends ChartPlugin {
     constructor() {
@@ -11,9 +12,10 @@ export default class AssemblyLineChartPlugin extends ChartPlugin {
         });
 
         super({
-            buildQuery,
+            controlPanel,
             loadChart: () => import('../AssemblyLine'),
             metadata,
+            transformProps,
         });
     }
 }
