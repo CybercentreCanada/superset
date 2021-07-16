@@ -1,46 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-
-// The following Styles component is a <div> element, which has been styled using Emotion
-// For docs, visit https://emotion.sh/docs/styled
-
-// Theming variables are provided for your use via a ThemeProvider
-// imported from @superset-ui/core. For variables available, please visit
-// https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/style/index.ts
-
-// const Styles = styled.div<AtAGlanceStylesProps>`
-//   background-color: ${({ theme }) => theme.colors.secondary.light2};
-//   padding: ${({ theme }) => theme.gridUnit * 4}px;
-//   border-radius: ${({ theme }) => theme.gridUnit * 2}px;
-//   height: ${({ height }) => height};
-//   width: ${({ width }) => width};
-//   overflow-y: scroll;
-
-//   h3 {
-//     /* You can use your props to control CSS! */
-//     font-size: ${({ theme, headerFontSize }) => theme.typography.sizes[headerFontSize]};
-//     font-weight: ${({ theme, boldText }) => theme.typography.weights[boldText ? 'bold' : 'normal']};
-//   }
-// `;
-
-
 import React, { useEffect, useState } from 'react';
 import { RiGlobalFill } from 'react-icons/ri';
 import { getChartDataRequest } from 'src/chart/chartAction';
@@ -85,15 +42,11 @@ const getPayloadField = (field: string, payload: any) => {
 };
 
 function getHostnames (payload: any) { 
-  const uniqueSet = new Set(payload.map(a => a.rrname));
+  let resultset = []
+  resultset = payload.map(a => a.rrname)
+  const uniqueSet = new Set(resultset);
   const result = [...uniqueSet];
-  console.log("payload: "  + JSON.stringify(payload));
-  console.log("hostnames: "  + JSON.stringify(result));
   return result;
-  // if (props.isFarsightLoading && !props.isFarsightInit) { 
-  //   return "Loading ...";
-  // }
-  // return getPayloadField("rrdata", props.farsightData).map((hostname) => console.log);
 }
 
 /**
@@ -130,6 +83,7 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
   newStarGeoFormData.metrics = undefined;
   newStarGeoFormData.datasource="60__table";
   newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
+
   return newStarGeoFormData;
 }
 
@@ -153,32 +107,71 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
 const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
    const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
   
-  // Setting up the filters
+  // Setting up the filter
   const IPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'rdata', operator: 'IN', comparator: [ip] };
 
   farsightFormData.adhoc_filters  = [IPFilter];
   farsightFormData.metrics = undefined;
   farsightFormData.columns = ["rrname"];
   farsightFormData.datasource = "58__table";
-  farsightFormData.limit = 10;
+  farsightFormData.row_limit = 50;
   return farsightFormData;
 }
 
+/**
+*   isPayloadUndefined:
+*     description: Check if payload is null or undefined.
+*     parameter:
+*       - name: payload
+*       - type: any
+*       - required: true
+*       - description: data we need to verify.  
+*     returns:
+*       value:
+*         description: Returns true or false.
+*/
 const isPayloadUndefined = (payload : any) =>{
   return payload == null;
 }
 
-const useDataApi = (formData: QueryFormData) => {
-  const [data, setData] = useState([]); 
-  const [isInit, setIsinit] = useState(true)
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
-  console.log("In useDataApi beginning- formData: " + JSON.stringify(formData));
-  console.log("In useDataApi beginning - data: " + JSON.stringify(data));
+/**
+*   useDataApi:
+*     description: Custom hook that queries the dataset.
+*     parameters:
+*       - name: formData
+*       - type: QueryFormData
+*       - required: true
+*       - description: Contains all the request information that is sent to the back end.
+*
+*       - name: setData, 
+*       - type: SetStateAction
+*       - required: true
+*       - description: sets the data property to the response data.  
+*
+*       - name: setIsinit, 
+*       - type: SetStateAction
+*       - required: true
+*       - description: sets the appropriate data property to the response data.  
+*
+*       - name: setIsLoading, 
+*       - type: SetStateAction
+*       - required: true
+*       - description: sets the appropriate isLoading property to either true or false depending on the 
+*         state of the query to the back end. 
+* 
+*       - name: setIsError, 
+*       - type: SetStateAction
+*       - required: true
+*       - description: sets the appropriate setIsError property to either true or false depending on the 
+*         state of the query to the back end.  
+*/
+const useDataApi = (formData: QueryFormData, 
+        setData: { (value: React.SetStateAction<never[]>): void; (value: React.SetStateAction<never[]>): void; (arg0: any): void; }, 
+        setIsinit: { (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
+        setIsLoading: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
+        setIsError: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; }) => {
    
   useEffect(() => {
-    console.log("isInit: " + isInit);
     const fetchLookupDetails = async () => {
       try {
         const asyncChartDataRequest = getChartDataRequest({
@@ -205,27 +198,39 @@ const useDataApi = (formData: QueryFormData) => {
     };
     fetchLookupDetails();
   }, [formData]);
-  return [{ data, isLoading, isError, isInit }] as const;
 };
 
+//Main Component
 function AtAGlanceCore ( initialFormData: QueryFormData) {
   console.log("In At A Glance");
   const [ipString, setIpString] = useState('3.251.148.10');
   const [formData, setFormData] = useState(initialFormData);
-  const [newStarGeoFormData, setNewStarGeoFormData] = useState(buildGeoFormData(formData, ipString));
+
+  //neustargeo state
+  const [geoFormData, setNewStarGeoFormData] = useState(buildGeoFormData(formData, ipString));
+  const [geoData, setGeoData] = useState([]);
+  const [isGeoInit, setIsGeoinit] = useState(true);
+  const [isGeoLoading, setIsGeoLoading] = useState(false);
+  const [isGeoError, setIsGeoError] = useState(false);
+
+  //farsight state 
   const [farsightFormData, setFarsightFormData] = useState(buildFarsightFormData(formData, ipString));
- 
+  const [farsightData, setFarsightData] = useState([]);
+  const [isFarsightInit, setIsFarsightinit] = useState(true) 
+  const [isFarsightLoading, setIsFarsightLoading] = useState(false);
+  const [isFarsightError, setIsFarsightError] = useState(false);
+
   // Query executions:
-  const [{ data : geoData, isLoading: isGeoLoading, isInit : isGeoInit, isError: isGeoError}] = useDataApi(newStarGeoFormData);
-  //console.log("geoData: " + JSON.stringify(geoData));
+  useDataApi(geoFormData, setGeoData, setIsGeoinit, setIsGeoLoading, setIsGeoError);
+  console.log("geoData: " + JSON.stringify(geoData));
 
-  const [{ data: farsightData, isLoading: isFarsightLoading, isError: isFarsightError }] = useDataApi(farsightFormData);
-  //console.log("farsightData: "  + JSON.stringify(farsightData));
+  useDataApi(farsightFormData, setFarsightData, setIsFarsightinit, setIsFarsightLoading, setIsFarsightError);
+  console.log("farsightData: "  + JSON.stringify(farsightData));
 
-
+  //form submit handler
   const [inputIp, setInputIp] = useState(ipString);
   const submit = event => {
-    if (inputIp == "")  
+    if (inputIp.trim() == "")  
        alert("IP can't be empty");
     else
       event.preventDefault();
@@ -292,20 +297,14 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
         <Row >
           <Col> DECIMAL: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("decimal", geoData[0])} </Col>
         </Row>
-        <Row >
-          <Col> VIRUSTOTAL COUNT: {isGeoLoading && !isGeoInit ? "Loading ..." : "Not yet available"} </Col>
-        </Row>
-        <Row >
-          <Col> ASSOCIATED HOSTNAMES: {isGeoLoading && !isGeoInit ? "Loading ..." : "Not yet available"} </Col>
-        </Row>
       </Grid>
     </div>
-    <div>
-      <h3>ASSOCIATE HOSTNAMES</h3>
-      <ul> 
-        {isGeoLoading && !isGeoInit ? "Loading ..." :  getHostnames(farsightData).map((hostname) =>  <li>{hostname}</li>)  } 
-      </ul> 
-    </div>    
+    <div style={styles.Datum}>
+      <h5>ASSOCIATED HOSTNAMES:</h5>
+        <ul style={styles.HostList}>  
+          {isFarsightLoading && !isFarsightInit ? "Loading ..." :  getHostnames(farsightData).map((hostname: string) =>  <li>{hostname}</li>)  } 
+        </ul> 
+      </div>    
     </> 
   );
 };

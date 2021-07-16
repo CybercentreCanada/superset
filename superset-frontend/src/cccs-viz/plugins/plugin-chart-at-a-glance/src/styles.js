@@ -32,13 +32,18 @@ const Datum = {
     padding: 0,
   }
 
+  const HostList = {
+    maxHeight: 300,
+    overflow: 'scroll',
+  }
 
   const styles = {
-    Datum : Datum,
-    DatumLink : DatumLink,
-    SectionTitle : SectionTitle,
-    UrlList : UrlList,
-    UrlListItem: UrlListItem, 
+    Datum: Datum,
+    DatumLink: DatumLink,
+    SectionTitle: SectionTitle,
+    UrlList: UrlList,
+    UrlListItem: UrlListItem,
+    HostList: HostList,
   }
 
   export default styles;
