@@ -77,12 +77,9 @@ import {
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
-<<<<<<< HEAD
   AtAGlance,
-=======
   BigNumberCurrencySelectionChartPlugin,
   BigNumberChartPlugin,
->>>>>>> cccs-1.2
 } from 'src/cccs-viz/plugins/';
 import { AtAGlanceChartPlugin } from 'src/cccs-viz/plugins/plugin-chart-at-a-glance/src';
 
@@ -92,13 +89,10 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
-<<<<<<< HEAD
         new AtAGlanceChartPlugin().configure({key:'at_a_glance'}),
-=======
         new GwwkChartsChartPlugin().configure({key: 'gwwk_charts'}),
         new GwwkDatasetsChartPlugin().configure({key: 'gwwk_datasets'}),
         new GwwkDashboardsChartPlugin().configure({key: 'gwwk_dashboards'}),
->>>>>>> cccs-1.2
         new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
         new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
         new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
