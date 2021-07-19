@@ -80,7 +80,9 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
   // Setting up newStarGeo query:
   const newStarGeoFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
   newStarGeoFormData.adhoc_filters = [startIPFilter, endIPFilter];
-  newStarGeoFormData.metrics = undefined;
+  newStarGeoFormData.metrics = undefined; 
+  // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
+  // the datasource id given when it was added to superset.
   newStarGeoFormData.datasource="60__table";
   newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
 
@@ -113,6 +115,8 @@ const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
   farsightFormData.adhoc_filters  = [IPFilter];
   farsightFormData.metrics = undefined;
   farsightFormData.columns = ["rrname"];
+  // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
+  // the datasource id given when it was added to superset
   farsightFormData.datasource = "58__table";
   farsightFormData.row_limit = 50;
   return farsightFormData;
@@ -222,10 +226,8 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
 
   // Query executions:
   useDataApi(geoFormData, setGeoData, setIsGeoinit, setIsGeoLoading, setIsGeoError);
-  console.log("geoData: " + JSON.stringify(geoData));
-
   useDataApi(farsightFormData, setFarsightData, setIsFarsightinit, setIsFarsightLoading, setIsFarsightError);
-  console.log("farsightData: "  + JSON.stringify(farsightData));
+
 
   //form submit handler
   const [inputIp, setInputIp] = useState(ipString);
@@ -234,11 +236,9 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
        alert("IP can't be empty");
     else
       event.preventDefault();
-      console.log("event value: " + inputIp);
       setNewStarGeoFormData(buildGeoFormData(formData, inputIp));
       setFarsightFormData(buildFarsightFormData(formData, inputIp));
       setIpString(inputIp);
-      console.log("ipstring in submit event" + ipString);
   };
 
   if (isPayloadUndefined(geoData) && !isGeoLoading)
