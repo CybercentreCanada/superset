@@ -17,10 +17,7 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import {
-  BigNumberChartPlugin,
-  BigNumberTotalChartPlugin,
-} from '@superset-ui/legacy-preset-chart-big-number';
+import { BigNumberTotalChartPlugin } from '@superset-ui/legacy-preset-chart-big-number';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -73,11 +70,19 @@ import {
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable/TimeTableChartPlugin';
-import { 
+import {
+  GwwkChartsChartPlugin,
+  GwwkDatasetsChartPlugin,
+  GwwkDashboardsChartPlugin,
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
+<<<<<<< HEAD
   AtAGlance,
+=======
+  BigNumberCurrencySelectionChartPlugin,
+  BigNumberChartPlugin,
+>>>>>>> cccs-1.2
 } from 'src/cccs-viz/plugins/';
 import { AtAGlanceChartPlugin } from 'src/cccs-viz/plugins/plugin-chart-at-a-glance/src';
 
@@ -87,15 +92,21 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+<<<<<<< HEAD
         new AtAGlanceChartPlugin().configure({key:'at_a_glance'}),
+=======
+        new GwwkChartsChartPlugin().configure({key: 'gwwk_charts'}),
+        new GwwkDatasetsChartPlugin().configure({key: 'gwwk_datasets'}),
+        new GwwkDashboardsChartPlugin().configure({key: 'gwwk_dashboards'}),
+>>>>>>> cccs-1.2
         new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
         new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
         new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
-        new BigNumberChartPlugin().configure({ key: 'big_number' }),
-        new BigNumberTotalChartPlugin().configure({ key: 'big_number_total' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
+        new BigNumberChartPlugin().configure({ key: 'big_number' }),
+        new BigNumberCurrencySelectionChartPlugin().configure({ key: 'big_number_total' }),
         new BubbleChartPlugin().configure({ key: 'bubble' }),
         new BulletChartPlugin().configure({ key: 'bullet' }),
         new CalendarChartPlugin().configure({ key: 'cal_heatmap' }),
