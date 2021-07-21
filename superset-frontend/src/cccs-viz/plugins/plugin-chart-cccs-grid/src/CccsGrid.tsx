@@ -131,6 +131,7 @@ export default function CccsGrid({
 
   const onGridReady = (params: any) => {
     console.log('onGridReady called');
+    params.columnApi.autoSizeAllColumns(false);
     params.api.forceUpdate();
   };
 
@@ -209,6 +210,10 @@ export default function CccsGrid({
     return formData.column_config?.[col]?.emitTarget || col;
   }
 
+  const gridOptions = {
+    suppressColumnVirtualisation: true
+  };
+
   return (
     <div style={{ width, height }} className="ag-theme-balham" >
       <AgGridReact
@@ -218,6 +223,7 @@ export default function CccsGrid({
         frameworkComponents={frameworkComponents}
         enableRangeSelection={true}
         allowContextMenuWithControlKey={true}
+        gridOptions={gridOptions}
         //getContextMenuItems={getContextMenuItems}
         onGridReady={onGridReady}
         onRangeSelectionChanged={onRangeSelectionChanged}
