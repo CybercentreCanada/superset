@@ -131,7 +131,6 @@ export default function CccsGrid({
 
   const onGridReady = (params: any) => {
     console.log('onGridReady called');
-    params.columnApi.autoSizeAllColumns(false);
     params.api.forceUpdate();
   };
 
@@ -210,6 +209,10 @@ export default function CccsGrid({
     return formData.column_config?.[col]?.emitTarget || col;
   }
 
+  function autoSizeAllColumns(params: any) {
+    params.columnApi.autoSizeAllColumns(false);
+  }
+
   const gridOptions = {
     suppressColumnVirtualisation: true
   };
@@ -224,7 +227,7 @@ export default function CccsGrid({
         enableRangeSelection={true}
         allowContextMenuWithControlKey={true}
         gridOptions={gridOptions}
-        onFirstDataRendered={onGridReady}
+        onFirstDataRendered={autoSizeAllColumns}
         //getContextMenuItems={getContextMenuItems}
         onGridReady={onGridReady}
         onRangeSelectionChanged={onRangeSelectionChanged}
