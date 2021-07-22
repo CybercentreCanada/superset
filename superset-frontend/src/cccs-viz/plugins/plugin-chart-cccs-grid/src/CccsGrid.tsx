@@ -223,7 +223,7 @@ export default function CccsGrid({
         enableRangeSelection={true}
         allowContextMenuWithControlKey={true}
         gridOptions={gridOptions}
-        onFirstDataRendered={onGridReady}
+        onGridReady={onGridReady}
         //getContextMenuItems={getContextMenuItems}
         onRangeSelectionChanged={onRangeSelectionChanged}
         onSelectionChanged={onSelectionChanged}
