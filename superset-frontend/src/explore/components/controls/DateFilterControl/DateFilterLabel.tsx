@@ -36,7 +36,7 @@ import {
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import Button from 'src/components/Button';
 import ControlHeader from 'src/explore/components/ControlHeader';
-import Label from 'src/components/Label';
+import Label, { Type } from 'src/components/Label';
 import Popover from 'src/components/Popover';
 import { Divider } from 'src/common/components';
 import Icons from 'src/components/Icons';
@@ -178,6 +178,7 @@ interface DateFilterControlProps {
   onChange: (timeRange: string) => void;
   value?: string;
   endpoints?: TimeRangeEndpoints;
+  type?: Type;
 }
 
 export const DATE_FILTER_CONTROL_TEST_ID = 'date-filter-control';
@@ -186,7 +187,7 @@ export const getDateFilterControlTestId = testWithId(
 );
 
 export default function DateFilterLabel(props: DateFilterControlProps) {
-  const { value = DEFAULT_TIME_RANGE, endpoints, onChange } = props;
+  const { value = DEFAULT_TIME_RANGE, endpoints, onChange, type } = props;
   const [actualTimeRange, setActualTimeRange] = useState<string>(value);
 
   const [show, setShow] = useState<boolean>(false);
@@ -222,6 +223,7 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
           guessedFrame === 'No filter'
         ) {
           setActualTimeRange(value);
+<<<<<<< HEAD
           setTooltipTitle(actualRange || '');
         } else if (
           guessedFrame === 'Today' ||
@@ -229,6 +231,13 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
         ) {
           setActualTimeRange(guessedFrame);
           setTooltipTitle(actualRange || '');
+=======
+          setTooltipTitle(
+            type === ('error' as Type)
+              ? t('Default value is required')
+              : actualRange || '',
+          );
+>>>>>>> c2e429039... fix(dashboard): Add required message in the tooltip for the time range filter (#15941)
         } else {
           setActualTimeRange(actualRange || '');
           setTooltipTitle(value || '');
