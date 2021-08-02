@@ -22,19 +22,20 @@ under the License.
 This file documents any backwards-incompatible changes in Superset and
 assists people when migrating to a new version.
 
-## 1.2.0
+## Next
+- [15927](https://github.com/apache/superset/pull/15927): Upgrades Celery to 5.x. Per the [upgrading](https://docs.celeryproject.org/en/stable/history/whatsnew-5.0.html#upgrading-from-celery-4-x) instructions Celery 5.0 introduces a new CLI implementation which is not completely backwards compatible. Please ensure global options are positioned before the sub-command.
 
-<<<<<<< HEAD
-=======
+- [13772](https://github.com/apache/superset/pull/13772): Row level security (RLS) is now enabled by default. To activate the feature, please run `superset init` to expose the RLS menus to Admin users.
+
+- [13980](https://github.com/apache/superset/pull/13980): Data health checks no longer use the metadata database as an interim cache. Though non-breaking, deployments which implement complex logic should likely memoize the callback function. Refer to documentation in the confg.py file for more detail.
+
 - [14255](https://github.com/apache/superset/pull/14255): The default `CSV_TO_HIVE_UPLOAD_DIRECTORY_FUNC` callable logic has been updated to leverage the specified database and schema to ensure the upload S3 key prefix is unique. Previously tables generated via upload from CSV with the same name but differ schema and/or cluster would use the same S3 key prefix. Note this change does not impact previously imported tables.
 
 ### Breaking Changes
 ### Potential Downtime
 - [14234](https://github.com/apache/superset/pull/14234): Adds the `limiting_factor` column to the `query` table. Give the migration includes a DDL operation on a heavily trafficed table, potential service downtime may be required.
 
->>>>>>> 6871ad15f... docs(UPDATING): Adding downtime for #14234 (#14513)
 ### Deprecations
-
 - [13440](https://github.com/apache/superset/pull/13440): Dashboard/Charts reports and old Alerts is deprecated. The following config keys are deprecated:
     - ENABLE_ALERTS
     - SCHEDULED_EMAIL_DEBUG_MODE
@@ -42,12 +43,7 @@ assists people when migrating to a new version.
     - EMAIL_ASYNC_TIME_LIMIT_SEC
     - EMAIL_REPORT_BCC_ADDRESS
     - EMAIL_REPORTS_USER
-
 ### Other
-
-- [13772](https://github.com/apache/superset/pull/13772): Row level security (RLS) is now enabled by default. To activate the feature, please run `superset init` to expose the RLS menus to Admin users.
-- [13980](https://github.com/apache/superset/pull/13980): Data health checks no longer use the metadata database as an interim cache. Though non-breaking, deployments which implement complex logic should likely memoize the callback function. Refer to documentation in the confg.py file for more detail.
-- [14255](https://github.com/apache/superset/pull/14255): The default `CSV_TO_HIVE_UPLOAD_DIRECTORY_FUNC` callable logic has been updated to leverage the specified database and schema to ensure the upload S3 key prefix is unique. Previously tables generated via upload from CSV with the same name but differ schema and/or cluster would use the same S3 key prefix. Note this change does not impact previously imported tables.
 
 ## 1.1.0
 
