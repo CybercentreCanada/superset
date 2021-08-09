@@ -14,12 +14,15 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+from ipaddress import NetmaskValueError, AddressValueError
 from superset.cccs.pythonpath.jinja_context_addons import *
 
 from tests.base_tests import SupersetTestCase
 
 class TestJinja2ContextAddons(SupersetTestCase):
     maxDiff = None
+
+    # Test for Correctness
 
     def test_ipv4str_to_number_template(self) -> None:
         rendered = ipv4str_to_number('192.168.0.0')
@@ -84,3 +87,54 @@ class TestJinja2ContextAddons(SupersetTestCase):
 
         rendered = dashobard_link(test_link_label, test_dashboard_id, test_src_column, test_target_column)
         self.assertEqual(" concat('<a href=\"http://10.162.232.22:8088/superset/dashboard/2301/?preselect_filters={%22160%22:{%22target_col%22:[%22', target_col, '%22]}}\">LABEL</a>' ) ", rendered)
+
+    #Test for Exceptions
+
+    def test_ipv4str_to_number_template_exception(self) -> None:
+        self.assertRaises(OSError, ipv4str_to_number, '1912.168.0.0')
+
+    def test_render_ipv4_column_template_exception(self) -> None:
+        test_filter = [
+            {
+                "col": "src_ip_num",
+                "op": "==",
+                "val": "1.1.1.1"
+            },
+            {
+                "col": "src_ip_num",
+                "op": "IN",
+                "val": ['3.3.3.3/8', '2.2.2.2']
+            }
+        ]
+        self.assertRaises(ValueError, render_ipv4_number_column, test_filter, 'src_ip_num' )
+
+    def test_render_ipv4_either_number_columns_template_exception(self) -> None:
+        test_filter = [
+            {
+                "col": "src_ip_num",
+                "op": "==",
+                "val": ['3.0.0.0/8', '2.2.2.200/34']
+            }
+        ]
+        self.assertRaises(NetmaskValueError, render_ipv4_either_number_columns, test_filter, "src_num_ip", "dst_num_ip")
+
+    def test_render_ipv4_between_number_colums_template_exception(self) -> None:
+        test_filter = [
+            {
+                "col": "src_ip_num",
+                "op": "2",
+                "val": ['255.255.255.255/0', '80.0.0.0/16']
+            }
+        ]
+        self.assertRaises(ValueError, render_ipv4_between_number_colums, test_filter, '1.1.1.1', '2.2.2.2')
+
+    def test_render_in_conditions_template_exception(self) -> None:
+        test_ip_array=['1.10.0.1.1','240.0.0.0/4.0']
+        self.assertRaises(AddressValueError, render_in_conditions, test_ip_array, "src_num_ip")
+
+    def test_dashobard_link_template_exception(self) -> None:
+        test_link_label = 123
+        test_dashboard_id = -100
+        test_src_column = 'test_col'
+        test_target_column = 'target_col'
+        self.assertRaises(TypeError, dashobard_link, test_link_label, test_dashboard_id, test_src_column, test_target_column)
