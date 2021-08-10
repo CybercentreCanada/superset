@@ -1,6 +1,6 @@
 {
   "name": "superset",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Superset is a data exploration platform designed to be visual, intuitive, and interactive.",
   "license": "Apache-2.0",
   "directories": {
@@ -61,14 +61,6 @@
   },
   "homepage": "https://superset.apache.org/",
   "dependencies": {
-    "@ag-grid-community/all-modules": "^25.0.1",
-    "@ag-grid-community/react": "^25.0.1",
-    "@ag-grid-enterprise/all-modules": "^25.0.1",
-    "@ag-grid-enterprise/charts": "^25.0.1",
-    "@ag-grid-enterprise/clipboard": "^25.0.1",
-    "@ag-grid-enterprise/excel-export": "^25.0.1",
-    "@ag-grid-enterprise/menu": "^25.0.1",
-    "@ag-grid-enterprise/range-selection": "^25.0.1",
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime-corejs3": "^7.12.5",
     "@data-ui/sparkline": "^0.0.84",
