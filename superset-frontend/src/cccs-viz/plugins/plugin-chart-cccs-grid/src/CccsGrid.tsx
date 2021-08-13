@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 //import { styled } from '@superset-ui/core';
 import { CccsGridProps } from './types';
 
@@ -40,6 +40,10 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 import { AllModules } from "@ag-grid-enterprise/all-modules";
 
+import {
+  ensureIsArray
+} from '@superset-ui/core';
+
 const DEFAULT_COLUMN_DEF = {
   flex: 1,
   minWidth: 100,
@@ -62,8 +66,14 @@ export default function CccsGrid({
   selectedValues,
   tooltipShowDelay,
   rowSelection,
+  emitFilter = false,
+  filters: initialFilters = {},
 }: CccsGridProps) {
 
+  const [, setFilters] = useState(initialFilters);
+
+  const [prevRow, setPrevRow] = useState(-1);
+  const [prevColumn, setPrevColmun] = useState('');
 
   const frameworkComponents = {
     countryValueRenderer: CountryValueRenderer,
@@ -100,34 +110,33 @@ export default function CccsGrid({
 
   // What is ownFilters used for???
 
-  const handleChange = useCallback(
-    (values: string[]) => {
+  const handleChange = useCallback(filters => {
+    if (!emitFilter) {
+      return;
+    }
 
-      if (!formData.emitFilter) {
-        return;
+    const groupBy = Object.keys(filters);
+    const groupByValues = Object.values(filters);
+    setDataMask({
+      extraFormData: {
+        filters: groupBy.length === 0 ? [] : groupBy.map(col => {
+          const val = ensureIsArray(filters?.[col]);
+          if (val === null || val === undefined) return {
+            col,
+            op: 'IS NULL'
+          };
+          return {
+            col,
+            op: 'IN',
+            val: val
+          };
+        })
+      },
+      filterState: {
+        value: groupByValues.length ? groupByValues : null
       }
-
-      setDataMask({
-        extraFormData: {
-          filters:
-            values.length === 0
-              ? []
-              : [{
-                col: "ip_string",
-                op: 'IN',
-                val: values,
-                }],
-        },
-        filterState: {
-          value: values.length ? values : null,
-        },
-        ownState: {
-          selectedValues: values.length ? values : null,
-        },
-      },);
-    },
-    [setDataMask, selectedValues],
-  );
+    });
+  }, [emitFilter, setDataMask]); // only take relevant page size options
 
   const onGridReady = (params: any) => {
     //const { name } = props;
@@ -146,29 +155,65 @@ export default function CccsGrid({
       selectedRows.length === 1 ? selectedRows[0].athlete : '';
   };
 
+  function isSingleCellSelection(cellRanges: any): boolean {
+    if (cellRanges.length != 1) {
+      return false;
+    }
+    const range = cellRanges[0];
+    return range.startRow.rowIndex == range.endRow.rowIndex && range.columns.length == 1;
+  }
+
+  function isSameSingleSelection(range: any): boolean {
+    const singleRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+    return prevRow == singleRow && prevColumn == range.columns[0].colId;
+  }
+
+  function cacheSingleSelection(range: any) {
+    const singleRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+    setPrevRow(singleRow);
+    setPrevColmun(range.columns[0].colId);
+  }
+
   const onRangeSelectionChanged = (params: any) => {
     const gridApi = params.api;
     var cellRanges = gridApi.getCellRanges();
 
-    cellRanges.forEach( (range: any) => {
-      // get starting and ending row, remember rowEnd could be before rowStart
-      var startRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
-      var endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
-
-      for (var rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-        range.columns.forEach( (column: any) => {
-          const cellRenderer = column.colDef?.cellRenderer;
-          if (cellRenderer == 'ipv4ValueRenderer') {
-            var rowModel = gridApi.getModel();
-            var rowNode = rowModel.getRow(rowIndex);
-            var value = gridApi.getValue(column, rowNode);
-            const values = [value];
-            handleChange([...values]);
-          }
-        });
+    if (isSingleCellSelection(cellRanges)) {
+      // Did user re-select the same single cell
+      if (isSameSingleSelection(cellRanges[0])) {
+        // clear selection in ag-grid
+        gridApi.clearRangeSelection();
+        // new cell ranges should be empty now
+        cellRanges = gridApi.getCellRanges();
       }
+      else {
+        // remember the single cell selection
+        cacheSingleSelection(cellRanges[0]);
+      }
+    }
+
+    const updatedFilters = {};
+    cellRanges.forEach((range: any) => {
+      range.columns.forEach((column: any) => {
+        const col = getEmitTarget(column.colDef?.field)
+        updatedFilters[col] = updatedFilters[col] || [];
+        const startRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+        const endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
+        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+          const value = gridApi.getValue(column, gridApi.getModel().getRow(rowIndex));
+          if (!updatedFilters[col].includes(value)) {
+            updatedFilters[col].push(value);
+          }
+        }
+      });
     });
 
+    setFilters(updatedFilters);
+    handleChange(updatedFilters);
+  }
+
+  function getEmitTarget(col: string) {
+    return formData.column_config?.[col]?.emitTarget || col;
   }
 
 

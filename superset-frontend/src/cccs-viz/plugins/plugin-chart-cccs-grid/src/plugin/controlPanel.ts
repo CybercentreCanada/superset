@@ -166,9 +166,8 @@ const config: ControlPanelConfig = {
 
         [
           {
-            name: 'metrics',
+            name: 'groupby',
             override: {
-              validators: [],
               visibility: isAggMode,
             },
           },
@@ -176,8 +175,9 @@ const config: ControlPanelConfig = {
 
         [
           {
-            name: 'groupby',
+            name: 'metrics',
             override: {
+              validators: [],
               visibility: isAggMode,
             },
           },
@@ -230,34 +230,9 @@ const config: ControlPanelConfig = {
 
     },
     {
-      label: t('Hello Controls!'),
+      label: t('CCCS Grid Options'),
       expanded: true,
       controlSetRows: [
-        [
-          {
-            name: 'header_text',
-            config: {
-              type: 'TextControl',
-              default: 'Hello, World!',
-              renderTrigger: true,
-              // ^ this makes it apply instantaneously, without triggering a "run query" button
-              label: t('Header Text'),
-              description: t('The text you want to see in the header'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'bold_text',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Bold Text'),
-              renderTrigger: true,
-              default: true,
-              description: t('A checkbox to make the '),
-            },
-          },
-        ],
         isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
         ? [
             {
@@ -265,13 +240,30 @@ const config: ControlPanelConfig = {
               config: {
                 type: 'CheckboxControl',
                 label: t('Enable emitting filters'),
-                default: true,
+                default: false,
                 renderTrigger: true,
-                description: t('Enable emmiting filters.'),
+                description: t('Whether to apply filter to dashboards when grid cells are clicked'),
               },
             },
           ] : []
         ,
+        [
+          {
+            name: 'column_config',
+            config: {
+              type: 'ColumnConfigControl',
+              label: t('Customize columns'),
+              description: t('Further customize how to display each column'),
+              renderTrigger: true,
+              mapStateToProps(explore, control, chart) {
+                return {
+                  queryResponse: chart?.queriesResponse?.[0] as ChartDataResponseResult | undefined,
+                  emitFilter: explore?.controls?.table_filter?.value,
+                };
+              },
+            },
+          },
+        ],
         [
           {
             name: 'header_font_size',
