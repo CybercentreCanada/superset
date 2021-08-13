@@ -40,6 +40,10 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 import { AllModules } from "@ag-grid-enterprise/all-modules";
 
+import {
+  ensureIsArray
+} from '@superset-ui/core';
+
 const DEFAULT_COLUMN_DEF = {
   flex: 1,
   minWidth: 100,
@@ -81,7 +85,7 @@ export default function CccsGrid({
     setDataMask({
       extraFormData: {
         filters: groupBy.length === 0 ? [] : groupBy.map(col => {
-          const val = filters == null ? void 0 : filters[col];
+          const val = ensureIsArray(filters?.[col]);
           if (val === null || val === undefined) return {
             col,
             op: 'IS NULL'
@@ -185,17 +189,14 @@ export default function CccsGrid({
     const updatedFilters = {};
     cellRanges.forEach((range: any) => {
       range.columns.forEach((column: any) => {
-        const cellRenderer = column.colDef?.cellRenderer;
         const col = getEmitTarget(column.colDef?.field)
         updatedFilters[col] = updatedFilters[col] || [];
-        if (cellRenderer == 'ipv4ValueRenderer') {
-          const startRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
-          const endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
-          for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-            const value = gridApi.getValue(column, gridApi.getModel().getRow(rowIndex));
-            if (!updatedFilters[col].includes(value)) {
-              updatedFilters[col].push(value);
-            }
+        const startRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+        const endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
+        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+          const value = gridApi.getValue(column, gridApi.getModel().getRow(rowIndex));
+          if (!updatedFilters[col].includes(value)) {
+            updatedFilters[col].push(value);
           }
         }
       });
