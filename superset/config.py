@@ -779,6 +779,25 @@ CELERY_CONFIG = CeleryConfig  # pylint: disable=invalid-name
 # Set celery config to None to disable all the above configuration
 # CELERY_CONFIG = None
 
+# A function that provides additional metadata to pass over to Celery workers.
+# The use case is mainly around having global Flask data also available in
+# async Celery calls, e.g. for DB_CONNECTION_MUTATOR to set up granular source
+# Example:
+#    def CELERY_FLASK_METADATA_EXTRACTOR() -> Dict:
+#        return {
+#            "slice_id": request.args.get("slice_id"),
+#            "dashboard_id": request.args.get("dashboard_id"),
+#        }
+CELERY_FLASK_METADATA_EXTRACTOR = None
+
+# A function that saves metadata passed by CELERY_FLASK_METADATA_EXTRACTOR on
+# the Celery worker side.
+# Example:
+#    def CELERY_FLASK_METADATA_EXTRACTOR(metadata: Dict) -> None:
+#        g.slice_id = metadata["slice_id"]
+#        g.dashboard_id = metadata["dashboard_id"]
+CELERY_FLASK_METADATA_INITIALIZER = None
+
 # Additional static HTTP headers to be served by your Superset server. Note
 # Flask-Talisman applies the relevant security HTTP headers.
 #
@@ -1343,9 +1362,8 @@ if CONFIG_PATH_ENV_VAR in os.environ:
         raise
 elif importlib.util.find_spec("superset_config") and not is_test():
     try:
-        # pylint: disable=import-error,wildcard-import,unused-wildcard-import
-        import superset_config
-        from superset_config import *  # type:ignore
+        import superset_config  # pylint: disable=import-error
+        from superset_config import *  # pylint: disable=import-error,wildcard-import
 
         print(f"Loaded your LOCAL configuration at [{superset_config.__file__}]")
     except Exception:
