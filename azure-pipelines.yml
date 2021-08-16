@@ -1,56 +1,36 @@
-# Docker
-
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
-
 trigger:
-- cccs-*
-
-resources:
-- repo: self
+  batch: true
+  branches:
+    include:
+      - cccs-main
 
 variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '0f6808c3-1749-435d-b894-32e5c4d8e77b'
-  imageRepository: 'cccs/superset'
-  containerRegistry: 'uchimera.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+  containerRegistry: uchimera
+  imageRepository: cccs/superset
+  dockerfile: $(Build.SourcesDirectory)/Dockerfile
   buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
+  DOCKER_BUILDKIT: 1
 
-  # Superset config file
-  supersetConfigFile: 'superset/config.py'
+pool:
+  vmImage: ubuntu-latest
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+steps:
+  - bash: |
+      BRANCH_NAME=$(echo "$SYSTEM_PULLREQUEST_SOURCEBRANCH $BUILD_SOURCEBRANCH" | sed -r 's/^\s*(refs\/heads\/)?(\S*).*$/\2/' | sed 's/\//_/g')
+      echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
+    displayName: Parse Source Control Branch Name
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - checkout: self
+  - bash: |
+      sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection\nBUILD_NUMBER = '$(Build.BuildNumber)'\n' $(System.DefaultWorkingDirectory)/$(supersetConfigFile)
+      echo "BUILD_NUMBER variable added to $(supersetConfigFile) with value $(Build.BuildNumber)"
 
-    - bash: |
-        BRANCH_NAME=`echo "$SYSTEM_PULLREQUEST_SOURCEBRANCH $BUILD_SOURCEBRANCH" | sed -r 's/^\s*(refs\/heads\/)?(\S*).*$/\2/' | sed 's/\//_/g'`
-        echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
-
-    - bash: |
-        sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection\nBUILD_NUMBER = '$(Build.BuildNumber)'\n' $(System.DefaultWorkingDirectory)/$(supersetConfigFile)
-        echo "BUILD_NUMBER variable added to $(supersetConfigFile) with value $(Build.BuildNumber)"
-
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: cccs/superset
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(BRANCH_NAME)
-          $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+  - task: Docker@2
+    displayName: Build and push an image to container registry
+    inputs:
+      command: buildAndPush
+      containerRegistry: $(containerRegistry)
+      repository: $(imageRepository)
+      dockerfile: $(dockerfile)
+      tags: |
+        $(BRANCH_NAME)
+        $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
