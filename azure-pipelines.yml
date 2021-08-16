@@ -2,7 +2,8 @@ trigger:
   batch: true
   branches:
     include:
-      - cccs-main
+      - cccs-*
+      - feature/CLDN-*
 
 variables:
   containerRegistry: uchimera
