@@ -43,6 +43,7 @@ import { AllModules } from "@ag-grid-enterprise/all-modules";
 import {
   ensureIsArray
 } from '@superset-ui/core';
+import { NULL_STRING } from 'src/utils/common';
 
 const DEFAULT_COLUMN_DEF = {
   flex: 1,
@@ -73,7 +74,7 @@ export default function CccsGrid({
   const [, setFilters] = useState(initialFilters);
 
   const [prevRow, setPrevRow] = useState(-1);
-  const [prevColumn, setPrevColmun] = useState('');
+  const [prevColumn, setPrevColumn] = useState('');
 
   const frameworkComponents = {
     countryValueRenderer: CountryValueRenderer,
@@ -171,7 +172,12 @@ export default function CccsGrid({
   function cacheSingleSelection(range: any) {
     const singleRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
     setPrevRow(singleRow);
-    setPrevColmun(range.columns[0].colId);
+    setPrevColumn(range.columns[0].colId);
+  }
+
+  function clearSingleSelection() {
+    setPrevRow(-1);
+    setPrevColumn(NULL_STRING);
   }
 
   const onRangeSelectionChanged = (params: any) => {
@@ -185,6 +191,9 @@ export default function CccsGrid({
         gridApi.clearRangeSelection();
         // new cell ranges should be empty now
         cellRanges = gridApi.getCellRanges();
+        // Clear previous selection
+        clearSingleSelection();
+
       }
       else {
         // remember the single cell selection

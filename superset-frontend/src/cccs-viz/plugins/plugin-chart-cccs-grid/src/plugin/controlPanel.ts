@@ -249,23 +249,6 @@ const config: ControlPanelConfig = {
         ,
         [
           {
-            name: 'column_config',
-            config: {
-              type: 'ColumnConfigControl',
-              label: t('Customize columns'),
-              description: t('Further customize how to display each column'),
-              renderTrigger: true,
-              mapStateToProps(explore, control, chart) {
-                return {
-                  queryResponse: chart?.queriesResponse?.[0] as ChartDataResponseResult | undefined,
-                  emitFilter: explore?.controls?.table_filter?.value,
-                };
-              },
-            },
-          },
-        ],
-        [
-          {
             name: 'header_font_size',
             config: {
               type: 'SelectControl',
