@@ -193,7 +193,6 @@ export default function CccsGrid({
         cellRanges = gridApi.getCellRanges();
         // Clear previous selection
         clearSingleSelection();
-
       }
       else {
         // remember the single cell selection
