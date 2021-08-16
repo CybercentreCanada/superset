@@ -7,7 +7,7 @@ trigger:
 
 variables:
   containerRegistry: uchimera
-  imageRepository: cccs/superset
+  imageRepository: cccs/superset-base
   dockerfile: $(Build.SourcesDirectory)/Dockerfile
   buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
   DOCKER_BUILDKIT: 1
