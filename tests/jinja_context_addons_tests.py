@@ -15,11 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 from ipaddress import NetmaskValueError, AddressValueError
-from superset.cccs.pythonpath.jinja_context_addons import *
+from jinja_context_addons import *
 
 from tests.base_tests import SupersetTestCase
 
-class TestJinja2ContextAddons(SupersetTestCase):
+class Jinja2ContextAddonsTest(SupersetTestCase):
     maxDiff = None
 
     # Test for Correctness
@@ -79,21 +79,24 @@ class TestJinja2ContextAddons(SupersetTestCase):
         rendered = render_in_conditions(test_ip_array, "src_num_ip")
         self.assertEqual(['(src_num_ip = 16843009)', '(src_num_ip >= 4026531840 AND src_num_ip <= 4294967295)'], rendered)
 
-    def test_dashobard_link_template(self) -> None:
+    def test_dashboard_link_template(self) -> None:
         test_link_label = "LABEL"
         test_dashboard_id = 2301
         test_src_column = 'test_col'
         test_target_column = 'target_col'
 
-        rendered = dashobard_link(test_link_label, test_dashboard_id, test_src_column, test_target_column)
+        rendered = dashboard_link(test_link_label, test_dashboard_id, test_src_column, test_target_column)
         self.assertEqual(" concat('<a href=\"http://10.162.232.22:8088/superset/dashboard/2301/?preselect_filters={%22160%22:{%22target_col%22:[%22', target_col, '%22]}}\">LABEL</a>' ) ", rendered)
 
     #Test for Exceptions
 
-    def test_ipv4str_to_number_template_exception(self) -> None:
+    def test_ipv4str_to_number_template_invalid_ip(self) -> None:
+        # Invalid Ip 1912.168.0.0
         self.assertRaises(OSError, ipv4str_to_number, '1912.168.0.0')
 
     def test_render_ipv4_column_template_exception(self) -> None:
+        # The ValueError in this test case comes from the '3.3.3.3/8' CIDR
+        # This is because the correct way to describe that range of ip's is to start from 3.0.0.0/8
         test_filter = [
             {
                 "col": "src_ip_num",
@@ -103,12 +106,13 @@ class TestJinja2ContextAddons(SupersetTestCase):
             {
                 "col": "src_ip_num",
                 "op": "IN",
-                "val": ['3.3.3.3/8', '2.2.2.2']
+                "val": ['3.3.3.3/8']
             }
         ]
         self.assertRaises(ValueError, render_ipv4_number_column, test_filter, 'src_ip_num' )
 
-    def test_render_ipv4_either_number_columns_template_exception(self) -> None:
+    def test_render_ipv4_either_number_columns_template_invalid_cidr(self) -> None:
+        # Invalid error cidr comes from 2.2.2.200/34
         test_filter = [
             {
                 "col": "src_ip_num",
@@ -118,7 +122,7 @@ class TestJinja2ContextAddons(SupersetTestCase):
         ]
         self.assertRaises(NetmaskValueError, render_ipv4_either_number_columns, test_filter, "src_num_ip", "dst_num_ip")
 
-    def test_render_ipv4_between_number_colums_template_exception(self) -> None:
+    def test_render_ipv4_between_number_colums_template_invalid_arguments(self) -> None:
         test_filter = [
             {
                 "col": "src_ip_num",
@@ -128,13 +132,13 @@ class TestJinja2ContextAddons(SupersetTestCase):
         ]
         self.assertRaises(ValueError, render_ipv4_between_number_colums, test_filter, '1.1.1.1', '2.2.2.2')
 
-    def test_render_in_conditions_template_exception(self) -> None:
+    def test_render_in_conditions_template_invalid_cidr(self) -> None:
         test_ip_array=['1.10.0.1.1','240.0.0.0/4.0']
         self.assertRaises(AddressValueError, render_in_conditions, test_ip_array, "src_num_ip")
 
-    def test_dashobard_link_template_exception(self) -> None:
+    def test_dashboard_link_template_invalid_label_type(self) -> None:
         test_link_label = 123
         test_dashboard_id = -100
         test_src_column = 'test_col'
         test_target_column = 'target_col'
-        self.assertRaises(TypeError, dashobard_link, test_link_label, test_dashboard_id, test_src_column, test_target_column)
+        self.assertRaises(TypeError, dashboard_link, test_link_label, test_dashboard_id, test_src_column, test_target_column)
