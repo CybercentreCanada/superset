@@ -80,6 +80,7 @@ class Jinja2ContextAddonsTest(SupersetTestCase):
         self.assertEqual(['(src_num_ip = 16843009)', '(src_num_ip >= 4026531840 AND src_num_ip <= 4294967295)'], rendered)
 
     def test_dashboard_link_template(self) -> None:
+        # TODO Update this test once the dashboard function is fully implemented and complete
         test_link_label = "LABEL"
         test_dashboard_id = 2301
         test_src_column = 'test_col'
@@ -137,6 +138,7 @@ class Jinja2ContextAddonsTest(SupersetTestCase):
         self.assertRaises(AddressValueError, render_in_conditions, test_ip_array, "src_num_ip")
 
     def test_dashboard_link_template_invalid_label_type(self) -> None:
+        # TODO Update this test once the dashboard function is fully implemented and complete
         test_link_label = 123
         test_dashboard_id = -100
         test_src_column = 'test_col'
