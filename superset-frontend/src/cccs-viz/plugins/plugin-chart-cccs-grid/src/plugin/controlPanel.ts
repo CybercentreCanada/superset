@@ -20,7 +20,8 @@ import {
   t,
   validateNonEmpty, FeatureFlag, isFeatureEnabled,
   QueryMode,
-  QueryFormColumn
+  QueryFormColumn,
+  ChartDataResponseResult,
 } from '@superset-ui/core';
 import {
   ControlConfig,
@@ -233,6 +234,18 @@ const config: ControlPanelConfig = {
       label: t('CCCS Grid Options'),
       expanded: true,
       controlSetRows: [
+        [
+          {
+            name: 'bold_text',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Bold Text'),
+              renderTrigger: true,
+              default: true,
+              description: t('A checkbox to make the '),
+            },
+          },
+        ],
         isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
         ? [
             {
@@ -247,6 +260,23 @@ const config: ControlPanelConfig = {
             },
           ] : []
         ,
+        [
+          {
+            name: 'column_config',
+            config: {
+              type: 'ColumnConfigControl',
+              label: t('Customize columns'),
+              description: t('Further customize how to display each column'),
+              renderTrigger: true,
+              mapStateToProps(explore, control, chart) {
+                return {
+                  queryResponse: chart?.queriesResponse?.[0] as ChartDataResponseResult | undefined,
+                  emitFilter: explore?.controls?.table_filter?.value,
+                };
+              },
+            },
+          },
+        ],
         [
           {
             name: 'header_font_size',
