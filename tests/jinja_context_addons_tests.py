@@ -16,6 +16,7 @@
 # under the License.
 from ipaddress import NetmaskValueError, AddressValueError
 from jinja_context_addons import *
+# Imports Jinja Context Addons from PYTHONPATH env variable, make sure to point the env var to the dir containing it
 
 from tests.base_tests import SupersetTestCase
 
