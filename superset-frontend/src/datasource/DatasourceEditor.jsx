@@ -226,7 +226,7 @@ function ColumnCollectionTable({
                 }
               />
             )}
-            {isFeatureEnabled(FeatureFlag.DASHBOARD_RBAC) ? (
+            {isFeatureEnabled(FeatureFlag.ENABLE_BUSINESS_TYPES) ? (
               <Field
                 fieldKey="business_type"
                 label={t('Business type')}
