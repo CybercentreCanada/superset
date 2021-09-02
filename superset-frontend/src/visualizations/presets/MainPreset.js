@@ -88,9 +88,7 @@ import {
   GwwkDashboardsChartPlugin,
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
-  StatusIndicatorChartPlugin,
-  BigNumberCurrencySelectionChartPlugin,
-  BigNumberChartPlugin,
+  StatusIndicatorChartPlugin
 } from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
