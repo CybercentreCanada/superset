@@ -89,8 +89,6 @@ import {
   IframeDemoChartPlugin,
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
-  BigNumberCurrencySelectionChartPlugin,
-  BigNumberChartPlugin,
 } from 'src/cccs-viz/plugins/';
 
 export default class MainPreset extends Preset {
