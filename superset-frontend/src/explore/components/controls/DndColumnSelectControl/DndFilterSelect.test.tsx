@@ -17,7 +17,7 @@
  * under the License.
  */
 import React from 'react';
-import { ColumnType } from '@superset-ui/core';
+import { GenericDataType } from '@superset-ui/core';
 import { render, screen } from 'spec/helpers/testing-library';
 import AdhocMetric from 'src/explore/components/controls/MetricControl/AdhocMetric';
 import AdhocFilter, {
@@ -38,7 +38,7 @@ const defaultProps = {
 
 test('renders with default props', () => {
   render(<DndFilterSelect {...defaultProps} />, { useDnd: true });
-  expect(screen.getByText('Drop columns or metrics')).toBeInTheDocument();
+  expect(screen.getByText('Drop columns or metrics here')).toBeInTheDocument();
 });
 
 test('renders with value', () => {
@@ -56,20 +56,27 @@ test('renders options with saved metric', () => {
   render(<DndFilterSelect {...defaultProps} formData={['saved_metric']} />, {
     useDnd: true,
   });
-  expect(screen.getByText('Drop columns or metrics')).toBeInTheDocument();
+  expect(screen.getByText('Drop columns or metrics here')).toBeInTheDocument();
 });
 
 test('renders options with column', () => {
   render(
     <DndFilterSelect
       {...defaultProps}
-      columns={[{ id: 1, type: ColumnType.STRING, column_name: 'Column' }]}
+      columns={[
+        {
+          id: 1,
+          type: 'VARCHAR',
+          type_generic: GenericDataType.STRING,
+          column_name: 'Column',
+        },
+      ]}
     />,
     {
       useDnd: true,
     },
   );
-  expect(screen.getByText('Drop columns or metrics')).toBeInTheDocument();
+  expect(screen.getByText('Drop columns or metrics here')).toBeInTheDocument();
 });
 
 test('renders options with adhoc metric', () => {
@@ -80,5 +87,5 @@ test('renders options with adhoc metric', () => {
   render(<DndFilterSelect {...defaultProps} formData={[adhocMetric]} />, {
     useDnd: true,
   });
-  expect(screen.getByText('Drop columns or metrics')).toBeInTheDocument();
+  expect(screen.getByText('Drop columns or metrics here')).toBeInTheDocument();
 });

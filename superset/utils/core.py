@@ -18,7 +18,6 @@
 import collections
 import decimal
 import errno
-import functools
 import json
 import logging
 import os
@@ -86,6 +85,7 @@ from typing_extensions import TypedDict
 
 import _thread  # pylint: disable=C0411
 from superset.constants import (
+    EXAMPLES_DB_UUID,
     EXTRA_FORM_DATA_APPEND_KEYS,
     EXTRA_FORM_DATA_OVERRIDE_EXTRA_KEYS,
     EXTRA_FORM_DATA_OVERRIDE_REGULAR_MAPPINGS,
@@ -96,7 +96,7 @@ from superset.exceptions import (
     SupersetException,
     SupersetTimeoutException,
 )
-from superset.typing import FlaskResponse, FormData, Metric
+from superset.typing import AdhocMetric, FilterValues, FlaskResponse, FormData, Metric
 from superset.utils.dates import datetime_to_epoch, EPOCH
 from superset.utils.hashing import md5_sha_from_dict, md5_sha_from_str
 
@@ -114,6 +114,8 @@ logging.getLogger("MARKDOWN").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 DTTM_ALIAS = "__timestamp"
+
+TIME_COMPARISION = "__"
 
 JS_MAX_INTEGER = 9007199254740991  # Largest int Java Script can handle 2^53-1
 
@@ -179,11 +181,31 @@ class ChartDataResultType(str, Enum):
     RESULTS = "results"
     SAMPLES = "samples"
     TIMEGRAINS = "timegrains"
+    POST_PROCESSED = "post_processed"
 
 
 class DatasourceDict(TypedDict):
     type: str
     id: int
+
+
+class AdhocFilterClause(TypedDict, total=False):
+    clause: str
+    expressionType: str
+    filterOptionName: Optional[str]
+    comparator: Optional[FilterValues]
+    operator: str
+    subject: str
+    isExtra: Optional[bool]
+    sqlExpression: Optional[str]
+
+
+class QueryObjectFilterClause(TypedDict, total=False):
+    col: str
+    op: str  # pylint: disable=invalid-name
+    val: Optional[FilterValues]
+    grain: Optional[str]
+    isExtra: Optional[bool]
 
 
 class ExtraFiltersTimeColumnType(str, Enum):
@@ -206,16 +228,19 @@ class FilterOperator(str, Enum):
     GREATER_THAN_OR_EQUALS = ">="
     LESS_THAN_OR_EQUALS = "<="
     LIKE = "LIKE"
+    ILIKE = "ILIKE"
     IS_NULL = "IS NULL"
     IS_NOT_NULL = "IS NOT NULL"
     IN = "IN"  # pylint: disable=invalid-name
     NOT_IN = "NOT IN"
     REGEX = "REGEX"
+    IS_TRUE = "IS TRUE"
+    IS_FALSE = "IS FALSE"
 
 
 class PostProcessingBoxplotWhiskerType(str, Enum):
     """
-    Calculate cell contibution to row/column total
+    Calculate cell contribution to row/column total
     """
 
     TUKEY = "tukey"
@@ -225,7 +250,7 @@ class PostProcessingBoxplotWhiskerType(str, Enum):
 
 class PostProcessingContributionOrientation(str, Enum):
     """
-    Calculate cell contibution to row/column total
+    Calculate cell contribution to row/column total
     """
 
     ROW = "row"
@@ -260,6 +285,7 @@ class QueryStatus(str, Enum):  # pylint: disable=too-few-public-methods
     RUNNING: str = "running"
     SCHEDULED: str = "scheduled"
     SUCCESS: str = "success"
+    FETCHING: str = "fetching"
     TIMED_OUT: str = "timed_out"
 
 
@@ -360,68 +386,9 @@ def flasher(msg: str, severity: str = "message") -> None:
         flash(msg, severity)
     except RuntimeError:
         if severity == "danger":
-            logger.error(msg)
+            logger.error(msg, exc_info=True)
         else:
             logger.info(msg)
-
-
-class _memoized:
-    """Decorator that caches a function's return value each time it is called
-
-    If called later with the same arguments, the cached value is returned, and
-    not re-evaluated.
-
-    Define ``watch`` as a tuple of attribute names if this Decorator
-    should account for instance variable changes.
-    """
-
-    def __init__(
-        self, func: Callable[..., Any], watch: Optional[Tuple[str, ...]] = None
-    ) -> None:
-        self.func = func
-        self.cache: Dict[Any, Any] = {}
-        self.is_method = False
-        self.watch = watch or ()
-
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        key = [args, frozenset(kwargs.items())]
-        if self.is_method:
-            key.append(tuple([getattr(args[0], v, None) for v in self.watch]))
-        key = tuple(key)  # type: ignore
-        if key in self.cache:
-            return self.cache[key]
-        try:
-            value = self.func(*args, **kwargs)
-            self.cache[key] = value
-            return value
-        except TypeError:
-            # uncachable -- for instance, passing a list as an argument.
-            # Better to not cache than to blow up entirely.
-            return self.func(*args, **kwargs)
-
-    def __repr__(self) -> str:
-        """Return the function's docstring."""
-        return self.func.__doc__ or ""
-
-    def __get__(
-        self, obj: Any, objtype: Type[Any]
-    ) -> functools.partial:  # type: ignore
-        if not self.is_method:
-            self.is_method = True
-        # Support instance methods.
-        return functools.partial(self.__call__, obj)
-
-
-def memoized(
-    func: Optional[Callable[..., Any]] = None, watch: Optional[Tuple[str, ...]] = None
-) -> Callable[..., Any]:
-    if func:
-        return _memoized(func)
-
-    def wrapper(f: Callable[..., Any]) -> Callable[..., Any]:
-        return _memoized(f, watch)
-
-    return wrapper
 
 
 def parse_js_uri_path_item(
@@ -473,6 +440,35 @@ def cast_to_num(value: Optional[Union[float, int, str]]) -> Optional[Union[float
         return float(value)
     except ValueError:
         return None
+
+
+def cast_to_boolean(value: Any) -> bool:
+    """Casts a value to an int/float
+
+    >>> cast_to_boolean(1)
+    True
+    >>> cast_to_boolean(0)
+    False
+    >>> cast_to_boolean(0.5)
+    True
+    >>> cast_to_boolean('true')
+    True
+    >>> cast_to_boolean('false')
+    False
+    >>> cast_to_boolean('False')
+    False
+    >>> cast_to_boolean(None)
+    False
+
+    :param value: value to be converted to boolean representation
+    :returns: value cast to `bool`. when value is 'true' or value that are not 0
+              converte into True
+    """
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    return False
 
 
 def list_minus(l: List[Any], minus: List[Any]) -> List[Any]:
@@ -753,7 +749,7 @@ def validate_json(obj: Union[bytes, bytearray, str]) -> None:
         try:
             json.loads(obj)
         except Exception as ex:
-            logger.error("JSON is not valid %s", str(ex))
+            logger.error("JSON is not valid %s", str(ex), exc_info=True)
             raise SupersetException("JSON is not valid")
 
 
@@ -769,7 +765,7 @@ class SigalrmTimeout:
     def handle_timeout(  # pylint: disable=unused-argument
         self, signum: int, frame: Any
     ) -> None:
-        logger.error("Process timed out")
+        logger.error("Process timed out", exc_info=True)
         raise SupersetTimeoutException(
             error_type=SupersetErrorType.BACKEND_TIMEOUT_ERROR,
             message=self.error_message,
@@ -1040,28 +1036,32 @@ def zlib_decompress(blob: bytes, decode: Optional[bool] = True) -> Union[bytes, 
     return decompressed.decode("utf-8") if decode else decompressed
 
 
-def to_adhoc(
-    filt: Dict[str, Any], expression_type: str = "SIMPLE", clause: str = "where"
-) -> Dict[str, Any]:
-    result = {
+def simple_filter_to_adhoc(
+    filter_clause: QueryObjectFilterClause, clause: str = "where",
+) -> AdhocFilterClause:
+    result: AdhocFilterClause = {
         "clause": clause.upper(),
-        "expressionType": expression_type,
-        "isExtra": bool(filt.get("isExtra")),
+        "expressionType": "SIMPLE",
+        "comparator": filter_clause.get("val"),
+        "operator": filter_clause["op"],
+        "subject": filter_clause["col"],
     }
+    if filter_clause.get("isExtra"):
+        result["isExtra"] = True
+    result["filterOptionName"] = md5_sha_from_dict(cast(Dict[Any, Any], result))
 
-    if expression_type == "SIMPLE":
-        result.update(
-            {
-                "comparator": filt.get("val"),
-                "operator": filt.get("op"),
-                "subject": filt.get("col"),
-            }
-        )
-    elif expression_type == "SQL":
-        result.update({"sqlExpression": filt.get(clause)})
+    return result
 
-    deterministic_name = md5_sha_from_dict(result)
-    result["filterOptionName"] = deterministic_name
+
+def form_data_to_adhoc(form_data: Dict[str, Any], clause: str) -> AdhocFilterClause:
+    if clause not in ("where", "having"):
+        raise ValueError(__("Unsupported clause type: %(clause)s", clause=clause))
+    result: AdhocFilterClause = {
+        "clause": clause.upper(),
+        "expressionType": "SQL",
+        "sqlExpression": form_data.get(clause),
+    }
+    result["filterOptionName"] = md5_sha_from_dict(cast(Dict[Any, Any], result))
 
     return result
 
@@ -1073,7 +1073,7 @@ def merge_extra_form_data(form_data: Dict[str, Any]) -> None:
     """
     filter_keys = ["filters", "adhoc_filters"]
     extra_form_data = form_data.pop("extra_form_data", {})
-    append_filters = extra_form_data.get("filters", None)
+    append_filters: List[QueryObjectFilterClause] = extra_form_data.get("filters", None)
 
     # merge append extras
     for key in [key for key in EXTRA_FORM_DATA_APPEND_KEYS if key not in filter_keys]:
@@ -1098,13 +1098,21 @@ def merge_extra_form_data(form_data: Dict[str, Any]) -> None:
     if extras:
         form_data["extras"] = extras
 
-    adhoc_filters = form_data.get("adhoc_filters", [])
+    adhoc_filters: List[AdhocFilterClause] = form_data.get("adhoc_filters", [])
     form_data["adhoc_filters"] = adhoc_filters
-    append_adhoc_filters = extra_form_data.get("adhoc_filters", [])
-    adhoc_filters.extend({"isExtra": True, **fltr} for fltr in append_adhoc_filters)
+    append_adhoc_filters: List[AdhocFilterClause] = extra_form_data.get(
+        "adhoc_filters", []
+    )
+    adhoc_filters.extend(
+        {"isExtra": True, **fltr} for fltr in append_adhoc_filters  # type: ignore
+    )
     if append_filters:
         adhoc_filters.extend(
-            to_adhoc({"isExtra": True, **fltr}) for fltr in append_filters if fltr
+            simple_filter_to_adhoc(
+                {"isExtra": True, **fltr}  # type: ignore
+            )
+            for fltr in append_filters
+            if fltr
         )
 
 
@@ -1171,16 +1179,16 @@ def merge_extra_filters(  # pylint: disable=too-many-branches
                             # Add filters for unequal lists
                             # order doesn't matter
                             if set(existing_filters[filter_key]) != set(filtr["val"]):
-                                adhoc_filters.append(to_adhoc(filtr))
+                                adhoc_filters.append(simple_filter_to_adhoc(filtr))
                         else:
-                            adhoc_filters.append(to_adhoc(filtr))
+                            adhoc_filters.append(simple_filter_to_adhoc(filtr))
                     else:
                         # Do not add filter if same value already exists
                         if filtr["val"] != existing_filters[filter_key]:
-                            adhoc_filters.append(to_adhoc(filtr))
+                            adhoc_filters.append(simple_filter_to_adhoc(filtr))
                 else:
                     # Filter not found, add it
-                    adhoc_filters.append(to_adhoc(filtr))
+                    adhoc_filters.append(simple_filter_to_adhoc(filtr))
         # Remove extra filters from the form data since no longer needed
         del form_data["extra_filters"]
 
@@ -1223,9 +1231,16 @@ def get_or_create_db(
         db.session.query(models.Database).filter_by(database_name=database_name).first()
     )
 
+    # databases with a fixed UUID
+    uuids = {
+        "examples": EXAMPLES_DB_UUID,
+    }
+
     if not database and always_create:
         logger.info("Creating database reference for %s", database_name)
-        database = models.Database(database_name=database_name)
+        database = models.Database(
+            database_name=database_name, uuid=uuids.get(database_name)
+        )
         db.session.add(database)
 
     if database:
@@ -1262,7 +1277,12 @@ def get_metric_name(metric: Metric) -> str:
 
 
 def get_metric_names(metrics: Sequence[Metric]) -> List[str]:
-    return [get_metric_name(metric) for metric in metrics]
+    return [metric for metric in map(get_metric_name, metrics) if metric]
+
+
+def get_first_metric_name(metrics: Sequence[Metric]) -> Optional[str]:
+    metric_labels = get_metric_names(metrics)
+    return metric_labels[0] if metric_labels else None
 
 
 def ensure_path_exists(path: str) -> None:
@@ -1279,15 +1299,16 @@ def convert_legacy_filters_into_adhoc(  # pylint: disable=invalid-name
     mapping = {"having": "having_filters", "where": "filters"}
 
     if not form_data.get("adhoc_filters"):
-        form_data["adhoc_filters"] = []
+        adhoc_filters: List[AdhocFilterClause] = []
+        form_data["adhoc_filters"] = adhoc_filters
 
         for clause, filters in mapping.items():
             if clause in form_data and form_data[clause] != "":
-                form_data["adhoc_filters"].append(to_adhoc(form_data, "SQL", clause))
+                adhoc_filters.append(form_data_to_adhoc(form_data, clause))
 
             if filters in form_data:
                 for filt in filter(lambda x: x is not None, form_data[filters]):
-                    form_data["adhoc_filters"].append(to_adhoc(filt, "SIMPLE", clause))
+                    adhoc_filters.append(simple_filter_to_adhoc(filt, clause))
 
     for key in ("filters", "having", "having_filters", "where"):
         if key in form_data:
@@ -1467,7 +1488,6 @@ def get_iterable(x: Any) -> List[Any]:
     :param x: The object
     :returns: An iterable representation
     """
-
     return x if isinstance(x, list) else [x]
 
 
@@ -1490,7 +1510,7 @@ def get_column_name_from_metric(metric: Metric) -> Optional[str]:
     :return: column name if simple metric, otherwise None
     """
     if is_adhoc_metric(metric):
-        metric = cast(Dict[str, Any], metric)
+        metric = cast(AdhocMetric, metric)
         if metric["expressionType"] == AdhocMetricExpressionType.SIMPLE:
             return cast(Dict[str, Any], metric["column"])["column_name"]
     return None
@@ -1504,12 +1524,7 @@ def get_column_names_from_metrics(metrics: List[Metric]) -> List[str]:
     :param metrics: Ad-hoc metric
     :return: column name if simple metric, otherwise None
     """
-    columns: List[str] = []
-    for metric in metrics:
-        column_name = get_column_name_from_metric(metric)
-        if column_name:
-            columns.append(column_name)
-    return columns
+    return [col for col in map(get_column_name_from_metric, metrics) if col]
 
 
 def extract_dataframe_dtypes(df: pd.DataFrame) -> List[GenericDataType]:
