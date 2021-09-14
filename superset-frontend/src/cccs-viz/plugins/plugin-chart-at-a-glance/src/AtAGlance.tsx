@@ -83,7 +83,7 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
   newStarGeoFormData.metrics = undefined; 
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset.
-  newStarGeoFormData.datasource="29__table";
+  newStarGeoFormData.datasource="28__table";
   newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
 
   return newStarGeoFormData;
@@ -117,7 +117,7 @@ const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
   farsightFormData.columns = ["rrname"];
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset
-  farsightFormData.datasource = "30__table";
+  farsightFormData.datasource = "31__table";
   farsightFormData.row_limit = 10;
   return farsightFormData;
 }
