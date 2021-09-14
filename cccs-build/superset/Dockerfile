@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM uchimera.azurecr.io/cccs/superset-base:cccs-1.3_20210909191324_b1940
+=======
+FROM uchimera.azurecr.io/cccs/superset-base:cccs-1.3_20210914140545_b1965
+>>>>>>> 86db89768... cccs-build/superset/Dockerfile
 
 USER root
 
