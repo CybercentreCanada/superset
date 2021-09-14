@@ -111,10 +111,10 @@
       default: 'at_a_glance'
     },
     time_range: {
-      default: t('Last day'),
+      default: t('Last hour'),
     },
      row_limit: {
-       default: 100,
+       default: 1,
      },
    },
  };
