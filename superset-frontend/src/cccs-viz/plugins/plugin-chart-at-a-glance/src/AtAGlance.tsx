@@ -208,14 +208,14 @@ const useDataApi = (formData: QueryFormData,
 function AtAGlanceCore ( initialFormData: QueryFormData) {
   console.log("In At A Glance");
   const [ipString, setIpString] = useState('3.251.148.10');
-  const [formData,] = useState(initialFormData);
+  const [formData, setFormData] = useState(initialFormData);
 
   //neustargeo state
   const [geoFormData, setNewStarGeoFormData] = useState(buildGeoFormData(formData, ipString));
   const [geoData, setGeoData] = useState([]);
   const [isGeoInit, setIsGeoinit] = useState(true);
   const [isGeoLoading, setIsGeoLoading] = useState(false);
-  //const [isGeoError, setIsGeoError] = useState(false);
+  const [isGeoError, setIsGeoError] = useState(false);
 
   //farsight state 
   const [farsightFormData, setFarsightFormData] = useState(buildFarsightFormData(formData, ipString));
