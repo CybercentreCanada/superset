@@ -85,6 +85,7 @@ export default function transformProps(chartProps: ChartProps) {
   const columnDefs = formColumns.map((c: any) => {
     return {
       field: c,
+      minWidth: 50,
       // @ts-ignore
       cellRenderer: columnTypeMap[c] == 'IPV4' ? 'ipv4ValueRenderer' :
       // @ts-ignore
