@@ -189,7 +189,7 @@ const useDataApi = (formData: QueryFormData,
         setIsLoading(true);
         setIsError(false);
         const response = await asyncChartDataRequest;
-        const newData = response.result[0].data;
+        const newData = response.json.result[0].data;
         setIsLoading(false);
         setData(newData);
       } catch (error) {
