@@ -79,9 +79,9 @@
      columnMap[name] = column.type;
      return columnMap;
    }, columnTypeMap);
- 
+
    const columnVerboseNameMap = new Map<string, string>();
- 
+
    columns.reduce(function (columnMap, column: Column) {
      // @ts-ignore
      const name = column['column_name'];
@@ -91,9 +91,8 @@
    }, columnVerboseNameMap);
  
    const formColumns = formData.columns as any;
- 
+
    const columnDefs = formColumns.map((c: any) => {
-     debugger;
      const columnType = columnTypeMap[c];
      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
      return {
@@ -110,12 +109,10 @@
        columnType == 'COUNTRY' ? 'countryValueRenderer' :
        // @ts-ignore
        columnType == 'JSON' ? 'jsonValueRenderer' :
-               undefined,
+         undefined,
        sortable: true,
      };
    });
- 
-   console.log(columnDefs);
  
    return {
      formData,
