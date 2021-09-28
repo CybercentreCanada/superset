@@ -63,7 +63,7 @@ export default function transformProps(chartProps: ChartProps) {
     table_filter: tableFilter,
   } = formData;
   const data = queriesData[0].data as TimeseriesDataRecord[];
- 
+
   const { setDataMask = () => { } } = hooks;
 
   const columns = datasource?.columns as Column[];
@@ -71,7 +71,7 @@ export default function transformProps(chartProps: ChartProps) {
   console.log('formData via TransformProps.ts', formData);
 
   const columnTypeMap = new Map<string, string>();
- 
+
   columns.reduce(function (columnMap, column: Column) {
     // @ts-ignore
     const name = column['column_name'];
@@ -109,11 +109,11 @@ export default function transformProps(chartProps: ChartProps) {
       columnType == 'COUNTRY' ? 'countryValueRenderer' :
       // @ts-ignore
       columnType == 'JSON' ? 'jsonValueRenderer' :
-        undefined,
+              undefined,
       sortable: true,
     };
   });
- 
+
   return {
     formData,
     setDataMask,
