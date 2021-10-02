@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, Column, TimeseriesDataRecord } from '@superset-ui/core';
+import { ChartProps, Column, QueryMode, TimeseriesDataRecord } from '@superset-ui/core';
 
 export default function transformProps(chartProps: ChartProps) {
   /**
@@ -57,10 +57,8 @@ export default function transformProps(chartProps: ChartProps) {
     queriesData,
   } = chartProps;
   const {
-    boldText,
-    headerFontSize,
-    headerText,
     table_filter: tableFilter,
+    query_mode: queryMode,
   } = formData;
   const data = queriesData[0].data as TimeseriesDataRecord[];
 
@@ -90,29 +88,52 @@ export default function transformProps(chartProps: ChartProps) {
     return columnMap;
   }, columnVerboseNameMap);
  
-  const formColumns = formData.columns as any;
+  var columnDefs = [];
 
-  const columnDefs = formColumns.map((c: any) => {
-    const columnType = columnTypeMap[c];
-    const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-    return {
-      field: c,
-      minWidth: 50,
-      headerName: columnHeader,
-      // @ts-ignore
-      cellRenderer: columnTypeMap[c] == 'IPV4' ? 'ipv4ValueRenderer' :
-      // @ts-ignore
-      columnType == 'IPV6' ? 'ipv6ValueRenderer' :
-      // @ts-ignore
-      columnType == 'DOMAIN' ? 'domainValueRenderer' :
-      // @ts-ignore
-      columnType == 'COUNTRY' ? 'countryValueRenderer' :
-      // @ts-ignore
-      columnType == 'JSON' ? 'jsonValueRenderer' :
-              undefined,
-      sortable: true,
-    };
-  });
+  if (queryMode === QueryMode.raw) {
+    columnDefs = formData.columns.map((c: any) => {
+      const columnType = columnTypeMap[c];
+      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+      return {
+        field: c,
+        minWidth: 50,
+        headerName: columnHeader,
+        // @ts-ignore
+        cellRenderer: columnType == 'IPV4' ? 'ipv4ValueRenderer' :
+        // @ts-ignore
+        columnType == 'IPV6' ? 'ipv6ValueRenderer' :
+        // @ts-ignore
+        columnType == 'DOMAIN' ? 'domainValueRenderer' :
+        // @ts-ignore
+        columnType == 'COUNTRY' ? 'countryValueRenderer' :
+        // @ts-ignore
+        columnType == 'JSON' ? 'jsonValueRenderer' :
+                undefined,
+        sortable: true,
+      };
+    });
+  } 
+  else {
+    const groupByColumnDefs = formData.groupby.map((c: any) => {
+      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+      return {
+        field: c,
+        minWidth: 50,
+        headerName: columnHeader,
+        sortable: true,
+      };
+    });
+    const metricsColumnDefs = formData.metrics.map((c: any) => {
+      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+      return {
+        field: c,
+        minWidth: 50,
+        headerName: columnHeader,
+        sortable: true,
+      };
+    });
+    columnDefs = groupByColumnDefs.concat(metricsColumnDefs);
+  }
 
   return {
     formData,
@@ -122,9 +143,6 @@ export default function transformProps(chartProps: ChartProps) {
     columnDefs: columnDefs,
     rowData: data,
     // and now your control data, manipulated as needed, and passed through as props!
-    boldText,
-    headerFontSize,
-    headerText,
     emitFilter: tableFilter,
   };
 }

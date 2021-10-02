@@ -137,12 +137,11 @@ export default function CccsGrid({
 
   const onGridReady = (params: any) => {
     console.log('onGridReady called');
-    params.api.forceUpdate();
   };
 
   const onSelectionChanged = (params: any) => {
     const gridApi = params.api;
-    var selectedRows = gridApi.getSelectedRows();
+    const selectedRows = gridApi.getSelectedRows();
     gridApi.document.querySelector('#selectedRows').innerHTML =
       selectedRows.length === 1 ? selectedRows[0].athlete : '';
   };
