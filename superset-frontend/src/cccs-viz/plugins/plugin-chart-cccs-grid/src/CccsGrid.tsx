@@ -42,6 +42,10 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 import { AllModules } from "@ag-grid-enterprise/all-modules";
 import { NULL_STRING } from 'src/utils/common';
 
+import { LicenseManager } from '@ag-grid-enterprise/core'
+const LICENSE_KEY = process.env.AG_GRID_LICENSE_KEY
+LicenseManager.setLicenseKey({LICENSE_KEY});
+
 import {
   ensureIsArray
 } from '@superset-ui/core';
