@@ -191,7 +191,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-
+        // TODO there should be a validation rule to avoid running the query without no metrics, see Table chart
         [
           {
             name: 'order_by_cols',

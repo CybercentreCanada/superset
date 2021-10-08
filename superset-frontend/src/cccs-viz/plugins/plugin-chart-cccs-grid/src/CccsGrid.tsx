@@ -136,7 +136,7 @@ export default function CccsGrid({
   };
 
   const onGridReady = (params: any) => {
-    console.log('onGridReady called');
+    console.log('onGridReady called')
   };
 
   const onSelectionChanged = (params: any) => {
@@ -224,7 +224,8 @@ export default function CccsGrid({
   }
 
   const gridOptions = {
-    suppressColumnVirtualisation: true
+    suppressColumnVirtualisation: true,
+    animateRows: true
     // Disables a Key performance feature for Ag-Grid to enable autosizing of multiple columns
     // if not disabled, only the first 10-15 columns will autosize
     // This change will make initial load up of Ag-Grid slower than before

@@ -16,133 +16,159 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, Column, QueryMode, TimeseriesDataRecord } from '@superset-ui/core';
+ import { ChartProps, Column, QueryMode, TimeseriesDataRecord } from '@superset-ui/core';
 
-export default function transformProps(chartProps: ChartProps) {
-  /**
-   * This function is called after a successful response has been
-   * received from the chart data endpoint, and is used to transform
-   * the incoming data prior to being sent to the Visualization.
-   *
-   * The transformProps function is also quite useful to return
-   * additional/modified props to your data viz component. The formData
-   * can also be accessed from your CccsGrid.tsx file, but
-   * doing supplying custom props here is often handy for integrating third
-   * party libraries that rely on specific props.
-   *
-   * A description of properties in `chartProps`:
-   * - `height`, `width`: the height/width of the DOM element in which
-   *   the chart is located
-   * - `formData`: the chart data request payload that was sent to the
-   *   backend.
-   * - `queriesData`: the chart data response payload that was received
-   *   from the backend. Some notable properties of `queriesData`:
-   *   - `data`: an array with data, each row with an object mapping
-   *     the column/alias to its value. Example:
-   *     `[{ col1: 'abc', metric1: 10 }, { col1: 'xyz', metric1: 20 }]`
-   *   - `rowcount`: the number of rows in `data`
-   *   - `query`: the query that was issued.
-   *
-   * Please note: the transformProps function gets cached when the
-   * application loads. When making changes to the `transformProps`
-   * function during development with hot reloading, changes won't
-   * be seen until restarting the development server.
-   */
-  const {
-    datasource,
-    hooks,
-    width,
-    height,
-    rawFormData: formData,
-    queriesData,
-  } = chartProps;
-  const {
-    table_filter: tableFilter,
-    query_mode: queryMode,
-  } = formData;
-  const data = queriesData[0].data as TimeseriesDataRecord[];
-
-  const { setDataMask = () => { } } = hooks;
-
-  const columns = datasource?.columns as Column[];
-
-  console.log('formData via TransformProps.ts', formData);
-
-  const columnTypeMap = new Map<string, string>();
-
-  columns.reduce(function (columnMap, column: Column) {
-    // @ts-ignore
-    const name = column['column_name'];
-    // @ts-ignore
-    columnMap[name] = column.type;
-    return columnMap;
-  }, columnTypeMap);
-
-  const columnVerboseNameMap = new Map<string, string>();
-
-  columns.reduce(function (columnMap, column: Column) {
-    // @ts-ignore
-    const name = column['column_name'];
-    // @ts-ignore
-    columnMap[name] = column.verbose_name;
-    return columnMap;
-  }, columnVerboseNameMap);
+ export default function transformProps(chartProps: ChartProps) {
+   /**
+    * This function is called after a successful response has been
+    * received from the chart data endpoint, and is used to transform
+    * the incoming data prior to being sent to the Visualization.
+    *
+    * The transformProps function is also quite useful to return
+    * additional/modified props to your data viz component. The formData
+    * can also be accessed from your CccsGrid.tsx file, but
+    * doing supplying custom props here is often handy for integrating third
+    * party libraries that rely on specific props.
+    *
+    * A description of properties in `chartProps`:
+    * - `height`, `width`: the height/width of the DOM element in which
+    *   the chart is located
+    * - `formData`: the chart data request payload that was sent to the
+    *   backend.
+    * - `queriesData`: the chart data response payload that was received
+    *   from the backend. Some notable properties of `queriesData`:
+    *   - `data`: an array with data, each row with an object mapping
+    *     the column/alias to its value. Example:
+    *     `[{ col1: 'abc', metric1: 10 }, { col1: 'xyz', metric1: 20 }]`
+    *   - `rowcount`: the number of rows in `data`
+    *   - `query`: the query that was issued.
+    *
+    * Please note: the transformProps function gets cached when the
+    * application loads. When making changes to the `transformProps`
+    * function during development with hot reloading, changes won't
+    * be seen until restarting the development server.
+    */
+   const {
+     datasource,
+     hooks,
+     width,
+     height,
+     rawFormData: formData,
+     queriesData,
+   } = chartProps;
+   const {
+     table_filter: tableFilter,
+     query_mode: queryMode,
+   } = formData;
+   const data = queriesData[0].data as TimeseriesDataRecord[];
  
-  var columnDefs = [];
-
-  if (queryMode === QueryMode.raw) {
-    columnDefs = formData.columns.map((c: any) => {
-      const columnType = columnTypeMap[c];
-      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-      return {
-        field: c,
-        minWidth: 50,
-        headerName: columnHeader,
-        // @ts-ignore
-        cellRenderer: columnType == 'IPV4' ? 'ipv4ValueRenderer' :
-        // @ts-ignore
-        columnType == 'IPV6' ? 'ipv6ValueRenderer' :
-        // @ts-ignore
-        columnType == 'DOMAIN' ? 'domainValueRenderer' :
-        // @ts-ignore
-        columnType == 'COUNTRY' ? 'countryValueRenderer' :
-        // @ts-ignore
-        columnType == 'JSON' ? 'jsonValueRenderer' :
-                undefined,
-        sortable: true,
-      };
-    });
-  } 
-  else {
-    const groupByColumnDefs = formData.groupby.map((c: any) => {
-      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-      return {
-        field: c,
-        minWidth: 50,
-        headerName: columnHeader,
-        sortable: true,
-      };
-    });
-    const metricsColumnDefs = formData.metrics.map((c: any) => {
-      const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-      return {
-        field: c,
-        minWidth: 50,
-        headerName: columnHeader,
-        sortable: true,
-      };
-    });
-    columnDefs = groupByColumnDefs.concat(metricsColumnDefs);
-  }
-
-  return {
-    formData,
-    setDataMask,
-    width,
-    height,
-    columnDefs: columnDefs,
-    rowData: data,
-    // and now your control data, manipulated as needed, and passed through as props!
-    emitFilter: tableFilter,
-  };
-}
+   const { setDataMask = () => { } } = hooks;
+ 
+   const columns = datasource?.columns as Column[];
+ 
+   const columnTypeMap = new Map<string, string>();
+ 
+   columns.reduce(function (columnMap, column: Column) {
+     // @ts-ignore
+     const name = column['column_name'];
+     // @ts-ignore
+     columnMap[name] = column.type;
+     return columnMap;
+   }, columnTypeMap);
+ 
+   const columnVerboseNameMap = new Map<string, string>();
+ 
+   columns.reduce(function (columnMap, column: Column) {
+     // @ts-ignore
+     const name = column['column_name'];
+     // @ts-ignore
+     columnMap[name] = column.verbose_name;
+     return columnMap;
+   }, columnVerboseNameMap);
+ 
+   const sortingColumnMap = new Map<string, boolean>();
+   
+   debugger;
+ 
+   formData.order_by_cols.reduce(function (columnMap: { [x: string]: any; }, item: String) {
+     if (typeof item === 'string') {
+       try {
+         let array  = JSON.parse(item);
+         let name = array[0];
+         let isAscending = array[1];
+         columnMap[name] = isAscending;
+       } catch (error) {
+         throw new Error('Found invalid orderby options');
+       }
+       return columnMap;
+     }
+     else {
+       console.log('Found invalid orderby options ' + item);
+       return undefined;
+     }
+   }, sortingColumnMap);
+ 
+   var columnDefs = [];
+ 
+   if (queryMode === QueryMode.raw) {
+     columnDefs = formData.columns.map((c: any) => {
+       const columnType = columnTypeMap[c];
+       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+       // TODO In order to maintain the sort order, sort directions should be applied once the columns are all defined
+       // TODO When sort direction/fields is changed, this is not reflected in the table
+       const sortDirection = sortingColumnMap[c] != undefined ? (sortingColumnMap[c] ? 'asc' : 'desc') : undefined;
+       debugger;
+       return {
+         field: c,
+         // minWidth: 50,
+         headerName: columnHeader,
+         // @ts-ignore
+         cellRenderer: columnType == 'IPV4' ? 'ipv4ValueRenderer' :
+         // @ts-ignore
+         columnType == 'IPV6' ? 'ipv6ValueRenderer' :
+         // @ts-ignore
+         columnType == 'DOMAIN' ? 'domainValueRenderer' :
+         // @ts-ignore
+         columnType == 'COUNTRY' ? 'countryValueRenderer' :
+         // @ts-ignore
+         columnType == 'JSON' ? 'jsonValueRenderer' :
+                 undefined,
+         sortable: true,
+         sort: sortDirection
+       };
+     });
+   } 
+   else {
+     const groupByColumnDefs = formData.groupby.map((c: any) => {
+       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+       return {
+         field: c,
+         minWidth: 50,
+         headerName: columnHeader,
+         sortable: true,
+       };
+     });
+     const metricsColumnDefs = formData.metrics.map((c: any) => {
+       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
+       return {
+         field: c,
+         minWidth: 50,
+         headerName: columnHeader,
+         sortable: true,
+       };
+     });
+     columnDefs = groupByColumnDefs.concat(metricsColumnDefs);
+   }
+ 
+   return {
+     formData,
+     setDataMask,
+     width,
+     height,
+     columnDefs: columnDefs,
+     rowData: data,
+     // and now your control data, manipulated as needed, and passed through as props!
+     emitFilter: tableFilter,
+   };
+ }
+ 
