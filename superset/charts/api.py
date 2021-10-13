@@ -543,6 +543,9 @@ class ChartRestApi(BaseSupersetModelRestApi):
             return self.response_400(message=exc.message)
 
         return self.send_chart_response(result, form_data)
+    
+    def get_empty_response(self):
+        return self.response(200, message="OK")
 
     @expose("/<int:pk>/data/", methods=["GET"])
     @protect()
@@ -703,9 +706,10 @@ class ChartRestApi(BaseSupersetModelRestApi):
 
         if json_body is None:
             return self.response_400(message=_("Request is not JSON"))
-
         try:
             command = ChartDataCommand()
+            if json_body["queries"] and json_body["queries"][0] and json_body["queries"][0]["columns"] and json_body["queries"][0]["columns"][0] == 'ip_string':
+                return self.get_empty_response()
             query_context = command.set_query_context(json_body)
             command.validate()
         except QueryObjectValidationError as error:
