@@ -544,6 +544,9 @@ class ChartRestApi(BaseSupersetModelRestApi):
 
         return self.send_chart_response(result, form_data)
     
+    # DO NOT MERGE BACK IN TO cccs-1.3 or anywhere else
+    #
+    # This is a hack to get a native filter to show up without doing a data query
     def get_empty_response(self):
         return self.response(200, message="OK")
 
@@ -708,6 +711,9 @@ class ChartRestApi(BaseSupersetModelRestApi):
             return self.response_400(message=_("Request is not JSON"))
         try:
             command = ChartDataCommand()
+            # DO NOT MERGE BACK IN TO cccs-1.3 or anywhere else
+            #
+            # This is a hack to get a native filter to show up without doing a data query
             if json_body["queries"] and json_body["queries"][0] and json_body["queries"][0]["columns"] and json_body["queries"][0]["columns"][0] == 'ip_string':
                 return self.get_empty_response()
             query_context = command.set_query_context(json_body)
