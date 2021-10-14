@@ -48,12 +48,14 @@
     * function during development with hot reloading, changes won't
     * be seen until restarting the development server.
     */
-   const { width, height, formData, queriesData } = chartProps;
+   const { width, height, formData, queriesData, hooks } = chartProps;
    const { boldText, headerFontSize, headerText } = formData;
    const data = queriesData[0].data as TimeseriesDataRecord[];
- console.log("in transformProps");
+   const { setDataMask = () => { } } = hooks;
+   console.log("in transformProps");
  
    return {
+     setDataMask,
      width,
      height,
      data,
@@ -61,6 +63,7 @@
      boldText,
      headerFontSize,
      headerText,
+     formData
    };
  }
  
