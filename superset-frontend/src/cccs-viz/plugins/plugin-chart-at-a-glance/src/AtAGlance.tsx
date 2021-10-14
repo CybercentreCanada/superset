@@ -5,6 +5,7 @@ import { QueryFormData, AdhocFilter } from '@superset-ui/core';
 import { Row, Col, Grid} from 'react-bootstrap/';
 import styles from './styles';
 import IPAddressUtil from './IpAddressUtil';
+import style from 'react-syntax-highlighter/dist/esm/styles/hljs/agate';
 
 /**
 *   getPayloadField:
@@ -83,7 +84,7 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
   newStarGeoFormData.metrics = undefined; 
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset.
-  newStarGeoFormData.datasource="28__table";
+  newStarGeoFormData.datasource="27__table";
   newStarGeoFormData.columns = ["asn", "carrier", "city", "connection_type", "country", "organization"];
 
   return newStarGeoFormData;
@@ -117,7 +118,7 @@ const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
   farsightFormData.columns = ["rrname"];
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset
-  farsightFormData.datasource = "31__table";
+  farsightFormData.datasource = "30__table";
   farsightFormData.row_limit = 10;
   return farsightFormData;
 }
@@ -206,7 +207,6 @@ const useDataApi = (formData: QueryFormData,
 
 //Main Component
 function AtAGlanceCore ( initialFormData: QueryFormData) {
-  console.log("In At A Glance");
   const [ipString, setIpString] = useState('3.251.148.10');
   const [formData, setFormData] = useState(initialFormData);
 
@@ -228,37 +228,22 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
   useDataApi(geoFormData, setGeoData, setIsGeoinit, setIsGeoLoading, setIsGeoError);
   useDataApi(farsightFormData, setFarsightData, setIsFarsightinit, setIsFarsightLoading, setIsFarsightError);
 
-
-  //form submit handler
-  const [inputIp, setInputIp] = useState(ipString);
-  const submit = (event: { preventDefault: () => void; }) => {
-    if (inputIp.trim() == "")  
-       alert("IP can't be empty");
-    else
-      event.preventDefault();
-      setNewStarGeoFormData(buildGeoFormData(formData, inputIp));
-      setFarsightFormData(buildFarsightFormData(formData, inputIp));
-      setIpString(inputIp);
-  };
-
-  if (isPayloadUndefined(geoData) && !isGeoLoading)
-    return (
-    <>  
-    <div style={styles.SectionTitle}>
-      <RiGlobalFill /> <span> At a Glance </span>
-    </div>
-    <div style={styles.Datum}>
-      <form autoComplete="off" onSubmit={submit}>
-          <label>
-            IP:
-            <input type="text" value={inputIp} onChange={e => {setInputIp(e.target.value); console.log( "e value" + e.target.value )} }/>
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-    </div>
-      <h3>No data found for this identifier </h3>
-    </>
-    );
+  if (initialFormData.formData && initialFormData.formData.extraFormData && initialFormData.formData.extraFormData.filters) {
+    for (const filter of initialFormData.formData.extraFormData.filters) {
+        if (filter.col === "ip_string") {
+            const localip: string = filter.val[0];
+            if (localip !== ipString) {
+              setNewStarGeoFormData(buildGeoFormData(initialFormData, localip));
+              setFarsightFormData(buildFarsightFormData(initialFormData, localip));
+              setIpString(localip);
+            } 
+        }
+    }
+  } else {
+    setNewStarGeoFormData(buildGeoFormData(initialFormData, ipString));
+    setFarsightFormData(buildFarsightFormData(initialFormData, ipString));
+    setIpString(ipString);
+  }
 
   return (
     <>
@@ -266,16 +251,10 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
       <RiGlobalFill /> <span> At a Glance </span>
     </div>
     <div style={styles.Datum}>
-      <form autoComplete="off" onSubmit={submit}>
-          <label>
-            IP:
-            <input type="text" value={inputIp} onChange={e => {setInputIp(e.target.value); console.log( "e value" + e.target.value )} }/>
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-    </div>
-    <div style={styles.Datum}>
       <Grid fluid >
+        <Row >
+          <Col> IP: { ipString }</Col>
+        </Row>
         <Row >
           <Col> ASN: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("asn", geoData[0])} </Col>
         </Row>
@@ -300,11 +279,11 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
       </Grid>
     </div>
     <div style={styles.Datum}>
-      <h5>ASSOCIATED HOSTNAMES:</h5>
-        <ul style={styles.HostList}>  
-          {isFarsightLoading && !isFarsightInit ? "Loading ..." :  getHostnames(farsightData).map((hostname: string) =>  <li>{hostname}</li>)  } 
-        </ul> 
-      </div>    
+      <p style={styles.HostnameTitle}>ASSOCIATED HOSTNAMES:</p>
+      <Grid fluid>
+        {isFarsightLoading && !isFarsightInit ? "Loading..." : getHostnames(farsightData).map((hostname: string) => <Row><Col style={styles.RowBullet}>{hostname}</Col></Row>) }
+      </Grid>
+    </div>    
     </> 
   );
 };

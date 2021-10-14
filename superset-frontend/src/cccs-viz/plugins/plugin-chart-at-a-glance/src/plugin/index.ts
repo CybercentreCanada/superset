@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
- // import buildQuery from './buildQuery';
+ import { t, Behavior, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+ //import buildQuery from './buildQuery';
  import controlPanel from './controlPanel';
  import transformProps from './transformProps';
  import thumbnail from '../images/thumbnail.png';
@@ -38,6 +38,7 @@
        description: 'At A Glance',
        name: t('At A Glance'),
        thumbnail,
+       behaviors: [Behavior.INTERACTIVE_CHART],
      });
  
      super({

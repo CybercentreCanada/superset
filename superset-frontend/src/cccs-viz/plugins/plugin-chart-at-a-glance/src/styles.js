@@ -3,7 +3,11 @@ const Datum = {
     borderColor:'#20A7C9',
     fontSize: "14px",
     marginBottom: 2,
-    padding: 2
+    padding: 2,
+    float: 'left',
+    width: '50%',
+    height: '200px',
+    overflow: 'auto'
   }
 
   const DatumLink = {
@@ -33,8 +37,18 @@ const Datum = {
   }
 
   const HostList = {
-    maxHeight: 300,
-    overflow: 'scroll',
+    maxHeight: 200,
+  }
+
+  const RowBullet = {
+    display: 'list-item',
+    'list-style-type': 'disc',
+    'list-style-position': 'inside'
+  }
+
+  const HostnameTitle = {
+    'padding-left': '5px',
+    'margin-bottom': '0'
   }
 
   const styles = {
@@ -44,6 +58,8 @@ const Datum = {
     UrlList: UrlList,
     UrlListItem: UrlListItem,
     HostList: HostList,
+    RowBullet: RowBullet,
+    HostnameTitle: HostnameTitle,
   }
 
   export default styles;
