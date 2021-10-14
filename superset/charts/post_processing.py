@@ -31,8 +31,15 @@ from typing import Any, Callable, Dict, Optional, Union
 
 import pandas as pd
 
-from superset.utils.core import DTTM_ALIAS, extract_dataframe_dtypes, get_metric_name
+from superset import app
+from superset.utils.core import (
+    DTTM_ALIAS,
+    ChartDataResultFormat,
+    extract_dataframe_dtypes,
+    get_metric_name
+)
 
+config = app.config
 
 def sql_like_sum(series: pd.Series) -> pd.Series:
     """
@@ -182,9 +189,19 @@ def pivot_table_v2(  # pylint: disable=too-many-branches
     return df
 
 
+def cccs_grid(result: Dict[Any, Any], form_data: Dict[str, Any]) -> Dict[Any, Any]:
+    """
+    CCCS Grid.
+    """
+    result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+
+    return result
+
+
 post_processors = {
     "pivot_table": pivot_table,
     "pivot_table_v2": pivot_table_v2,
+    "cccs_grid": cccs_grid,
 }
 
 
@@ -193,23 +210,26 @@ def apply_post_process(
 ) -> Dict[Any, Any]:
     form_data = form_data or {}
 
-    viz_type = form_data.get("viz_type")
+    viz_type = result["query_context"].viz_type
     if viz_type not in post_processors:
         return result
 
     post_processor = post_processors[viz_type]
 
-    for query in result["queries"]:
-        df = pd.read_csv(StringIO(query["data"]))
-        processed_df = post_processor(df, form_data)
+    if (result["query_context"].result_format == ChartDataResultFormat.CSV):
+        for query in result["queries"]:
+            df = pd.read_csv(StringIO(query["data"]))
+            processed_df = post_processor(df, form_data)
 
-        buf = StringIO()
-        processed_df.to_csv(buf)
-        buf.seek(0)
+            buf = StringIO()
+            processed_df.to_csv(buf)
+            buf.seek(0)
 
-        query["data"] = buf.getvalue()
-        query["colnames"] = list(processed_df.columns)
-        query["coltypes"] = extract_dataframe_dtypes(processed_df)
-        query["rowcount"] = len(processed_df.index)
+            query["data"] = buf.getvalue()
+            query["colnames"] = list(processed_df.columns)
+            query["coltypes"] = extract_dataframe_dtypes(processed_df)
+            query["rowcount"] = len(processed_df.index)
+    else:
+        result = post_processor(result, form_data)
 
     return result

@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { buildQueryContext, QueryFormData } from '@superset-ui/core';
+import { buildQueryContext } from '@superset-ui/core';
+import { CccsGridQueryFormData } from '../types';
 
 /**
  * The buildQuery function is used to create an instance of QueryContext that's
@@ -32,7 +33,12 @@ import { buildQueryContext, QueryFormData } from '@superset-ui/core';
  * it is possible to define post processing operations in the QueryObject, or multiple queries
  * if a viz needs multiple different result sets.
  */
-export default function buildQuery(formData: QueryFormData) {
+export default function buildQuery(formData: CccsGridQueryFormData) {
+  // TODO: cleanup
+  formData["force"] = true;
+  formData["result_type"] = "post_processed";
+  formData["viz_type"] = "cccs_grid";
+  console.log('formData via index.ts', formData);
   return buildQueryContext(formData, baseQueryObject => [
     {
       ...baseQueryObject,

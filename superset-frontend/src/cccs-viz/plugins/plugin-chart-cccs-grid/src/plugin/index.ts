@@ -21,8 +21,12 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
+import { CccsGridQueryFormData, CccsGridChartProps } from '../types';
 
-export default class CccsGridChartPlugin extends ChartPlugin {
+export default class CccsGridChartPlugin extends ChartPlugin<
+  CccsGridQueryFormData,
+  CccsGridChartProps
+> {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library
@@ -34,18 +38,16 @@ export default class CccsGridChartPlugin extends ChartPlugin {
    * (pivoting, rolling aggregations, sorting etc) or submitting multiple queries.
    */
   constructor() {
-    const metadata = new ChartMetadata({
-      description: 'CCCS Grid',
-      name: t('CCCS Grid'),
-      thumbnail,
-      behaviors: [Behavior.INTERACTIVE_CHART],
-   });
-
     super({
       buildQuery,
       controlPanel,
       loadChart: () => import('../CccsGrid'),
-      metadata,
+      metadata: new ChartMetadata({
+        description: 'CCCS Grid',
+        name: t('CCCS Grid'),
+        thumbnail,
+        behaviors: [Behavior.INTERACTIVE_CHART],
+      }),
       transformProps,
     });
   }

@@ -18,7 +18,7 @@
  */
 import React, { useCallback, useState } from 'react';
 //import { styled } from '@superset-ui/core';
-import { CccsGridProps } from './types';
+import { CccsGridTransformedProps } from './types';
 
 
 import CountryValueRenderer from './CountryValueRenderer';
@@ -43,8 +43,6 @@ import { AllModules } from "@ag-grid-enterprise/all-modules";
 import { NULL_STRING } from 'src/utils/common';
 
 import { LicenseManager } from '@ag-grid-enterprise/core'
-const LICENSE_KEY = process.env.AG_GRID_LICENSE_KEY ?? ''
-LicenseManager.setLicenseKey(LICENSE_KEY);
 
 import {
   ensureIsArray
@@ -64,6 +62,7 @@ const DEFAULT_COLUMN_DEF = {
 export default function CccsGrid({
   width,
   height,
+  agGridLicenseKey,
   columnDefs,
   rowData,
   formData,
@@ -73,7 +72,9 @@ export default function CccsGrid({
   rowSelection,
   emitFilter = false,
   filters: initialFilters = {},
-}: CccsGridProps) {
+}: CccsGridTransformedProps) {
+
+  LicenseManager.setLicenseKey(LICENSE_KEY);
 
   const [, setFilters] = useState(initialFilters);
 
@@ -127,8 +128,6 @@ export default function CccsGrid({
   //   ];
   //   return result;
   // };
-
-
 
   const frameworkComponents = {
     countryValueRenderer: CountryValueRenderer,

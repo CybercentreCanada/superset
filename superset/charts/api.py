@@ -504,7 +504,6 @@ class ChartRestApi(BaseSupersetModelRestApi):
         # post-processing of data, eg, the pivot table.
         if (
             result_type == ChartDataResultType.POST_PROCESSED
-            and result_format == ChartDataResultFormat.CSV
         ):
             result = apply_post_process(result, form_data)
 
@@ -706,6 +705,8 @@ class ChartRestApi(BaseSupersetModelRestApi):
 
         try:
             command = ChartDataCommand()
+            # TODO: remove
+            json_body["viz_type"] = "cccs_grid"
             query_context = command.set_query_context(json_body)
             command.validate()
         except QueryObjectValidationError as error:

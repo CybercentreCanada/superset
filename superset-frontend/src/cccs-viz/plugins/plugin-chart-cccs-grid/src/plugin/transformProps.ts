@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, Column, TimeseriesDataRecord } from '@superset-ui/core';
+import { Column, TimeseriesDataRecord } from '@superset-ui/core';
+import { CccsGridChartProps } from '../types';
 
-export default function transformProps(chartProps: ChartProps) {
+export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
    * received from the chart data endpoint, and is used to transform
@@ -63,6 +64,7 @@ export default function transformProps(chartProps: ChartProps) {
     table_filter: tableFilter,
   } = formData;
   const data = queriesData[0].data as TimeseriesDataRecord[];
+  const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
   const { setDataMask = () => { } } = hooks;
 
@@ -89,7 +91,7 @@ export default function transformProps(chartProps: ChartProps) {
     columnMap[name] = column.verbose_name;
     return columnMap;
   }, columnVerboseNameMap);
- 
+
   const formColumns = formData.columns as any;
 
   const columnDefs = formColumns.map((c: any) => {
@@ -126,5 +128,6 @@ export default function transformProps(chartProps: ChartProps) {
     headerFontSize,
     headerText,
     emitFilter: tableFilter,
+    agGridLicenseKey,
   };
 }

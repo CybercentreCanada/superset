@@ -16,29 +16,49 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormData, SetDataMaskHook, supersetTheme, TimeseriesDataRecord } from '@superset-ui/core';
+import {
+  ChartDataResponseResult,
+  ChartProps,
+  QueryFormData,
+  SetDataMaskHook,
+  supersetTheme,
+  TimeseriesDataRecord
+} from '@superset-ui/core';
+
+export type CccsGridQueryFormData = QueryFormData & {
+  headerText?: string;
+  setDataMask?: SetDataMaskHook;
+  selectedValues?: Record<number, string>;
+  emitFilter: boolean;
+}
 
 export interface CccsGridStylesProps {
-  height: number;
-  width: number;
   headerFontSize?: keyof typeof supersetTheme.typography.sizes;
   boldText?: boolean;
 }
 
-interface CccsGridCustomizeProps {
-  headerText: string;
-  emitFilter: boolean;
-  setDataMask: SetDataMaskHook;
-  selectedValues: Record<number, string>;
-  formData: CccsGridQueryFormData;
+// @ts-ignore
+export const DEFAULT_FORM_DATA: CccsGridQueryFormData = {
+  emitFilter: false,
+  viz_type: "cccs_grid",
 }
 
-export type CccsGridQueryFormData = QueryFormData &
-  CccsGridStylesProps &
-  CccsGridCustomizeProps;
+export interface CccsGridChartDataResponseResult extends ChartDataResponseResult {
+  agGridLicenseKey: string;
+}
 
-export type CccsGridProps = CccsGridStylesProps &
-  CccsGridCustomizeProps & {
+export interface CccsGridChartProps extends ChartProps {
+  formData: CccsGridQueryFormData;
+  queriesData: CccsGridChartDataResponseResult[];
+}
+
+export interface CccsGridTransformedProps {
+    formData: CccsGridQueryFormData;
+    height: number;
+    width: number;
+    setDataMask: SetDataMaskHook,
+    selectedValues: Record<number, string>;
+    emitFilter: boolean;
     data: TimeseriesDataRecord[];
     columnDefs: any;
     rowData: any;
@@ -49,6 +69,7 @@ export type CccsGridProps = CccsGridStylesProps &
     rowSelection: any;
     filters: any;
     // add typing here for the props you pass in from transformProps.ts!
-  };
+    agGridLicenseKey: string;
+}
 
 export type EventHandlers = Record<string, { (props: any): void }>;
