@@ -26,3 +26,4 @@ export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
 export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
 export { default as AtAGlanceChartPlugin } from './plugin-chart-at-a-glance/src/plugin';
+export { default as ApplicationLinksChartPlugin } from './plugin-chart-application-links/src/plugin';
