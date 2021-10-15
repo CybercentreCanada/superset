@@ -90,6 +90,7 @@ import {
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
   AtAGlance,
+  ApplicationLinksChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import { AtAGlanceChartPlugin } from 'src/cccs-viz/plugins/plugin-chart-at-a-glance/src';
 
@@ -112,6 +113,7 @@ export default class MainPreset extends Preset {
         new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
         new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
         new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
+        new ApplicationLinksChartPlugin().configure({key: 'application_links'}),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),

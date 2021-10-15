@@ -5,7 +5,6 @@ import { QueryFormData, AdhocFilter } from '@superset-ui/core';
 import { Row, Col, Grid} from 'react-bootstrap/';
 import styles from './styles';
 import IPAddressUtil from './IpAddressUtil';
-import style from 'react-syntax-highlighter/dist/esm/styles/hljs/agate';
 
 /**
 *   getPayloadField:
@@ -207,7 +206,8 @@ const useDataApi = (formData: QueryFormData,
 
 //Main Component
 function AtAGlanceCore ( initialFormData: QueryFormData) {
-  const [ipString, setIpString] = useState('3.251.148.10');
+  const DEFAULT_IP_STRING: string = '3.251.148.10';
+  const [ipString, setIpString] = useState(DEFAULT_IP_STRING);
   const [formData, setFormData] = useState(initialFormData);
 
   //neustargeo state
@@ -228,21 +228,27 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
   useDataApi(geoFormData, setGeoData, setIsGeoinit, setIsGeoLoading, setIsGeoError);
   useDataApi(farsightFormData, setFarsightData, setIsFarsightinit, setIsFarsightLoading, setIsFarsightError);
 
-  if (initialFormData.formData && initialFormData.formData.extraFormData && initialFormData.formData.extraFormData.filters) {
-    for (const filter of initialFormData.formData.extraFormData.filters) {
-        if (filter.col === "ip_string") {
-            const localip: string = filter.val[0];
-            if (localip !== ipString) {
-              setNewStarGeoFormData(buildGeoFormData(initialFormData, localip));
-              setFarsightFormData(buildFarsightFormData(initialFormData, localip));
-              setIpString(localip);
-            } 
-        }
+  
+  console.log("ipString = " + ipString);
+  console.log("initialFormData = " + JSON.stringify(initialFormData));
+
+  for (let i: number = 0; i < initialFormData.formData?.extraFormData?.filters?.length; i++) {
+    let filter = initialFormData.formData.extraFormData.filters[i];
+    if (filter.col === "ip_string") {
+      const localip: string = filter.val[0];
+      if (localip !== ipString) {
+        setNewStarGeoFormData(buildGeoFormData(initialFormData, localip));
+        setFarsightFormData(buildFarsightFormData(initialFormData, localip));
+        setIpString(localip);
+      }
+      break;
     }
-  } else {
-    setNewStarGeoFormData(buildGeoFormData(initialFormData, ipString));
-    setFarsightFormData(buildFarsightFormData(initialFormData, ipString));
-    setIpString(ipString);
+  }
+
+  if (Object.keys(initialFormData.formData.extraFormData).length === 0 && ipString !== DEFAULT_IP_STRING) {
+    setIpString(DEFAULT_IP_STRING);
+    setNewStarGeoFormData(buildGeoFormData(initialFormData, DEFAULT_IP_STRING));
+    setFarsightFormData(buildFarsightFormData(initialFormData, DEFAULT_IP_STRING));
   }
 
   return (
