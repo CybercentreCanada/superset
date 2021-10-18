@@ -90,6 +90,7 @@ import {
   CccsGridChartPlugin,
   StatusIndicatorChartPlugin,
   AtAGlance,
+  AtAGlanceUserIDChartPlugin,
   ApplicationLinksChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import { AtAGlanceChartPlugin } from 'src/cccs-viz/plugins/plugin-chart-at-a-glance/src';
