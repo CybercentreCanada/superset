@@ -74,7 +74,7 @@ export default function CccsGrid({
   filters: initialFilters = {},
 }: CccsGridTransformedProps) {
 
-  LicenseManager.setLicenseKey(LICENSE_KEY);
+  LicenseManager.setLicenseKey(agGridLicenseKey);
 
   const [, setFilters] = useState(initialFilters);
 
