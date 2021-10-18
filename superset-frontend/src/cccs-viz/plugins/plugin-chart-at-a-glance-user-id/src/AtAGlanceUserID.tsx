@@ -182,7 +182,7 @@ const useDataApi = (formData: QueryFormData,
 
 //Main Component
 function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
-  const [userIDString, setUserIDString] = useState('ryan.stubbert@gmail.com,');
+  const [userIDString, setUserIDString] = useState('coolguy@some.com,');
   const [formData, ] = useState(initialFormData);
 
   //neustargeo state 
