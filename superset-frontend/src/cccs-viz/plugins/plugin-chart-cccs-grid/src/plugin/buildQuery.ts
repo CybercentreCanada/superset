@@ -17,7 +17,10 @@
  * under the License.
  */
 import { buildQueryContext } from '@superset-ui/core';
-import { CccsGridQueryFormData } from '../types';
+import {
+  CccsGridQueryFormData,
+  DEFAULT_FORM_DATA,
+} from '../types';
 
 /**
  * The buildQuery function is used to create an instance of QueryContext that's
@@ -35,10 +38,11 @@ import { CccsGridQueryFormData } from '../types';
  */
 export default function buildQuery(formData: CccsGridQueryFormData) {
   // TODO: cleanup
-  formData["force"] = true;
-  formData["result_type"] = "post_processed";
-  formData["viz_type"] = "cccs_grid";
-  console.log('formData via index.ts', formData);
+  formData = {
+    ...formData,
+    ...DEFAULT_FORM_DATA,
+  };
+  console.log('formData via buildQuery.ts', formData);
   return buildQueryContext(formData, baseQueryObject => [
     {
       ...baseQueryObject,

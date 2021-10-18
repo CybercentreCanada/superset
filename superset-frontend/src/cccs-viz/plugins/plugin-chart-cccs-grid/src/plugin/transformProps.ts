@@ -17,7 +17,11 @@
  * under the License.
  */
 import { Column, TimeseriesDataRecord } from '@superset-ui/core';
-import { CccsGridChartProps } from '../types';
+import {
+  CccsGridChartProps,
+  CccsGridQueryFormData,
+  DEFAULT_FORM_DATA,
+} from '../types';
 
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
@@ -61,8 +65,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    table_filter: tableFilter,
-  } = formData;
+    emitFilter,
+  }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
@@ -127,7 +131,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    emitFilter: tableFilter,
+    emitFilter,
     agGridLicenseKey,
   };
 }
