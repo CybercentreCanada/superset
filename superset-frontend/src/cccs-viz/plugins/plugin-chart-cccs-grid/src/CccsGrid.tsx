@@ -47,10 +47,7 @@ import {
 } from '@superset-ui/core';
 
 const DEFAULT_COLUMN_DEF = {
-  flex: 1,
-  minWidth: 125,
-  editable: true,
-  sortable: true,
+  editable: false,
   filter: true,
   resizable: true,
   tooltipField: '',
@@ -71,7 +68,7 @@ export default function CccsGrid({
   filters: initialFilters = {},
 }: CccsGridProps) {
 
-  const [, setFilters] = useState(initialFilters);
+  const [setFilters] = useState(initialFilters);
 
   const [prevRow, setPrevRow] = useState(-1);
   const [prevColumn, setPrevColumn] = useState('');

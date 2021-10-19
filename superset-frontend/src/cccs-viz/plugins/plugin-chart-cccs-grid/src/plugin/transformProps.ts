@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- import { ChartProps, Column, QueryMode, TimeseriesDataRecord } from '@superset-ui/core';
+ import { ChartProps, Column, QueryMode, t, TimeseriesDataRecord } from '@superset-ui/core';
 
  export default function transformProps(chartProps: ChartProps) {
    /**
@@ -66,8 +66,8 @@
  
    const columns = datasource?.columns as Column[];
  
+   // Map of column types, key is column name, value is column type
    const columnTypeMap = new Map<string, string>();
- 
    columns.reduce(function (columnMap, column: Column) {
      // @ts-ignore
      const name = column['column_name'];
@@ -75,9 +75,9 @@
      columnMap[name] = column.type;
      return columnMap;
    }, columnTypeMap);
- 
+
+   // Map of verbose names, key is column name, value is verbose name
    const columnVerboseNameMap = new Map<string, string>();
- 
    columns.reduce(function (columnMap, column: Column) {
      // @ts-ignore
      const name = column['column_name'];
@@ -86,78 +86,91 @@
      return columnMap;
    }, columnVerboseNameMap);
  
-   const sortingColumnMap = new Map<string, boolean>();
-   
-   debugger;
- 
-   formData.order_by_cols.reduce(function (columnMap: { [x: string]: any; }, item: String) {
+   // Map of sorting columns, key is column name, value is an struct of sort direction (asc/desc) and sort index
+   const sortingColumnMap = new Map<string, {}>();
+   formData.order_by_cols.reduce(function (columnMap: { [x: string]: any; }, item: string, currentIndex: number) {
+     // Logic from extractQueryFields.ts
      if (typeof item === 'string') {
        try {
-         let array  = JSON.parse(item);
-         let name = array[0];
-         let isAscending = array[1];
-         columnMap[name] = isAscending;
+         const array  = JSON.parse(item);
+         const name = array[0];
+         const sortDirection = array[1];
+         const sortIndex = currentIndex - 1;
+         const sortOptions = { sortDirection: sortDirection, sortIndex: sortIndex};
+         columnMap[name] = sortOptions;
        } catch (error) {
-         throw new Error('Found invalid orderby options');
+         throw new Error(t('Found invalid orderby option: %s', item));
        }
        return columnMap;
      }
      else {
-       console.log('Found invalid orderby options ' + item);
+       console.log('Found invalid orderby option: %s.', item);
        return undefined;
      }
    }, sortingColumnMap);
- 
-   var columnDefs = [];
+
+   // Array of types we don't want to sort on
+   const nonSortableColumns = ['JSON'];
+
+   // Key is column type, value is renderer name
+   const rendererMap = {
+      IPV4: 'ipv4ValueRenderer',
+      IPV6: 'ipv6ValueRenderer', 
+      DOMAIN: 'domainValueRenderer',
+      COUNTRY: 'countryValueRenderer',
+      JSON: 'jsonValueRenderer'
+    };
+   
+   var columnDefs: Column[] = [];
  
    if (queryMode === QueryMode.raw) {
-     columnDefs = formData.columns.map((c: any) => {
-       const columnType = columnTypeMap[c];
-       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-       // TODO In order to maintain the sort order, sort directions should be applied once the columns are all defined
-       // TODO When sort direction/fields is changed, this is not reflected in the table
-       const sortDirection = sortingColumnMap[c] != undefined ? (sortingColumnMap[c] ? 'asc' : 'desc') : undefined;
-       debugger;
+     columnDefs = formData.columns.map((column: any) => {
+       const columnType = columnTypeMap[column];
+       const columnHeader = columnVerboseNameMap[column] ? columnVerboseNameMap[column] : column;
+       const sortDirection = column in sortingColumnMap ? (sortingColumnMap[column].sortDirection ? 'asc' : 'desc') : null;
+       const sortIndex = column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
+       const cellRenderer = columnType in rendererMap ? rendererMap[columnType] : undefined;
+       const isSortable  = !(nonSortableColumns.includes(columnType));
        return {
-         field: c,
-         // minWidth: 50,
+         field: column,
          headerName: columnHeader,
-         // @ts-ignore
-         cellRenderer: columnType == 'IPV4' ? 'ipv4ValueRenderer' :
-         // @ts-ignore
-         columnType == 'IPV6' ? 'ipv6ValueRenderer' :
-         // @ts-ignore
-         columnType == 'DOMAIN' ? 'domainValueRenderer' :
-         // @ts-ignore
-         columnType == 'COUNTRY' ? 'countryValueRenderer' :
-         // @ts-ignore
-         columnType == 'JSON' ? 'jsonValueRenderer' :
-                 undefined,
-         sortable: true,
-         sort: sortDirection
+         cellRenderer: cellRenderer,
+         sortable: isSortable,
+         sort: sortDirection,
+         sortIndex: sortIndex
        };
      });
    } 
    else {
-     const groupByColumnDefs = formData.groupby.map((c: any) => {
-       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-       return {
-         field: c,
-         minWidth: 50,
-         headerName: columnHeader,
-         sortable: true,
-       };
-     });
-     const metricsColumnDefs = formData.metrics.map((c: any) => {
-       const columnHeader = columnVerboseNameMap[c] ? columnVerboseNameMap[c] : c;
-       return {
-         field: c,
-         minWidth: 50,
-         headerName: columnHeader,
-         sortable: true,
-       };
-     });
-     columnDefs = groupByColumnDefs.concat(metricsColumnDefs);
+     if (formData.groupby)
+     {
+      const groupByColumnDefs = formData.groupby.map((column: any) => {
+        const columnHeader = columnVerboseNameMap[column] ? columnVerboseNameMap[column] : column;
+        const columnType = columnTypeMap[column];
+        const cellRenderer = columnType in rendererMap ? rendererMap[columnType] : undefined;
+        const isSortable  = !(nonSortableColumns.includes(columnType));
+        return {
+          field: column,
+          headerName: columnHeader,
+          cellRenderer: cellRenderer,
+          sortable: isSortable,
+        };
+      });
+      columnDefs = columnDefs.concat(groupByColumnDefs);
+     }
+
+     if (formData.metrics)
+     {
+      const metricsColumnDefs = formData.metrics.map((column: any) => {
+        const columnHeader = columnVerboseNameMap[column] ? columnVerboseNameMap[column] : column;
+        return {
+          field: column,
+          headerName: columnHeader,
+          sortable: true,
+        };
+      });
+      columnDefs = columnDefs.concat(metricsColumnDefs);
+     }
    }
  
    return {
