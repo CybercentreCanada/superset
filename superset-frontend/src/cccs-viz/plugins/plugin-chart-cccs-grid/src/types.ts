@@ -33,6 +33,8 @@ export type CccsGridQueryFormData = QueryFormData & {
 }
 
 export interface CccsGridStylesProps {
+  height: number;
+  width: number;
   headerFontSize?: keyof typeof supersetTheme.typography.sizes;
   boldText?: boolean;
 }
@@ -48,15 +50,13 @@ export interface CccsGridChartDataResponseResult extends ChartDataResponseResult
   agGridLicenseKey: string;
 }
 
-export interface CccsGridChartProps extends ChartProps {
-  formData: CccsGridQueryFormData;
-  queriesData: CccsGridChartDataResponseResult[];
+export class CccsGridChartProps extends ChartProps {
+  declare formData: CccsGridQueryFormData;
+  declare queriesData: CccsGridChartDataResponseResult[];
 }
 
-export interface CccsGridTransformedProps {
+export interface CccsGridTransformedProps extends CccsGridStylesProps {
     formData: CccsGridQueryFormData;
-    height: number;
-    width: number;
     setDataMask: SetDataMaskHook,
     selectedValues: Record<number, string>;
     emitFilter: boolean;
