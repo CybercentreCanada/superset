@@ -54,19 +54,28 @@
    console.log('formData via TransformProps.ts', formData);
  
  
-   let ip_string: string = "3.251.148.10";
+   let application: string = "ALFRED";
+   let appVal: string = "";
+   let appType: string = "IP";
    
    for (let i: number = 0; i < formData?.extraFormData?.filters?.length; i++) {
        let filter = formData.extraFormData.filters[0];
        if (filter.col === "ip_string") {
-           ip_string = filter.val[0];
-           break;
+          appType = "IP";
+          appVal = filter.val[0];
+          break;
+       } else if (filter.col === "user_id") {
+          appType = "USER_ID";
+          appVal = filter.val[0];
+          break;
        }
    }
  
    return {
      data,
-     ip_string,
+     application,
+     appVal,
+     appType,
    };
  }
  
