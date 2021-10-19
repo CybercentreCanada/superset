@@ -37,7 +37,6 @@ import {
  * if a viz needs multiple different result sets.
  */
 export default function buildQuery(formData: CccsGridQueryFormData) {
-  // TODO: cleanup
   formData = {
     ...formData,
     ...DEFAULT_FORM_DATA,
