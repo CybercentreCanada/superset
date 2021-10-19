@@ -3,13 +3,29 @@ const Datum = {
   borderColor:'#20A7C9',
   fontSize: "14px",
   marginBottom: 2,
+  padding: 10,
+  paddingleft: 10,
+  float: 'left',
+  width: '50%',
+  height: '150px',
+  overflow: 'auto'
+}
+const DatumTop = {
+  border: '1px solid',
+  borderColor:'#20A7C9',
+  fontSize: "14px",
+  marginBottom: 2,
   padding: 2,
   float: 'left',
   width: '100%',
-  height: '200px',
+  height: '75px',
   overflow: 'auto'
 }
-
+const DatumTopElement = {
+  fontSize: "14px",
+  width: '50%',
+  overflow: 'auto'
+}
 const DatumLink = {
   marginTop: 1
 }
@@ -53,6 +69,8 @@ const HostnameTitle = {
 
 const styles = {
   Datum: Datum,
+  DatumTop: DatumTop,
+  DatumTopElement: DatumTopElement,
   DatumLink: DatumLink,
   SectionTitle: SectionTitle,
   UrlList: UrlList,

@@ -1,9 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,  } from 'react';
 import { RiGlobalFill } from 'react-icons/ri';
 import { getChartDataRequest } from 'src/chart/chartAction';
 import { QueryFormData, AdhocFilter } from '@superset-ui/core';
 import { Row, Col, Grid} from 'react-bootstrap/';
+import Collapse from 'src/components/Collapse';
 import styles from './styles';
+
+
+
+type DataManager = {
+  formData : QueryFormData,
+  data : any[],
+  isInit : boolean, 
+  isLoading : boolean,
+  isError : boolean
+}
+
+
 
 /**
 *   getPayloadField:
@@ -69,7 +82,7 @@ const buildAadFormData = (currentFormData: QueryFormData, userId: string) =>{
   // Setting up newStarGeo query:
   const aadFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
 
-  const userIdOperationFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'operation', operator: '==', comparator: 'UserLoggedIn'};
+  const userIdOperationFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'operation', operator: 'IN', comparator: ['UserLoggedIn', 'UserLoginFailed']};
   console.log("USER_ID: " + userId )
   const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'user_id', operator: '==', comparator: userId};
 
@@ -85,7 +98,7 @@ const buildAadFormData = (currentFormData: QueryFormData, userId: string) =>{
   return aadFormData;
 }
 
-const buildAadActionFormData = (currentFormData: QueryFormData, userId: string) =>{
+const buildSASWorkloadCount = (currentFormData: QueryFormData, userId: string, table : string) =>{
   // Filter that will be applied to all the queries for each datasrouce. Use this statement when ip_string is available in datasource.
   // const filter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'ip_string', operator: 'IN', comparator: [userIDString] };
   // For now, we are translating the dotted notation back to numerical and casting it into a string as the adhocFilter accepts a string as a comparator but 
@@ -95,22 +108,22 @@ const buildAadActionFormData = (currentFormData: QueryFormData, userId: string) 
   // const endIPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'end_ip_int', operator: '>=', comparator: userId == null ? '' :userId};
 
   // Setting up newStarGeo query:
-  const aadFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
+  const sasFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
 
-  const userIdOperationFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'operation', operator: '==', comparator: 'UserLoggedIn'};
-  console.log("USER_ID: " + userId )
-  const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'user_id', operator: '==', comparator: userId};
+  const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'userid', operator: '==', comparator: userId};
 
-  aadFormData.adhoc_filters = [userIdOperationFilter, userIdFilter];
-  aadFormData.metrics = undefined; 
-  aadFormData.time_range = 'Last Day'
-  aadFormData.granularity = 'cbs_collection_date'
+  sasFormData.adhoc_filters = [userIdFilter];
+  sasFormData.metrics = ['count']; 
+  sasFormData.time_range = 'Last Day'
+  sasFormData.granularity = 'cbs_collection_date'
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset.
-  aadFormData.datasource="24__table";
-  aadFormData.columns = ["user_id","client_ip","client_ip_cbs_geo_country_name","operation","user_key"];
+  sasFormData.datasource= table;
+  sasFormData.columns = ["operation"];
+  sasFormData.extra_filters
 
-  return aadFormData;
+  sasFormData
+  return sasFormData;
 }
 
 
@@ -145,57 +158,77 @@ const buildAadActionFormData = (currentFormData: QueryFormData, userId: string) 
 *       - description: sets the appropriate setIsError property to either true or false depending on the 
 *         state of the query to the back end.  
 */
-const useDataApi = (formData: QueryFormData, 
-        setData: { (value: React.SetStateAction<never[]>): void; (value: React.SetStateAction<never[]>): void; (arg0: any): void; }, 
-        setIsinit: { (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
-        setIsLoading: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
-        setIsError: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; }) => {
+
+const useDataApi = (dataManager : DataManager, setDataManager : { (value: React.SetStateAction<DataManager>): void; (arg0: DataManager): void; }) => {
   useEffect(() => {
     const fetchLookupDetails = async () => {
       try {
         const asyncChartDataRequest = getChartDataRequest({
-          formData: formData,
+          formData: dataManager.formData,
           resultFormat: 'json',
           resultType: 'full',
           force: false, // when true, bypass the redis cache
           method: 'POST',
         });
-        setIsinit(false);
-        setIsLoading(true);
-        setIsError(false);
+        setDataManager(
+          { ...dataManager,
+            isInit : true,
+            isLoading : true,
+            isError : false
+          });
         const response = await asyncChartDataRequest;
         const newData = response.json.result[0].data;
-        setIsLoading(false);
-        setData(newData);
-      } catch (error) {
-          console.log(error);
-          setIsError(true);
-          setIsLoading(false);
-      }
-
-      setIsLoading(false);
+        setDataManager(
+          { ...dataManager,
+            data : newData,
+            isLoading : false,
+          });
+    } catch (error) {
+        console.log(error);
+        setDataManager(
+          { ...dataManager,
+            isError : true,
+            isLoading : false,
+          });
+        }
     };
-    fetchLookupDetails();
-  }, [formData]);
+  fetchLookupDetails();
+  }, [dataManager.formData]);
 };
-
 
 //Main Component
 function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
   const [userIDString, setUserIDString] = useState('coolguy@some.com,');
   const [formData, ] = useState(initialFormData);
 
-  //neustargeo state 
-  const [aadFormData, setAadFormData] = useState(buildAadFormData(formData, userIDString));
-  const [aadData, setAadData] = useState([]);
-  const [isAadInit, setIsAadInit] = useState(true);
-  const [isAadLoading, setIsAadLoading] = useState(false);
-  const [, setIsAadError] = useState(false);
-
-  // Query executions:
-  useDataApi(aadFormData, setAadData, setIsAadInit, setIsAadLoading, setIsAadError);
   let canadianIpsList : any[] = [];
   let nonCanadianIpsList : any[] = [];
+
+  let nonSucsessfulCanadianIpsList : any[] = [];
+  let nonSucsessfulNonCanadianIpsList : any[] = [];
+
+
+  const [aadDataManager, setAadDataManger] = useState<DataManager>({
+    formData : buildAadFormData(formData, userIDString),
+    data : [],
+    isInit: false,
+    isLoading: false,
+    isError: false
+  });
+
+  const [teamsDataManager, setTeamsDataManager] = useState<DataManager>({
+    formData : buildSASWorkloadCount(formData, userIDString, '26__table'),
+    data : [],
+    isInit: false,
+    isLoading: false,
+    isError: false
+  });
+
+
+
+  // Query executions:
+  useDataApi(aadDataManager, setAadDataManger);
+  useDataApi(teamsDataManager, setTeamsDataManager);
 
   let hasFiltered = false; 
 
@@ -206,7 +239,15 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
     if (filter.col === "user_id") {
       const localuserID: string = filter.val[0];
       if (localuserID !== userIDString) {
-        setAadFormData(buildAadFormData(initialFormData, localuserID));
+        setAadDataManger({
+          ...aadDataManager,
+          formData :  buildAadFormData(initialFormData, localuserID)
+        });
+        setTeamsDataManager({
+          ...teamsDataManager,
+          formData :  buildSASWorkloadCount(initialFormData, localuserID, '26__table')
+        });
+
         setUserIDString(localuserID);
         hasFiltered = false;
       }
@@ -214,19 +255,25 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
     }
   }
 
-  if (!isAadLoading || isAadInit && hasFiltered == false)
-  {
-    console.log("FILTERING HEGYFEGGY")
-    
-    canadianIpsList = aadData.filter(function(item){
-      return getPayloadField("client_ip_cbs_geo_country_name", item) == 'canada';
+  if (!aadDataManager.isLoading || aadDataManager.isInit && hasFiltered == false)
+  {    
+    canadianIpsList = aadDataManager.data.filter(function(item){
+      return getPayloadField("client_ip_cbs_geo_country_name", item) == 'canada' && getPayloadField("operation", item) == "UserLoggedIn" ;
     })
     
-    nonCanadianIpsList = aadData.filter(function(item){
-      return getPayloadField("client_ip_cbs_geo_country_name", item) != 'canada';
+    nonCanadianIpsList = aadDataManager.data.filter(function(item){
+      return getPayloadField("client_ip_cbs_geo_country_name", item) != 'canada' && getPayloadField("operation", item) == "UserLoggedIn";
     })
+
+    nonSucsessfulCanadianIpsList = aadDataManager.data.filter(function(item){
+      return getPayloadField("client_ip_cbs_geo_country_name", item) == 'canada' && getPayloadField("operation", item) != "UserLoggedIn" ;
+    })
+    
+    nonSucsessfulNonCanadianIpsList = aadDataManager.data.filter(function(item){
+      return getPayloadField("client_ip_cbs_geo_country_name", item) != 'canada' && getPayloadField("operation", item) != "UserLoggedIn";
+    })
+    
    hasFiltered = true;
-   console.log("FILTERING HEGYFEGGY: " + canadianIpsList)
   }
 
   
@@ -235,42 +282,102 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
     <div style={styles.SectionTitle}>
       <RiGlobalFill /> <span> At a Glance </span>
     </div>
+    <div style={styles.DatumTop}>
+    <Grid fluid >
+    <Row >
+      <Col style={styles.DatumTopElement} >
+            User Email: { userIDString }
+      </Col>
+      <Col style={styles.DatumTopElement}>
+            User ID:  {aadDataManager.isLoading ? "Loading" :  getPayloadField("user_key", aadDataManager.data[0]) }
+      </Col>
+    </Row>
+    </Grid>
+    </div>
     <div style={styles.Datum}>
       <Grid fluid >
         <Row>
-          <Row >
-            <Col> User ID: { userIDString }</Col>
-          </Row>
-          <Row >
-            <Col> User Key: {isAadLoading && !isAadInit ? "Loading ..." : getPayloadField("user_key", aadData[0])} </Col>
-          </Row>
-          <Row >
-            <Col> Number of sucessfull login attempts (total): {isAadLoading && !isAadInit ? "Loading ..." : aadData.length } </Col>
-          </Row>
-          <Row >
-            <Col> Nummber of sucessfull login attempst (Outside Canada): {isAadLoading && !isAadInit ? "Loading ..." : nonCanadianIpsList.length} </Col>
-          </Row>
-          <Row >
-            <Col> Number of sucessfull login attempts (Inside Canada): {isAadLoading && !isAadInit ? "Loading ..." : canadianIpsList.length} </Col>
-          </Row>
-          <Row >
-            <Col> Actions: {isAadLoading && !isAadInit ? "Loading ..." : getPayloadField("user_id", aadData[0])} </Col>
-          </Row>
+          <Collapse
+          bordered
+          expandIconPosition="left"
+          ghost
+          >
+          <Collapse.Panel 
+            header={<span className="header"> Number of Sucessful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : canadianIpsList.length } </span>}
+            key="1"
+          >
+            {aadDataManager.isLoading && !aadDataManager.isInit ?
+            <></> :
+            <ul>
+              {canadianIpsList.map((a: { client_ip: string; }) => (
+                  <li>{a.client_ip}</li>
+            ))}
+            </ul>}
+          </Collapse.Panel>
+          <Collapse.Panel 
+            header={<span className="header"> Number of Sucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonCanadianIpsList.length } </span>}
+            key="2"
+          >
+            {aadDataManager.isLoading && !aadDataManager.isInit ?
+            <></> :
+            <ul>
+              {nonCanadianIpsList.map((a: { client_ip: string; }) => (
+                  <li>{a.client_ip}</li>
+            ))}
+            </ul>}
+          </Collapse.Panel>
+          <Collapse.Panel 
+            header={<span className="header"> Number of Unsucessful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulCanadianIpsList.length } </span>}
+            key="3"
+          >
+            {aadDataManager.isLoading && !aadDataManager.isInit ?
+            <></> :
+            <ul>
+              {nonSucsessfulCanadianIpsList.map((a: { client_ip: string; }) => (
+                  <li>{a.client_ip}</li>
+            ))}
+            </ul>}
+          </Collapse.Panel>
+          <Collapse.Panel 
+            header={<span className="header"> Number of Unsucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulCanadianIpsList.length } </span>}
+            key="4"
+          >
+            {aadDataManager.isLoading && !aadDataManager.isInit ?
+            <></> :
+            <ul>
+              {nonSucsessfulCanadianIpsList.map((a: { client_ip: string; }) => (
+                  <li>{a.client_ip}</li>
+            ))}
+            </ul>}
+          </Collapse.Panel>
+        </Collapse>
         </Row>
       </Grid>
     </div>
     <div style={styles.Datum}>
-      <p style={styles.HostnameTitle}>Logons from canadian IPs:</p>
-      <Grid fluid>
-        {isAadLoading && !isAadInit ? "Loading..." : canadianIpsList.map((row: { client_ip: any; }) => <Row><Col style={styles.RowBullet}> {row.client_ip} </Col></Row>) }
+      <Grid fluid >
+        <Row>
+          <Collapse
+          bordered
+          expandIconPosition="left"
+          ghost
+          >
+          <Collapse.Panel 
+            header={<span className="header"> Teams : {teamsDataManager.isLoading ? "Loading.." : teamsDataManager.data.length } </span>}
+            key="metrics"
+          >
+            {teamsDataManager.isLoading && !teamsDataManager.isInit ?
+            <></> :
+            <ul>
+              {teamsDataManager.data.map((a: { operation: string, count: number }) => (
+                  <li>{a.operation} : {a.count}</li>
+            ))}
+            </ul>}
+          </Collapse.Panel>
+        </Collapse>
+        </Row>
       </Grid>
-    </div>
-    <div style={styles.Datum}>
-      <p style={styles.HostnameTitle}>Logons from non canadian IPs:</p>
-      <Grid fluid>
-        {isAadLoading && !isAadInit ? "Loading..." : nonCanadianIpsList.map((row: { client_ip: any; }) => <Row><Col style={styles.RowBullet}> {row.client_ip} </Col></Row>) }
-      </Grid>
-    </div>      
+    </div>    
     </>   
   );
 };
