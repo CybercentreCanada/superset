@@ -6,17 +6,37 @@ import { Row, Col, Grid} from 'react-bootstrap/';
 import Collapse from 'src/components/Collapse';
 import styles from './styles';
 
-
-
 type DataManager = {
   formData : QueryFormData,
   data : any[],
   isInit : boolean, 
   isLoading : boolean,
   isError : boolean
-}
+};
 
+type sasDataManager = {
+  title : string,
+  table : string,
+  dataManager : DataManager,
+  setDataManager : React.Dispatch<React.SetStateAction<DataManager>>, 
+};
 
+type sasDatasource = {
+  title : string,
+  table : string,
+};
+
+const tablesList : sasDatasource[] = [
+  {title : "Teams", table : "26__table"},
+  {title : "Exchange", table : "30__table"},
+  {title : "One Drive", table : "27__table"},
+  {title : "Share Point", table : "29__table"},
+] 
+
+const IP_DASHBOARD_ID = 13;
+const IP_FILTER_ID = 'DYDz2U6XL'
+const SUPERSET_URL = 'http://localhost:9000'
+const IP_DASHBOARD_LINK = `${ SUPERSET_URL }/superset/dashboard/${ IP_DASHBOARD_ID }/?native_filters=%28NATIVE_FILTER-${ IP_FILTER_ID }%3A%28__cache%3A%28label%3APLEASEREPLACETHIS%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28PLEASEREPLACETHIS%29%29%2CextraFormData%3A%28filters%3A%21%28%28col%3Aip_string%2Cop%3AIN%2Cval%3A%21%28PLEASEREPLACETHIS%29%29%29%29%2CfilterState%3A%28label%3APLEASEREPLACETHIS%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28PLEASEREPLACETHIS%29%29%2Cid%3ANATIVE_FILTER-${ IP_FILTER_ID }%2CownState%3A%28%29%29%29`;
 
 /**
 *   getPayloadField:
@@ -114,7 +134,7 @@ const buildSASWorkloadCount = (currentFormData: QueryFormData, userId: string, t
 
   sasFormData.adhoc_filters = [userIdFilter];
   sasFormData.metrics = ['count']; 
-  sasFormData.time_range = 'Last Day'
+  sasFormData.time_range = 'Last Week'
   sasFormData.granularity = 'cbs_collection_date'
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset.
@@ -203,9 +223,9 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
 
   let canadianIpsList : any[] = [];
   let nonCanadianIpsList : any[] = [];
-
   let nonSucsessfulCanadianIpsList : any[] = [];
   let nonSucsessfulNonCanadianIpsList : any[] = [];
+  let  sasDatamanagerList : sasDataManager[] = [];
 
 
   const [aadDataManager, setAadDataManger] = useState<DataManager>({
@@ -216,26 +236,28 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
     isError: false
   });
 
-  const [teamsDataManager, setTeamsDataManager] = useState<DataManager>({
-    formData : buildSASWorkloadCount(formData, userIDString, '26__table'),
-    data : [],
-    isInit: false,
-    isLoading: false,
-    isError: false
-  });
-
+  sasDatamanagerList = tablesList.flatMap( (function (value : sasDatasource) {
+    const [dataManager, setDataManager] = useState<DataManager>({
+      formData : buildSASWorkloadCount(formData, userIDString, value.table),
+      data : [],
+      isInit: false,
+      isLoading: false,
+      isError: false
+    });
+    return { title: value.title, table : value.table, dataManager : dataManager, setDataManager : setDataManager }
+  })); 
 
 
   // Query executions:
   useDataApi(aadDataManager, setAadDataManger);
-  useDataApi(teamsDataManager, setTeamsDataManager);
+  sasDatamanagerList.forEach( function (value : sasDataManager) {
+    useDataApi(value.dataManager, value.setDataManager);
+  });
 
   let hasFiltered = false; 
 
   for (let i: number = 0; i < initialFormData.formData?.extraFormData?.filters?.length; i++) {
     let filter = initialFormData.formData.extraFormData.filters[i];
-    console.log('FILTER COL' + filter.col )
-
     if (filter.col === "user_id") {
       const localuserID: string = filter.val[0];
       if (localuserID !== userIDString) {
@@ -243,11 +265,12 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
           ...aadDataManager,
           formData :  buildAadFormData(initialFormData, localuserID)
         });
-        setTeamsDataManager({
-          ...teamsDataManager,
-          formData :  buildSASWorkloadCount(initialFormData, localuserID, '26__table')
+        sasDatamanagerList.forEach( function (value : sasDataManager) {
+          value.setDataManager({
+            ...value.dataManager,
+            formData :  buildSASWorkloadCount(initialFormData, localuserID, value.table)
+          })
         });
-
         setUserIDString(localuserID);
         hasFiltered = false;
       }
@@ -310,7 +333,7 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
             <></> :
             <ul>
               {canadianIpsList.map((a: { client_ip: string; }) => (
-                  <li>{a.client_ip}</li>
+                    <li><a href={IP_DASHBOARD_LINK.replaceAll("PLEASEREPLACETHIS", `'${ a.client_ip }'`)}>{a.client_ip}</a></li>
             ))}
             </ul>}
           </Collapse.Panel>
@@ -339,13 +362,13 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
             </ul>}
           </Collapse.Panel>
           <Collapse.Panel 
-            header={<span className="header"> Number of Unsucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulCanadianIpsList.length } </span>}
+            header={<span className="header"> Number of Unsucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulNonCanadianIpsList.length } </span>}
             key="4"
           >
             {aadDataManager.isLoading && !aadDataManager.isInit ?
             <></> :
             <ul>
-              {nonSucsessfulCanadianIpsList.map((a: { client_ip: string; }) => (
+              {nonSucsessfulNonCanadianIpsList.map((a: { client_ip: string; }) => (
                   <li>{a.client_ip}</li>
             ))}
             </ul>}
@@ -362,18 +385,20 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
           expandIconPosition="left"
           ghost
           >
-          <Collapse.Panel 
-            header={<span className="header"> Teams : {teamsDataManager.isLoading ? "Loading.." : teamsDataManager.data.length } </span>}
-            key="metrics"
-          >
-            {teamsDataManager.isLoading && !teamsDataManager.isInit ?
-            <></> :
-            <ul>
-              {teamsDataManager.data.map((a: { operation: string, count: number }) => (
-                  <li>{a.operation} : {a.count}</li>
+            {sasDatamanagerList.map((a: sasDataManager) => (
+                <Collapse.Panel 
+                header={<span className="header"> {a.title} : {a.dataManager.isLoading ? "Loading.." : a.dataManager.data.length } </span>}
+                key={a.title}
+              >
+                {a.dataManager.isLoading && !a.dataManager.isInit ?
+                <></> :
+                <ul>
+                  {a.dataManager.data.map((a: { operation: string, count: number }) => (
+                      <li>{a.operation} : {a.count}</li>
+                ))}
+                </ul>}
+              </Collapse.Panel>
             ))}
-            </ul>}
-          </Collapse.Panel>
         </Collapse>
         </Row>
       </Grid>
@@ -383,3 +408,4 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
 };
 
 export default AtAGlanceUserIDCore; 
+
