@@ -51,7 +51,7 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
 /**
  * Visibility check
  */
- function isQueryMode(mode: QueryMode) {
+function isQueryMode(mode: QueryMode) {
   return ({ controls }: ControlPanelsContainerProps) => getQueryMode(controls) === mode;
 }
 
@@ -219,8 +219,8 @@ const config: ControlPanelConfig = {
                 const newState = originalMapStateToProps?.(state, controlState) ?? {};
                 // @ts-ignore
                 newState.externalValidationErrors = isRawMode({ controls }) && ensureIsArray(controlState.value).length === 0
-                      ? [t('must have a value')]
-                      : [];
+                  ? [t('must have a value')]
+                  : [];
                 return newState;
               },
             },

@@ -214,10 +214,10 @@ export default function CccsGrid({
     return formData.column_config?.[col]?.emitTarget || col;
   }
 
-  function autoSizeFirst100Columns(params: any){
+  function autoSizeFirst100Columns(params: any) {
     // Autosizes only the first 100 Columns in Ag-Grid
-    const allColumnIds = params.columnApi.getAllColumns().map((col: any) => {return col.getColId()});
-    params.columnApi.autoSizeColumns(allColumnIds.slice(0,100), false);
+    const allColumnIds = params.columnApi.getAllColumns().map((col: any) => { return col.getColId() });
+    params.columnApi.autoSizeColumns(allColumnIds.slice(0, 100), false);
   }
 
   const gridOptions = {

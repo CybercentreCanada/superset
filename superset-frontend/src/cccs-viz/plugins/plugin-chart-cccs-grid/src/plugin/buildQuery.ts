@@ -33,7 +33,7 @@ import { BuildQuery } from '@superset-ui/core/lib/chart/registries/ChartBuildQue
  * it is possible to define post processing operations in the QueryObject, or multiple queries
  * if a viz needs multiple different result sets.
  */
- export function getQueryMode(formData: QueryFormData) {
+export function getQueryMode(formData: QueryFormData) {
   const { query_mode: mode } = formData;
   if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
     return mode;
@@ -128,7 +128,7 @@ export const cachedBuildQuery = (): BuildQuery<QueryFormData> => {
         ownState: options?.ownState ?? {},
         hooks: {
           ...options?.hooks,
-          setDataMask: () => {},
+          setDataMask: () => { },
           setCachedChanges,
         },
       },
