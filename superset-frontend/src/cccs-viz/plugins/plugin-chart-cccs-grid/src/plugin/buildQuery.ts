@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { buildQueryContext, ensureIsArray, getMetricLabel, PostProcessingRule, QueryFormData, QueryMode, QueryObject, removeDuplicates } from '@superset-ui/core';
+import { buildQueryContext, PostProcessingRule, QueryFormData, QueryMode, QueryObject } from '@superset-ui/core';
 import { BuildQuery } from '@superset-ui/core/lib/chart/registries/ChartBuildQueryRegistrySingleton';
 
 /**
@@ -44,9 +44,7 @@ import { BuildQuery } from '@superset-ui/core/lib/chart/registries/ChartBuildQue
 }
 
 const buildQuery: BuildQuery<QueryFormData> = (formData: QueryFormData, options) => {
-  const { percent_metrics: percentMetrics, order_desc: orderDesc = false } = formData;
   const queryMode = getQueryMode(formData);
-  const sortByMetric = ensureIsArray(formData.timeseries_limit_metric)[0];
   let formDataCopy = formData;
   // never include time in raw records mode
   if (queryMode === QueryMode.raw) {
@@ -62,27 +60,9 @@ const buildQuery: BuildQuery<QueryFormData> = (formData: QueryFormData, options)
 
     if (queryMode === QueryMode.aggregate) {
       metrics = metrics || [];
-      // orverride orderby with timeseries metric when in aggregation mode
-      if (sortByMetric) {
-        orderby = [[sortByMetric, !orderDesc]];
-      } else if (metrics?.length > 0) {
+      if (metrics?.length > 0) {
         // default to ordering by first metric in descending order
-        // when no "sort by" metric is set (regargless if "SORT DESC" is set to true)
         orderby = [[metrics[0], false]];
-      }
-      // add postprocessing for percent metrics only when in aggregation mode
-      if (percentMetrics && percentMetrics.length > 0) {
-        const percentMetricLabels = removeDuplicates(percentMetrics.map(getMetricLabel));
-        metrics = removeDuplicates(metrics.concat(percentMetrics), getMetricLabel);
-        postProcessing = [
-          {
-            operation: 'contribution',
-            options: {
-              // TODO columns: percentMetricLabels,
-              rename_columns: percentMetricLabels.map(x => `%${x}`),
-            },
-          },
-        ];
       }
     }
 

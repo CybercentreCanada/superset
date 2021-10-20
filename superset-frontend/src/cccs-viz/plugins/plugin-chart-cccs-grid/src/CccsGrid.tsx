@@ -133,7 +133,7 @@ export default function CccsGrid({
   };
 
   const onGridReady = (params: any) => {
-    console.log('onGridReady called')
+    console.log('onGridReady called');
   };
 
   const onSelectionChanged = (params: any) => {
