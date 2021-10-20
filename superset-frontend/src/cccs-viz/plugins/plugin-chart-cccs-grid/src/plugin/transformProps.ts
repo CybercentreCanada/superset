@@ -74,8 +74,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
 
   const columns = datasource?.columns as Column[];
 
-  console.log('formData via TransformProps.ts', formData);
-
   const columnTypeMap = new Map<string, string>();
 
   columns.reduce(function (columnMap, column: Column) {
