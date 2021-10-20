@@ -41,7 +41,6 @@ export default function buildQuery(formData: CccsGridQueryFormData) {
     ...formData,
     ...DEFAULT_FORM_DATA,
   };
-  console.log('formData via buildQuery.ts', formData);
   return buildQueryContext(formData, baseQueryObject => [
     {
       ...baseQueryObject,

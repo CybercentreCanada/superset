@@ -26,6 +26,7 @@ In order to do that, we reproduce the post-processing in Python
 for these chart types.
 """
 
+import logging
 from io import StringIO
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -40,6 +41,7 @@ from superset.utils.core import (
 )
 
 config = app.config
+logger = logging.getLogger(__name__)
 
 def sql_like_sum(series: pd.Series) -> pd.Series:
     """
@@ -193,7 +195,10 @@ def cccs_grid(result: Dict[Any, Any], form_data: Dict[str, Any]) -> Dict[Any, An
     """
     CCCS Grid.
     """
-    result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    except KeyError as err:
+        logger.exception(err)
 
     return result
 
