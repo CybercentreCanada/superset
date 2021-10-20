@@ -86,7 +86,7 @@
      return columnMap;
    }, columnVerboseNameMap);
  
-   // Map of sorting columns, key is column name, value is an struct of sort direction (asc/desc) and sort index
+   // Map of sorting columns, key is column name, value is a struct of sort direction (asc/desc) and sort index
    const sortingColumnMap = new Map<string, {}>();
    formData.order_by_cols.reduce(function (columnMap: { [x: string]: any; }, item: string, currentIndex: number) {
      // Logic from extractQueryFields.ts
@@ -109,9 +109,6 @@
      }
    }, sortingColumnMap);
 
-   // Array of types we don't want to sort on
-   const nonSortableColumns = ['JSON'];
-
    // Key is column type, value is renderer name
    const rendererMap = {
       IPV4: 'ipv4ValueRenderer',
@@ -130,7 +127,7 @@
        const sortDirection = column in sortingColumnMap ? (sortingColumnMap[column].sortDirection ? 'asc' : 'desc') : null;
        const sortIndex = column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
        const cellRenderer = columnType in rendererMap ? rendererMap[columnType] : undefined;
-       const isSortable  = !(nonSortableColumns.includes(columnType));
+       const isSortable  = true;
        return {
          field: column,
          headerName: columnHeader,
@@ -148,7 +145,7 @@
         const columnHeader = columnVerboseNameMap[column] ? columnVerboseNameMap[column] : column;
         const columnType = columnTypeMap[column];
         const cellRenderer = columnType in rendererMap ? rendererMap[columnType] : undefined;
-        const isSortable  = !(nonSortableColumns.includes(columnType));
+        const isSortable  = true;
         return {
           field: column,
           headerName: columnHeader,
