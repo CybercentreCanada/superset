@@ -14,6 +14,7 @@ import urllib
 import json
 import requests
 import os 
+import pickle
 
 from requests.structures import CaseInsensitiveDict
 
@@ -44,7 +45,11 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         client_secret = os.getenv('SUPERSET_CLIENT_SECRET')  
 
         url = 'https://login.microsoftonline.com/{0}/oauth2/v2.0/token'.format(tenant_id)
+        refresh_token = ""
         
+        with open('refresh_token.pkl', 'rb') as f:
+            refresh_token = pickle.load(f)
+
         refresh_token = session['oauth_refresh']
         if refresh_token:
             refresh_params = {
