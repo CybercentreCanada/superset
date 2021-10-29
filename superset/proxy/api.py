@@ -49,8 +49,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         
         with open('refresh_token.pkl', 'rb') as f:
             refresh_token = pickle.load(f)
-
-        refresh_token = session['oauth_refresh']
+            
         if refresh_token:
             refresh_params = {
                 "client_id": client_id,
