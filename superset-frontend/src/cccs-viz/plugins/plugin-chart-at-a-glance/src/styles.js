@@ -22,44 +22,39 @@ const Datum = {
     spacing: 1
   }
 
-  const UrlList = {
-    hight: '100%',
-    width: '100%',
-    maxWidth: 360,
-    overflow: 'auto',
-    maxHeight: 100,
-    float: 'left',
+  const ColList = {
+    "border-bottom": "1px solid #F0F0F0",
+    "padding-bottom": "1px",
   }
 
-  const UrlListItem = {
-    backgroundColor: 'inherit',
-    padding: 0,
-  }
-
-  const HostList = {
-    maxHeight: 200,
+  const DropListHeader = {
+    "padding-top": "0",
+    "padding-bottom": "1px",
   }
 
   const RowBullet = {
     display: 'list-item',
     'list-style-type': 'disc',
-    'list-style-position': 'inside'
+    'list-style-position': 'inside',
+    "border-bottom": "1px solid #F0F0F0",
+    "padding-bottom": "1px",
   }
 
   const HostnameTitle = {
-    'padding-left': '5px',
-    'margin-bottom': '0'
+    "padding-left": "5px",
+    "margin-bottom": "0",
+    "border-bottom": "1px solid #F0F0F0",
+    "padding-bottom": "1px"
   }
 
   const styles = {
     Datum: Datum,
     DatumLink: DatumLink,
     SectionTitle: SectionTitle,
-    UrlList: UrlList,
-    UrlListItem: UrlListItem,
-    HostList: HostList,
+    ColList: ColList,
+    DropListHeader: DropListHeader,
     RowBullet: RowBullet,
-    HostnameTitle: HostnameTitle,
+    HostnameTitle: HostnameTitle
   }
 
   export default styles;
