@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 export default function ApplicationLinks(props: ApplicationsProps) {
     const { application, appVal, appType } = props;
     const [alfredCount, setAlfredCount] = useState(-1);
+    
     useEffect(() => {
-        fetch(`${location.host}/api/v1/proxy/alfred/user_id/${ appVal }`)
+        fetch(`http://${location.host}/api/v1/proxy/alfred/user_id/${ appVal }`)
         .then(res => res.json())
         .then((response : { payload : {data: any[]} }) => {
             console.log(response)
@@ -41,7 +42,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
              </p>
              :
              <p style={{float: "left", "display": "table-cell", "line-height": "20px", height: 20 + "px"}}>
-             Alfred might know about this {infoType}, search the <a href={ url } target="_blank">Alfred</a> knowledge base.
+             Alfred has not seen this {infoType}, search the <a href={ url } target="_blank">Alfred</a> knowledge base.
              </p>
         
             }
