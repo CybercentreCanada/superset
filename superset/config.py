@@ -36,6 +36,7 @@ from celery.schedules import crontab
 from dateutil import tz
 from flask import Blueprint
 from flask_appbuilder.security.manager import AUTH_DB
+
 from pandas.io.parsers import STR_NA_VALUES
 
 from superset.jinja_context import (  # pylint: disable=unused-import
@@ -47,6 +48,21 @@ from superset.utils.core import is_test, parse_boolean_string
 from superset.utils.encrypt import SQLAlchemyUtilsAdapter
 from superset.utils.log import DBEventLogger
 from superset.utils.logging_configurator import DefaultLoggingConfigurator
+
+###########LOGIN STUFF################
+
+from flask import session
+from flask_appbuilder.security.manager import AUTH_OAUTH
+from superset.security import SupersetSecurityManager
+from flask_appbuilder.security.sqla.models import (
+    PermissionView,
+    assoc_permissionview_role,
+)
+from dotenv import load_dotenv
+load_dotenv()
+
+#############################
+
 
 logger = logging.getLogger(__name__)
 
@@ -367,7 +383,7 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     "DASHBOARD_NATIVE_FILTERS": True,
     "DASHBOARD_CROSS_FILTERS": True,
     "DASHBOARD_NATIVE_FILTERS_SET": True,
-    "DASHBOARD_FILTERS_EXPERIMENTAL": False,
+    "DASHBOARD_FILTERS_EXPERIMENTAL": True,
     "GLOBAL_ASYNC_QUERIES": False,
     "VERSIONED_EXPORT": False,
     # Note that: RowLevelSecurityFilter is only given by default to the Admin role
@@ -1142,7 +1158,7 @@ SQLALCHEMY_EXAMPLES_URI = None
 
 # Some sqlalchemy connection strings can open Superset to security risks.
 # Typically these should not be allowed.
-PREVENT_UNSAFE_DB_CONNECTIONS = True
+PREVENT_UNSAFE_DB_CONNECTIONS = False
 
 # Path used to store SSL certificates that are generated when using custom certs.
 # Defaults to temporary directory.
@@ -1237,6 +1253,98 @@ MENU_HIDE_USER_INFO = False
 # SQLalchemy link doc reference
 SQLALCHEMY_DOCS_URL = "https://docs.sqlalchemy.org/en/13/core/engines.html"
 SQLALCHEMY_DISPLAY_TEXT = "SQLAlchemy docs"
+
+# LOGIN SECTION ################################
+
+
+client_id = os.getenv('SUPERSET_CLIENT_ID') 
+tenant_id = os.getenv('SUPERSET_TENANT_ID') 
+client_secret = os.getenv('SUPERSET_CLIENT_SECRET')  
+
+AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+        "name": "azure",
+        "icon": "fa-windows",
+        "token_key": "access_token",
+        "remote_app": {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "api_base_url": f"https://login.microsoftonline.com/{ tenant_id }/oauth2/v2.0",
+            "client_kwargs": {
+                "scope": f"{ client_id }/.default profile openid email offline_access"
+            },
+            "request_token_url": None,
+            "access_token_url": f"https://login.microsoftonline.com/{ tenant_id }/oauth2/v2.0/token",
+            "authorize_url": f"https://login.microsoftonline.com/{ tenant_id }/oauth2/v2.0/authorize",
+        },
+    },
+]
+
+
+
+log = logging.getLogger(__name__)
+
+class DynamicRoleSecurityManager(SupersetSecurityManager):
+
+    def __init__(self, appbuilder) -> None:
+        super().__init__(appbuilder)
+
+        self.included_dbs: List[str] = self.appbuilder.app.config.get("INCLUDED_DBS", [])
+        self.included_schemas: List[str] = self.appbuilder.app.config.get("INCLUDED_SCHEMAS", [])
+
+        # [db_name].[schema_name] or [db_name].[datasource_name]
+        self.view_name_pattern = re.compile('\[(.+)\]\.\[(.+)]')
+        # Datasources which match this pattern will be available to all GammaPlus users, regardless of schema
+        # or database level permissions.
+        self.shared_pattern = re.compile('shared_.+')
+
+    # Additional permissions to be granted to GammaPlus users which are not user defined permissions
+    # (see _is_user_defined_permission() )
+    GAMMA_PLUS_PERMISSION_VIEWS = {
+            "can_write": "Dataset",
+            "can_save": "Datasource",
+            "can_function_names": "Database"
+        }
+
+    def oauth_user_info(self, provider, resp):
+        if provider == "azure":
+            log.debug("Azure response received : {0}".format(resp))
+            id_token = resp["id_token"]
+            me = self._azure_jwt_token_parse(id_token)
+
+            session['oauth_refresh'] = resp["refresh_token"]
+            print(f"session : {session} ")
+            return {
+                "name": me["name"],
+                # Note that for 'email' to be returned as part of the token, the optional claim must be added to the App Registration in Azure
+                "email": me["email"],
+                "first_name": me.get("given_name", ""), # Optional claim may not be present (e.g. for guest accounts)
+                "last_name": me.get("family_name", ""), # Optional claim may not be present (e.g. for guest accounts)
+                "id": me["oid"],
+                "username": me["oid"],
+                # Note that for 'groups' to be returned as part of the token, appropriate token configuration must be added to the App Registration in Azure
+                "groups": me["groups"],
+                # This is for the AUTH_ROLES_MAPPING
+                "role_keys": me["groups"],
+            }
+        else:
+            return {}
+            
+    def get_oauth_refresh_token(self) -> str:
+        """
+            Return the oauth_refresh member from the session 
+        """
+        return session['oauth_refresh'] if 'oauth_refresh' in session  else ''
+
+
+CUSTOM_SECURITY_MANAGER = DynamicRoleSecurityManager
+
+AUTH_USER_REGISTRATION = True
+AUTH_ROLE_PUBLIC = 'Admin'
+AUTH_USER_REGISTRATION_ROLE = 'Admin'
+
+# LOGIN SECTION END ################################
 
 # -------------------------------------------------------------------
 # *                WARNING:  STOP EDITING  HERE                    *
