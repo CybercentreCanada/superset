@@ -27,14 +27,14 @@ type sasDatasource = {
 };
 
 const tablesList : sasDatasource[] = [
-  {title : "Teams", table : "26__table"},
-  {title : "Exchange", table : "30__table"},
-  {title : "One Drive", table : "27__table"},
-  {title : "Share Point", table : "29__table"},
+  {title : "Teams", table : "43__table"},
+  {title : "Exchange", table : "51__table"},
+  {title : "OneDrive", table : "52__table"},
+  {title : "SharePoint", table : "53__table"},
 ] 
 
-const IP_DASHBOARD_ID = 13;
-const IP_FILTER_ID = 'DYDz2U6XL'
+const IP_DASHBOARD_ID = 19;
+const IP_FILTER_ID = 'vxX3zR2Tz'
 const SUPERSET_URL = 'http://localhost:9000'
 const IP_DASHBOARD_LINK = `${ SUPERSET_URL }/superset/dashboard/${ IP_DASHBOARD_ID }/?native_filters=%28NATIVE_FILTER-${ IP_FILTER_ID }%3A%28__cache%3A%28label%3APLEASEREPLACETHIS%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28PLEASEREPLACETHIS%29%29%2CextraFormData%3A%28filters%3A%21%28%28col%3Aip_string%2Cop%3AIN%2Cval%3A%21%28PLEASEREPLACETHIS%29%29%29%29%2CfilterState%3A%28label%3APLEASEREPLACETHIS%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28PLEASEREPLACETHIS%29%29%2Cid%3ANATIVE_FILTER-${ IP_FILTER_ID }%2CownState%3A%28%29%29%29`;
 
@@ -104,15 +104,18 @@ const buildAadFormData = (currentFormData: QueryFormData, userId: string) =>{
 
   const userIdOperationFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'operation', operator: 'IN', comparator: ['UserLoggedIn', 'UserLoginFailed']};
   console.log("USER_ID: " + userId )
-  const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'user_id', operator: '==', comparator: userId};
+  // const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'user_id', operator: '==', comparator: userId};
+  let sqlExpressionBld:string = "lower(\"user_id\") = lower('" + userId + "')";
+  console.log("sqlExpressionBld = " + sqlExpressionBld);
+  const userIdFilter : AdhocFilter = {expressionType: 'SQL', clause: 'WHERE', sqlExpression: sqlExpressionBld};
 
   aadFormData.adhoc_filters = [userIdOperationFilter, userIdFilter];
   aadFormData.metrics = undefined; 
-  aadFormData.time_range = 'Last Day'
+  aadFormData.time_range = 'Last 5 Days'
   aadFormData.granularity = 'cbs_collection_date'
   // Datasource Id is specific to the environment. It needs to be changed for each environement as it has to match
   // the datasource id given when it was added to superset.
-  aadFormData.datasource="24__table";
+  aadFormData.datasource="42__table";
   aadFormData.columns = ["user_id","client_ip","client_ip_cbs_geo_country_name","operation","user_key"];
 
   return aadFormData;
@@ -130,7 +133,10 @@ const buildSASWorkloadCount = (currentFormData: QueryFormData, userId: string, t
   // Setting up newStarGeo query:
   const sasFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
 
-  const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'userid', operator: '==', comparator: userId};
+  // const userIdFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'userid', operator: '==', comparator: userId};
+  let sqlExpressionBld:string = "lower(\"userid\") = lower('" + userId + "')";
+  console.log("sqlExpressionBld = " + sqlExpressionBld);
+  const userIdFilter : AdhocFilter = {expressionType: 'SQL', clause: 'WHERE', sqlExpression: sqlExpressionBld};
 
   sasFormData.adhoc_filters = [userIdFilter];
   sasFormData.metrics = ['count']; 
@@ -326,7 +332,7 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
           ghost
           >
           <Collapse.Panel 
-            header={<span className="header"> Number of Sucessful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : canadianIpsList.length } </span>}
+            header={<span className="header"> Number of Successful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : canadianIpsList.length } </span>}
             key="1"
           >
             {aadDataManager.isLoading && !aadDataManager.isInit ?
@@ -338,7 +344,7 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
             </ul>}
           </Collapse.Panel>
           <Collapse.Panel 
-            header={<span className="header"> Number of Sucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonCanadianIpsList.length } </span>}
+            header={<span className="header"> Number of Successful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonCanadianIpsList.length } </span>}
             key="2"
           >
             {aadDataManager.isLoading && !aadDataManager.isInit ?
@@ -350,7 +356,7 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
             </ul>}
           </Collapse.Panel>
           <Collapse.Panel 
-            header={<span className="header"> Number of Unsucessful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulCanadianIpsList.length } </span>}
+            header={<span className="header"> Number of Unsuccessful Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulCanadianIpsList.length } </span>}
             key="3"
           >
             {aadDataManager.isLoading && !aadDataManager.isInit ?
@@ -362,7 +368,7 @@ function AtAGlanceUserIDCore ( initialFormData: QueryFormData) {
             </ul>}
           </Collapse.Panel>
           <Collapse.Panel 
-            header={<span className="header"> Number of Unsucessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulNonCanadianIpsList.length } </span>}
+            header={<span className="header"> Number of Unsuccessful non Canadian Login Attempts : {aadDataManager.isLoading ? "Loading" : nonSucsessfulNonCanadianIpsList.length } </span>}
             key="4"
           >
             {aadDataManager.isLoading && !aadDataManager.isInit ?

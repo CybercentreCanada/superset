@@ -5,6 +5,15 @@ import { QueryFormData, AdhocFilter } from '@superset-ui/core';
 import { Row, Col, Grid} from 'react-bootstrap/';
 import styles from './styles';
 import IPAddressUtil from './IpAddressUtil';
+import Collapse from 'src/components/Collapse';
+
+type DataManager = {
+  formData : QueryFormData,
+  data: any[],
+  isInit: boolean,
+  isLoading: boolean,
+  isError: boolean
+}
 
 /**
 *   getPayloadField:
@@ -41,7 +50,7 @@ const getPayloadField = (field: string, payload: any) => {
   }
 };
 
-function getHostnames (payload: any) { 
+function getHostnames (payload: any) {
   let resultset = []
   resultset = payload.map((a: { rrname: any; }) => a.rrname)
   const uniqueSet = new Set(resultset);
@@ -107,7 +116,7 @@ const buildGeoFormData = (currentFormData: QueryFormData, ip: string) =>{
 *         description: Returns the appropriately filled form data.
 */
 const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
-   const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
+  const farsightFormData : QueryFormData = JSON.parse(JSON.stringify(currentFormData));
 
   // Setting up the filter
   const IPFilter : AdhocFilter = {expressionType: 'SIMPLE', clause: 'WHERE', subject: 'rdata', operator: 'IN', comparator: [ip] };
@@ -169,39 +178,56 @@ const isPayloadUndefined = (payload : any) =>{
 *       - description: sets the appropriate setIsError property to either true or false depending on the 
 *         state of the query to the back end.  
 */
-const useDataApi = (formData: QueryFormData, 
-        setData: { (value: React.SetStateAction<never[]>): void; (value: React.SetStateAction<never[]>): void; (arg0: any): void; }, 
-        setIsinit: { (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
-        setIsLoading: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
-        setIsError: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; }) => {
+// const useDataApi = (formData: QueryFormData, 
+//         setData: { (value: React.SetStateAction<never[]>): void; (value: React.SetStateAction<never[]>): void; (arg0: any): void; }, 
+//         setIsinit: { (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
+//         setIsLoading: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; },
+//         setIsError: { (value: React.SetStateAction<boolean>): void; (value: React.SetStateAction<boolean>): void; (arg0: boolean): void; }) => {
 
+const useDataApi = (dataManager : DataManager, setDataManager: { (value: React.SetStateAction<DataManager>): void; (arg0: DataManager): void; }) =>{
   useEffect(() => {
     const fetchLookupDetails = async () => {
       try {
         const asyncChartDataRequest = getChartDataRequest({
-          formData: formData,
+          formData: dataManager.formData,
           resultFormat: 'json',
           resultType: 'full',
           force: false, // when true, bypass the redis cache
           method: 'POST',
         });
-        setIsinit(false);
-        setIsLoading(true);
-        setIsError(false);
+        setDataManager(
+          { ...dataManager,
+            isInit: true,
+            isLoading: true,
+            isError: false
+          }
+        );
+        console.log("Set Loading to true");
         const response = await asyncChartDataRequest;
         const newData = response.json.result[0].data;
-        setIsLoading(false);
-        setData(newData);
+        setDataManager(
+          {
+            ...dataManager,
+            data: newData,
+            isLoading: false
+          }
+        );
+        console.log("Set Loading to false, no error");
       } catch (error) {
           console.log(error);
-          setIsError(true);
-          setIsLoading(false);
+          setDataManager(
+            {
+              ...dataManager,
+              isError: true,
+              isLoading: false,
+            }
+          );
+          console.log("Set loading to false, with error");
       }
-
-      setIsLoading(false);
+      // setIsLoading(false);
     };
     fetchLookupDetails();
-  }, [formData]);
+  }, [dataManager.formData]);
 };
 
 //Main Component
@@ -211,34 +237,43 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
   const [formData, setFormData] = useState(initialFormData);
 
   //neustargeo state
-  const [geoFormData, setNewStarGeoFormData] = useState(buildGeoFormData(formData, ipString));
-  const [geoData, setGeoData] = useState([]);
-  const [isGeoInit, setIsGeoinit] = useState(true);
-  const [isGeoLoading, setIsGeoLoading] = useState(false);
-  const [isGeoError, setIsGeoError] = useState(false);
+  const [geoFormData, setNewStarGeoFormData] = useState<DataManager>({
+    formData : buildGeoFormData(formData, ipString),
+    data: [],
+    isInit: false,
+    isLoading: false,
+    isError: false
+  });
 
   //farsight state 
-  const [farsightFormData, setFarsightFormData] = useState(buildFarsightFormData(formData, ipString));
-  const [farsightData, setFarsightData] = useState([]);
-  const [isFarsightInit, setIsFarsightinit] = useState(true) 
-  const [isFarsightLoading, setIsFarsightLoading] = useState(false);
-  const [isFarsightError, setIsFarsightError] = useState(false);
+  const [farsightFormData, setFarsightFormData] = useState<DataManager>({
+    formData : buildFarsightFormData(formData, ipString),
+    data: [],
+    isInit: false,
+    isLoading: false,
+    isError: false
+  });
 
   // Query executions:
-  useDataApi(geoFormData, setGeoData, setIsGeoinit, setIsGeoLoading, setIsGeoError);
-  useDataApi(farsightFormData, setFarsightData, setIsFarsightinit, setIsFarsightLoading, setIsFarsightError);
-
+  console.log("useDataApi start for geoFormData");
+  useDataApi(geoFormData, setNewStarGeoFormData);
+  console.log("end useDataApi for geoFormData\n\nuseDataApi start for farsightFormData");
+  useDataApi(farsightFormData, setFarsightFormData);
+  console.log("end useDataApi for farsightFormData");
   
-  console.log("ipString = " + ipString);
-  console.log("initialFormData = " + JSON.stringify(initialFormData));
-
   for (let i: number = 0; i < initialFormData.formData?.extraFormData?.filters?.length; i++) {
     let filter = initialFormData.formData.extraFormData.filters[i];
     if (filter.col === "ip_string") {
       const localip: string = filter.val[0];
       if (localip !== ipString) {
-        setNewStarGeoFormData(buildGeoFormData(initialFormData, localip));
-        setFarsightFormData(buildFarsightFormData(initialFormData, localip));
+        setNewStarGeoFormData({
+          ...geoFormData,
+          formData: buildGeoFormData(initialFormData, localip)
+        });
+        setFarsightFormData({
+          ...farsightFormData,
+          formData: buildFarsightFormData(initialFormData, localip)
+        });
         setIpString(localip);
       }
       break;
@@ -247,8 +282,15 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
 
   if (Object.keys(initialFormData.formData.extraFormData).length === 0 && ipString !== DEFAULT_IP_STRING) {
     setIpString(DEFAULT_IP_STRING);
-    setNewStarGeoFormData(buildGeoFormData(initialFormData, DEFAULT_IP_STRING));
-    setFarsightFormData(buildFarsightFormData(initialFormData, DEFAULT_IP_STRING));
+    setNewStarGeoFormData({
+      ...geoFormData,
+      formData: buildGeoFormData(initialFormData, DEFAULT_IP_STRING)
+    });
+    setFarsightFormData({
+      ...farsightFormData,
+      formData: buildFarsightFormData(initialFormData, DEFAULT_IP_STRING)
+    });
+
   }
 
   return (
@@ -259,35 +301,35 @@ function AtAGlanceCore ( initialFormData: QueryFormData) {
     <div style={styles.Datum}>
       <Grid fluid >
         <Row >
-          <Col> IP: { ipString }</Col>
+          <Col style={styles.ColList}> IP: { ipString }</Col>
         </Row>
         <Row >
-          <Col> ASN: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("asn", geoData[0])} </Col>
+          <Col style={styles.ColList}> ASN: {geoFormData.isLoading ? "Loading ..." : getPayloadField("asn", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> CARRIER: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("carrier", geoData[0])} </Col>
+          <Col style={styles.ColList}> CARRIER: {geoFormData.isLoading ? "Loading ..." : getPayloadField("carrier", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> CONNECTION TYPE: {isGeoLoading && !isGeoInit ? "Loading ..." :  getPayloadField("connection_type", geoData[0])} </Col>
+          <Col style={styles.ColList}> CONNECTION TYPE: {geoFormData.isLoading ? "Loading ..." :  getPayloadField("connection_type", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> ORGANIZATION: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("organization", geoData[0])} </Col>
+          <Col style={styles.ColList}> ORGANIZATION: {geoFormData.isLoading ? "Loading ..." : getPayloadField("organization", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> CITY: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("city", geoData[0])} </Col>
+          <Col style={styles.ColList}> CITY: {geoFormData.isLoading ? "Loading ..." : getPayloadField("city", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> COUNTRY: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("country", geoData[0])} </Col>
+          <Col style={styles.ColList}> COUNTRY: {geoFormData.isLoading ? "Loading ..." : getPayloadField("country", geoFormData.data[0])} </Col>
         </Row>
         <Row >
-          <Col> DECIMAL: {isGeoLoading && !isGeoInit ? "Loading ..." : getPayloadField("decimal", geoData[0])} </Col>
+          <Col> DECIMAL: {geoFormData.isLoading ? "Loading ..." : getPayloadField("decimal", geoFormData.data[0])} </Col>
         </Row>
       </Grid>
     </div>
     <div style={styles.Datum}>
-      <p style={styles.HostnameTitle}>ASSOCIATED HOSTNAMES:</p>
+      <p style={styles.HostnameTitle}>ASSOCIATED HOSTNAMES: {farsightFormData.isLoading ? "Loading..." : farsightFormData.data.length }</p>
       <Grid fluid>
-        {isFarsightLoading && !isFarsightInit ? "Loading..." : getHostnames(farsightData).map((hostname: string) => <Row><Col style={styles.RowBullet}>{hostname}</Col></Row>) }
+        {farsightFormData.isLoading ? "" : getHostnames(farsightFormData.data).map((hostname: string) => <Row><Col style={styles.RowBullet}>{hostname}</Col></Row>) }
       </Grid>
     </div>    
     </> 
