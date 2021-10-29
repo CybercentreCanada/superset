@@ -13,6 +13,7 @@ from flask import session
 import urllib
 import json
 import requests
+import os 
 
 from requests.structures import CaseInsensitiveDict
 
@@ -34,11 +35,14 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
     )
     def get(self, id : str, **kwargs: Any) -> Response:
 
-        client_id = '9857feba-e79f-4e57-b587-92fd33fd0389'
-        tenant_id = 'da9cbe40-ec1e-4997-afb3-17d87574571a'
-        alfred_client_id = 'e51f4263-a055-422b-870c-0730fc2b2462'
-        client_secret = 'fcW7Q~NP5q5P4u2xVZl-G4-nMapXKYlh.tTXU'
+
+        alfred_client_id = os.getenv('ALFRED_CLIENT_ID') 
         alfred_token = ''
+
+        client_id = os.getenv('SUPERSET_CLIENT_ID') 
+        tenant_id = os.getenv('SUPERSET_TENANT_ID') 
+        client_secret = os.getenv('SUPERSET_CLIENT_SECRET')  
+
         url = 'https://login.microsoftonline.com/{0}/oauth2/v2.0/token'.format(tenant_id)
         
         refresh_token = session['oauth_refresh']
@@ -90,4 +94,4 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
                 print("Error obtaining on-behalf-of Fission token: %s" % e)
             refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
             print(refresh_resp_json)
-        return self.response(200,paylod=refresh_resp_json)
+        return self.response(200,payload=refresh_resp_json)
