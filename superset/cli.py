@@ -19,6 +19,7 @@ import json
 import logging
 import sys
 from datetime import datetime, timedelta
+from pathlib import Path
 from subprocess import Popen
 from typing import Any, Dict, List, Optional, Type, Union
 from zipfile import is_zipfile, ZipFile
@@ -30,7 +31,6 @@ from colorama import Fore, Style
 from flask import current_app, g
 from flask.cli import FlaskGroup, with_appcontext
 from flask_appbuilder import Model
-from pathlib2 import Path
 
 from superset import app, appbuilder, config, security_manager
 from superset.app import create_app
@@ -124,8 +124,9 @@ def load_examples_run(
 
     examples.load_css_templates()
 
-    print("Loading energy related dataset")
-    examples.load_energy(only_metadata, force)
+    if load_test_data:
+        print("Loading energy related dataset")
+        examples.load_energy(only_metadata, force)
 
     print("Loading [World Bank's Health Nutrition and Population Stats]")
     examples.load_world_bank_health_n_pop(only_metadata, force)
@@ -133,24 +134,16 @@ def load_examples_run(
     print("Loading [Birth names]")
     examples.load_birth_names(only_metadata, force)
 
-    print("Loading [Tabbed dashboard]")
-    examples.load_tabbed_dashboard(only_metadata)
+    if load_test_data:
+        print("Loading [Tabbed dashboard]")
+        examples.load_tabbed_dashboard(only_metadata)
 
     if not load_test_data:
-        print("Loading [Random time series data]")
-        examples.load_random_time_series_data(only_metadata, force)
-
         print("Loading [Random long/lat data]")
         examples.load_long_lat_data(only_metadata, force)
 
         print("Loading [Country Map data]")
         examples.load_country_map_data(only_metadata, force)
-
-        print("Loading [Multiformat time series]")
-        examples.load_multiformat_time_series(only_metadata, force)
-
-        print("Loading [Paris GeoJson]")
-        examples.load_paris_iris_geojson(only_metadata, force)
 
         print("Loading [San Francisco population polygons]")
         examples.load_sf_population_polygons(only_metadata, force)
@@ -736,9 +729,15 @@ def load_test_users_run() -> None:
         gamma_sqllab_role = sm.add_role("gamma_sqllab")
         sm.add_permission_role(gamma_sqllab_role, examples_pv)
 
+        gamma_no_csv_role = sm.add_role("gamma_no_csv")
+        sm.add_permission_role(gamma_no_csv_role, examples_pv)
+
         for role in ["Gamma", "sql_lab"]:
             for perm in sm.find_role(role).permissions:
                 sm.add_permission_role(gamma_sqllab_role, perm)
+
+                if str(perm) != "can csv on Superset":
+                    sm.add_permission_role(gamma_no_csv_role, perm)
 
         users = (
             ("admin", "Admin"),
@@ -746,6 +745,7 @@ def load_test_users_run() -> None:
             ("gamma2", "Gamma"),
             ("gamma_sqllab", "gamma_sqllab"),
             ("alpha", "Alpha"),
+            ("gamma_no_csv", "gamma_no_csv"),
         )
         for username, role in users:
             user = sm.find_user(username)

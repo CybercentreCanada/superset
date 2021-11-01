@@ -28,15 +28,15 @@ from superset.utils import core as utils
 from .helpers import (
     get_example_data,
     get_slice_json,
+    get_table_connector_registry,
     merge_slice,
     misc_dash_slices,
-    TBL,
 )
 
 
 def load_long_lat_data(only_metadata: bool = False, force: bool = False) -> None:
     """Loading lat/long data from a csv file in the repo"""
-    tbl_name = "long_lat"
+    tbl_name = "Sample Geodata"
     database = utils.get_example_database()
     table_exists = database.has_table_by_name(tbl_name)
 
@@ -82,11 +82,13 @@ def load_long_lat_data(only_metadata: bool = False, force: bool = False) -> None
         print("-" * 80)
 
     print("Creating table reference")
-    obj = db.session.query(TBL).filter_by(table_name=tbl_name).first()
+    table = get_table_connector_registry()
+    obj = db.session.query(table).filter_by(table_name=tbl_name).first()
     if not obj:
-        obj = TBL(table_name=tbl_name)
+        obj = table(table_name=tbl_name)
     obj.main_dttm_col = "datetime"
     obj.database = database
+    obj.filter_select_enabled = True
     db.session.merge(obj)
     db.session.commit()
     obj.fetch_metadata()
