@@ -4,7 +4,6 @@ const Datum = {
     fontSize: "14px",
     marginBottom: 2,
     padding: 2,
-    float: 'left',
     width: '50%',
     height: '200px',
     overflow: 'auto'
@@ -23,28 +22,28 @@ const Datum = {
   }
 
   const ColList = {
-    "border-bottom": "1px solid #F0F0F0",
-    "padding-bottom": "1px",
+    borderBottom: '1px solid #F0F0F0',
+    paddingBottom: '1px',
   }
 
   const DropListHeader = {
-    "padding-top": "0",
-    "padding-bottom": "1px",
+    paddingTop: "0",
+    paddingBottom: "1px",
   }
 
   const RowBullet = {
     display: 'list-item',
-    'list-style-type': 'disc',
-    'list-style-position': 'inside',
-    "border-bottom": "1px solid #F0F0F0",
-    "padding-bottom": "1px",
+    listStyleType: 'disc',
+    listStyleposition: 'inside',
+    borderBottom: "1px solid #F0F0F0",
+    paddingBottom: "1px",
   }
 
   const HostnameTitle = {
-    "padding-left": "5px",
-    "margin-bottom": "0",
-    "border-bottom": "1px solid #F0F0F0",
-    "padding-bottom": "1px"
+    paddingLeft: "5px",
+    marginBottom: "0",
+    borderBottom: "1px solid #F0F0F0",
+    paddingBottom: "1px"
   }
 
   const styles = {

@@ -5,7 +5,6 @@ import { QueryFormData, AdhocFilter } from '@superset-ui/core';
 import { Row, Col, Grid} from 'react-bootstrap/';
 import styles from './styles';
 import IPAddressUtil from './IpAddressUtil';
-import Collapse from 'src/components/Collapse';
 
 type DataManager = {
   formData : QueryFormData,
@@ -131,21 +130,7 @@ const buildFarsightFormData = (currentFormData: QueryFormData, ip: string) =>{
   return farsightFormData;
 }
 
-/**
-*   isPayloadUndefined:
-*     description: Check if payload is null or undefined.
-*     parameter:
-*       - name: payload
-*       - type: any
-*       - required: true
-*       - description: data we need to verify.  
-*     returns:
-*       value:
-*         description: Returns true or false.
-*/
-const isPayloadUndefined = (payload : any) =>{
-  return payload == null;
-}
+
 
 /**
 *   useDataApi:
@@ -234,7 +219,7 @@ const useDataApi = (dataManager : DataManager, setDataManager: { (value: React.S
 function AtAGlanceCore ( initialFormData: QueryFormData) {
   const DEFAULT_IP_STRING: string = '3.251.148.10';
   const [ipString, setIpString] = useState(DEFAULT_IP_STRING);
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData,] = useState(initialFormData);
 
   //neustargeo state
   const [geoFormData, setNewStarGeoFormData] = useState<DataManager>({

@@ -5,7 +5,6 @@ const Datum = {
   marginBottom: 2,
   padding: 10,
   paddingleft: 10,
-  float: 'left',
   width: '50%',
   height: '150px',
   overflow: 'auto'
@@ -16,7 +15,6 @@ const DatumTop = {
   fontSize: "14px",
   marginBottom: 2,
   padding: 2,
-  float: 'left',
   width: '100%',
   height: '75px',
   overflow: 'auto'
@@ -44,7 +42,6 @@ const UrlList = {
   maxWidth: 360,
   overflow: 'auto',
   maxHeight: 100,
-  float: 'left',
 }
 
 const UrlListItem = {
@@ -57,9 +54,7 @@ const HostList = {
 }
 
 const RowBullet = {
-  display: 'list-item',
-  'list-style-type': 'disc',
-  'list-style-position': 'inside'
+
 }
 
 const HostnameTitle = {
