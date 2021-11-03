@@ -36,7 +36,7 @@ export default class CccsGridChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: t('Hogwarts Table: An AG Grid control for Hogwarts data. https://www.ag-grid.com/documentation/'),
+      description: t('Hogwarts Table: An AG Grid control for Hogwarts data.'),
       name: t('Hogwarts Table'),
       category: t('Table'),
       tags: [
