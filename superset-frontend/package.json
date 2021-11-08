@@ -76,7 +76,7 @@
     "@emotion/cache": "^11.1.3",
     "@emotion/react": "^11.1.5",
     "@superset-ui/chart-controls": "^0.17.84",
-    "@superset-ui/core": "^0.17.81",
+    "@superset-ui/core": "^0.17.81-cccs.0",
     "@superset-ui/legacy-plugin-chart-calendar": "^0.17.84",
     "@superset-ui/legacy-plugin-chart-chord": "^0.17.84",
     "@superset-ui/legacy-plugin-chart-country-map": "^0.17.84",
