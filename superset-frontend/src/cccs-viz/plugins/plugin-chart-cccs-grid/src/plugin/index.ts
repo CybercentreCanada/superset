@@ -22,6 +22,7 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 import { CccsGridQueryFormData, CccsGridChartProps } from '../types';
+import example1 from '../images/Table1.png';
 
 export default class CccsGridChartPlugin extends ChartPlugin<
   CccsGridQueryFormData,
@@ -38,6 +39,23 @@ export default class CccsGridChartPlugin extends ChartPlugin<
    * (pivoting, rolling aggregations, sorting etc) or submitting multiple queries.
    */
   constructor() {
+    const metadata = new ChartMetadata({
+      description: t('Hogwarts Table: An AG Grid control for Hogwarts data.'),
+      name: t('Hogwarts Table'),
+      category: t('Table'),
+      tags: [
+        t('Hogwarts'),
+        t('Table'),
+        t('Grid'),
+        t('Popular'),
+        t('Report'),
+        t('Tabular')
+      ],
+      exampleGallery: [{url: example1}],
+      thumbnail,
+      behaviors: [Behavior.INTERACTIVE_CHART],
+   });
+
     super({
       buildQuery,
       controlPanel,
