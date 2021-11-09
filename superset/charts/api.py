@@ -705,8 +705,6 @@ class ChartRestApi(BaseSupersetModelRestApi):
 
         try:
             command = ChartDataCommand()
-            # TODO: remove
-            json_body["viz_type"] = "cccs_grid"
             query_context = command.set_query_context(json_body)
             command.validate()
         except QueryObjectValidationError as error:
