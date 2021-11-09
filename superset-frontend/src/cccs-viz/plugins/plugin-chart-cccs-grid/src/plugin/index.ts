@@ -60,12 +60,7 @@ export default class CccsGridChartPlugin extends ChartPlugin<
       buildQuery,
       controlPanel,
       loadChart: () => import('../CccsGrid'),
-      metadata: new ChartMetadata({
-        description: 'CCCS Grid',
-        name: t('CCCS Grid'),
-        thumbnail,
-        behaviors: [Behavior.INTERACTIVE_CHART],
-      }),
+      metadata: metadata,
       transformProps,
     });
   }

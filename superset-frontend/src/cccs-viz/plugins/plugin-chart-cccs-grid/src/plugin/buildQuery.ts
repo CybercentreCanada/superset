@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { 
+import {
   buildQueryContext,
   PostProcessingRule,
-  QueryFormData,
   QueryMode,
   QueryObject
 } from '@superset-ui/core';

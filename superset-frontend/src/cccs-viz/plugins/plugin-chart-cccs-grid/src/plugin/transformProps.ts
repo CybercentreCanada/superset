@@ -17,7 +17,6 @@
  * under the License.
  */
 import {
-  ChartProps,
   Column,
   QueryMode,
   t,
