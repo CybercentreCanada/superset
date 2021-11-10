@@ -61,7 +61,6 @@
   },
   "homepage": "https://superset.apache.org/",
   "dependencies": {
-    "@ag-grid-community/all-modules": "^26.0.0",
     "@ag-grid-community/core": "^26.0.0",
     "@ag-grid-community/react": "^26.0.0",
     "@ag-grid-enterprise/all-modules": "^26.0.0",
@@ -112,7 +111,6 @@
     "@superset-ui/preset-chart-xy": "^0.17.84",
     "@vx/responsive": "^0.0.195",
     "abortcontroller-polyfill": "^1.1.9",
-    "ag-grid-community": "^26.0.0",
     "antd": "^4.9.4",
     "array-move": "^2.2.1",
     "bootstrap": "^3.4.1",
