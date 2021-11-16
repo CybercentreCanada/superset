@@ -59,7 +59,7 @@ RUN mkdir -p /app/superset-frontend
 RUN mkdir -p /app/superset/assets
 COPY ./docker/frontend-mem-nag.sh /
 COPY ./superset-frontend/package* /app/superset-frontend/
-RUN --mount=type=secret,id=npmrc,target=/tmp/.npmrc,uid=1000 cat /tmp/.npmrc \
+RUN --mount=type=secret,id=npmrc,target=/tmp/.npmrc,uid=1000 \
         /frontend-mem-nag.sh \
         && cd /app/superset-frontend \
         && npm install --legacy-peer-deps --userconfig=/tmp/.npmrc
