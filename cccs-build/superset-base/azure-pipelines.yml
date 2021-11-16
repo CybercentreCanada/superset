@@ -30,6 +30,7 @@ steps:
       command: buildAndPush
       containerRegistry: $(containerRegistry)
       repository: $(imageRepository)
+      arguments: --secret id=npmrc,src=$(npmrc) --progress=plain
       dockerfile: $(dockerfile)
       tags: |
         $(BRANCH_NAME)
