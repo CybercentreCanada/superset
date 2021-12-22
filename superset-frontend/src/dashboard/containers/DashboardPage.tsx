@@ -20,7 +20,7 @@ import React, { useEffect, FC } from 'react';
 import { t } from '@superset-ui/core';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { useToasts } from 'src/messageToasts/enhancers/withToasts';
+import { useToasts } from 'src/components/MessageToasts/withToasts';
 import Loading from 'src/components/Loading';
 import {
   useDashboard,
@@ -30,7 +30,9 @@ import {
 import { hydrateDashboard } from 'src/dashboard/actions/hydrate';
 import { setDatasources } from 'src/dashboard/actions/datasources';
 import injectCustomCss from 'src/dashboard/util/injectCustomCss';
+import setupPlugins from 'src/setup/setupPlugins';
 
+setupPlugins();
 const DashboardContainer = React.lazy(
   () =>
     import(
@@ -40,19 +42,18 @@ const DashboardContainer = React.lazy(
     ),
 );
 
+const originalDocumentTitle = document.title;
+
 const DashboardPage: FC = () => {
   const dispatch = useDispatch();
   const { addDangerToast } = useToasts();
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
-  const { result: dashboard, error: dashboardApiError } = useDashboard(
-    idOrSlug,
-  );
-  const { result: charts, error: chartsApiError } = useDashboardCharts(
-    idOrSlug,
-  );
-  const { result: datasets, error: datasetsApiError } = useDashboardDatasets(
-    idOrSlug,
-  );
+  const { result: dashboard, error: dashboardApiError } =
+    useDashboard(idOrSlug);
+  const { result: charts, error: chartsApiError } =
+    useDashboardCharts(idOrSlug);
+  const { result: datasets, error: datasetsApiError } =
+    useDashboardDatasets(idOrSlug);
 
   const error = dashboardApiError || chartsApiError;
   const readyToRender = Boolean(dashboard && charts);
@@ -69,6 +70,9 @@ const DashboardPage: FC = () => {
     if (dashboard_title) {
       document.title = dashboard_title;
     }
+    return () => {
+      document.title = originalDocumentTitle;
+    };
   }, [dashboard_title]);
 
   useEffect(() => {

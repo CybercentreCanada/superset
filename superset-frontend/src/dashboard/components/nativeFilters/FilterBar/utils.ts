@@ -27,9 +27,9 @@ export enum TabIds {
   FilterSets = 'filterSets',
 }
 
-export function mapParentFiltersToChildren(
-  filters: Filter[],
-): { [id: string]: Filter[] } {
+export function mapParentFiltersToChildren(filters: Filter[]): {
+  [id: string]: Filter[];
+} {
   const cascadeChildren = {};
   filters.forEach(filter => {
     const [parentId] = filter.cascadeParentIds || [];
@@ -56,7 +56,7 @@ export const checkIsMissingRequiredValue = (
   const value = filterState?.value;
   // TODO: this property should be unhardcoded
   return (
-    filter.controlValues.enableEmptyFilter &&
+    filter.controlValues?.enableEmptyFilter &&
     (value === null || value === undefined)
   );
 };

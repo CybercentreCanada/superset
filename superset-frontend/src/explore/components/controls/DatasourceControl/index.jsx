@@ -114,9 +114,8 @@ class DatasourceControl extends React.PureComponent {
       showChangeDatasourceModal: false,
     };
     this.onDatasourceSave = this.onDatasourceSave.bind(this);
-    this.toggleChangeDatasourceModal = this.toggleChangeDatasourceModal.bind(
-      this,
-    );
+    this.toggleChangeDatasourceModal =
+      this.toggleChangeDatasourceModal.bind(this);
     this.toggleEditDatasourceModal = this.toggleEditDatasourceModal.bind(this);
     this.toggleShowDatasource = this.toggleShowDatasource.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
@@ -227,10 +226,7 @@ class DatasourceControl extends React.PureComponent {
             </Tooltip>
           )}
           {extra?.warning_markdown && (
-            <WarningIconWithTooltip
-              warningMarkdown={extra.warning_markdown}
-              size={30}
-            />
+            <WarningIconWithTooltip warningMarkdown={extra.warning_markdown} />
           )}
           <Dropdown
             overlay={datasourceMenu}

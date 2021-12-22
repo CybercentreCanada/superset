@@ -74,10 +74,8 @@ const ConditionalFormattingControl = ({
   ...props
 }: ConditionalFormattingControlProps) => {
   const theme = useTheme();
-  const [
-    conditionalFormattingConfigs,
-    setConditionalFormattingConfigs,
-  ] = useState<ConditionalFormattingConfig[]>(value ?? []);
+  const [conditionalFormattingConfigs, setConditionalFormattingConfigs] =
+    useState<ConditionalFormattingConfig[]>(value ?? []);
 
   useEffect(() => {
     if (onChange) {
@@ -125,6 +123,8 @@ const ConditionalFormattingControl = ({
   }: ConditionalFormattingConfig) => {
     const columnName = (column && verboseMap?.[column]) ?? column;
     switch (operator) {
+      case COMPARATOR.NONE:
+        return `${columnName}`;
       case COMPARATOR.BETWEEN:
         return `${targetValueLeft} ${COMPARATOR.LESS_THAN} ${columnName} ${COMPARATOR.LESS_THAN} ${targetValueRight}`;
       case COMPARATOR.BETWEEN_OR_EQUAL:

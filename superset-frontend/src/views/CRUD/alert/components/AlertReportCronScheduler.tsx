@@ -29,10 +29,9 @@ interface AlertReportCronSchedulerProps {
   onChange: (change: string) => any;
 }
 
-export const AlertReportCronScheduler: FunctionComponent<AlertReportCronSchedulerProps> = ({
-  value,
-  onChange,
-}) => {
+export const AlertReportCronScheduler: FunctionComponent<
+  AlertReportCronSchedulerProps
+> = ({ value, onChange }) => {
   const theme = useTheme();
   const inputRef = useRef<AntdInput>(null);
   const [scheduleFormat, setScheduleFormat] = useState<'picker' | 'input'>(

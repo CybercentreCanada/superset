@@ -21,7 +21,9 @@ import { styled, t } from '@superset-ui/core';
 import Modal from 'src/components/Modal';
 import Button from 'src/components/Button';
 import SyntaxHighlighterCopy from 'src/views/CRUD/data/components/SyntaxHighlighterCopy';
-import withToasts, { ToastProps } from 'src/messageToasts/enhancers/withToasts';
+import withToasts, {
+  ToastProps,
+} from 'src/components/MessageToasts/withToasts';
 import { useQueryPreviewState } from 'src/views/CRUD/data/hooks';
 
 const QueryTitle = styled.div`
@@ -69,7 +71,9 @@ interface SavedQueryPreviewModalProps extends ToastProps {
   show: boolean;
 }
 
-const SavedQueryPreviewModal: FunctionComponent<SavedQueryPreviewModalProps> = ({
+const SavedQueryPreviewModal: FunctionComponent<
+  SavedQueryPreviewModalProps
+> = ({
   fetchData,
   onHide,
   openInSqlLab,
@@ -79,16 +83,12 @@ const SavedQueryPreviewModal: FunctionComponent<SavedQueryPreviewModalProps> = (
   addDangerToast,
   addSuccessToast,
 }) => {
-  const {
-    handleKeyPress,
-    handleDataChange,
-    disablePrevious,
-    disableNext,
-  } = useQueryPreviewState<SavedQueryObject>({
-    queries,
-    currentQueryId: savedQuery.id,
-    fetchData,
-  });
+  const { handleKeyPress, handleDataChange, disablePrevious, disableNext } =
+    useQueryPreviewState<SavedQueryObject>({
+      queries,
+      currentQueryId: savedQuery.id,
+      fetchData,
+    });
 
   return (
     <div role="none" onKeyUp={handleKeyPress}>
