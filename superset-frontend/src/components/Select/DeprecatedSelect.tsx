@@ -71,7 +71,7 @@ type AnyReactSelect<OptionType extends OptionTypeBase> =
 
 export type SupersetStyledSelectProps<
   OptionType extends OptionTypeBase,
-  T extends WindowedSelectProps<OptionType> = WindowedSelectProps<OptionType>
+  T extends WindowedSelectProps<OptionType> = WindowedSelectProps<OptionType>,
 > = T & {
   // additional props for easier usage or backward compatibility
   labelKey?: string;
@@ -103,7 +103,7 @@ function styled<
     | WindowedSelectComponentType<OptionType>
     | ComponentType<
         SelectProps<OptionType>
-      > = WindowedSelectComponentType<OptionType>
+      > = WindowedSelectComponentType<OptionType>,
 >(SelectComponent: SelectComponentType) {
   type SelectProps = SupersetStyledSelectProps<OptionType>;
   type Components = SelectComponents<OptionType>;
@@ -113,7 +113,8 @@ function styled<
   });
 
   // default components for the given OptionType
-  const supersetDefaultComponents: SelectComponentsConfig<OptionType> = DEFAULT_COMPONENTS;
+  const supersetDefaultComponents: SelectComponentsConfig<OptionType> =
+    DEFAULT_COMPONENTS;
 
   const getSortableMultiValue = (MultiValue: Components['MultiValue']) =>
     SortableElement((props: MultiValueProps<OptionType>) => {
@@ -249,8 +250,15 @@ function styled<
     if (forceOverflow) {
       Object.assign(restProps, {
         closeMenuOnScroll: (e: Event) => {
+          // ensure menu is open
+          const menuIsOpen = (stateManager as BasicSelect<OptionType>)?.state
+            ?.menuIsOpen;
           const target = e.target as HTMLElement;
-          return target && !target.classList?.contains('Select__menu-list');
+          return (
+            menuIsOpen &&
+            target &&
+            !target.classList?.contains('Select__menu-list')
+          );
         },
         menuPosition: 'fixed',
       });

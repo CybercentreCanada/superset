@@ -71,12 +71,11 @@ export type ThemeConfig = {
   colors: {
     // add known colors
     [key in keyof typeof reactSelectColors]: string;
-  } &
-    {
-      [key in keyof ReturnType<typeof colors>]: string;
-    } & {
-      [key: string]: string; // any other colors
-    };
+  } & {
+    [key in keyof ReturnType<typeof colors>]: string;
+  } & {
+    [key: string]: string; // any other colors
+  };
   spacing: Theme['spacing'] & {
     // line height and font size must be pixels for easier computation
     // of option item height in WindowedMenuList
@@ -314,13 +313,8 @@ export type InputProps = ReactSelectInputProps & {
   inputStyle?: object;
 };
 
-const {
-  ClearIndicator,
-  DropdownIndicator,
-  Option,
-  Input,
-  SelectContainer,
-} = defaultComponents as Required<DeepNonNullable<SelectComponentsType>>;
+const { ClearIndicator, DropdownIndicator, Option, Input, SelectContainer } =
+  defaultComponents as Required<DeepNonNullable<SelectComponentsType>>;
 
 export const DEFAULT_COMPONENTS: SelectComponentsType = {
   SelectContainer: ({ children, ...props }) => {

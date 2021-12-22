@@ -68,6 +68,9 @@ const propTypes = {
 };
 
 const BLANK = {};
+const NONEXISTENT_DATASET = t(
+  'The dataset associated with this chart no longer exists',
+);
 
 const defaultProps = {
   addFilter: () => BLANK,
@@ -104,9 +107,8 @@ const RefreshOverlayWrapper = styled.div`
 class Chart extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.handleRenderContainerFailure = this.handleRenderContainerFailure.bind(
-      this,
-    );
+    this.handleRenderContainerFailure =
+      this.handleRenderContainerFailure.bind(this);
   }
 
   componentDidMount() {
@@ -178,7 +180,11 @@ class Chart extends React.PureComponent {
     const message = chartAlert || queryResponse?.message;
 
     // if datasource is still loading, don't render JS errors
-    if (chartAlert && datasource === PLACEHOLDER_DATASOURCE) {
+    if (
+      chartAlert !== undefined &&
+      chartAlert !== NONEXISTENT_DATASET &&
+      datasource === PLACEHOLDER_DATASOURCE
+    ) {
       return (
         <Styles
           data-ui-anchor="chart"

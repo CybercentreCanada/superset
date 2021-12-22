@@ -18,8 +18,9 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { connect } from 'react-redux';
 import cx from 'classnames';
+
 import { t, SafeMarkdown } from '@superset-ui/core';
 import { Logger, LOG_ACTIONS_RENDER_CHART } from 'src/logger/LogUtils';
 import { MarkdownEditor } from 'src/components/AsyncAceEditor';
@@ -108,13 +109,8 @@ class Markdown extends React.PureComponent {
   }
 
   static getDerivedStateFromProps(nextProps, state) {
-    const {
-      hasError,
-      editorMode,
-      markdownSource,
-      undoLength,
-      redoLength,
-    } = state;
+    const { hasError, editorMode, markdownSource, undoLength, redoLength } =
+      state;
     const {
       component: nextComponent,
       undoLength: nextUndoLength,
@@ -366,4 +362,10 @@ class Markdown extends React.PureComponent {
 Markdown.propTypes = propTypes;
 Markdown.defaultProps = defaultProps;
 
-export default Markdown;
+function mapStateToProps(state) {
+  return {
+    undoLength: state.dashboardLayout.past.length,
+    redoLength: state.dashboardLayout.future.length,
+  };
+}
+export default connect(mapStateToProps)(Markdown);

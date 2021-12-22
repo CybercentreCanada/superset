@@ -42,6 +42,7 @@ export const validateForm = async (
       errors: [error],
     };
     form.setFields([fieldError]);
+    setCurrentFilterId(filterId);
   };
 
   try {
@@ -57,25 +58,34 @@ export const validateForm = async (
       }
     }
 
-    const validateCycles = (filterId: string, trace: string[] = []) => {
+    const validateCycles = (
+      filterId: string,
+      trace: string[] = [],
+    ): boolean => {
       if (trace.includes(filterId)) {
         addValidationError(
           filterId,
           'parentFilter',
           'Cannot create cyclic hierarchy',
         );
+        return false;
       }
-      const parentId = formValues.filters[filterId]
-        ? formValues.filters[filterId].parentFilter?.value
+      const parentId = formValues.filters?.[filterId]
+        ? formValues.filters[filterId]?.parentFilter?.value
         : filterConfigMap[filterId]?.cascadeParentIds?.[0];
       if (parentId) {
-        validateCycles(parentId, [...trace, filterId]);
+        return validateCycles(parentId, [...trace, filterId]);
       }
+      return true;
     };
 
-    filterIds
+    const invalid = filterIds
       .filter(id => !removedFilters[id])
-      .forEach(filterId => validateCycles(filterId));
+      .some(filterId => !validateCycles(filterId));
+
+    if (invalid) {
+      return null;
+    }
 
     return formValues;
   } catch (error) {
@@ -100,89 +110,94 @@ export const validateForm = async (
   }
 };
 
-export const createHandleSave = (
-  filterConfigMap: Record<string, Filter>,
-  filterIds: string[],
-  removedFilters: Record<string, FilterRemoval>,
-  saveForm: Function,
-  values: NativeFiltersForm,
-) => async () => {
-  const newFilterConfig: FilterConfiguration = filterIds
-    .filter(id => !removedFilters[id])
-    .map(id => {
-      // create a filter config object from the form inputs
-      const formInputs = values.filters[id];
-      // if user didn't open a filter, return the original config
-      if (!formInputs) return filterConfigMap[id];
-      const target: Partial<Target> = {};
-      if (formInputs.dataset) {
-        target.datasetId = formInputs.dataset.value;
-      }
-      if (formInputs.dataset && formInputs.column) {
-        target.column = { name: formInputs.column };
-      }
-      return {
-        id,
-        adhoc_filters: formInputs.adhoc_filters,
-        time_range: formInputs.time_range,
-        controlValues: formInputs.controlValues ?? {},
-        granularity_sqla: formInputs.granularity_sqla,
-        requiredFirst: Object.values(formInputs.requiredFirst ?? {}).find(
-          rf => rf,
-        ),
-        name: formInputs.name,
-        filterType: formInputs.filterType,
-        // for now there will only ever be one target
-        targets: [target],
-        defaultDataMask: formInputs.defaultDataMask ?? getInitialDataMask(),
-        cascadeParentIds: formInputs.parentFilter
-          ? [formInputs.parentFilter.value]
-          : [],
-        scope: formInputs.scope,
-        sortMetric: formInputs.sortMetric,
-      };
-    });
+export const createHandleSave =
+  (
+    filterConfigMap: Record<string, Filter>,
+    filterIds: string[],
+    removedFilters: Record<string, FilterRemoval>,
+    saveForm: Function,
+    values: NativeFiltersForm,
+  ) =>
+  async () => {
+    const newFilterConfig: FilterConfiguration = filterIds
+      .filter(id => !removedFilters[id])
+      .map(id => {
+        // create a filter config object from the form inputs
+        const formInputs = values.filters?.[id];
+        // if user didn't open a filter, return the original config
+        if (!formInputs) return filterConfigMap[id];
+        const target: Partial<Target> = {};
+        if (formInputs.dataset) {
+          target.datasetId = formInputs.dataset.value;
+        }
+        if (formInputs.dataset && formInputs.column) {
+          target.column = { name: formInputs.column };
+        }
+        return {
+          id,
+          adhoc_filters: formInputs.adhoc_filters,
+          time_range: formInputs.time_range,
+          controlValues: formInputs.controlValues ?? {},
+          granularity_sqla: formInputs.granularity_sqla,
+          requiredFirst: Object.values(formInputs.requiredFirst ?? {}).find(
+            rf => rf,
+          ),
+          name: formInputs.name,
+          filterType: formInputs.filterType,
+          // for now there will only ever be one target
+          targets: [target],
+          defaultDataMask: formInputs.defaultDataMask ?? getInitialDataMask(),
+          cascadeParentIds: formInputs.parentFilter
+            ? [formInputs.parentFilter.value]
+            : [],
+          scope: formInputs.scope,
+          sortMetric: formInputs.sortMetric,
+          type: formInputs.type,
+        };
+      });
 
-  await saveForm(newFilterConfig);
-};
-
-export const createHandleTabEdit = (
-  setRemovedFilters: (
-    value:
-      | ((
-          prevState: Record<string, FilterRemoval>,
-        ) => Record<string, FilterRemoval>)
-      | Record<string, FilterRemoval>,
-  ) => void,
-  setSaveAlertVisible: Function,
-  addFilter: Function,
-) => (filterId: string, action: 'add' | 'remove') => {
-  const completeFilterRemoval = (filterId: string) => {
-    // the filter state will actually stick around in the form,
-    // and the filterConfig/newFilterIds, but we use removedFilters
-    // to mark it as removed.
-    setRemovedFilters(removedFilters => ({
-      ...removedFilters,
-      [filterId]: { isPending: false },
-    }));
+    await saveForm(newFilterConfig);
   };
 
-  if (action === 'remove') {
-    // first set up the timer to completely remove it
-    const timerId = window.setTimeout(
-      () => completeFilterRemoval(filterId),
-      REMOVAL_DELAY_SECS * 1000,
-    );
-    // mark the filter state as "removal in progress"
-    setRemovedFilters(removedFilters => ({
-      ...removedFilters,
-      [filterId]: { isPending: true, timerId },
-    }));
-    setSaveAlertVisible(false);
-  } else if (action === 'add') {
-    addFilter();
-  }
-};
+export const createHandleTabEdit =
+  (
+    setRemovedFilters: (
+      value:
+        | ((
+            prevState: Record<string, FilterRemoval>,
+          ) => Record<string, FilterRemoval>)
+        | Record<string, FilterRemoval>,
+    ) => void,
+    setSaveAlertVisible: Function,
+    addFilter: Function,
+  ) =>
+  (filterId: string, action: 'add' | 'remove') => {
+    const completeFilterRemoval = (filterId: string) => {
+      // the filter state will actually stick around in the form,
+      // and the filterConfig/newFilterIds, but we use removedFilters
+      // to mark it as removed.
+      setRemovedFilters(removedFilters => ({
+        ...removedFilters,
+        [filterId]: { isPending: false },
+      }));
+    };
+
+    if (action === 'remove') {
+      // first set up the timer to completely remove it
+      const timerId = window.setTimeout(
+        () => completeFilterRemoval(filterId),
+        REMOVAL_DELAY_SECS * 1000,
+      );
+      // mark the filter state as "removal in progress"
+      setRemovedFilters(removedFilters => ({
+        ...removedFilters,
+        [filterId]: { isPending: true, timerId },
+      }));
+      setSaveAlertVisible(false);
+    } else if (action === 'add') {
+      addFilter();
+    }
+  };
 
 export const NATIVE_FILTER_PREFIX = 'NATIVE_FILTER-';
 export const generateFilterId = () =>
