@@ -70,8 +70,12 @@ class AnchorLink extends React.PureComponent {
   }
 
   render() {
-    const { anchorLinkId, filters, showShortLinkButton, placement } =
-      this.props;
+    const {
+      anchorLinkId,
+      filters,
+      showShortLinkButton,
+      placement,
+    } = this.props;
     return (
       <span className="anchor-link-container" id={anchorLinkId}>
         {showShortLinkButton && (

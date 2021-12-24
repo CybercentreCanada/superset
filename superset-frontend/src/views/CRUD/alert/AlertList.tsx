@@ -123,8 +123,10 @@ function AlertList({
   const [currentAlert, setCurrentAlert] = useState<Partial<AlertObject> | null>(
     null,
   );
-  const [currentAlertDeleting, setCurrentAlertDeleting] =
-    useState<AlertObject | null>(null);
+  const [
+    currentAlertDeleting,
+    setCurrentAlertDeleting,
+  ] = useState<AlertObject | null>(null);
 
   // Actions
   function handleAlertEdit(alert: AlertObject | null) {

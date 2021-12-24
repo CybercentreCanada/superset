@@ -49,8 +49,14 @@ type ExploreActionButtonsProps = {
 };
 
 const ActionButton = (props: ActionButtonProps) => {
-  const { icon, text, tooltip, className, onTooltipVisibilityChange, ...rest } =
-    props;
+  const {
+    icon,
+    text,
+    tooltip,
+    className,
+    onTooltipVisibilityChange,
+    ...rest
+  } = props;
   return (
     <Tooltip
       id={`${icon}-tooltip`}

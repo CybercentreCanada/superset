@@ -83,9 +83,8 @@ describe('ChartHolder', () => {
   it('should render full size', async () => {
     renderWrapper();
 
-    const chart = (
-      screen.getByTestId('slice-container').firstChild as HTMLElement
-    ).style;
+    const chart = (screen.getByTestId('slice-container')
+      .firstChild as HTMLElement).style;
 
     await waitFor(() => expect(chart?.width).toBe('992px'));
     expect(chart?.height).toBe('714px');
