@@ -60,19 +60,45 @@ import extractUrlParams from '../util/extractUrlParams';
 
 export const HYDRATE_DASHBOARD = 'HYDRATE_DASHBOARD';
 
-export const hydrateDashboard =
-  (dashboardData, chartData) => (dispatch, getState) => {
-    const { user, common } = getState();
-    let { metadata } = dashboardData;
-    const regularUrlParams = extractUrlParams('regular');
-    const reservedUrlParams = extractUrlParams('reserved');
-    const editMode = reservedUrlParams.edit === 'true';
+export const hydrateDashboard = (dashboardData, chartData) => (
+  dispatch,
+  getState,
+) => {
+  const { user, common } = getState();
+  let { metadata } = dashboardData;
+  const regularUrlParams = extractUrlParams('regular');
+  const reservedUrlParams = extractUrlParams('reserved');
+  const editMode = reservedUrlParams.edit === 'true';
 
-    let preselectFilters = {};
+  let preselectFilters = {};
 
-    chartData.forEach(chart => {
-      // eslint-disable-next-line no-param-reassign
-      chart.slice_id = chart.form_data.slice_id;
+  chartData.forEach(chart => {
+    // eslint-disable-next-line no-param-reassign
+    chart.slice_id = chart.form_data.slice_id;
+    return chart.form_data.slice_id;
+  });
+  try {
+    // allow request parameter overwrite dashboard metadata
+    preselectFilters =
+      getUrlParam(URL_PARAMS.preselectFilters) ||
+      JSON.parse(metadata.default_filters);
+  } catch (e) {
+    //
+  }
+
+  // Priming the color palette with user's label-color mapping provided in
+  // the dashboard's JSON metadata
+  if (metadata?.label_colors) {
+    const namespace = metadata.color_namespace;
+    const colorMap = isString(metadata.label_colors)
+      ? JSON.parse(metadata.label_colors)
+      : metadata.label_colors;
+    const categoricalNamespace = CategoricalColorNamespace.getNamespace(
+      namespace,
+    );
+
+    Object.keys(colorMap).forEach(label => {
+      categoricalNamespace.setColor(label, colorMap[label]);
     });
     try {
       // allow request parameter overwrite dashboard metadata
@@ -386,4 +412,6 @@ export const hydrateDashboard =
         dashboardLayout,
       },
     });
-  };
+  }
+  return null;
+};

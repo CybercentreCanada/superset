@@ -48,6 +48,9 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
+
+  /* eslint-disable */
+
   const { width, height, formData, queriesData } = chartProps;
   const { boldText, headerFontSize, headerText } = formData;
   const data = queriesData[0].data as TimeseriesDataRecord[];
@@ -57,7 +60,7 @@ export default function transformProps(chartProps: ChartProps) {
   var ip = '3.1.1.1';
   var num = formData?.adhocFilters?.length;
 
-  for (var i = 0; i < num; i++) {
+  for (let i = 0; i < num; i++) {
     var f = formData?.adhocFilters[i];
     if (f.subject == 'ip_string') {
       ip = f.comparator[0];
@@ -75,7 +78,7 @@ export default function transformProps(chartProps: ChartProps) {
 
   var num = formData?.extraFilters?.length;
 
-  for (var i = 0; i < num; i++) {
+  for (let i = 0; i < num; i++) {
     var f = formData?.extraFilters[i];
     if (f.col == 'ip_string') {
       ip = f.val[0];
@@ -93,7 +96,7 @@ export default function transformProps(chartProps: ChartProps) {
 
   var num = formData?.extraFormData?.append_form_data?.filters?.length;
 
-  for (var i = 0; i < num; i++) {
+  for (let i = 0; i < num; i++) {
     var f = formData?.extraFormData?.append_form_data?.filters[i];
     if (f.col == 'ip_string') {
       ip = f.val[0];
@@ -122,3 +125,4 @@ export default function transformProps(chartProps: ChartProps) {
     ip,
   };
 }
+/* eslint-enable */

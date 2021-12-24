@@ -69,9 +69,17 @@ enum LIMITING_FACTOR {
 
 const LOADING_STYLES: CSSProperties = { position: 'relative', minHeight: 100 };
 
+interface DatasetOwner {
+  first_name: string;
+  id: number;
+  last_name: string;
+  username: string;
+}
+
 interface DatasetOptionAutocomplete {
   value: string;
   datasetId: number;
+  owners: [DatasetOwner];
 }
 
 interface ResultSetProps {
@@ -142,6 +150,7 @@ const updateDataset = async (
   datasetId: number,
   sql: string,
   columns: Array<Record<string, any>>,
+  owners: [number],
   overrideColumns: boolean,
 ) => {
   const endpoint = `api/v1/dataset/${datasetId}?override_columns=${overrideColumns}`;
@@ -149,6 +158,7 @@ const updateDataset = async (
   const body = JSON.stringify({
     sql,
     columns,
+    owners,
   });
 
   const data: JsonResponse = await SupersetClient.put({
@@ -191,25 +201,30 @@ export default class ResultSet extends React.PureComponent<
     this.fetchResults = this.fetchResults.bind(this);
     this.popSelectStar = this.popSelectStar.bind(this);
     this.reFetchQueryResults = this.reFetchQueryResults.bind(this);
-    this.toggleExploreResultsButton =
-      this.toggleExploreResultsButton.bind(this);
+    this.toggleExploreResultsButton = this.toggleExploreResultsButton.bind(
+      this,
+    );
     this.handleSaveInDataset = this.handleSaveInDataset.bind(this);
     this.handleHideSaveModal = this.handleHideSaveModal.bind(this);
     this.handleDatasetNameChange = this.handleDatasetNameChange.bind(this);
-    this.handleSaveDatasetRadioBtnState =
-      this.handleSaveDatasetRadioBtnState.bind(this);
+    this.handleSaveDatasetRadioBtnState = this.handleSaveDatasetRadioBtnState.bind(
+      this,
+    );
     this.handleOverwriteCancel = this.handleOverwriteCancel.bind(this);
     this.handleOverwriteDataset = this.handleOverwriteDataset.bind(this);
-    this.handleOverwriteDatasetOption =
-      this.handleOverwriteDatasetOption.bind(this);
+    this.handleOverwriteDatasetOption = this.handleOverwriteDatasetOption.bind(
+      this,
+    );
     this.handleSaveDatasetModalSearch = debounce(
       this.handleSaveDatasetModalSearch.bind(this),
       1000,
     );
-    this.handleFilterAutocompleteOption =
-      this.handleFilterAutocompleteOption.bind(this);
-    this.handleOnChangeAutoComplete =
-      this.handleOnChangeAutoComplete.bind(this);
+    this.handleFilterAutocompleteOption = this.handleFilterAutocompleteOption.bind(
+      this,
+    );
+    this.handleOnChangeAutoComplete = this.handleOnChangeAutoComplete.bind(
+      this,
+    );
     this.handleExploreBtnClick = this.handleExploreBtnClick.bind(this);
   }
 
@@ -264,6 +279,7 @@ export default class ResultSet extends React.PureComponent<
       datasetToOverwrite.datasetId,
       sql,
       results.selected_columns.map(d => ({ column_name: d.name })),
+      datasetToOverwrite.owners.map((o: DatasetOwner) => o.id),
       true,
     );
 
@@ -400,10 +416,13 @@ export default class ResultSet extends React.PureComponent<
         endpoint: '/api/v1/dataset',
       })(`q=${queryParams}`);
 
-      return response.result.map((r: { table_name: string; id: number }) => ({
-        value: r.table_name,
-        datasetId: r.id,
-      }));
+      return response.result.map(
+        (r: { table_name: string; id: number; owners: [DatasetOwner] }) => ({
+          value: r.table_name,
+          datasetId: r.id,
+          owners: r.owners,
+        }),
+      );
     }
 
     return null;

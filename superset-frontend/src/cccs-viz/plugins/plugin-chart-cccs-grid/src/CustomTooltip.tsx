@@ -13,9 +13,8 @@ export default class CustomTooltip extends Component<
   }
 
   render() {
-    const data = this.props.api.getDisplayedRowAtIndex(
-      this.props.rowIndex,
-    ).data;
+    const data = this.props.api.getDisplayedRowAtIndex(this.props.rowIndex)
+      .data;
     return (
       <div
         className="custom-tooltip"

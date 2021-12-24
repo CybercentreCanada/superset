@@ -44,6 +44,7 @@ const propTypes = {
   // formData contains chart's own filter parameter
   // and merged with extra filter that current dashboard applying
   formData: PropTypes.object.isRequired,
+  labelColors: PropTypes.object,
   width: PropTypes.number,
   height: PropTypes.number,
   setControlValue: PropTypes.func,
@@ -107,8 +108,9 @@ const RefreshOverlayWrapper = styled.div`
 class Chart extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.handleRenderContainerFailure =
-      this.handleRenderContainerFailure.bind(this);
+    this.handleRenderContainerFailure = this.handleRenderContainerFailure.bind(
+      this,
+    );
   }
 
   componentDidMount() {

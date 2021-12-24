@@ -55,8 +55,9 @@ export default class AdhocFilterEditPopoverSqlTabContent extends React.Component
   constructor(props) {
     super(props);
     this.onSqlExpressionChange = this.onSqlExpressionChange.bind(this);
-    this.onSqlExpressionClauseChange =
-      this.onSqlExpressionClauseChange.bind(this);
+    this.onSqlExpressionClauseChange = this.onSqlExpressionClauseChange.bind(
+      this,
+    );
     this.handleAceEditorRef = this.handleAceEditorRef.bind(this);
 
     this.selectProps = {

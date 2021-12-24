@@ -74,8 +74,10 @@ const ConditionalFormattingControl = ({
   ...props
 }: ConditionalFormattingControlProps) => {
   const theme = useTheme();
-  const [conditionalFormattingConfigs, setConditionalFormattingConfigs] =
-    useState<ConditionalFormattingConfig[]>(value ?? []);
+  const [
+    conditionalFormattingConfigs,
+    setConditionalFormattingConfigs,
+  ] = useState<ConditionalFormattingConfig[]>(value ?? []);
 
   useEffect(() => {
     if (onChange) {

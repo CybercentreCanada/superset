@@ -57,11 +57,12 @@ function getTabChildrenScope({
       ))
   ) {
     // get all charts from tabChildren that is not in scope
-    const immuneChartIdsFromTabsNotInScope =
-      getImmuneChartIdsFromTabsNotInScope({
+    const immuneChartIdsFromTabsNotInScope = getImmuneChartIdsFromTabsNotInScope(
+      {
         tabs: tabChildren,
         tabsInScope: flatMap(tabScopes, ({ scope }) => scope),
-      });
+      },
+    );
     const immuneChartIdsFromTabsInScope = flatMap(
       Object.values(tabScopes),
       ({ immune }) => immune,

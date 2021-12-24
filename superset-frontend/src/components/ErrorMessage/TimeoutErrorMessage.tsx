@@ -38,9 +38,10 @@ function TimeoutErrorMessage({
 }: ErrorMessageComponentProps<TimeoutErrorExtra>) {
   const { extra, level } = error;
 
-  const isVisualization = (
-    ['dashboard', 'explore'] as (string | undefined)[]
-  ).includes(source);
+  const isVisualization = (['dashboard', 'explore'] as (
+    | string
+    | undefined
+  )[]).includes(source);
 
   const subtitle = isVisualization
     ? tn(

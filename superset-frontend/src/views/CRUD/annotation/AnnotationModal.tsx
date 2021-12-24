@@ -91,8 +91,10 @@ const AnnotationModal: FunctionComponent<AnnotationModalProps> = ({
   show,
 }) => {
   const [disableSave, setDisableSave] = useState<boolean>(true);
-  const [currentAnnotation, setCurrentAnnotation] =
-    useState<AnnotationObject | null>(null);
+  const [
+    currentAnnotation,
+    setCurrentAnnotation,
+  ] = useState<AnnotationObject | null>(null);
   const isEditMode = annotation !== null;
 
   // annotation fetch logic

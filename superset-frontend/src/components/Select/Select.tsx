@@ -93,6 +93,7 @@ export interface SelectProps extends PickedSelectProps {
   pageSize?: number;
   invertSelection?: boolean;
   fetchOnlyOnSearch?: boolean;
+  onError?: (error: string) => void;
 }
 
 const StyledContainer = styled.div`
@@ -180,6 +181,7 @@ const Select = ({
   mode = 'single',
   name,
   notFoundContent,
+  onError,
   onChange,
   onClear,
   optionFilterProps = ['label', 'value'],
@@ -195,8 +197,9 @@ const Select = ({
   const shouldShowSearch = isAsync || allowNewOptions ? true : showSearch;
   const initialOptions =
     options && Array.isArray(options) ? options : EMPTY_OPTIONS;
-  const [selectOptions, setSelectOptions] =
-    useState<OptionsType>(initialOptions);
+  const [selectOptions, setSelectOptions] = useState<OptionsType>(
+    initialOptions,
+  );
   const shouldUseChildrenOptions = !!selectOptions.find(
     opt => opt?.customLabel,
   );
@@ -326,11 +329,18 @@ const Select = ({
     setSearchedValue('');
   };
 
-  const onError = (response: Response) =>
-    getClientErrorObject(response).then(e => {
-      const { error } = e;
-      setError(error);
-    });
+  const internalOnError = useCallback(
+    (response: Response) =>
+      getClientErrorObject(response).then(e => {
+        const { error } = e;
+        setError(error);
+
+        if (onError) {
+          onError(error);
+        }
+      }),
+    [onError],
+  );
 
   const handleData = (data: OptionsType) => {
     let mergedData: OptionsType = [];
@@ -385,13 +395,13 @@ const Select = ({
             setAllValuesLoaded(true);
           }
         })
-        .catch(onError)
+        .catch(internalOnError)
         .finally(() => {
           setIsLoading(false);
           setIsTyping(false);
         });
     },
-    [allValuesLoaded, fetchOnlyOnSearch, options],
+    [allValuesLoaded, fetchOnlyOnSearch, internalOnError, options],
   );
 
   const handleOnSearch = useMemo(

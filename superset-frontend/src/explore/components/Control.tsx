@@ -47,8 +47,9 @@ export type ControlProps = {
 /**
  *
  */
-export type ControlComponentProps<ValueType extends JsonValue = JsonValue> =
-  Omit<ControlProps, 'value'> & BaseControlComponentProps<ValueType>;
+export type ControlComponentProps<
+  ValueType extends JsonValue = JsonValue
+> = Omit<ControlProps, 'value'> & BaseControlComponentProps<ValueType>;
 
 export default function Control(props: ControlProps) {
   const {
@@ -68,7 +69,9 @@ export default function Control(props: ControlProps) {
 
   const ControlComponent = typeof type === 'string' ? controlMap[type] : type;
   if (!ControlComponent) {
-    return <>Unknown controlType: {type}</>;
+    // eslint-disable-next-line no-console
+    console.warn(`Unknown controlType: ${type}`);
+    return null;
   }
 
   return (

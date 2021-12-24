@@ -290,8 +290,12 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   render() {
-    const { showTrendLine, height, headerFontSize, subheaderFontSize } =
-      this.props;
+    const {
+      showTrendLine,
+      height,
+      headerFontSize,
+      subheaderFontSize,
+    } = this.props;
     const className = this.getClassName();
 
     if (showTrendLine) {

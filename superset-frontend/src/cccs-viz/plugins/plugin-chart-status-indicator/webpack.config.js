@@ -2,14 +2,14 @@ const webpack = require('webpack');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const parsedArgs = require('yargs').argv;
-const packageJson = require('./package.json');
+const packageJson = require('./package');
 
 // input dir
 const SRC_DIR = path.resolve(__dirname, './src');
 // output dir
 const BUILD_DIR = path.resolve(__dirname, './dist');
 
-const { mode = 'development', devserverPort = 9000 } = parsedArgs;
+const { mode = 'development', } = parsedArgs;
 const isDevMode = mode !== 'production';
 const peerDependencies = new Set(Object.keys(packageJson.peerDependencies));
 

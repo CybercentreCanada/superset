@@ -73,13 +73,19 @@ function AnnotationLayersList({
     addDangerToast,
   );
 
-  const [annotationLayerModalOpen, setAnnotationLayerModalOpen] =
-    useState<boolean>(false);
-  const [currentAnnotationLayer, setCurrentAnnotationLayer] =
-    useState<AnnotationLayerObject | null>(null);
+  const [
+    annotationLayerModalOpen,
+    setAnnotationLayerModalOpen,
+  ] = useState<boolean>(false);
+  const [
+    currentAnnotationLayer,
+    setCurrentAnnotationLayer,
+  ] = useState<AnnotationLayerObject | null>(null);
 
-  const [layerCurrentlyDeleting, setLayerCurrentlyDeleting] =
-    useState<AnnotationLayerObject | null>(null);
+  const [
+    layerCurrentlyDeleting,
+    setLayerCurrentlyDeleting,
+  ] = useState<AnnotationLayerObject | null>(null);
 
   const handleLayerDelete = ({ id, name }: AnnotationLayerObject) => {
     SupersetClient.delete({

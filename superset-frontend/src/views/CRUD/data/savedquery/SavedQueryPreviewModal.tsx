@@ -71,9 +71,7 @@ interface SavedQueryPreviewModalProps extends ToastProps {
   show: boolean;
 }
 
-const SavedQueryPreviewModal: FunctionComponent<
-  SavedQueryPreviewModalProps
-> = ({
+const SavedQueryPreviewModal: FunctionComponent<SavedQueryPreviewModalProps> = ({
   fetchData,
   onHide,
   openInSqlLab,
@@ -83,12 +81,16 @@ const SavedQueryPreviewModal: FunctionComponent<
   addDangerToast,
   addSuccessToast,
 }) => {
-  const { handleKeyPress, handleDataChange, disablePrevious, disableNext } =
-    useQueryPreviewState<SavedQueryObject>({
-      queries,
-      currentQueryId: savedQuery.id,
-      fetchData,
-    });
+  const {
+    handleKeyPress,
+    handleDataChange,
+    disablePrevious,
+    disableNext,
+  } = useQueryPreviewState<SavedQueryObject>({
+    queries,
+    currentQueryId: savedQuery.id,
+    fetchData,
+  });
 
   return (
     <div role="none" onKeyUp={handleKeyPress}>
