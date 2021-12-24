@@ -75,9 +75,9 @@ export default function setupFormatters() {
   decimals.forEach(decimal => {
     currencies.forEach(symbol => {
       getNumberFormatterRegistry().registerValue(
-        symbol + ',.' + decimal + 'f',
+        `${symbol},.${decimal}f`,
         createD3NumberFormatter({
-          formatString: '$,.' + decimal + 'f',
+          formatString: `$,.${decimal}f`,
           locale: {
             decimal: '.',
             thousands: ',',

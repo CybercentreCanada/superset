@@ -209,20 +209,19 @@ const MetricsControl = ({
     [value],
   );
 
-  const isAddNewMetricDisabled = useCallback(
-    () => !multi && value.length > 0,
-    [multi, value.length],
-  );
+  const isAddNewMetricDisabled = useCallback(() => !multi && value.length > 0, [
+    multi,
+    value.length,
+  ]);
 
   const savedMetricOptions = useMemo(
     () => getOptionsForSavedMetrics(savedMetrics, propsValue, null),
     [propsValue, savedMetrics],
   );
 
-  const newAdhocMetric = useMemo(
-    () => new AdhocMetric({ isNew: true }),
-    [value],
-  );
+  const newAdhocMetric = useMemo(() => new AdhocMetric({ isNew: true }), [
+    value,
+  ]);
   const addNewMetricPopoverTrigger = useCallback(
     trigger => {
       if (isAddNewMetricDisabled()) {
@@ -266,10 +265,10 @@ const MetricsControl = ({
     setValue(coerceAdhocMetrics(propsValue));
   }, [propsValue]);
 
-  const onDropLabel = useCallback(
-    () => handleChange(value),
-    [handleChange, value],
-  );
+  const onDropLabel = useCallback(() => handleChange(value), [
+    handleChange,
+    value,
+  ]);
 
   const valueRenderer = useCallback(
     (option, index) => (

@@ -47,8 +47,10 @@ export function findControlItem(
 
 const getMemoizedControlConfig = memoizeOne(
   (controlKey, controlPanelConfig) => {
-    const { controlOverrides = {}, controlPanelSections = [] } =
-      controlPanelConfig;
+    const {
+      controlOverrides = {},
+      controlPanelSections = [],
+    } = controlPanelConfig;
     const control = expandControlConfig(
       findControlItem(controlPanelSections, controlKey),
       controlOverrides,

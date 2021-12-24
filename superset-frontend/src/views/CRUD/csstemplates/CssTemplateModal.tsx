@@ -75,8 +75,10 @@ const CssTemplateModal: FunctionComponent<CssTemplateModalProps> = ({
   cssTemplate = null,
 }) => {
   const [disableSave, setDisableSave] = useState<boolean>(true);
-  const [currentCssTemplate, setCurrentCssTemplate] =
-    useState<TemplateObject | null>(null);
+  const [
+    currentCssTemplate,
+    setCurrentCssTemplate,
+  ] = useState<TemplateObject | null>(null);
   const [isHidden, setIsHidden] = useState<boolean>(true);
   const isEditMode = cssTemplate !== null;
 

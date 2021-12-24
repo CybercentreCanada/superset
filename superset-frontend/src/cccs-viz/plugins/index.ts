@@ -24,4 +24,3 @@ export { default as GwwkDatasetsChartPlugin } from './plugin-chart-gwwk-charts/s
 export { default as GwwkDashboardsChartPlugin } from './plugin-chart-gwwk-charts/src/Dashboards';
 export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
-export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';

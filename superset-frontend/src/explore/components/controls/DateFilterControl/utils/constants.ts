@@ -93,8 +93,7 @@ export const SINCE_MODE_OPTIONS: SelectOptionType[] = [
   { value: DEFAULT_RELATIVE_END_TIME, label: t('Midnight') },
 ];
 
-export const UNTIL_MODE_OPTIONS: SelectOptionType[] =
-  SINCE_MODE_OPTIONS.slice();
+export const UNTIL_MODE_OPTIONS: SelectOptionType[] = SINCE_MODE_OPTIONS.slice();
 
 export const COMMON_RANGE_SET: Set<CommonRangeType> = new Set([
   'Last day',
@@ -113,12 +112,12 @@ export const CALENDAR_RANGE_SET: Set<CalendarRangeType> = new Set([
 export const MOMENT_FORMAT = 'YYYY-MM-DD[T]HH:mm:ss';
 export const SEVEN_DAYS_AGO = moment()
   .utc()
-  .add(DEFAULT_RELATIVE_START_TIME == 'tomorrow' ? 1 : 0, 'days')
+  .add(DEFAULT_RELATIVE_START_TIME === 'tomorrow' ? 1 : 0, 'days')
   .startOf('day')
   .subtract(7, 'days')
   .format(MOMENT_FORMAT);
 export const MIDNIGHT = moment()
   .utc()
-  .add(DEFAULT_RELATIVE_END_TIME == 'tomorrow' ? 1 : 0, 'days')
+  .add(DEFAULT_RELATIVE_END_TIME === 'tomorrow' ? 1 : 0, 'days')
   .startOf('day')
   .format(MOMENT_FORMAT);

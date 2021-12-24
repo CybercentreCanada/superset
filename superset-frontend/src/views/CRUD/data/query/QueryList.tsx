@@ -91,8 +91,10 @@ function QueryList({ addDangerToast, addSuccessToast }: QueryListProps) {
     false,
   );
 
-  const [queryCurrentlyPreviewing, setQueryCurrentlyPreviewing] =
-    useState<QueryObject>();
+  const [
+    queryCurrentlyPreviewing,
+    setQueryCurrentlyPreviewing,
+  ] = useState<QueryObject>();
 
   const theme = useTheme();
 

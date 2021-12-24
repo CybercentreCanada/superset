@@ -52,15 +52,18 @@ const ColumnSelectPopover = ({
   onChange,
   onClose,
 }: ColumnSelectPopoverProps) => {
-  const [initialCalculatedColumn, initialSimpleColumn] =
-    editedColumn?.expression
-      ? [editedColumn, undefined]
-      : [undefined, editedColumn];
+  const [
+    initialCalculatedColumn,
+    initialSimpleColumn,
+  ] = editedColumn?.expression
+    ? [editedColumn, undefined]
+    : [undefined, editedColumn];
   const [selectedCalculatedColumn, setSelectedCalculatedColumn] = useState(
     initialCalculatedColumn,
   );
-  const [selectedSimpleColumn, setSelectedSimpleColumn] =
-    useState(initialSimpleColumn);
+  const [selectedSimpleColumn, setSelectedSimpleColumn] = useState(
+    initialSimpleColumn,
+  );
 
   const [calculatedColumns, simpleColumns] = useMemo(
     () =>

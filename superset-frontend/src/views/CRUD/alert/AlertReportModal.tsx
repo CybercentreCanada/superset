@@ -401,8 +401,10 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     conf?.ALERT_REPORTS_NOTIFICATION_METHODS || DEFAULT_NOTIFICATION_METHODS;
 
   const [disableSave, setDisableSave] = useState<boolean>(true);
-  const [currentAlert, setCurrentAlert] =
-    useState<Partial<AlertObject> | null>();
+  const [
+    currentAlert,
+    setCurrentAlert,
+  ] = useState<Partial<AlertObject> | null>();
   const [isHidden, setIsHidden] = useState<boolean>(true);
   const [contentType, setContentType] = useState<string>('dashboard');
   const [reportFormat, setReportFormat] = useState<string>(
@@ -423,8 +425,10 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     contentType === 'chart' &&
     (isFeatureEnabled(FeatureFlag.ALERTS_ATTACH_REPORTS) || isReport);
 
-  const [notificationAddState, setNotificationAddState] =
-    useState<NotificationAddStatus>('active');
+  const [
+    notificationAddState,
+    setNotificationAddState,
+  ] = useState<NotificationAddStatus>('active');
   const [notificationSettings, setNotificationSettings] = useState<
     NotificationSetting[]
   >([]);
@@ -570,25 +574,24 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
 
   // Fetch data to populate form dropdowns
   const loadOwnerOptions = useMemo(
-    () =>
-      (input = '', page: number, pageSize: number) => {
-        const query = rison.encode({
-          filter: input,
-          page,
-          page_size: pageSize,
-        });
-        return SupersetClient.get({
-          endpoint: `/api/v1/report/related/owners?q=${query}`,
-        }).then(response => ({
-          data: response.json.result.map(
-            (item: { value: number; text: string }) => ({
-              value: item.value,
-              label: item.text,
-            }),
-          ),
-          totalCount: response.json.count,
-        }));
-      },
+    () => (input = '', page: number, pageSize: number) => {
+      const query = rison.encode({
+        filter: input,
+        page,
+        page_size: pageSize,
+      });
+      return SupersetClient.get({
+        endpoint: `/api/v1/report/related/owners?q=${query}`,
+      }).then(response => ({
+        data: response.json.result.map(
+          (item: { value: number; text: string }) => ({
+            value: item.value,
+            label: item.text,
+          }),
+        ),
+        totalCount: response.json.count,
+      }));
+    },
     [],
   );
 
@@ -623,26 +626,25 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   };
 
   const loadSourceOptions = useMemo(
-    () =>
-      (input = '', page: number, pageSize: number) => {
-        const query = rison.encode({
-          filter: input,
-          page,
-          page_size: pageSize,
-        });
-        return SupersetClient.get({
-          endpoint: `/api/v1/report/related/database?q=${query}`,
-        }).then(response => {
-          const list = response.json.result.map(
-            (item: { value: number; text: string }) => ({
-              value: item.value,
-              label: item.text,
-            }),
-          );
-          setSourceOptions(list);
-          return { data: list, totalCount: response.json.count };
-        });
-      },
+    () => (input = '', page: number, pageSize: number) => {
+      const query = rison.encode({
+        filter: input,
+        page,
+        page_size: pageSize,
+      });
+      return SupersetClient.get({
+        endpoint: `/api/v1/report/related/database?q=${query}`,
+      }).then(response => {
+        const list = response.json.result.map(
+          (item: { value: number; text: string }) => ({
+            value: item.value,
+            label: item.text,
+          }),
+        );
+        setSourceOptions(list);
+        return { data: list, totalCount: response.json.count };
+      });
+    },
     [],
   );
 
@@ -656,26 +658,25 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   }, [databaseLabel, getSourceData]);
 
   const loadDashboardOptions = useMemo(
-    () =>
-      (input = '', page: number, pageSize: number) => {
-        const query = rison.encode({
-          filter: input,
-          page,
-          page_size: pageSize,
-        });
-        return SupersetClient.get({
-          endpoint: `/api/v1/report/related/dashboard?q=${query}`,
-        }).then(response => {
-          const list = response.json.result.map(
-            (item: { value: number; text: string }) => ({
-              value: item.value,
-              label: item.text,
-            }),
-          );
-          setDashboardOptions(list);
-          return { data: list, totalCount: response.json.count };
-        });
-      },
+    () => (input = '', page: number, pageSize: number) => {
+      const query = rison.encode({
+        filter: input,
+        page,
+        page_size: pageSize,
+      });
+      return SupersetClient.get({
+        endpoint: `/api/v1/report/related/dashboard?q=${query}`,
+      }).then(response => {
+        const list = response.json.result.map(
+          (item: { value: number; text: string }) => ({
+            value: item.value,
+            label: item.text,
+          }),
+        );
+        setDashboardOptions(list);
+        return { data: list, totalCount: response.json.count };
+      });
+    },
     [],
   );
 
@@ -730,27 +731,26 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   }, [getChartData, noChartLabel]);
 
   const loadChartOptions = useMemo(
-    () =>
-      (input = '', page: number, pageSize: number) => {
-        const query = rison.encode({
-          filter: input,
-          page,
-          page_size: pageSize,
-        });
-        return SupersetClient.get({
-          endpoint: `/api/v1/report/related/chart?q=${query}`,
-        }).then(response => {
-          const list = response.json.result.map(
-            (item: { value: number; text: string }) => ({
-              value: item.value,
-              label: item.text,
-            }),
-          );
+    () => (input = '', page: number, pageSize: number) => {
+      const query = rison.encode({
+        filter: input,
+        page,
+        page_size: pageSize,
+      });
+      return SupersetClient.get({
+        endpoint: `/api/v1/report/related/chart?q=${query}`,
+      }).then(response => {
+        const list = response.json.result.map(
+          (item: { value: number; text: string }) => ({
+            value: item.value,
+            label: item.text,
+          }),
+        );
 
-          setChartOptions(list);
-          return { data: list, totalCount: response.json.count };
-        });
-      },
+        setChartOptions(list);
+        return { data: list, totalCount: response.json.count };
+      });
+    },
     [],
   );
 
