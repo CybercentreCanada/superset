@@ -25,3 +25,6 @@ export { default as GwwkDashboardsChartPlugin } from './plugin-chart-gwwk-charts
 export { default as IframeDemoChartPlugin } from './plugin-chart-iframe-demo/src/plugin';
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
 export { default as StatusIndicatorChartPlugin } from './plugin-chart-status-indicator/src/chart';
+export { default as AtAGlanceChartPlugin } from './plugin-chart-at-a-glance/src/plugin';
+export { default as AtAGlanceUserIdChartPlugin } from './plugin-chart-at-a-glance-user-id/src/plugin';
+export { default as ApplicationLinksChartPlugin } from './plugin-chart-application-links/src/plugin';
