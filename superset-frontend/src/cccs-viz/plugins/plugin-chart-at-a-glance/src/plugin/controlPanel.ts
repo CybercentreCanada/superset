@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- import { t, validateNonEmpty } from '@superset-ui/core';
- import { ControlPanelConfig } from '@superset-ui/chart-controls';
+import { t } from '@superset-ui/core';
+import { ControlPanelConfig } from '@superset-ui/chart-controls';
 
- const config: ControlPanelConfig = {
-   /**
+const config: ControlPanelConfig = {
+  /**
     * The control panel is split into two tabs: "Query" and
     * "Chart Options". The controls that define the inputs to
     * the chart data request, such as columns and metrics, usually
@@ -94,30 +94,14 @@
     * - validateNumber: must be an intger or decimal value
     */
 
-   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
-   controlPanelSections: [
-     {
-       label: t('Query'),
-       expanded: true,
-       controlSetRows: [['metrics'], ['adhoc_filters'], ['row_limit', null]],
-     },
-   ], 
-   controlOverrides: {
-     series: {
-       validators: [validateNonEmpty],
-       clearable: false,
-     },
-     viz_type: {
-      default: 'at_a_glance'
+  // For control input types, see: superset-frontend/src/explore/components/controls/index.js
+  controlPanelSections: [
+    {
+      label: t('Query'),
+      expanded: true,
+      controlSetRows: [['metrics'], ['adhoc_filters'], ['row_limit', null]],
     },
-    time_range: {
-      default: t('Last hour'),
-    },
-     row_limit: {
-       default: 1,
-     },
-   },
- };
+  ],
+};
 
- export default config;
-
+export default config;
