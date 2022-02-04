@@ -39,6 +39,7 @@ from superset.utils.core import (
     extract_dataframe_dtypes,
     get_metric_name
 )
+from superset.common.query_context import QueryContext
 
 config = app.config
 logger = logging.getLogger(__name__)
@@ -290,7 +291,10 @@ def apply_post_process(
 ) -> Dict[Any, Any]:
     form_data = form_data or {}
 
-    viz_type = form_data.get("viz_type", "") if form_data.get("viz_type", "") else result.get("query_context", {}).get("viz_type", "")
+    viz_type = form_data.get("viz_type", "")
+    if not viz_type:
+        viz_type = result.get("query_context", QueryContext).viz_type if result.get("query_context", QueryContext).viz_type else ""
+
     if viz_type not in post_processors:
         return result
 
