@@ -280,6 +280,16 @@ export default class SelectControl extends React.PureComponent {
         (this.props.default !== undefined ? this.props.default : undefined),
     };
 
+    const assistiveTextContents = inputArray => {
+      if (inputArray !== null) {
+        if (inputArray.length === 0) {
+          return '';
+        }
+        return `${inputArray.length} option(s)`;
+      }
+      return '';
+    };
+
     const deprecatedProps = {
       autoFocus,
       'aria-label': label,
@@ -302,7 +312,7 @@ export default class SelectControl extends React.PureComponent {
       value: getValue(),
       options: this.state.options,
       placeholder,
-      assistiveText: '',
+      assistiveText: assistiveTextContents(value),
       promptTextCreator,
       selectRef: this.getSelectRef,
       valueKey,
