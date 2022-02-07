@@ -213,6 +213,7 @@ const config: ControlPanelConfig = {
             name: 'columns',
             override: {
               visibility: isRawMode,
+<<<<<<< HEAD
               mapStateToProps: (state: ControlPanelState, controlState: ControlState) => {
                 const { controls } = state;
                 const originalMapStateToProps = sharedControls?.columns?.mapStateToProps;
@@ -221,6 +222,23 @@ const config: ControlPanelConfig = {
                 newState.externalValidationErrors = isRawMode({ controls }) && ensureIsArray(controlState.value).length === 0
                   ? [t('must have a value')]
                   : [];
+=======
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const { controls } = state;
+                const originalMapStateToProps =
+                  sharedControls?.columns?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =
+                  // @ts-ignore
+                  isRawMode({ controls }) &&
+                  ensureIsArray(controlState.value).length === 0
+                    ? [t('must have a value')]
+                    : [];
+>>>>>>> 24b510551... CLDN-1231: uncomment lines that were commented out for the 1.4 upgrade (#88)
                 return newState;
               },
             },
