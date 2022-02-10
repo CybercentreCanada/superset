@@ -27,8 +27,12 @@ export default function ApplicationLinks(props: ApplicationsProps) {
       `http://${location.host}/api/v1/proxy/alfred/${callback_url}/${appVal}`,
     )
       .then(res => res.json())
-      .then((response: { payload: { data: any[] } }) => {
-        setAlfredCount(response.payload.data.length);
+      .then(response => {
+        if (response !== null && response.payload !== undefined) {
+          setAlfredCount(response.payload.data?.length);
+        } else {
+          setAlfredCount(0);
+        }
       })
       .catch(e => {
         // eslint-disable-next-line no-console
