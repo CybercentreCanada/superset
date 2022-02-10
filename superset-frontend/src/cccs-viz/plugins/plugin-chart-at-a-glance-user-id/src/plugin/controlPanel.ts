@@ -108,7 +108,7 @@ const config: ControlPanelConfig = {
       clearable: false,
     },
     viz_type: {
-      default: 'at_a_glance',
+      default: 'at_a_glance_user_id',
     },
     time_range: {
       default: t('Last hour'),

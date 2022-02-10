@@ -40,11 +40,20 @@ export default function buildQuery(formData: QueryFormData) {
 
   return buildQueryContext(formData, baseQueryObject => {
     // RAW mode (not aggregated)
-    // eslint-disable-next-line no-param-reassign
-    baseQueryObject.metrics = undefined;
+    let { filters = [] } = baseQueryObject;
+    if (formData.formData.extraFormData.filters?.length > 0) {
+      // eslint-disable-next-line prefer-destructuring
+      filters = formData.formData.extraFormData.filters;
+    }
+    const queryObject = {
+      ...baseQueryObject,
+      metrics: undefined,
+      filters,
+    };
 
-    return [{
-        ...baseQueryObject,
+    return [
+      {
+        ...queryObject,
       },
     ];
   });

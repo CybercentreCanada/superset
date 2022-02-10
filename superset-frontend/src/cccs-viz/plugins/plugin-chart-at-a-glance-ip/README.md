@@ -1,4 +1,4 @@
-## @superset-ui/plugin-chart-at-a-glance
+## @superset-ui/plugin-chart-at-a-glance-ip
 
 
 
@@ -9,9 +9,9 @@ This plugin provides At A Glance for Superset.
 Configure `key`, which can be any `string`, and register the plugin. This `key` will be used to lookup this chart throughout the app.
 
 ```js
-import AtAGlanceChartPlugin from '@superset-ui/plugin-chart-at-a-glance';
+import AtAGlanceChartPlugin from '@superset-ui/plugin-chart-at-a-glance-ip';
 new AtAGlanceChartPlugin()
-  .configure({ key: 'at-a-glance' })
+  .configure({ key: 'at_a_glance_ip' })
   .register();
 ```
 
@@ -19,7 +19,7 @@ Then use it via `SuperChart`. See [storybook](https://apache-superset.github.io/
 
 ```js
 <SuperChart
-  chartType="at-a-glance"
+  chartType="at_a_glance_ip"
   width={600}
   height={600}
   formData={...}
@@ -32,22 +32,24 @@ Then use it via `SuperChart`. See [storybook](https://apache-superset.github.io/
 ### File structure generated
 
 ```
-├── package.json
 ├── README.md
-├── tsconfig.json
 ├── src
-│   ├── AtAGlance.tsx
+│   ├── AtAGlanceIP.tsx
 │   ├── images
-│   │   └── thumbnail.png
+│   │   ├── thumbnail.png
+│   │   └── thumbnail.png:Zone.Identifier
 │   ├── index.ts
 │   ├── plugin
 │   │   ├── buildQuery.ts
 │   │   ├── controlPanel.ts
 │   │   ├── index.ts
 │   │   └── transformProps.ts
-│   └── types.ts
+│   └── styles.js
 ├── test
-│   └── index.test.ts
+│   ├── index.test.ts
+│   └── plugin
+│       ├── buildQuery.test.ts
+│       └── transformProps.test.ts
 └── types
     └── external.d.ts
 ```

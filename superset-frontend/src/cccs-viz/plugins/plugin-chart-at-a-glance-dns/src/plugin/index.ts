@@ -21,7 +21,7 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 
-export default class AtAGlanceChartPlugin extends ChartPlugin {
+export default class AtAGlanceChartDnsPlugin extends ChartPlugin {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library
@@ -34,15 +34,15 @@ export default class AtAGlanceChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'At A Glance',
-      name: t('At A Glance'),
+      description: 'At A Glance IP DNS Information',
+      name: t('At A Glance IP DNS'),
       thumbnail,
       behaviors: [Behavior.INTERACTIVE_CHART],
     });
 
     super({
       controlPanel,
-      loadChart: () => import('../AtAGlance'),
+      loadChart: () => import('../AtAGlanceDns'),
       metadata,
       transformProps,
     });

@@ -16,8 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
-import { ControlPanelConfig } from '@superset-ui/chart-controls';
+import { t, ensureIsArray } from '@superset-ui/core';
+import {
+  ControlPanelConfig,
+  ControlPanelState,
+  ControlState,
+  sharedControls,
+  sections,
+} from '@superset-ui/chart-controls';
 
 const config: ControlPanelConfig = {
   /**
@@ -96,10 +102,38 @@ const config: ControlPanelConfig = {
 
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
+    sections.legacyTimeseriesTime,
     {
       label: t('Query'),
       expanded: true,
-      controlSetRows: [['metrics'], ['adhoc_filters'], ['row_limit', null]],
+      controlSetRows: [
+        ['metrics'],
+        ['adhoc_filters'],
+        ['row_limit', null],
+        [
+          {
+            name: 'columns',
+            override: {
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.columns?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                // @ts-ignore
+                newState.externalValidationErrors =
+                  // isRawMode({ controls }) &&
+                  ensureIsArray(controlState.value).length === 0
+                    ? [t('must have a value')]
+                    : [];
+                return newState;
+              },
+            },
+          },
+        ],
+      ],
     },
   ],
 };
