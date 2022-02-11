@@ -88,6 +88,7 @@ import {
   AtAGlanceChartIpPlugin,
   AtAGlanceChartDnsPlugin,
   AtAGlanceUserIdChartPlugin,
+  AtAGlanceUserIDSasChartPlugin,
   ApplicationLinksChartPlugin,
 } from 'src/cccs-viz/plugins/';
 
@@ -108,6 +109,9 @@ export default class MainPreset extends Preset {
       plugins: [
         new AtAGlanceUserIdChartPlugin().configure({
           key: 'at_a_glance_user_id',
+        }),
+        new AtAGlanceUserIDSasChartPlugin().configure({
+          key: 'at_a_glance_user_id_sas',
         }),
         new ApplicationLinksChartPlugin().configure({
           key: 'application_links',
