@@ -16,8 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
-import { ControlPanelConfig } from '@superset-ui/chart-controls';
+import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
+import {
+  ControlPanelConfig,
+  ControlPanelState,
+  ControlState,
+  sharedControls,
+} from '@superset-ui/chart-controls';
 
 const config: ControlPanelConfig = {
   /**
@@ -100,60 +105,27 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        ['groupby'],
-        ['metrics'],
         ['adhoc_filters'],
-        ['row_limit', null],
-      ],
-    },
-    {
-      label: t('Hello Controls!'),
-      expanded: true,
-      controlSetRows: [
         [
           {
-            name: 'header_text',
-            config: {
-              type: 'TextControl',
-              default: 'Hello, World!',
-              renderTrigger: true,
-              // ^ this makes it apply instantaneously, without triggering a "run query" button
-              label: t('Header Text'),
-              description: t('The text you want to see in the header'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'bold_text',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Bold Text'),
-              renderTrigger: true,
-              default: true,
-              description: t('A checkbox to make the '),
-            },
-          },
-        ],
-        [
-          {
-            name: 'header_font_size',
-            config: {
-              type: 'SelectControl',
-              label: t('Font Size'),
-              default: 'xl',
-              choices: [
-                // [value, label]
-                ['xxs', 'xx-small'],
-                ['xs', 'x-small'],
-                ['s', 'small'],
-                ['m', 'medium'],
-                ['l', 'large'],
-                ['xl', 'x-large'],
-                ['xxl', 'xx-large'],
-              ],
-              renderTrigger: true,
-              description: t('The size of your header font'),
+            name: 'columns',
+            override: {
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.columns?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                // @ts-ignore
+                newState.externalValidationErrors =
+                  // isRawMode({ controls }) &&
+                  ensureIsArray(controlState.value).length === 0
+                    ? [t('must have a value')]
+                    : [];
+                return newState;
+              },
             },
           },
         ],
