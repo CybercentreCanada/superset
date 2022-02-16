@@ -21,7 +21,7 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 
-export default class AtAGlanceUserIDSasChartPlugin extends ChartPlugin {
+export default class AtAGlanceUserIdSasChartPlugin extends ChartPlugin {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library
@@ -34,8 +34,8 @@ export default class AtAGlanceUserIDSasChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'At A Glance User ID Sas',
-      name: t('At A Glance User ID Sas'),
+      description: 'At A Glance User ID SAS',
+      name: t('At A Glance User ID SAS'),
       thumbnail,
       behaviors: [Behavior.INTERACTIVE_CHART],
     });

@@ -21,7 +21,7 @@ import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 
-export default class AtAGlanceUserIDChartPlugin extends ChartPlugin {
+export default class AtAGlanceUserIdChartPlugin extends ChartPlugin {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { AtAGlanceUserIDSasChartPlugin } from '../src';
+import { AtAGlanceUserIdSasChartPlugin } from '../src';
 
 /**
  * The example tests in this file act as a starting point, and
@@ -28,6 +28,6 @@ import { AtAGlanceUserIDSasChartPlugin } from '../src';
   */
 describe('@superset-ui/plugin-chart-at-a-glance', () => {
   it('exists', () => {
-    expect(AtAGlanceUserIDSasChartPlugin).toBeDefined();
+    expect(AtAGlanceUserIdSasChartPlugin).toBeDefined();
   });
 });

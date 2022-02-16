@@ -54,12 +54,12 @@ const getPayloadField = (field: string, payload: any) => {
 
 // Main Component
 function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
-  const [userIDString, setUserIDString] = useState('coolguy@some.com,');
+  const [userIDString, setUserIDString] = useState('user@domain.invalid,');
 
   let canadianIpsList: any[] = [];
   let nonCanadianIpsList: any[] = [];
-  let nonSucsessfulCanadianIpsList: any[] = [];
-  let nonSucsessfulNonCanadianIpsList: any[] = [];
+  let unSucsessfulCanadianIpsList: any[] = [];
+  let unSucsessfulNonCanadianIpsList: any[] = [];
 
   const [aadDataManager, setAadDataManger] = useState<DataManager>({
     formData: initialFormData,
@@ -79,51 +79,55 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
   ) {
     const filter = initialFormData.formData.extraFormData.filters[i];
     if (filter.col === 'user_id') {
-      const localuserID: string = filter.val[0];
-      if (localuserID !== userIDString) {
+      const localuserId: string = filter.val[0];
+      if (localuserId !== userIDString) {
         setAadDataManger({
           ...aadDataManager,
           data: initialFormData.data,
           formData: initialFormData,
         });
-        setUserIDString(localuserID);
+        setUserIDString(localuserId);
         hasFiltered = false;
       }
       break;
     }
   }
 
+  const COUNTRY_NAME_FIELD = 'client_ip_cbs_geo_country_name';
+  const CANADA = 'canada';
+  const OPERATION = 'operation';
+  const USER_LOGGED_IN = 'UserLoggedIn';
   if (
     !aadDataManager.isLoading ||
     (aadDataManager.isInit && hasFiltered === false)
   ) {
     canadianIpsList = aadDataManager.data.filter(function (item) {
       return (
-        getPayloadField('client_ip_cbs_geo_country_name', item) === 'canada' &&
-        getPayloadField('operation', item) === 'UserLoggedIn'
+        getPayloadField(COUNTRY_NAME_FIELD, item) === CANADA &&
+        getPayloadField(OPERATION, item) === USER_LOGGED_IN
       );
     });
 
     nonCanadianIpsList = aadDataManager.data.filter(function (item) {
       return (
-        getPayloadField('client_ip_cbs_geo_country_name', item) !== 'canada' &&
-        getPayloadField('operation', item) === 'UserLoggedIn'
+        getPayloadField(COUNTRY_NAME_FIELD, item) !== CANADA &&
+        getPayloadField(OPERATION, item) === USER_LOGGED_IN
       );
     });
 
-    nonSucsessfulCanadianIpsList = aadDataManager.data.filter(function (item) {
+    unSucsessfulCanadianIpsList = aadDataManager.data.filter(function (item) {
       return (
-        getPayloadField('client_ip_cbs_geo_country_name', item) === 'canada' &&
-        getPayloadField('operation', item) !== 'UserLoggedIn'
+        getPayloadField(COUNTRY_NAME_FIELD, item) === CANADA &&
+        getPayloadField(OPERATION, item) !== USER_LOGGED_IN
       );
     });
 
-    nonSucsessfulNonCanadianIpsList = aadDataManager.data.filter(function (
+    unSucsessfulNonCanadianIpsList = aadDataManager.data.filter(function (
       item,
     ) {
       return (
-        getPayloadField('client_ip_cbs_geo_country_name', item) !== 'canada' &&
-        getPayloadField('operation', item) !== 'UserLoggedIn'
+        getPayloadField(COUNTRY_NAME_FIELD, item) !== CANADA &&
+        getPayloadField(OPERATION, item) !== USER_LOGGED_IN
       );
     });
 
@@ -216,7 +220,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                     Number of Unsuccessful Canadian Login Attempts :{' '}
                     {aadDataManager.isLoading
                       ? 'Loading'
-                      : nonSucsessfulCanadianIpsList.length}{' '}
+                      : unSucsessfulCanadianIpsList.length}{' '}
                   </span>
                 }
                 key="3"
@@ -225,7 +229,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                   <></>
                 ) : (
                   <ul>
-                    {nonSucsessfulCanadianIpsList.map(
+                    {unSucsessfulCanadianIpsList.map(
                       (a: { client_ip: string }) => (
                         <li>{a.client_ip}</li>
                       ),
@@ -240,7 +244,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                     Number of Unsuccessful non Canadian Login Attempts :{' '}
                     {aadDataManager.isLoading
                       ? 'Loading'
-                      : nonSucsessfulNonCanadianIpsList.length}{' '}
+                      : unSucsessfulNonCanadianIpsList.length}{' '}
                   </span>
                 }
                 key="4"
@@ -249,7 +253,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                   <></>
                 ) : (
                   <ul>
-                    {nonSucsessfulNonCanadianIpsList.map(
+                    {unSucsessfulNonCanadianIpsList.map(
                       (a: { client_ip: string }) => (
                         <li>{a.client_ip}</li>
                       ),

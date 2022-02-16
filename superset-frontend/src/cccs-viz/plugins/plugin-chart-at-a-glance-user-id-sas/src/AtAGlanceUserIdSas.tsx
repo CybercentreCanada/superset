@@ -4,8 +4,8 @@ import { QueryFormData } from '@superset-ui/core';
 import Collapse from 'src/components/Collapse';
 
 // Main Component
-const AtAGlanceUserIDSasCore = (initialFormData: QueryFormData) => {
-  const [userIDString, setUserIDString] = useState('user@domain.invalid,');
+const AtAGlanceUserIdSasCore = (initialFormData: QueryFormData) => {
+  const [userIDString, setUserIdString] = useState('user@domain.invalid,');
   const [data, setData] = useState(initialFormData.data);
 
   for (
@@ -16,10 +16,10 @@ const AtAGlanceUserIDSasCore = (initialFormData: QueryFormData) => {
   ) {
     const filter = initialFormData.formData.extraFormData.filters[i];
     if (filter.col === 'user_id') {
-      const localuserID: string = filter.val[0];
-      if (localuserID !== userIDString) {
+      const localuserId: string = filter.val[0];
+      if (localuserId !== userIDString) {
         setData(initialFormData.data);
-        setUserIDString(localuserID);
+        setUserIdString(localuserId);
       }
       break;
     }
@@ -62,4 +62,4 @@ const AtAGlanceUserIDSasCore = (initialFormData: QueryFormData) => {
   );
 };
 
-export default AtAGlanceUserIDSasCore;
+export default AtAGlanceUserIdSasCore;

@@ -126,7 +126,7 @@ const config: ControlPanelConfig = {
                 newState.externalValidationErrors =
                   // isRawMode({ controls }) &&
                   ensureIsArray(controlState.value).length === 0
-                    ? [t('must have a value')]
+                    ? [t('This control must have a value.')]
                     : [];
                 return newState;
               },

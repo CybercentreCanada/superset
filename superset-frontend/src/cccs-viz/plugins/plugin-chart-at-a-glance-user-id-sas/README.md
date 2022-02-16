@@ -1,6 +1,6 @@
 ## @superset-ui/plugin-chart-at-a-glance-sas
 
-This plugin provides At A Glance User Id for Superset.
+This plugin provides At A Glance User ID for Superset.
 
 ### Usage
 

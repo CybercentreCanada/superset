@@ -162,7 +162,7 @@ const config: ControlPanelConfig = {
                 // @ts-ignore
                 newState.externalValidationErrors =
                   ensureIsArray(controlState.value).length === 0
-                    ? [t('must have a value')]
+                    ? [t('This control must have a value.')]
                     : [];
                 return newState;
               },
@@ -185,15 +185,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-
-        [
-          {
-            name: 'adhoc_filters',
-            override: {
-              // validators: [adhocFilterValidator],
-            },
-          },
-        ],
+        ['adhoc_filters'],
         [
           {
             name: 'row_limit',

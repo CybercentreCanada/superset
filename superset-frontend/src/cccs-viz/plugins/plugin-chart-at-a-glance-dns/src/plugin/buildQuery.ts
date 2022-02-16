@@ -34,7 +34,8 @@ import { buildQueryContext, QueryFormData } from '@superset-ui/core';
  */
 export default function buildQuery(formData: QueryFormData) {
   /*
-   We receive an ip as a filter, our job is to find everthing there is to know about that ip
+   We receive an IP as a filter. Our job is to find everything there is to know
+   about that IP.
    We fire multiple queries to multiple data sets and collect the results here.
    */
 

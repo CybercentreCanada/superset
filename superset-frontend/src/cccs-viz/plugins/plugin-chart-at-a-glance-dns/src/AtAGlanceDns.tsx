@@ -44,9 +44,9 @@ const AtAGlanceCoreDns = (initialFormData: QueryFormData) => {
   ) {
     const filter = initialFormData.formData.extraFormData.filters[i];
     if (filter.col === IP_STRING) {
-      const localip: string = filter.val[0];
-      if (localip !== ipString) {
-        setIpString(localip);
+      const localIp: string = filter.val[0];
+      if (localIp !== ipString) {
+        setIpString(localIp);
         setDisplayData(initialFormData.data);
       }
       break;

@@ -53,7 +53,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
           />
           {alfredCount > 0 ? (
             <p>
-              Alfred has seen this {infoType} {alfredCount} time(s), search the{' '}
+              Alfred has seen this {infoType} {alfredCount} time(s).  Search the{' '}
               <a href={url} target="_blank" rel="noreferrer">
                 Alfred
               </a>{' '}
@@ -61,7 +61,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
             </p>
           ) : (
             <p>
-              Alfred has not seen this {infoType}, search the{' '}
+              Alfred has not seen this {infoType}.  Search the{' '}
               <a href={url} target="_blank" rel="noreferrer">
                 Alfred
               </a>{' '}
