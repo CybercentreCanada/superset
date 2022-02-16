@@ -11,7 +11,8 @@ type DataManager = {
   isError: boolean;
 };
 
-// TODO: Fix this so links between dashboards will work again
+// TODO: https://cccs.atlassian.net/browse/CLDN-1258
+// Fix this so links between dashboards will work again
 // const IP_DASHBOARD_ID = 19;
 // const IP_FILTER_ID = 'vxX3zR2Tz';
 // const SUPERSET_URL = 'http://localhost:9000';
@@ -177,7 +178,8 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                   <ul>
                     {canadianIpsList.map((a: { client_ip: string }) => (
                       <li>
-                        {/* TODO: Add link back in
+                        {/* TODO: https://cccs.atlassian.net/browse/CLDN-1258
+                        Add link back in
                         <a
                           href={IP_DASHBOARD_LINK.replaceAll(
                             'PLEASEREPLACETHIS',
