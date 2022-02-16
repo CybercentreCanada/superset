@@ -169,6 +169,7 @@ class DatabaseSchema(Schema):
     allows_subquery = fields.Bool()
     allows_cost_estimate = fields.Bool()
     allows_virtual_table_explore = fields.Bool()
+    allows_preview_data = fields.Bool()
     explore_database_id = fields.Int()
 
 
