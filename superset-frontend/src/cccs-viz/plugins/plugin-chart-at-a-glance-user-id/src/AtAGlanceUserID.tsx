@@ -58,8 +58,8 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
 
   let canadianIpsList: any[] = [];
   let nonCanadianIpsList: any[] = [];
-  let unSucsessfulCanadianIpsList: any[] = [];
-  let unSucsessfulNonCanadianIpsList: any[] = [];
+  let unsuccessfulCanadianIpsList: any[] = [];
+  let unsuccessfulNonCanadianIpsList: any[] = [];
 
   const [aadDataManager, setAadDataManger] = useState<DataManager>({
     formData: initialFormData,
@@ -79,14 +79,14 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
   ) {
     const filter = initialFormData.formData.extraFormData.filters[i];
     if (filter.col === 'user_id') {
-      const localuserId: string = filter.val[0];
-      if (localuserId !== userIDString) {
+      const localUserId: string = filter.val[0];
+      if (localUserId !== userIDString) {
         setAadDataManger({
           ...aadDataManager,
           data: initialFormData.data,
           formData: initialFormData,
         });
-        setUserIDString(localuserId);
+        setUserIDString(localUserId);
         hasFiltered = false;
       }
       break;
@@ -115,14 +115,14 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
       );
     });
 
-    unSucsessfulCanadianIpsList = aadDataManager.data.filter(function (item) {
+    unsuccessfulCanadianIpsList = aadDataManager.data.filter(function (item) {
       return (
         getPayloadField(COUNTRY_NAME_FIELD, item) === CANADA &&
         getPayloadField(OPERATION, item) !== USER_LOGGED_IN
       );
     });
 
-    unSucsessfulNonCanadianIpsList = aadDataManager.data.filter(function (
+    unsuccessfulNonCanadianIpsList = aadDataManager.data.filter(function (
       item,
     ) {
       return (
@@ -220,7 +220,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                     Number of Unsuccessful Canadian Login Attempts :{' '}
                     {aadDataManager.isLoading
                       ? 'Loading'
-                      : unSucsessfulCanadianIpsList.length}{' '}
+                      : unsuccessfulCanadianIpsList.length}{' '}
                   </span>
                 }
                 key="3"
@@ -229,7 +229,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                   <></>
                 ) : (
                   <ul>
-                    {unSucsessfulCanadianIpsList.map(
+                    {unsuccessfulCanadianIpsList.map(
                       (a: { client_ip: string }) => (
                         <li>{a.client_ip}</li>
                       ),
@@ -244,7 +244,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                     Number of Unsuccessful non Canadian Login Attempts :{' '}
                     {aadDataManager.isLoading
                       ? 'Loading'
-                      : unSucsessfulNonCanadianIpsList.length}{' '}
+                      : unsuccessfulNonCanadianIpsList.length}{' '}
                   </span>
                 }
                 key="4"
@@ -253,7 +253,7 @@ function AtAGlanceUserIDCore(initialFormData: QueryFormData) {
                   <></>
                 ) : (
                   <ul>
-                    {unSucsessfulNonCanadianIpsList.map(
+                    {unsuccessfulNonCanadianIpsList.map(
                       (a: { client_ip: string }) => (
                         <li>{a.client_ip}</li>
                       ),
