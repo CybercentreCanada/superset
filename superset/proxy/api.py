@@ -63,7 +63,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         #         "refresh_token": refresh_token
         #     }
 
-        #     # URL encoding: client secret must be URL encoded, but grant_type and scope must not be encoded
+        #     # URL encoding: client secret must be URL encoded, but
+        #     # grant_type and scope must not be encoded
         #     refresh_data = '&'.join(["{}={}".format(k, v) for k, v in refresh_params.items()])
         #     try:
         #         refresh_resp = requests.post(url, data = refresh_data)
@@ -105,15 +106,15 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         #     print(refresh_resp_json)
         # return self.response(200,payload=refresh_resp_json)
 
-        testJSON = {"data": ["A", "B", "C"]}
-        return self.response(200, payload=testJSON)
+        test_JSON = {"data": ["A", "B", "C"]}
+        return self.response(200, payload=test_JSON)
 
     @expose("/alfred/ip_string/<string:id>", methods=["GET"])
     @event_logger.log_this_with_context(
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get",
         log_to_statsd=False,  # pylint: disable-arguments-renamed
     )
-    def get_ipstring(self, ip: str, **kwargs: Any) -> Response:
+    def get_ipstring(self, ip_string: str, **kwargs: Any) -> Response:
         """
         Placeholder until we work out everything this function is going to do.
         """
@@ -139,7 +140,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         #         "refresh_token": refresh_token
         #     }
 
-        #     # URL encoding: client secret must be URL encoded, but grant_type and scope must not be encoded
+        #     # URL encoding: client secret must be URL encoded, but
+        #     # grant_type and scope must not be encoded
         #     refresh_data = '&'.join(["{}={}".format(k, v) for k, v in refresh_params.items()])
         #     try:
         #         refresh_resp = requests.post(url, data = refresh_data)
@@ -171,7 +173,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         #     headers = CaseInsensitiveDict()
         #     headers["Accept"] = "application/json"
         #     headers["Authorization"] = f"Bearer { alfred_token }"
-        #     url = "https://alfred-tst.u.chimera.azure.cyber.gc.ca:9488/rest/search/cypher?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22" + ip + "%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri"
+        #     url = "https://alfred-tst.u.chimera.azure.cyber.gc.ca:9488/rest/search/cypher?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22" + ip_string + "%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri"
         #     alfred_resp = ""
         #     try:
         #         alfred_resp = requests.get(url, headers=headers)
@@ -181,5 +183,5 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         #     print(refresh_resp_json)
         # return self.response(200,payload=refresh_resp_json)
 
-        testJSON = {"data": ["A", "B", "C"]}
-        return self.response(200, payload=testJSON)
+        test_JSON = {"data": ["A", "B", "C"]}
+        return self.response(200, payload=test_JSON)
