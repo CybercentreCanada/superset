@@ -37,6 +37,7 @@ import {
   PivotTableStylesProps,
   SelectedFiltersType,
 } from './types';
+import { Tree, TreeNode } from './react-pivottable/utilities/tree';
 
 const Styles = styled.div<PivotTableStylesProps>`
   ${({ height, width, margin }) => `
@@ -276,6 +277,8 @@ export default function PivotTableChart(props: PivotTableProps) {
       isGrandTotal: boolean,
     ) => {
       if (isSubtotal || isGrandTotal || !emitFilter) {
+        console.log(JSON.stringify(filters))
+        console.log("CTLR+Click?: " + e.ctrlKey)
         return;
       }
 
@@ -289,26 +292,37 @@ export default function PivotTableChart(props: PivotTableProps) {
       if (filtersEntries.length === 0) {
         return;
       }
-
       const [key, val] = filtersEntries[filtersEntries.length - 1];
+      
+      //treeNode 
+      let filterEntriesTree : Tree  = {}
 
+      // Build updatedFilters Tree structure from  map
       let updatedFilters = { ...(selectedFilters || {}) };
-      // multi select
-      // if (selectedFilters && isActiveFilterValue(key, val)) {
-      //   updatedFilters[key] = selectedFilters[key].filter((x: DataRecordValue) => x !== val);
-      // } else {
-      //   updatedFilters[key] = [...(selectedFilters?.[key] || []), val];
-      // }
-      // single select
-      if (selectedFilters && isActiveFilterValue(key, val)) {
-        updatedFilters = {};
+      if (e.ctrlKey){
+        if (selectedFilters) {
+          let active = isActiveFilterValue(key, val)
+          filtersEntries.map((entry) => {
+            const [key, val] = entry;
+            updatedFilters[key] = [...new Set([...selectedFilters[key], val])];
+          })
+        } else {
+          filtersEntries.map((entry) => {
+            const [key, val] = entry;
+            updatedFilters[key] = [...(selectedFilters?.[key] || []), val];
+          })
+        }
       } else {
-        updatedFilters = {
-          [key]: [val],
-        };
+        // single select
+        if (selectedFilters && isActiveFilterValue(key, val)) {
+            updatedFilters = {};
+          } else {
+            updatedFilters = {
+              [key]: [val],
+            };
+          }
       }
-      if (
-        Array.isArray(updatedFilters[key]) &&
+      if (Array.isArray(updatedFilters[key]) &&
         updatedFilters[key].length === 0
       ) {
         delete updatedFilters[key];
