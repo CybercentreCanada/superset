@@ -38,6 +38,29 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
     ALFRED_SCOPE = "api://alfred.u.dev/Alfred.ALL"
 
+    def error_obtaining_token(self, token_name: str, raised_exception: Exception) -> Response:
+        """
+        This is a function that returns an http response based on a passed in application name
+        and exception that was caught when trying to get an OBO token for an application
+        """
+        logger.error("Error obtaining on-behalf-of %s token: %s", token_name, raised_exception)
+        return self.response(
+            400,
+            payload=f"Error obtaining on-behalf-of {token_name} token: {raised_exception}"
+            )
+
+    def error_obtaining_response(self, token_name: str, raised_exception: Exception) -> Response:
+        """
+        This is a function that returns an http response based on a passed in application name
+        and exception that was caught when trying to get a response from an application
+        """
+        logger.error("Error obtaining %s response: %s", token_name, raised_exception)
+        return self.response(
+            400,
+            payload=f"Error obtaining {token_name} response: {raised_exception}"
+            )
+
+
     @expose("/alfred/user_id/<string:user_id>", methods=["GET"])
     @event_logger.log_this_with_context(
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get",
@@ -47,28 +70,17 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         """
         Placeholder until we work out everything this function is going to do.
         """
-        user = current_user
 
         try:
-            alfred_token = security_manager.msal_fetch_access_token_silent(
-                flask_user=user.username, scopes=[self.ALFRED_SCOPE]
+            alfred_token = security_manager.get_on_behalf_of_access_token(
+                scope=self.ALFRED_SCOPE
             )
             if not alfred_token:
                 raise Exception("Unable to fetch Alfred token")
         except requests.exceptions.HTTPError as err:
-            logger.error("Error obtaining on-behalf-of Alfred token: %s" % err)
-            return self.response(
-                400, payload="Error obtaining on-behalf-of Alfred token: %s" % err
-            )
-        except Exception as exception_catch:
-            logger.error(
-                "Error obtaining on-behalf-of Alfred token: %s" % exception_catch
-            )
-            return self.response(
-                400,
-                payload="Error obtaining on-behalf-of Alfred token: %s"
-                % exception_catch,
-            )
+            return self.error_obtaining_token("Alfred", err)
+        except Exception as err:
+            return self.error_obtaining_token("Alfred", err)
         else:
             headers = CaseInsensitiveDict()
             headers["Accept"] = "application/json"
@@ -82,8 +94,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
             try:
                 alfred_resp = requests.get(url, headers=headers)
-            except Exception as exception_catch:
-                print("Error obtaining Alfred response: %s" % exception_catch)
+            except requests.exceptions.ConnectionError as err:
+                return self.error_obtaining_response("Alfred", err)
 
             # refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
             print(alfred_resp)
