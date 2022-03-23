@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 class ProxyRestAPI(BaseSupersetModelRestApi):
     """
-    Contains the functions which will act as the proxy to the Alfred API
+    Contains the functions which will act as the proxy to the Alfred API,
+    as well as the helper functions for dealing with caught exceptions
     """
 
     datamodel = SQLAInterface(SqlaTable)
@@ -36,7 +37,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
     openapi_spec_tag = "Proxy"
 
-    ALFRED_SCOPE = "api://alfred.u.dev/Alfred.ALL"
+    # ALFRED_SCOPE = os.environ.get('ALFRED_SCOPE')     #un-comment on deployment
+    ALFRED_SCOPE = "api://alfred.pb/Alfred.ALL"
 
     def error_obtaining_token(self, token_name: str, raised_exception: Exception) -> Response:
         """
@@ -70,10 +72,11 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         """
         Placeholder until we work out everything this function is going to do.
         """
+        user = current_user
 
         try:
-            alfred_token = security_manager.get_on_behalf_of_access_token(
-                scope=self.ALFRED_SCOPE
+            alfred_token = security_manager.get_access_token(
+                user=user.username, scopes=[self.ALFRED_SCOPE]
             )
             if not alfred_token:
                 raise Exception("Unable to fetch Alfred token")
@@ -86,7 +89,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             headers["Accept"] = "application/json"
             headers["Authorization"] = f"Bearer { alfred_token }"
             url = (
-                "https://alfred-tst.u.chimera.azure.cyber.gc.ca:9488/rest/search/cypher?expression=MATCH%20(email:EMAIL_ADDRESS)%20WHERE%20email.value%20in%20[%22"
+                "https://alfred-stg-pb.chimera.cyber.gc.ca:9488/rest/search/cypher?expression=MATCH%20(email:EMAIL_ADDRESS)%20WHERE%20email.value%20in%20[%22"
                 + user_id
                 + "%22]%20return%20email.value,%20email.maliciousness,%20email.uri"
             )
