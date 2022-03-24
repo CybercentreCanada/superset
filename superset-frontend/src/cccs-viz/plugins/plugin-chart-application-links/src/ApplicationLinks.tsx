@@ -8,14 +8,15 @@ export default function ApplicationLinks(props: ApplicationsProps) {
   let url = '';
   let infoType = '';
   let callback_url = '';
+  const alfred_url = 'https://alfred-stg-pb.chimera.cyber.gc.ca';
 
   if (application === 'ALFRED') {
     if (appType === 'USER_ID') {
-      url = `https://alfred-stg-pb.chimera.cyber.gc.ca/?expression=MATCH%20(email:EMAIL_ADDRESS)%20WHERE%20email.value%20in%20%5B%22${appVal}%22%5D%20return%20email.value,%20email.maliciousness,%20email.uri`;
+      url = `${alfred_url}/?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20email.value%2C%20email.maliciousness%2C%20email.uri`;
       infoType = 'user id';
       callback_url = 'user_id';
     } else {
-      url = `https://alfred-stg-pb.chimera.cyber.gc.ca/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`;
+      url = `${alfred_url}/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`;
       infoType = 'IP';
       callback_url = 'ip_string';
     }
