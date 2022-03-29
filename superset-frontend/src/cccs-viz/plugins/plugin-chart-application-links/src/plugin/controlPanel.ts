@@ -21,8 +21,18 @@ import {
   ControlPanelConfig,
   ControlPanelState,
   ControlState,
+  ControlStateMapping,
   sharedControls,
 } from '@superset-ui/chart-controls';
+
+const validateAggControlValues = (
+  controls: ControlStateMapping,
+  values: any[],
+) => {
+  const areControlsEmpty = values.every(val => ensureIsArray(val).length === 0);
+  // @ts-ignore
+  return areControlsEmpty ? [t('Metrics must have a value')] : [];
+};
 
 const config: ControlPanelConfig = {
   /**
@@ -108,24 +118,33 @@ const config: ControlPanelConfig = {
         ['adhoc_filters'],
         [
           {
-            name: 'columns',
+            name: 'metrics',
             override: {
+              // visibility: () => true,
+              validators: [],
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
+                const { controls } = state;
                 const originalMapStateToProps =
-                  sharedControls?.columns?.mapStateToProps;
+                  sharedControls?.metrics?.mapStateToProps;
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
-                // @ts-ignore
-                newState.externalValidationErrors =
-                  // isRawMode({ controls }) &&
-                  ensureIsArray(controlState.value).length === 0
-                    ? [t('This control must have a value.')]
-                    : [];
+                newState.externalValidationErrors = validateAggControlValues(
+                  controls,
+                  [controlState.value],
+                );
                 return newState;
               },
+            },
+          },
+        ],
+        [
+          {
+            name: 'row_limit',
+            override: {
+              default: 1,
             },
           },
         ],
@@ -139,7 +158,7 @@ const config: ControlPanelConfig = {
       clearable: false,
     },
     row_limit: {
-      default: 100,
+      default: 1,
     },
   },
 };
