@@ -4,18 +4,18 @@ import { ApplicationsProps } from './types';
 export default function ApplicationLinks(props: ApplicationsProps) {
   const { application, appVal, appType } = props;
   const [alfredCount, setAlfredCount] = useState(-1);
+  const [alfredURL, setAlfredURL] = useState(
+    'https://alfred-stg-pb.chimera.cyber.gc.ca',
+  );
 
-  let url = '';
   let infoType = '';
   let callback_url = '';
 
   if (application === 'ALFRED') {
     if (appType === 'USER_ID') {
-      url = `https://alfred-tst.u.chimera.azure.cyber.gc.ca/?expression=MATCH%20(email:EMAIL_ADDRESS)%20WHERE%20email.value%20in%20[%22${appVal}%22]%20return%20email.value,%20email.maliciousness,%20email.uri`;
       infoType = 'user id';
       callback_url = 'user_id';
     } else {
-      url = `https://alfred-tst.u.chimera.azure.cyber.gc.ca/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`;
       infoType = 'IP';
       callback_url = 'ip_string';
     }
@@ -27,10 +27,21 @@ export default function ApplicationLinks(props: ApplicationsProps) {
     )
       .then(res => res.json())
       .then(response => {
-        if (response !== null && response.payload !== undefined) {
+        if (response !== null && response.payload.err !== true) {
           setAlfredCount(response.payload.data?.length);
+          // eslint-disable-next-line eqeqeq
         } else {
           setAlfredCount(0);
+        }
+
+        if (appType === 'USER_ID') {
+          setAlfredURL(
+            `${response.payload?.url}/?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20email.value%2C%20email.maliciousness%2C%20email.uri`,
+          );
+        } else {
+          setAlfredURL(
+            `${response.payload?.url}/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`,
+          );
         }
       })
       .catch(e => {
@@ -41,12 +52,12 @@ export default function ApplicationLinks(props: ApplicationsProps) {
         // and will display this message the the user
         throw new Error('Failed to fetch results from Alfred');
       });
-  }, [appVal, callback_url]);
+  }, [appVal, appType, callback_url]);
 
   return (
     <div>
       <div>
-        <a href={url} target="_blank" rel="noreferrer">
+        <a href={alfredURL} target="_blank" rel="noreferrer">
           <img
             height="17"
             width="30"
@@ -57,7 +68,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
         {alfredCount > 0 ? (
           <p>
             Alfred has seen this {infoType} {alfredCount} time(s). Search the{' '}
-            <a href={url} target="_blank" rel="noreferrer">
+            <a href={alfredURL} target="_blank" rel="noreferrer">
               Alfred
             </a>{' '}
             knowledge base.
@@ -65,7 +76,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
         ) : (
           <p>
             Alfred has not seen this {infoType}. Search the{' '}
-            <a href={url} target="_blank" rel="noreferrer">
+            <a href={alfredURL} target="_blank" rel="noreferrer">
               Alfred
             </a>{' '}
             knowledge base.
