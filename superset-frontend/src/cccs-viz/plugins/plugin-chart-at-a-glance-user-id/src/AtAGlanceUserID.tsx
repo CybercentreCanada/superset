@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { RiGlobalFill } from 'react-icons/ri';
 import { QueryFormData } from '@superset-ui/core';
 import Collapse from 'src/components/Collapse';
 import styles from './styles';
@@ -23,22 +22,29 @@ const generateClientIpLinksList = (
   ipDashboardId: string,
   ipDashboardFilterId: string,
 ) => (
-  <ul>
-    {ipList.map((a: { client_ip: string }) => (
-      <li>
-        <a
-          href={
-            `${ipDashBoardBaseUrl}/superset/dashboard/${ipDashboardId}/?native_filters=%28NATIVE_FILTER-${ipDashboardFilterId}%3A%28__cache%3A%28label%3A'${a.client_ip}'` +
-            `%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28'${a.client_ip}'%29%29%2CextraFormData%3A%28filters%3A%21%28%28col%3Aip_string%2Cop%3AIN%2Cval%3A%21%28'${a.client_ip}'` +
-            `%29%29%29%29%2CfilterState%3A%28label%3A'${a.client_ip}'%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28'${a.client_ip}'%29%29%2Cid%3ANATIVE_FILTER-${ipDashboardFilterId}` +
-            `%2CownState%3A%28%29%29%29`
-          }
-        >
-          {a.client_ip}
-        </a>
-      </li>
-    ))}
-  </ul>
+  <table
+    className="table table-striped table-condensed"
+    style={styles.AtAGlanceLists}
+  >
+    <tbody>
+      {ipList.map((a: { client_ip: string }) => (
+        <tr>
+          <td>
+            <a
+              href={
+                `${ipDashBoardBaseUrl}/superset/dashboard/${ipDashboardId}/?native_filters=%28NATIVE_FILTER-${ipDashboardFilterId}%3A%28__cache%3A%28label%3A'${a.client_ip}'` +
+                `%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28'${a.client_ip}'%29%29%2CextraFormData%3A%28filters%3A%21%28%28col%3Aip_string%2Cop%3AIN%2Cval%3A%21%28'${a.client_ip}'` +
+                `%29%29%29%29%2CfilterState%3A%28label%3A'${a.client_ip}'%2CvalidateStatus%3A%21f%2Cvalue%3A%21%28'${a.client_ip}'%29%29%2Cid%3ANATIVE_FILTER-${ipDashboardFilterId}` +
+                `%2CownState%3A%28%29%29%29`
+              }
+            >
+              {a.client_ip}
+            </a>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 );
 
 /**
@@ -163,10 +169,6 @@ function AtAGlanceUserIDCore(props: AtAGlanceUserIDProps) {
   return (
     <div style={styles.AtAGlance}>
       <div>
-        <RiGlobalFill />
-        <span>At a Glance</span>
-      </div>
-      <div>
         <table>
           <tr>
             <td>User Email: {userIDString}</td>
@@ -181,7 +183,7 @@ function AtAGlanceUserIDCore(props: AtAGlanceUserIDProps) {
           </tr>
         </table>
       </div>
-      <div style={styles.AtAGlanceLists}>
+      <div>
         <table>
           <tr>
             <Collapse bordered expandIconPosition="left" ghost>
