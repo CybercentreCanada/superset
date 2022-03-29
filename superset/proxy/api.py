@@ -1,7 +1,9 @@
 """
 API For Alfred REST requests
 """
+import json
 import logging
+import os
 from typing import Any
 
 import requests
@@ -34,10 +36,25 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
     user = current_user
 
-    # ALFRED_SCOPE = os.environ.get('ALFRED_SCOPE')     #un-comment on deployment
-    # ALFRED_URL = os.environ.get('ALFRED_URL')         #un-comment on deployment
-    ALFRED_SCOPE = "api://alfred.pb/Alfred.ALL"
-    ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
+    ALFRED_SCOPE = os.environ.get("ALFRED_SCOPE")
+    if ALFRED_SCOPE is None:
+        ALFRED_SCOPE = "api://alfred.pb/Alfred.ALL"
+
+    ALFRED_URL = os.environ.get("ALFRED_URL")
+    if ALFRED_URL is None:
+        ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
+
+    def attach_url(
+        self, response_code: int, app_url: str, err: bool, payload
+    ) -> Response:
+        """
+        This is a function that will attach the app URL with the response that is
+        being sent to the front-end (this will allow us to avoid hard coded URL's in
+        both the back-end and the front-end)
+        """
+        prep_payload = {"data": payload, "url": app_url, "err": err}
+
+        return self.response(response_code, payload=prep_payload)
 
     def error_obtaining_token(
         self, token_name: str, raised_exception: Exception
@@ -49,9 +66,11 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         logger.error(
             "Error obtaining on-behalf-of %s token: %s", token_name, raised_exception
         )
-        return self.response(
+        return self.attach_url(
             400,
-            payload=f"Error obtaining on-behalf-of {token_name} token: {raised_exception}",
+            self.ALFRED_URL,
+            True,
+            f"Error obtaining on-behalf-of {token_name} token: {raised_exception}",
         )
 
     def error_obtaining_response(
@@ -62,8 +81,11 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         and exception that was caught when trying to get a response from an application
         """
         logger.error("Error obtaining %s response: %s", token_name, raised_exception)
-        return self.response(
-            400, payload=f"Error obtaining {token_name} response: {raised_exception}"
+        return self.attach_url(
+            400,
+            self.ALFRED_URL,
+            True,
+            f"Error obtaining {token_name} response: {raised_exception}",
         )
 
     @expose("/alfred/user_id/<string:user_id>", methods=["GET"])
@@ -106,7 +128,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
             # refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
             print(alfred_resp)
-            return self.response(200, payload=alfred_resp)
+            return self.attach_url(200, self.ALFRED_URL, False, alfred_resp)
 
     @expose("/alfred/ip_string/<string:ip_string>", methods=["GET"])
     @event_logger.log_this_with_context(
@@ -148,4 +170,4 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
             # refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
             print(alfred_resp)
-            return self.response(200, payload=alfred_resp)
+            return self.attach_url(200, self.ALFRED_URL, False, alfred_resp)
