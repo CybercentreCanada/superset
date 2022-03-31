@@ -28,7 +28,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
       .then(res => res.json())
       .then(response => {
         if (response !== null && response.payload?.err !== true) {
-          setAlfredCount(response.payload.data?.length);
+          setAlfredCount(response.payload.data?.data?.length);
           // eslint-disable-next-line eqeqeq
         } else {
           setAlfredCount(0);

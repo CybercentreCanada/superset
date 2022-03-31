@@ -1,6 +1,7 @@
 """
 API For Alfred REST requests
 """
+import json
 import logging
 import os
 from typing import Any
@@ -44,8 +45,6 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
 
     SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE")
-    if SSL_CERT is None:
-        SSL_CERT = "/usr/local/share/ca-certificates/ssl_proxy_corp_cse-cst_gc_ca.crt"
 
     def attach_url(
         self, response_code: int, app_url: str, err: bool, payload
@@ -129,9 +128,11 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             except requests.exceptions.ConnectionError as err:
                 return self.error_obtaining_response("Alfred", err)
 
-            # refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
-            print(alfred_resp)
-            return self.attach_url(200, self.ALFRED_URL, False, alfred_resp)
+            refresh_resp_json = json.loads(
+                alfred_resp.content.decode("utf8", "replace")
+            )
+            print(refresh_resp_json)
+            return self.attach_url(200, self.ALFRED_URL, False, refresh_resp_json)
 
     @expose("/alfred/ip_string/<string:ip_string>", methods=["GET"])
     @event_logger.log_this_with_context(
@@ -171,6 +172,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             except requests.exceptions.ConnectionError as err:
                 return self.error_obtaining_response("Alfred", err)
 
-            # refresh_resp_json = json.loads(alfred_resp.content.decode('utf8', 'replace'))
-            print(alfred_resp)
-            return self.attach_url(200, self.ALFRED_URL, False, alfred_resp)
+            refresh_resp_json = json.loads(
+                alfred_resp.content.decode("utf8", "replace")
+            )
+            print(refresh_resp_json)
+            return self.attach_url(200, self.ALFRED_URL, False, refresh_resp_json)
