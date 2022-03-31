@@ -1,7 +1,6 @@
 """
 API For Alfred REST requests
 """
-import json
 import logging
 import os
 from typing import Any
@@ -43,6 +42,10 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
     ALFRED_URL = os.environ.get("ALFRED_URL")
     if ALFRED_URL is None:
         ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
+
+    SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE")
+    if SSL_CERT is None:
+        SSL_CERT = "/usr/local/share/ca-certificates/ssl_proxy_corp_cse-cst_gc_ca.crt"
 
     def attach_url(
         self, response_code: int, app_url: str, err: bool, payload
@@ -115,14 +118,14 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             headers["Authorization"] = f"Bearer { alfred_token }"
             url = (
                 self.ALFRED_URL
-                + ":9488/rest/search/cypher?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22"
+                + "/rest/search/cypher?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22"
                 + user_id
                 + "%22%5D%20RETURN%20email.value%2C%20email.maliciousness%2C%20email.uri"
             )
             alfred_resp = ""
 
             try:
-                alfred_resp = requests.get(url, headers=headers)
+                alfred_resp = requests.get(url, headers=headers, verify=self.SSL_CERT)
             except requests.exceptions.ConnectionError as err:
                 return self.error_obtaining_response("Alfred", err)
 
@@ -157,14 +160,14 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             headers["Authorization"] = f"Bearer { alfred_token }"
             url = (
                 self.ALFRED_URL
-                + ":9488/rest/search/cypher?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22"
+                + "/rest/search/cypher?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22"
                 + ip_string
                 + "%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri"
             )
             alfred_resp = ""
 
             try:
-                alfred_resp = requests.get(url, headers=headers)
+                alfred_resp = requests.get(url, headers=headers, verify=self.SSL_CERT)
             except requests.exceptions.ConnectionError as err:
                 return self.error_obtaining_response("Alfred", err)
 
