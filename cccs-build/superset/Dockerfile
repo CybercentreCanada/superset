@@ -1,4 +1,4 @@
-FROM uchimera.azurecr.io/cccs/superset-base:feature_CLDN-1282_20220401124124_b3222
+FROM uchimera.azurecr.io/cccs/superset-base:feature_CLDN-1282_20220401144035_b3227
 
 USER root
 
