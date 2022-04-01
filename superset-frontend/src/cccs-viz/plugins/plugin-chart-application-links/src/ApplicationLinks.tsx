@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ApplicationsProps } from './types';
+import styles from './styles';
 
 export default function ApplicationLinks(props: ApplicationsProps) {
   const { application, appVal, appType } = props;
@@ -56,8 +57,13 @@ export default function ApplicationLinks(props: ApplicationsProps) {
 
   return (
     <div>
-      <div>
-        <a href={alfredURL} target="_blank" rel="noreferrer">
+      <div style={styles.InlineBlock}>
+        <a
+          href={alfredURL}
+          target="_blank"
+          rel="noreferrer"
+          style={styles.InlineImg}
+        >
           <img
             height="17"
             width="30"
@@ -66,7 +72,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
           />
         </a>
         {alfredCount > 0 ? (
-          <p>
+          <p style={styles.InlineText}>
             Alfred has seen this {infoType} {alfredCount} time(s). Search the{' '}
             <a href={alfredURL} target="_blank" rel="noreferrer">
               Alfred
@@ -74,7 +80,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
             knowledge base.
           </p>
         ) : (
-          <p>
+          <p style={styles.InlineText}>
             Alfred has not seen this {infoType}. Search the{' '}
             <a href={alfredURL} target="_blank" rel="noreferrer">
               Alfred
