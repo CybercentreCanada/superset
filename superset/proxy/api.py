@@ -34,17 +34,22 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
 
     openapi_spec_tag = "Proxy"
 
-    user = current_user
+    def __init__(self):
+        """
+        This is the init function for the ProxyRestAPI class
+        """
+        super().__init__()
+        self.user = current_user
 
-    ALFRED_SCOPE = os.environ.get("ALFRED_SCOPE")
-    if ALFRED_SCOPE is None:
-        ALFRED_SCOPE = "api://alfred.pb/Alfred.ALL"
+        self.ALFRED_SCOPE = os.environ.get("ALFRED_SCOPE")
+        if self.ALFRED_SCOPE is None:
+            self.ALFRED_SCOPE = "api://alfred.pb/Alfred.ALL"
 
-    ALFRED_URL = os.environ.get("ALFRED_URL")
-    if ALFRED_URL is None:
-        ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
+        self.ALFRED_URL = os.environ.get("ALFRED_URL")
+        if self.ALFRED_URL is None:
+            self.ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
 
-    SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE")
+        self.SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE")
 
     def attach_url(
         self, response_code: int, app_url: str, err: bool, payload
