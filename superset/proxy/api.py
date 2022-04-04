@@ -50,6 +50,8 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
             self.ALFRED_URL = "https://alfred-stg-pb.chimera.cyber.gc.ca"
 
         self.SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE")
+        if self.SSL_CERT is None:
+            self.SSL_CERT = os.environ.get("REQUESTS_CA_BUNDLE_DEV")
 
     def attach_url(
         self, response_code: int, app_url: str, err: bool, payload
