@@ -345,8 +345,8 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     # make GET request to explore_json. explore_json accepts both GET and POST request.
     # See `PR 7935 <https://github.com/apache/superset/pull/7935>`_ for more details.
     "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": False,
-    "ENABLE_TEMPLATE_PROCESSING": False,
-    "ENABLE_TEMPLATE_REMOVE_FILTERS": False,
+    "ENABLE_TEMPLATE_PROCESSING": True,
+    "ENABLE_TEMPLATE_REMOVE_FILTERS": True,
     "KV_STORE": False,
     # When this feature is enabled, nested types in Presto will be
     # expanded into extra columns and/or arrays. This is experimental,
@@ -1275,6 +1275,593 @@ MENU_HIDE_USER_INFO = False
 # SQLalchemy link doc reference
 SQLALCHEMY_DOCS_URL = "https://docs.sqlalchemy.org/en/13/core/engines.html"
 SQLALCHEMY_DISPLAY_TEXT = "SQLAlchemy docs"
+
+import os
+import logging
+import re
+from typing import Any, List
+import requests
+import urllib
+import json
+from sqlalchemy.engine.base import Connection
+from sqlalchemy.orm.mapper import Mapper
+from sqlalchemy.sql import text
+from flask import session
+from flask_login import current_user
+import msal
+
+from superset.security import SupersetSecurityManager
+
+from flask_appbuilder.security.sqla.models import (
+    PermissionView,
+    assoc_permissionview_role,
+)
+
+
+
+log = logging.getLogger(__name__)
+
+GAMMA_PLUS = "GammaPlus"
+
+
+class DynamicRoleSecurityManager(SupersetSecurityManager):
+
+    AUTH_ROLES_SYNC_AT_LOGIN = True
+    
+    azureClient = msal.ConfidentialClientApplication( 
+        client_credential='fcW7Q~NP5q5P4u2xVZl-G4-nMapXKYlh.tTXU',
+        client_id='9857feba-e79f-4e57-b587-92fd33fd0389',
+        authority='https://login.microsoftonline.com/da9cbe40-ec1e-4997-afb3-17d87574571a'
+    )
+
+
+    def __init__(self, appbuilder) -> None:
+        super().__init__(appbuilder)
+
+        self.included_roles: List[str] = self.appbuilder.app.config.get("INCLUDED_ROLES", [])
+
+        # [db_name].[schema_name] or [db_name].[datasource_name]
+        self.view_name_pattern = re.compile('\[(.+)\]\.\[(.+)]')
+        # [db_name].(database_id)
+        self.db_view_name_pattern = re.compile('\[(.+)\]\.\((.+)\)')
+        # Datasources which match this pattern will be available to all GammaPlus users, regardless of schema
+        # or database level permissions.
+        self.shared_pattern = re.compile('shared_.+')
+
+    # Additional permissions to be granted to GammaPlus users which are not user defined permissions
+    # (see _is_user_defined_permission() )
+    GAMMA_PLUS_PERMISSION_VIEWS = {
+            "can_write": "Dataset",
+            "can_save": "Datasource",
+            "can_function_names": "Database"
+        }
+
+    def oauth_user_info(self, provider, resp):
+        if provider == "azure":
+            log.debug("Azure response received : {0}".format(resp))
+            id_token = resp["id_token"]
+            log.debug(str(id_token))
+            me = self._azure_jwt_token_parse(id_token)
+            log.info("Parse JWT token : {0}".format(me))
+            # Refresh and cache tokens in msal
+            self.azureClient.acquire_token_by_refresh_token(refresh_token=resp["refresh_token"], scopes=[''])
+
+            graph_access_token = self.msal_fetch_access_token_silent(scopes=['User.Read'], flask_user=me["oid"])
+            
+            member_objects_response = requests.post('https://graph.microsoft.com/v1.0/users/{0}/getMemberObjects'.format(me["oid"]),
+                headers={
+                    "Authorization": "Bearer {0}".format(graph_access_token),
+                    "Content-Type": "application/json"
+                },
+                data = json.dumps({ "securityEnabledOnly": True }))
+            member_objects_response.raise_for_status()
+            user_membership = member_objects_response.json()["value"]
+            log.debug("User memberships: {0}".format(user_membership))
+
+            return {
+                "name": me["name"],
+                # Note that for 'email' to be returned as part of the token, the optional claim must be added to the App Registration in Azure
+                "email": me["email"],
+                "first_name": me.get("given_name", ""), # Optional claim may not be present (e.g. for guest accounts)
+                "last_name": me.get("family_name", ""), # Optional claim may not be present (e.g. for guest accounts)
+                "id": me["oid"],
+                "username": me["oid"],
+                "groups": user_membership,
+                # This is for the AUTH_ROLES_MAPPING
+                "role_keys": user_membership,
+            }
+        else:
+            return {}
+    
+    def msal_fetch_access_token_silent(self, flask_user, scopes=[]):
+        response = self.msal_fetch_response_silent(flask_user, scopes)
+        token = ''
+
+        if response: 
+            oauth_provider = session['oauth_provider']
+            token = response[self.get_oauth_token_key_name(oauth_provider)]
+        
+        return token
+    
+    def msal_fetch_response_silent(self, flask_user, scopes):
+        account = self.msal_fetch_user_account(flask_user)
+        try:
+            return self.azureClient.acquire_token_silent(account=account, scopes=scopes)
+        except Exception as e:
+            log.error("MSAL error obtaining silent token: {0}".format(e) , exc_info=1)
+            return {}
+
+
+    def msal_fetch_user_account(self, flask_user):
+        log.info("FETCHING THE USER")
+        log.info(self.azureClient.get_accounts())
+        log.info(flask_user)
+        accounts = [x for x in self.azureClient.get_accounts() if x["local_account_id"] == flask_user]
+        if not accounts:
+            raise Exception("User not found")
+        elif len(accounts) > 1:
+            raise Exception("Multiple users found")
+        return accounts[0]
+
+    def auth_user_oauth(self, userinfo):
+        user = super().auth_user_oauth(userinfo)
+        # If user has changes, update the user
+        # Note is is not needed to check for roles as that is handeled by super().auth_user_oauth(userinfo)
+        print("THE USER")
+        print(user.__dict__)
+        if ( userinfo.get("username", "") != user.username 
+            or userinfo.get("first_name", "") != user.first_name 
+            or userinfo.get("last_name", "") != user.last_name 
+            or userinfo.get("email", "") != user.email 
+        ):
+            user.username = userinfo.get("username", "")
+            user.first_name = userinfo.get("first_name", "")
+            user.last_name = userinfo.get("last_name", "")
+            user.email = userinfo.get("email", "")
+            self.update_user(user)
+        return user
+CUSTOM_SECURITY_MANAGER = DynamicRoleSecurityManager
+
+
+AUTH_USER_REGISTRATION = True
+from flask_appbuilder.security.manager import AUTH_OAUTH
+AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+        "name": "azure",
+        "icon": "fa-windows",
+        "token_key": "access_token",
+        "remote_app": {
+            "client_id": '9857feba-e79f-4e57-b587-92fd33fd0389',
+            "client_secret": 'fcW7Q~NP5q5P4u2xVZl-G4-nMapXKYlh.tTXU',
+            "api_base_url": "https://login.microsoftonline.com/{0}/oauth2/v2.0".format('da9cbe40-ec1e-4997-afb3-17d87574571a'),
+            "client_kwargs": {
+                "scope": "{0}/.default profile openid email offline_access".format('9857feba-e79f-4e57-b587-92fd33fd0389')
+            },
+            "request_token_url": None,
+            "access_token_url": "https://login.microsoftonline.com/{0}/oauth2/v2.0/token".format('da9cbe40-ec1e-4997-afb3-17d87574571a'),
+            "authorize_url": "https://login.microsoftonline.com/{0}/oauth2/v2.0/authorize".format('da9cbe40-ec1e-4997-afb3-17d87574571a'),
+        },
+    },
+]
+
+
+
+import logging
+import json
+import os
+import requests
+import urllib
+from flask_login import current_user
+from trino.auth import JWTAuthentication
+
+
+logger = logging.getLogger(__name__)
+
+def mutate_db_connection(uri, params, username, security_manager, source):
+    """Mutates any Trino database connection to include the required fields for user impersonation.
+
+    This implementation will set params['connect_args']['user'] to the user's e-mail
+    address or, if the user doesn't have an e-mail address, their username. If both of those fields
+    are None, this function makes sure that no user impersonation will occur.
+
+    For more information, see Superset's template config.py file
+    (https://github.com/apache/superset/blob/7697bc297c5da16069713e248fe16574dff40dfc/superset/config.py#L888)
+    """
+    if uri.drivername == 'trino':
+        # TODO If provider not auzre do somthing else:
+        connect_args = params.setdefault('connect_args', dict())
+        trino_scope = 'api://2d1c8df8-f208-49ff-9004-ba77565cfccc/user_impersonation'
+        user = current_user
+        logger.info("THIS IS MY SUER FLASK")
+        logger.info(current_user.__dict__)
+        if trino_scope and user:
+            try:
+
+                trino_token = security_manager.msal_fetch_access_token_silent(flask_user=user.username,scopes=[trino_scope])
+                logger.info("THIS IS MY TOKEN")
+                logger.info(trino_token)
+                if not trino_token:
+                    raise Exception("Unable to fetch token")
+                connect_args['auth'] = JWTAuthentication(trino_token)
+            except requests.exceptions.HTTPError as err:
+                logger.error("Error obtaining on-behalf-of Trino token: %s" % err)
+            except Exception as e:
+                logger.error("Error obtaining on-behalf-of Trino token: %s" % e)
+        
+        # TODO: When fission is used again re add this token
+        #fission_token = security_manager.get_on_behalf_of_access_token('{0}/default'.format(fission_client_id))
+        fission_token = ''
+
+
+        if user:
+            db_username = user.email if user.email else user.username
+            if db_username:
+                connect_args['user'] = db_username
+            else:
+                connect_args.pop('user')
+            if fission_token:
+                connect_args['http_headers'] = {'X-Trino-Extra-Credential': f"access-token={fission_token}"}
+
+        logger.info("IM DONE")
+    return uri, params
+
+DB_CONNECTION_MUTATOR = mutate_db_connection
+
+
+
+
+
+
+
+
+
+import ipaddress
+import logging
+import socket
+import struct
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
+
+from superset.utils.core import FilterOperator
+
+logger = logging.getLogger(__name__)
+
+
+def ipv4str_to_number(addr):
+    """
+    Return the numerical representation of the provided ip string.
+
+    :param addr: The ip string
+    :returns: numerical value
+    """
+    if type(addr) == int:
+        return addr
+    else:
+        return struct.unpack("!I", socket.inet_aton(addr.strip()))[0]
+
+
+def render_ipv4_between_number_columns(filters, start, end) -> str:
+    """
+    Return a WHERE clause for ip addresses converted to integer value across
+    two columns in a table.
+
+    :param filters: The filters passed in from a superset function call
+    :param start: Column containing start integer IP addresses
+    :param end: Column containing end integer IP addresses
+    :returns: proper WHERE clause for start and end OR a blank response which
+              will have no impact on the original query
+    """
+    added_condition = False
+    sql = " AND ("
+    for flt in filters:
+        if added_condition:
+            sql += " OR "
+        val = flt.get("val")
+        sql += _render_ipv4_between_number_columns(start, end, val)
+        added_condition = True
+    sql += ")"
+    return sql if added_condition else ""
+
+
+def render_ipv4_between_number_columns_or_nothing(filters, start, end) -> str:
+    """
+    Return a WHERE clause for ip addresses convert to integer value across two
+    columns in a table.  If a valid clause can't be generated then return a
+    clause that will render no results.
+
+    :param filters: The filters passed in from a superset function call
+    :param start: Column containing start integer IP addresses
+    :param end: Column containing end integer IP addresses
+    :returns: proper WHERE clause for start and end OR a WHERE clause that will
+              not return results (no filter value passed in)
+    """
+    sql = render_ipv4_between_number_columns(filters, start, end)
+    return sql if sql != "" else " AND 1 = 2"
+
+
+def _render_ipv4_between_number_columns(start, end, val) -> str:
+    """
+    Return the rendering of an ip string value falling between a low
+        and high ip column.
+
+    :param low_col: The name of the low column.
+    :param high_col: The name of the high column.
+    :param val: An array of ip string values.
+    :returns: SQL.
+    """
+    conditions = []
+    for cidr in val:
+        if type(cidr) == int:
+            ip = cidr
+            conditions.append(f"({start} <= {ip} AND {end} >= {ip})")
+        else:
+            ips = ipaddress.IPv4Network(cidr.strip(), strict=False)
+            if ips.num_addresses > 1:
+                # regex prevents calling this function with cidr values
+                # if we ever want to support such values we would do it here.
+                low = ipv4str_to_number(str(ips[0]))
+                high = ipv4str_to_number(str(ips[ips.num_addresses - 1]))
+                cond = f"""( ({start} <= {low} AND {end} >= {low})
+                    OR ({start} <= {high} AND {end} >= {high})
+                    OR ({low} <= {start} AND {end} <= {high}) )"""
+                conditions.append(cond)
+            else:
+                ip = ipv4str_to_number(str(ips[0]))
+                conditions.append(f"({start} <= {ip} AND {end} >= {ip})")
+    # ("START_IP" >= 16777216 AND "END_IP" <= 16777216)
+    # OR ("START_IP" >= 16777216 AND "END_IP" <= 3332232)
+    # OR ("START_IP" >= 45689644 AND "END_IP" <= 45689644)
+    return " OR ".join(conditions)
+
+
+def render_in_conditions(ip_array, ip_column_name) -> str:
+    """
+    Return the rendering of an ip string value on the provided column.
+
+    :param ip_column_name: Name of the column.
+    :param ip_array: A list of ip string values. These can include CIDR ranges.
+    :returns: List of conditions to OR.
+    """
+    conditions = []
+    for cidr in ip_array:
+        if type(cidr) == int:
+            ip = cidr
+            conditions.append(f"({ip_column_name} = {ip})")
+        else:
+            ips = ipaddress.IPv4Network(cidr.strip(), strict=False)
+            if ips.num_addresses > 1:
+                low = ipv4str_to_number(str(ips[0]))
+                high = ipv4str_to_number(str(ips[ips.num_addresses - 1]))
+                conditions.append(
+                    f"({ip_column_name} >= {low} AND {ip_column_name} <= {high})"
+                )
+            else:
+                ip = ipv4str_to_number(str(ips[0]))
+                conditions.append(f"({ip_column_name} = {ip})")
+    return conditions
+
+
+def render_ipv4_number_column(filters, col: str) -> str:
+    sql = ""
+    for flt in filters:
+        op = flt.get("op")
+        val = flt.get("val")
+        sql += " AND (" + _render_ipv4_number_column(col, op, val) + ")"
+    return sql
+
+
+def _render_ipv4_number_column(col: str, op: str, val: Any) -> str:
+    """
+    Return the rendering of an ip string value.
+
+
+    :param col: The name of the column.
+    :param op: The operator to render.
+    :param val: Ip string value.
+    :returns: SQL.
+    """
+    # SRC_IP = 122344
+    # DST_IP <= 122344
+    # IP <> 122344
+    if op == FilterOperator.IN.value:
+        return " OR ".join(render_in_conditions(val, col))
+    elif op == FilterOperator.EQUALS.value:
+        ipnumvalue = ipv4str_to_number(val)
+        return f"{col} = {ipnumvalue}"
+    else:
+        ipnumvalue = ipv4str_to_number(val)
+        return f"{col} {op} {ipnumvalue}"
+
+
+def render_ipv4_either_number_columns(filters, src_col: str, dst_col: str) -> str:
+    sql = ""
+    for flt in filters:
+        val = flt.get("val")
+        sql += (
+            " AND (" + _render_ipv4_either_number_columns(src_col, dst_col, val) + ")"
+        )
+    return sql
+
+
+def _render_ipv4_either_number_columns(src_col, dst_col, val) -> str:
+    """
+    Return the rendering of an ip string value matching either directions.
+
+    :param src_col: The name of the source column.
+    :param dst_col: The name of the destination column.
+    :param val: A list of ip string values. These can include CIDR ranges.
+    :returns: SQL.
+    """
+    # ('1.1.1.1', '2.0.0.0/24')
+    # is replaced with an OR filter on both SRC_IP and DST_IP
+    # ( SRC_IP = 22345 OR (SRC_IP >= 10000 AND SRC_IP <= 20000) )
+    # OR
+    # ( DST_IP = 22345 OR (DST_IP >= 10000 AND DST_IP <= 20000) )
+    return " OR ".join(
+        render_in_conditions(val, src_col) + render_in_conditions(val, dst_col)
+    )
+
+
+def render_ip_array_filter(filters, col, ignore_cidr=False) -> str:
+    """
+    Return the sql for an ARRAY statement with an IP address.
+
+    :param filters: passed in filters from jinja expression
+    :param col: the column name to generate the filter for
+    :param ignore_cidr: the cidr range is ignored and 2 = 2 is appended to the query
+    :returns: SQL
+    """
+    sql = ""
+    added_condition = False
+    if len(filters) > 0:
+        for flt in filters:
+            vals = flt.get('val')
+            if len(vals) > 0:
+                ips = ipaddress.IPv4Network(vals[0], False)
+                if ips.num_addresses == 1:
+                    # if a single ip address is sent in (not a CIDR) then build
+                    # the sql based on that single value
+                    sql = f" AND {col} IN (ARRAY['{str(ips[0])}'])"
+                    added_condition = True
+                elif ips.num_addresses > 1:
+                    added_condition = True
+                    if ignore_cidr:
+                        sql = " AND 2 = 2"
+                    else:
+                        sql = f" AND {col} BETWEEN ARRAY['{str(ips[0])}'] AND ARRAY['{str(ips[ips.num_addresses - 1])}']"
+                # if num_addresses <= 0 then don't generate anything
+    return sql if added_condition else " AND 1 = 1"
+
+
+def render_ip_array_filter_or_nothing(filters, col, ignore_cidr=False) -> str:
+    """
+    Return a valid SQL WHERE clause condition or a condition that will render
+    no results.
+
+    :param filters: passed in filters from jinja expression
+    :param col: the column name to generate the expression for
+    :param ignore_cidr: the cidr range is ignored and 2 = 2 is appended to the query
+    :returns: SQL
+    """
+    sql = render_ip_array_filter(filters, col, ignore_cidr=ignore_cidr)
+    return sql if sql != " AND 1 = 1" else " AND 1 = 2"
+
+
+def dashboard_link(link_label, dashboard_id, src_column, target_column) -> str:
+    """
+    Experimental feature for linking to other dashboards
+    """
+    # FIXME: Experimenting with linking to other dashboards.
+    prefix = (
+        '<a href="http://10.162.232.22:8088/superset/dashboard/'
+        + str(dashboard_id)
+        + "/?preselect_filters={%22160%22:{%22"
+        + target_column
+        + "%22:[%22"
+    )
+    suffix = '%22]}}">' + link_label + "</a>"
+    return f" concat('{prefix}', {target_column}, '{suffix}' ) "
+
+
+def _render_in_conditions_string_ips(ip_array, ip_column_name) -> str:
+    """
+    Return the rendering of an ip string value on the provided column.
+
+    :param ip_column_name: Name of the column.
+    :param ip_array: A list of ip string values. These can include CIDR ranges.
+    :returns: List of conditions to OR.
+    """
+    conditions = []
+    for cidr in ip_array:
+        ips = ipaddress.IPv4Network(cidr.strip(), False)
+        if ips.num_addresses > 1:
+            low =str(ips[0])
+            high = str(ips[ips.num_addresses - 1])
+            conditions.append(
+                f"({ip_column_name} >= '{low}' AND {ip_column_name} <= '{high}')"
+            )
+        else:
+            ip = str(ips[0])
+            conditions.append(f"({ip_column_name} = '{ip}')")
+    return conditions
+
+
+def _render_ipv4_string_column(col: str, op: str, val: Any) -> str:
+    """
+    Return the rendering of an ip string value.
+
+    :param col: The name of the column.
+    :param op: The operator to render.
+    :param val: Ip string value.
+    :returns: SQL.
+    """
+    # SRC_IP equals 1.22.3.44
+    # DST_IP <= 1.22.3.44
+    # IP <> 1.22.3.44
+    if op == FilterOperator.IN.value:
+        return " OR ".join(_render_in_conditions_string_ips(val, col))
+    elif op == FilterOperator.EQUALS.value:
+        return f"{col} = '{val}'"
+    else:
+        return f"{col} {op} '{val}'"
+
+
+def render_ipv4_string_columns(filters, col: str) -> str:
+    """
+    Return SQL for multiple ipv4 strings
+
+    :param filters - passed in filters from jinja expression
+    :param col - column name to generate expression for
+    """
+    sql = ""
+    op = ""
+    val = ""
+    for flt in filters:
+        op = flt.get("op")
+        val = flt.get("val")
+        sql += " AND " + _render_ipv4_string_column(col, op, val) + " "
+    return sql
+
+
+def set_default_dttm(dttm_val, dttm_type: str, op: str, col: str) -> str:
+    """
+    Returns SQL with default dates if passed in 'to_dttm' or 'from_dttm' jinja variable
+    is type: None
+
+    :param dttm_val - passed in Jinja variable from Jinja expression, will either
+    be a 'from_dttm' or a 'to_dttm' object
+    :param dttm_type - passed in sring representation of jinja variable
+    :param op - operation to be used within generated SQL
+    :param col - column name to generate expression for
+    """
+    sql = " AND {col} {op} from_iso8601_timestamp('{dttm}')"
+    if dttm_val is None:
+        today = datetime.now()
+        yesterday = datetime.now() - timedelta(1)
+        if dttm_type == "from_dttm":
+            dttm = str(datetime.strftime(yesterday, '%Y-%m-%dT%H:%M:%S'))
+        else:
+            dttm = str(datetime.strftime(today, '%Y-%m-%dT%H:%M:%S'))
+    else:
+        dttm = dttm_val
+    return sql.format(col = col, op = op, dttm = dttm)
+
+
+# Register operator rendering functions
+JINJA_CONTEXT_ADDONS = {
+    "render_ipv4_between_number_columns": render_ipv4_between_number_columns,
+    "render_ipv4_between_number_columns_or_nothing": render_ipv4_between_number_columns_or_nothing,
+    "render_ipv4_either_number_columns": render_ipv4_either_number_columns,
+    "render_ipv4_number_column": render_ipv4_number_column,
+    "render_ipv4_string_columns": render_ipv4_string_columns,
+    "render_ip_array_filter": render_ip_array_filter,
+    "render_ip_array_filter_or_nothing": render_ip_array_filter_or_nothing,
+    "dashboard_link": dashboard_link,
+    "set_default_dttm": set_default_dttm,
+}
+
+
 
 # -------------------------------------------------------------------
 # *                WARNING:  STOP EDITING  HERE                    *
