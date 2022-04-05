@@ -24,7 +24,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
   useEffect(() => {
     fetch(
       // eslint-disable-next-line no-restricted-globals
-      `https://${location.host}/api/v1/proxy/alfred/${callback_url}/${appVal}`,
+      `//${location.host}/api/v1/proxy/alfred/${callback_url}/${appVal}`,
     )
       .then(res => res.json())
       .then(response => {
