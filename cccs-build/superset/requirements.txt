@@ -10,3 +10,4 @@ mysql-connector-python==8.0.26
 elasticsearch-dbapi==0.2.4
 trino==0.306.0
 msal==1.17.0
+
