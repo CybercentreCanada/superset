@@ -175,6 +175,9 @@ class ChartRestApi(BaseSupersetModelRestApi):
         "slice_name",
         "table.default_endpoint",
         "table.table_name",
+        "tags.id",
+        "tags.name",
+        "tags.type",
         "thumbnail_url",
         "url",
         "viz_type",
@@ -205,6 +208,7 @@ class ChartRestApi(BaseSupersetModelRestApi):
         "description",
         "id",
         "owners",
+        "tags",
         "slice_name",
         "viz_type",
     ]

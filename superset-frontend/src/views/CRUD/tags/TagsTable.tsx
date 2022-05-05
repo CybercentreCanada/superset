@@ -18,10 +18,22 @@
  */
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import { t } from '@superset-ui/core';
-import TableView from 'src/components/TableView';
+import { t, styled } from '@superset-ui/core';
+import TableView, { EmptyWrapperType } from 'src/components/TableView';
 import { fetchObjects } from '../../../tags';
 import Loading from '../../../components/Loading';
+
+const TagsTableContainer = styled.div`
+  text-align: left;
+  border-radius: ${({ theme }) => theme.gridUnit * 1}px 0;
+  margin: 0 ${({ theme }) => theme.gridUnit * 4}px;
+  .table {
+    table-layout: fixed;
+  }
+  .td {
+    width: 33%;
+  }
+`;
 
 interface TaggedObject {
   id: number;
@@ -66,12 +78,14 @@ export default function TagsTable({ search = '' }: TagsTableProps) {
   const renderTable = (type: any) => {
     const data = objects[type].map((o: TaggedObject) => ({
       [type]: <a href={o.url}>{o.name}</a>,
-      creator: o.creator,
+      // eslint-disable-next-line react/no-danger
+      creator: <div dangerouslySetInnerHTML={{ __html: o.creator }} />,
       modified: moment.utc(o.changed_on).fromNow(),
     }));
     return (
       <TableView
         className="table-condensed"
+        emptyWrapperType={EmptyWrapperType.Small}
         data={data}
         pageSize={50}
         columns={[
@@ -88,7 +102,7 @@ export default function TagsTable({ search = '' }: TagsTableProps) {
 
   if (objects) {
     return (
-      <div>
+      <TagsTableContainer>
         <h3>{t('Dashboards')}</h3>
         {renderTable('dashboard')}
         <hr />
@@ -97,7 +111,7 @@ export default function TagsTable({ search = '' }: TagsTableProps) {
         <hr />
         <h3>{t('Queries')}</h3>
         {renderTable('query')}
-      </div>
+      </TagsTableContainer>
     );
   }
   return <Loading />;
