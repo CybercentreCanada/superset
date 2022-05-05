@@ -140,6 +140,9 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "owners.username",
         "owners.first_name",
         "owners.last_name",
+        "tags.id",
+        "tags.name",
+        "tags.type",
         "roles.id",
         "roles.name",
     ]
@@ -175,6 +178,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "published",
         "roles",
         "slug",
+        # "tags",
     )
     search_filters = {
         "dashboard_title": [DashboardTitleOrSlugFilter],

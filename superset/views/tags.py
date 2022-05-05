@@ -21,8 +21,9 @@ from typing import Any, Dict, List
 import simplejson as json
 from flask import request, Response
 from flask_appbuilder import expose
+from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.hooks import before_request
-from flask_appbuilder.security.decorators import has_access_api
+from flask_appbuilder.security.decorators import has_access, has_access_api
 from jinja2.sandbox import SandboxedEnvironment
 from sqlalchemy import and_, func
 from werkzeug.exceptions import NotFound
@@ -34,6 +35,7 @@ from superset.models.slice import Slice
 from superset.models.sql_lab import SavedQuery
 from superset.models.tags import ObjectTypes, Tag, TaggedObject, TagTypes
 from superset.typing import FlaskResponse
+from superset.views.base import SupersetModelView
 
 from .base import BaseSupersetView, json_success
 
@@ -46,6 +48,20 @@ def process_template(content: str) -> str:
         "current_username": ExtraCache.current_username,
     }
     return template.render(context)
+
+
+class TagModelView(SupersetModelView):
+    route_base = "/superset/tags"
+    datamodel = SQLAInterface(Tag)
+    class_permission_name = "Tags"
+
+    @has_access
+    @expose("/")
+    def list(self) -> FlaskResponse:
+        if not is_feature_enabled("TAGGING_SYSTEM"):
+            return super().list()
+
+        return super().render_app_template()
 
 
 class TagView(BaseSupersetView):

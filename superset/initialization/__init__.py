@@ -189,7 +189,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             TableSchemaView,
             TabStateView,
         )
-        from superset.views.tags import TagView
+        from superset.views.tags import TagView, TagModelView
 
         #
         # Setup API views
@@ -407,7 +407,14 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             )
         except ImportError:
             pass
-
+        appbuilder.add_view(
+            TagModelView,
+            "Tags",
+            label=__("Tags"),
+            icon="",
+            category="",
+            category_icon="",
+        )
         appbuilder.add_api(LogRestApi)
         appbuilder.add_view(
             LogModelView,

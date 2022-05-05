@@ -40,7 +40,11 @@
  *     </div>
  *   </div>
  */
- .react-tags {
+.ant-tag {
+  color: black;
+}
+
+.react-tags {
   position: relative;
   display: inline-block;
   padding: 1px 0 0 1px;
@@ -204,10 +208,4 @@
 .react-tags-rw a.deco-none {
   color: inherit;
   text-decoration:none;
-}
-
-.react-tags span.glyphicon {
-  cursor: pointer;
-  margin-left: 3px;
-  top: 2px;
 }

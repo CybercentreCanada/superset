@@ -240,6 +240,7 @@
     "@types/react-select": "^3.0.19",
     "@types/react-sticky": "^6.0.3",
     "@types/react-table": "^7.0.19",
+    "@types/react-tag-autocomplete": "^6.1.1",
     "@types/react-ultimate-pagination": "^1.2.0",
     "@types/react-virtualized": "^9.21.10",
     "@types/react-window": "^1.8.2",
