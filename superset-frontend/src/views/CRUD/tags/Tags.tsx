@@ -58,10 +58,16 @@ function Tags() {
   const [tagsQuery, setTagsQuery] = useQueryParam('tags', StringParam);
 
   useEffect(() => {
-    fetchSuggestions({ includeTypes: false }, (suggestions: Tag[]) => {
-      const tagSuggestions = [...suggestions.map(tag => tag.name)];
-      setTagSuggestions(tagSuggestions);
-    });
+    fetchSuggestions(
+      { includeTypes: false },
+      (suggestions: Tag[]) => {
+        const tagSuggestions = [...suggestions.map(tag => tag.name)];
+        setTagSuggestions(tagSuggestions);
+      },
+      (error: Response) => {
+        console.log(error.json());
+      },
+    );
   }, [tagsQuery]);
 
   const onTagSearchChange = (tags: Tag[]) => {

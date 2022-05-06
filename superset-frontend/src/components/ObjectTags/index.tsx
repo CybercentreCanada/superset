@@ -45,7 +45,7 @@ const TagsDiv = styled.div`
 `;
 
 const TagComponent = ({ tag, onDelete }: TagComponentProps) => (
-  <AntdTag closable onClose={onDelete} color="blue">
+  <AntdTag key={tag.id} closable onClose={onDelete} color="blue">
     {tag.name}
   </AntdTag>
 );
@@ -69,23 +69,9 @@ export const ObjectTags = ({
     );
   };
 
-  const orderTags = (pTags: Tag[]) =>
-    [...pTags].sort((a: Tag, b: Tag) => {
-      const left = String(a.name).toUpperCase();
-      const right = String(b.name).toUpperCase();
-
-      if (left < right) {
-        return -1;
-      }
-      if (left > right) {
-        return 1;
-      }
-      return 0;
-    });
-
   useEffect(() => {
-    fetchTags((pTags: Tag[]) => {
-      setTags(orderTags(pTags));
+    fetchTags((tags: Tag[]) => {
+      setTags(tags);
     });
     fetchSuggestions((suggestions: Tag[]) => {
       setTagSuggestions(suggestions);
@@ -98,20 +84,18 @@ export const ObjectTags = ({
     }
   }, [tags, tagSuggestions]);
 
-  const onDelete = (i: number) => {
-    if (tags != null) {
-      const tagId = tags[i].id;
-      const newTags = [...tags].filter(tag => tag.id !== tagId);
-      deleteTag(tags[i].name, () => setTags(orderTags(newTags)));
-      // onChange(tags);
-    }
+  const onDelete = (tagIndex: number) => {
+    deleteTag(tags[tagIndex].name, () =>
+      setTags(tags.filter((_, i) => i !== tagIndex)),
+    );
+    // onChange(tags);
   };
 
   const onAddition = (tag: Tag) => {
     if (tags.some(t => t.name === tag.name)) {
       return;
     }
-    addTag(tag.name, () => setTags(orderTags([...tags, tag])));
+    addTag(tag.name, () => setTags([...tags, tag]));
     // onChange(tags);
   };
 
