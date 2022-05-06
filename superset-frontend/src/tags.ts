@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SupersetClient } from '@superset-ui/core';
+import { JsonObject, SupersetClient } from '@superset-ui/core';
+import Tag from 'src/types/Tag';
 
 export const OBJECT_TYPES = Object.freeze({
   DASHBOARD: 'dashboard',
@@ -25,9 +26,13 @@ export const OBJECT_TYPES = Object.freeze({
 });
 
 export function fetchTags(
-  { objectType, objectId, includeTypes = false },
-  callback,
-  error,
+  {
+    objectType,
+    objectId,
+    includeTypes = false,
+  }: { objectType: string; objectId: number; includeTypes: boolean },
+  callback: (json: JsonObject) => void,
+  error: (response: Response) => void,
 ) {
   if (objectType === undefined || objectId === undefined) {
     throw new Error('Need to specify objectType and objectId');
@@ -35,23 +40,32 @@ export function fetchTags(
   SupersetClient.get({ endpoint: `/tagview/tags/${objectType}/${objectId}/` })
     .then(({ json }) =>
       callback(
-        json.filter(tag => tag.name.indexOf(':') === -1 || includeTypes),
+        json.filter((tag: Tag) => tag.name.indexOf(':') === -1 || includeTypes),
       ),
     )
     .catch(response => error(response));
 }
 
-export function fetchSuggestions({ includeTypes = false }, callback, error) {
+export function fetchSuggestions(
+  { includeTypes = false },
+  callback: (json: JsonObject) => void,
+  error: (response: Response) => void,
+) {
   SupersetClient.get({ endpoint: '/tagview/tags/suggestions/' })
     .then(({ json }) =>
       callback(
-        json.filter(tag => tag.name.indexOf(':') === -1 || includeTypes),
+        json.filter((tag: Tag) => tag.name.indexOf(':') === -1 || includeTypes),
       ),
     )
     .catch(response => error(response));
 }
 
-export function deleteTag({ objectType, objectId }, tag, callback, error) {
+export function deleteTag(
+  { objectType, objectId }: { objectType: string; objectId: number },
+  tag: Tag,
+  callback: (text: string) => void,
+  error: (response: Response) => void,
+) {
   if (objectType === undefined || objectId === undefined) {
     throw new Error('Need to specify objectType and objectId');
   }
@@ -65,10 +79,14 @@ export function deleteTag({ objectType, objectId }, tag, callback, error) {
 }
 
 export function addTag(
-  { objectType, objectId, includeTypes = false },
-  tag,
-  callback,
-  error,
+  {
+    objectType,
+    objectId,
+    includeTypes = false,
+  }: { objectType: string; objectId: number; includeTypes: boolean },
+  tag: string,
+  callback: (text: string) => void,
+  error: (response: Response) => void,
 ) {
   if (objectType === undefined || objectId === undefined) {
     throw new Error('Need to specify objectType and objectId');
@@ -85,7 +103,11 @@ export function addTag(
     .catch(response => error(response));
 }
 
-export function fetchObjects({ tags = '', types }, callback, error) {
+export function fetchObjects(
+  { tags = '', types }: { tags: string; types: string | null },
+  callback: (json: JsonObject) => void,
+  error: (response: Response) => void,
+) {
   let url = `/tagview/tagged_objects/?tags=${tags}`;
   if (types) {
     url += `&types=${types}`;

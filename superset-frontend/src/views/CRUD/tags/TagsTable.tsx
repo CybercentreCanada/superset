@@ -64,13 +64,19 @@ export default function TagsTable({ search = '' }: TagsTableProps) {
 
   useEffect(() => {
     const fetchResults = (search: string) => {
-      fetchObjects({ tags: search, types: null }, (data: TaggedObject[]) => {
-        const objects = { dashboard: [], chart: [], query: [] };
-        data.forEach(object => {
-          objects[object.type].push(object);
-        });
-        setObjects(objects);
-      });
+      fetchObjects(
+        { tags: search, types: null },
+        (data: TaggedObject[]) => {
+          const objects = { dashboard: [], chart: [], query: [] };
+          data.forEach(object => {
+            objects[object.type].push(object);
+          });
+          setObjects(objects);
+        },
+        (error: Response) => {
+          console.log(error.json());
+        },
+      );
     };
     fetchResults(search);
   }, [search]);
