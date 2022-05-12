@@ -108,14 +108,6 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
-<<<<<<< HEAD
-        new GwwkChartsChartPlugin().configure({key: 'gwwk_charts'}),
-        new GwwkDatasetsChartPlugin().configure({key: 'gwwk_datasets'}),
-        new GwwkDashboardsChartPlugin().configure({key: 'gwwk_dashboards'}),
-        new StatusIndicatorChartPlugin().configure({key: 'status_indicator'}),
-        new IframeDemoChartPlugin().configure({key: 'iframe_demo'}),
-        new CccsGridChartPlugin().configure({key: 'cccs_grid'}),
-=======
         new AtAGlanceUserIdChartPlugin().configure({
           key: 'at_a_glance_user_id',
         }),
@@ -133,7 +125,6 @@ export default class MainPreset extends Preset {
         new StatusIndicatorChartPlugin().configure({ key: 'status_indicator' }),
         new IframeDemoChartPlugin().configure({ key: 'iframe_demo' }),
         new CccsGridChartPlugin().configure({ key: 'cccs_grid' }),
->>>>>>> c5ba6da6d... CLDN-906 - Remove hard coded table ids from the code (#91)
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
         new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
