@@ -1,6 +1,6 @@
 {
   "name": "superset",
-  "version": "0.0.0dev",
+  "version": "1.4.0",
   "description": "Superset is a data exploration platform designed to be visual, intuitive, and interactive.",
   "license": "Apache-2.0",
   "directories": {
@@ -16,7 +16,7 @@
     "dev-server": "cross-env NODE_ENV=development BABEL_ENV=development node --max_old_space_size=4096 ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --mode=development",
     "prod": "npm run build",
     "build-dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=development webpack --mode=development --color",
-    "build-instrumented": "cross-env NODE_ENV=development BABEL_ENV=instrumented webpack --mode=development --color",
+    "build-instrumented": "cross-env NODE_ENV=production BABEL_ENV=instrumented webpack --mode=production --color",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production BABEL_ENV=\"${BABEL_ENV:=production}\" webpack --mode=production --color",
     "lint": "eslint --ignore-path=.eslintignore --ext .js,.jsx,.ts,.tsx . && npm run type",
     "prettier-check": "prettier --check 'src/**/*.{css,less,sass,scss}'",
@@ -61,6 +61,8 @@
   },
   "homepage": "https://superset.apache.org/",
   "dependencies": {
+    "@ag-grid-community/react": "^26.0.0",
+    "@ag-grid-enterprise/all-modules": "^26.0.0",
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime-corejs3": "^7.12.5",
     "@data-ui/sparkline": "^0.0.84",
@@ -139,7 +141,7 @@
     "query-string": "^6.13.7",
     "re-resizable": "^6.6.1",
     "react": "^16.13.1",
-    "react-ace": "^5.10.0",
+    "react-ace": "^9.4.4",
     "react-checkbox-tree": "^1.5.1",
     "react-color": "^2.13.8",
     "react-datetime": "^3.0.4",
