@@ -109,9 +109,10 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         if the passed in user_id is in any reports/incidents
         """
         try:
-            alfred_token = security_manager.get_access_token(
-                user=self.user.username, scopes=[self.ALFRED_SCOPE]
-            )
+            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(self.user.username,
+                                                                                    self.ALFRED_SCOPE,
+                                                                                    'alfred',
+                                                                                    cache_result=True)
             if not alfred_token:
                 raise Exception("Unable to fetch Alfred token")
         except requests.exceptions.HTTPError as err:
@@ -153,9 +154,10 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         if the passed in ip_string is in any reports/incidents
         """
         try:
-            alfred_token = security_manager.get_access_token(
-                user=self.user.username, scopes=[self.ALFRED_SCOPE]
-            )
+            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(self.user.username,
+                                                                                    self.ALFRED_SCOPE,
+                                                                                    'alfred',
+                                                                                    cache_result=True)
             if not alfred_token:
                 raise Exception("Unable to fetch Alfred token")
         except requests.exceptions.HTTPError as err:
