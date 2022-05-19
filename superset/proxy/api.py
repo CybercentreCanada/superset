@@ -39,7 +39,6 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         This is the init function for the ProxyRestAPI class
         """
         super().__init__()
-        self.user = current_user
 
         self.ALFRED_SCOPE = os.environ.get("ALFRED_SCOPE")
         if self.ALFRED_SCOPE is None:
@@ -109,7 +108,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         if the passed in user_id is in any reports/incidents
         """
         try:
-            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(self.user.username,
+            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(current_user.username,
                                                                                     self.ALFRED_SCOPE,
                                                                                     'alfred',
                                                                                     cache_result=True)
@@ -154,7 +153,7 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         if the passed in ip_string is in any reports/incidents
         """
         try:
-            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(self.user.username,
+            alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(current_user.username,
                                                                                     self.ALFRED_SCOPE,
                                                                                     'alfred',
                                                                                     cache_result=True)
