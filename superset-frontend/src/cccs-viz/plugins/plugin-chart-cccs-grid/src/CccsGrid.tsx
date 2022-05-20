@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 //import { styled } from '@superset-ui/core';
 import { CccsGridTransformedProps } from './types';
 
@@ -74,6 +74,8 @@ export default function CccsGrid({
   const [prevRow, setPrevRow] = useState(-1);
   const [prevColumn, setPrevColumn] = useState('');
   const [searchValue, setSearchValue] = useState('');
+
+  const gridRef = useRef<AgGridReact>(null);
 
   const handleChange = useCallback(
     filters => {
@@ -249,6 +251,10 @@ export default function CccsGrid({
     }
   }, [include_search])
 
+  useEffect(() => {
+    gridRef.current?.props.api?.paginationSetPageSize(page_length);
+  }, [page_length]);
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -278,6 +284,7 @@ export default function CccsGrid({
       </div>
       ) : null}
       <AgGridReact
+        ref={gridRef}
         modules={AllModules}
         columnDefs={columnDefs}
         defaultColDef={DEFAULT_COLUMN_DEF}
