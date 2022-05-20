@@ -252,8 +252,6 @@ export default function CccsGrid({
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
-    pagination: page_length > 0,
-    paginationPageSize: page_length
     // Disables a Key performance feature for Ag-Grid to enable autosizing of multiple columns
     // if not disabled, only the first 10-15 columns will autosize
     // This change will make initial load up of Ag-Grid slower than before
@@ -296,6 +294,8 @@ export default function CccsGrid({
         cacheQuickFilter={true}
         quickFilterText={searchValue}
         rowGroupPanelShow="always"
+        paginationPageSize={page_length}
+        pagination={page_length > 0}
       />
     </div>
   );
