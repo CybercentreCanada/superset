@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 //import { styled } from '@superset-ui/core';
 import { CccsGridTransformedProps } from './types';
 
@@ -63,6 +63,7 @@ export default function CccsGrid({
   tooltipShowDelay,
   rowSelection,
   emitFilter = false,
+  include_search,
   filters: initialFilters = {},
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
@@ -241,6 +242,12 @@ export default function CccsGrid({
     setSearchValue(target.value);
   }
 
+  useEffect(() => {
+    if (!include_search) {
+      setSearchValue("");
+    }
+  }, [include_search])
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -251,6 +258,7 @@ export default function CccsGrid({
 
   return (
     <div style={{ width, height }} className="ag-theme-balham">
+      { include_search ? (
       <div className="form-inline" style={{ paddingBottom: "0.5em" }}> 
         <div className="row">
           <div className="col-sm-6"></div>
@@ -267,6 +275,7 @@ export default function CccsGrid({
           </div>
         </div>
       </div>
+      ) : null}
       <AgGridReact
         modules={AllModules}
         columnDefs={columnDefs}
