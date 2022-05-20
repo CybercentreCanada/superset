@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { RowNode } from '@ag-grid-enterprise/all-modules';
 import { Column, getMetricLabel, Metric, QueryMode, t, TimeseriesDataRecord } from '@superset-ui/core';
 import {
   CccsGridChartProps,
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
+import ipaddr from 'ipaddr.js';
 
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
@@ -136,6 +138,23 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   },
   sortingColumnMap);
 
+  function compareIPv4(valueA: string, valueB: string, nodeA: RowNode, nodeB: RowNode, isInverted: boolean) {
+    // https://stackoverflow.com/questions/48618635/require-sorting-on-ip-address-using-js
+    const num1 = Number(valueA.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+    const num2 = Number(valueB.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+    return num1-num2;
+  }
+
+
+  function compareIPv6(valueA: string, valueB: string, nodeA: RowNode, nodeB: RowNode, isInverted: boolean) {
+    const ipA = ipaddr.parse(valueA).toNormalizedString();
+    const ipB = ipaddr.parse(valueB).toNormalizedString();
+    if (ipA == ipB) {
+      return 0;
+    }
+    return (ipA > ipB) ? 1 : -1;
+  }
+
   // Key is column type, value is renderer name
   const rendererMap = {
     IPV4: 'ipv4ValueRenderer',
@@ -143,6 +162,11 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     DOMAIN: 'domainValueRenderer',
     COUNTRY: 'countryValueRenderer',
     JSON: 'jsonValueRenderer',
+  };
+
+  const comparatorMap = {
+    IPV4: compareIPv4,
+    IPV6: compareIPv6,
   };
 
   var columnDefs: Column[] = [];
@@ -164,6 +188,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const cellRenderer =
         columnType in rendererMap ? rendererMap[columnType] : undefined;
       const isSortable = true;
+      const comparator =
+        columnType in comparatorMap ? comparatorMap[columnType] : undefined;
       return {
         field: column,
         headerName: columnHeader,
@@ -171,6 +197,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sortable: isSortable,
         sort: sortDirection,
         sortIndex: sortIndex,
+        comparator: comparator,
       };
     });
   } else {
