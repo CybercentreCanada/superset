@@ -69,13 +69,14 @@ export default function CccsGrid({
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
-  const [setFilters] = useState(initialFilters);
+  const [,setFilters] = useState(initialFilters);
 
   const [prevRow, setPrevRow] = useState(-1);
   const [prevColumn, setPrevColumn] = useState('');
   const [searchValue, setSearchValue] = useState('');
 
   const gridRef = useRef<AgGridReact>(null);
+  const keyRefresh = useRef<number>(0);
 
   const handleChange = useCallback(
     filters => {
@@ -252,7 +253,12 @@ export default function CccsGrid({
   }, [include_search])
 
   useEffect(() => {
-    gridRef.current?.props.api?.paginationSetPageSize(page_length);
+    if (page_length <= 0) {
+      gridRef.current?.props.api?.paginationSetPageSize(rowData.length);
+    } else {
+      gridRef.current?.props.api?.paginationSetPageSize(page_length);
+    }
+    keyRefresh.current += 1
   }, [page_length]);
 
   const gridOptions = {
@@ -284,6 +290,7 @@ export default function CccsGrid({
       </div>
       ) : null}
       <AgGridReact
+        key={keyRefresh.current}
         ref={gridRef}
         modules={AllModules}
         columnDefs={columnDefs}
@@ -301,8 +308,8 @@ export default function CccsGrid({
         cacheQuickFilter={true}
         quickFilterText={searchValue}
         rowGroupPanelShow="always"
-        paginationPageSize={page_length}
-        pagination={page_length > 0}
+        paginationPageSize={page_length == 0 ? rowData.length : page_length}
+        pagination={true}
       />
     </div>
   );
