@@ -39,6 +39,7 @@ import {
   formatSelectOptions
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
+import validateInteger from '@superset-ui/core/lib/validator/validateNumber';
 
 //import cidrRegex from 'cidr-regex';
 
@@ -543,6 +544,7 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
             default: null,
             choices: PAGE_SIZE_OPTIONS,
             description: t('Rows per page, 0 means no pagination'),
+            validators: [validateInteger]
           },
         },
       ],
