@@ -385,7 +385,7 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
     controlSetRows: [
       [
         {
-          name: 'table_filter',
+          name: 'emitFilter',
           config: {
             type: 'CheckboxControl',
             label: t('Enable emitting filters'),
@@ -407,8 +407,8 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
             default: false,
             description: t('Whether to include a client-side search box'),
           },
-        }
-      ]
+        },
+      ],
     ],
   });
 }
