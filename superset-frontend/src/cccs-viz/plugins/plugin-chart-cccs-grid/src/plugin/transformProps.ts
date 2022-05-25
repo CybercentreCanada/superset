@@ -169,11 +169,11 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       return {
         field: column,
         headerName: columnHeader,
-        cellRenderer: cellRenderer,
+        cellRenderer,
         sortable: isSortable,
         sort: sortDirection,
-        sortIndex: sortIndex,
-        enableRowGroup: enableRowGroup,
+        sortIndex,
+        enableRowGroup,
       };
     });
   } else {
@@ -190,9 +190,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         return {
           field: column,
           headerName: columnHeader,
-          cellRenderer: cellRenderer,
+          cellRenderer,
           sortable: isSortable,
-          enableRowGroup: enableRowGroup,
+          enableRowGroup,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);
@@ -209,7 +209,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           field: metric,
           headerName: metricHeader,
           sortable: true,
-          enableRowGroup: true
+          enableRowGroup: true,
         };
       });
       columnDefs = columnDefs.concat(metricsColumnDefs);
