@@ -60,7 +60,7 @@ export default function CccsGrid({
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
-  const [setFilters] = useState(initialFilters);
+  const [, setFilters] = useState(initialFilters);
 
   const [prevRow, setPrevRow] = useState(-1);
   const [prevColumn, setPrevColumn] = useState('');
@@ -268,7 +268,6 @@ export default function CccsGrid({
           </div>
         </div>
       ) : null}
-      {emitFilter ? <>EMIT FILTER IS ON - TEMP MESSAGE</> : null}
       <AgGridReact
         modules={AllModules}
         columnDefs={columnDefs}
@@ -279,7 +278,7 @@ export default function CccsGrid({
         allowContextMenuWithControlKey={true}
         gridOptions={gridOptions}
         onGridColumnsChanged={autoSizeFirst100Columns}
-        //getContextMenuItems={getContextMenuItems}
+        // getContextMenuItems={getContextMenuItems}
         onGridReady={onGridReady}
         onRangeSelectionChanged={onRangeSelectionChanged}
         onSelectionChanged={onSelectionChanged}
