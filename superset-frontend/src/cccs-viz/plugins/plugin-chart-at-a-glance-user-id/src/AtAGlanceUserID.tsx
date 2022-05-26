@@ -20,6 +20,7 @@ const generateClientIpLinksList = (columnDefs: any, rowData: any) => (
       rowData={rowData}
       columnDefs={columnDefs}
       domLayout="autoHeight"
+      enableCellTextSelection={true}
     />
   </div>
 );
