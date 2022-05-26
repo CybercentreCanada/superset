@@ -292,6 +292,7 @@ export default function CccsGrid({
         rowData={rowData}
         cacheQuickFilter={true}
         quickFilterText={searchValue}
+        rowGroupPanelShow="always"
       />
     </div>
   );
