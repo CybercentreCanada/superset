@@ -36,6 +36,7 @@ import {
   ControlPanelState,
   ControlState,
 } from '@superset-ui/chart-controls';
+import ColumnOption from '@superset-ui/chart-controls/lib/components/ColumnOption';
 
 //import cidrRegex from 'cidr-regex';
 
@@ -55,7 +56,7 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
  * Visibility check
  */
 function isQueryMode(mode: QueryMode) {
-  return ({ controls }: ControlPanelsContainerProps) =>
+  return ({ controls }: Pick<ControlPanelsContainerProps, 'controls'>) =>
     getQueryMode(controls) === mode;
 }
 
@@ -179,7 +180,18 @@ const config: ControlPanelConfig = {
         [
           {
             name: 'groupby',
-            override: {
+            config: {
+              type: 'SelectControl',
+              label: t('Group by'),
+              description: sharedControls.groupby.description,
+              multi: true,
+              freeForm: true,
+              allowAll: true,
+              default: [],
+              valueKey: "column_name",
+              includeTime: false,
+              optionRenderer: c => <ColumnOption showType column={c} />,
+              valueRenderer: c => <ColumnOption column={c} />,
               visibility: isAggMode,
               mapStateToProps: (
                 state: ControlPanelState,
@@ -197,7 +209,8 @@ const config: ControlPanelConfig = {
                 return newState;
               },
               rerender: ['metrics'],
-            },
+              canCopy: true,
+            } as typeof sharedControls.groupby,
           },
         ],
         [
@@ -228,8 +241,17 @@ const config: ControlPanelConfig = {
         [
           {
             name: 'columns',
-            override: {
-              visibility: isRawMode,
+            config: {
+              type: 'SelectControl',
+              label: t('Columns'),
+              description: t('Columns to display'),
+              multi: true,
+              freeForm: true,
+              allowAll: true,
+              default: [],
+              optionRenderer: c => <ColumnOption showType column={c} />,
+              valueRenderer: c => <ColumnOption column={c} />,
+              valueKey: 'column_name',
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
@@ -247,7 +269,9 @@ const config: ControlPanelConfig = {
                     : [];
                 return newState;
               },
-            },
+              visibility: isRawMode,
+              canCopy: true,
+            } as typeof sharedControls.groupby,
           },
         ],
         [
