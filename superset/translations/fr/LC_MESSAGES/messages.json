@@ -2447,7 +2447,8 @@
       ],
       "Limit selector values": [""],
       "These filters apply to the values available in the dropdowns": [""],
-      "Time-series Table": ["Table de Séries temporelles"]
+      "Time-series Table": ["Table de Séries temporelles"],
+      "Copy the contents of this control": ["Copier le contenu de ce contrôle"]
     }
   }
 }
