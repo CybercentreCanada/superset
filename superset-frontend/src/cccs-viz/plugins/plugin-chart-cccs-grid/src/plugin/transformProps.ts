@@ -165,13 +165,15 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const cellRenderer =
         columnType in rendererMap ? rendererMap[columnType] : undefined;
       const isSortable = true;
+      const enableRowGroup = true;
       return {
         field: column,
         headerName: columnHeader,
-        cellRenderer: cellRenderer,
+        cellRenderer,
         sortable: isSortable,
         sort: sortDirection,
-        sortIndex: sortIndex,
+        sortIndex,
+        enableRowGroup,
       };
     });
   } else {
@@ -184,11 +186,13 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         const cellRenderer =
           columnType in rendererMap ? rendererMap[columnType] : undefined;
         const isSortable = true;
+        const enableRowGroup = true;
         return {
           field: column,
           headerName: columnHeader,
-          cellRenderer: cellRenderer,
+          cellRenderer,
           sortable: isSortable,
+          enableRowGroup,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);
@@ -205,6 +209,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           field: metric,
           headerName: metricHeader,
           sortable: true,
+          enableRowGroup: true,
         };
       });
       columnDefs = columnDefs.concat(metricsColumnDefs);
