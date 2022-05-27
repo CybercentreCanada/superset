@@ -37,6 +37,8 @@ const propTypes = {
   tooltipOnClick: PropTypes.func,
   warning: PropTypes.string,
   danger: PropTypes.string,
+  canCopy: PropTypes.bool,
+  copyOnClick: PropTypes.func,
 };
 
 const defaultProps = {
@@ -67,6 +69,17 @@ class ControlHeader extends React.Component {
                 tooltip={this.props.description}
                 placement="top"
                 onClick={this.props.tooltipOnClick}
+              />{' '}
+            </span>
+          )}
+          {this.props.canCopy && (
+            <span>
+              <InfoTooltipWithTrigger
+                label={t('copy')}
+                tooltip={t('Copy the content of this control')}
+                placement="top"
+                icon="copy"
+                onClick={this.props.copyOnClick}
               />{' '}
             </span>
           )}
