@@ -18,6 +18,7 @@
  */
 import {
   t,
+  tn,
   FeatureFlag,
   isFeatureEnabled,
   QueryMode,
@@ -36,7 +37,7 @@ import {
   ControlPanelState,
   ControlState,
 } from '@superset-ui/chart-controls';
-import ColumnOption from '@superset-ui/chart-controls/lib/components/ColumnOption';
+import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 //import cidrRegex from 'cidr-regex';
 
@@ -85,6 +86,29 @@ const validateAggControlValues = (
     ? [t('Metrics or Group By must have a value')]
     : [];
 };
+
+const validateColumnValues = (
+  controls: ControlStateMapping,
+  values: any[],
+  state: ControlPanelState
+) => {
+  const invalidColumns = values.filter((val: any) => val !== undefined && !state.datasource?.columns.some(col => col.column_name === val));
+  return invalidColumns.length !== 0
+    ? [tn('Invalid column: %s', 'Invalid columns: %s', invalidColumns.length, invalidColumns.join(", "))]
+    : [];
+}
+
+const validateAggColumnValues = (
+  controls: ControlStateMapping,
+  values: any[],
+  state: ControlPanelState
+) => {
+  const result = validateAggControlValues(controls, values);
+  if (result.length === 0 && isAggMode({ controls })) {
+    return validateColumnValues(controls, values[1], state);
+  };
+  return result;
+}
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
@@ -190,8 +214,8 @@ const config: ControlPanelConfig = {
               default: [],
               valueKey: "column_name",
               includeTime: false,
-              optionRenderer: c => <ColumnOption showType column={c} />,
-              valueRenderer: c => <ColumnOption column={c} />,
+              optionRenderer: c => <StyledColumnOption showType column={c} />,
+              valueRenderer: c => <StyledColumnOption column={c} />,
               visibility: isAggMode,
               mapStateToProps: (
                 state: ControlPanelState,
@@ -202,9 +226,10 @@ const config: ControlPanelConfig = {
                   sharedControls?.groupby?.mapStateToProps;
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggControlValues(
+                newState.externalValidationErrors = validateAggColumnValues(
                   controls,
                   [controls.metrics?.value, controlState.value],
+                  state
                 );
                 return newState;
               },
@@ -249,8 +274,8 @@ const config: ControlPanelConfig = {
               freeForm: true,
               allowAll: true,
               default: [],
-              optionRenderer: c => <ColumnOption showType column={c} />,
-              valueRenderer: c => <ColumnOption column={c} />,
+              optionRenderer: c => <StyledColumnOption showType column={c} />,
+              valueRenderer: c => <StyledColumnOption column={c} />,
               valueKey: 'column_name',
               mapStateToProps: (
                 state: ControlPanelState,
@@ -263,10 +288,12 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors =
                   // @ts-ignore
-                  isRawMode({ controls }) &&
+                  (isRawMode({ controls }) &&
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
-                    : [];
+                    : isRawMode({ controls })
+                    ? validateColumnValues(controls, ensureIsArray(controlState.value), state)
+                    : []);
                 return newState;
               },
               visibility: isRawMode,
