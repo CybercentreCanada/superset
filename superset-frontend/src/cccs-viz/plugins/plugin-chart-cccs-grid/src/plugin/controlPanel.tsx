@@ -25,6 +25,7 @@ import {
   QueryFormColumn,
   ensureIsArray,
   validateNonEmpty,
+  validateInteger,
 } from '@superset-ui/core';
 import {
   ControlConfig,
@@ -540,9 +541,10 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
             freeForm: true,
             renderTrigger: true,
             label: t('Page length'),
-            default: null,
+            default: 100,
             choices: PAGE_SIZE_OPTIONS,
             description: t('Rows per page, 0 means no pagination'),
+            validators: [validateInteger]
           },
         },
       ],
