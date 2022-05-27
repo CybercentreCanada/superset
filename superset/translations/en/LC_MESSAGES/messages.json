@@ -2035,7 +2035,7 @@
       "Limit selector values": [""],
       "These filters apply to the values available in the dropdowns": [""],
       "Time-series Table": [""],
-      "Copy the contents of this control": [""]
+      "Copy the content of this control": [""]
     }
   }
 }

@@ -76,7 +76,7 @@ class ControlHeader extends React.Component {
             <span>
               <InfoTooltipWithTrigger
                 label={t('copy')}
-                tooltip={t('Copy the contents of this control')}
+                tooltip={t('Copy the content of this control')}
                 placement="top"
                 icon="copy"
                 onClick={this.props.copyOnClick}
