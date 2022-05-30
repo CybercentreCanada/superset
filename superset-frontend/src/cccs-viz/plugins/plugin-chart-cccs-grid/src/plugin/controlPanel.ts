@@ -437,10 +437,4 @@ const config: ControlPanelConfig = {
   },
 };
 
-// CLDN-941: Only show the CUSTOMIZE tab if DASHBOARD_CROSS_FILTERS are enabled in the system.
-// When more customization is added in the future this code can be removed and the code above
-// can be re-enabled.
-
 export default config;
-
-
