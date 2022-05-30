@@ -255,6 +255,14 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'timeseries_limit_metric',
+            override: {
+              visibility: isAggMode
+            },
+          },
+        ],
+        [
+          {
             name: 'columns',
             override: {
               visibility: isRawMode,
@@ -308,6 +316,18 @@ const config: ControlPanelConfig = {
             name: 'row_limit',
             override: {
               default: 100,
+            },
+          },
+        ],
+        [
+          {
+            name: 'order_desc',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Sort descending'),
+              default: true,
+              description: t('Whether to sort descending or ascending'),
+              visibility: isAggMode,
             },
           },
         ],

@@ -18,6 +18,7 @@
  */
 import {
   buildQueryContext,
+  ensureIsArray,
   getMetricLabel,
   PostProcessingRule,
   QueryMode,
@@ -56,11 +57,12 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
   options: any,
 ) => {
   const queryMode = getQueryMode(formData);
+  const sortByMetric = ensureIsArray(formData.timeseries_limit_metric)[0];
   let formDataCopy = {
     ...formData,
     ...DEFAULT_FORM_DATA,
   };
-  const { percent_metrics: percentMetrics } = formData;
+  const { percent_metrics: percentMetrics, order_desc: orderDesc = false } = formData;
   // never include time in raw records mode
   if (queryMode === QueryMode.raw) {
     formDataCopy = {
@@ -76,7 +78,9 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
 
     if (queryMode === QueryMode.aggregate) {
       metrics = metrics || [];
-      if (metrics?.length > 0) {
+      if (sortByMetric) {
+        orderby = [[sortByMetric, !orderDesc]];
+      } else if (metrics?.length > 0) {
         // default to ordering by first metric in descending order
         orderby = [[metrics[0], false]];
       }
