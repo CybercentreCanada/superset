@@ -25,7 +25,7 @@ import {
   QueryFormColumn,
   ensureIsArray,
   validateNonEmpty,
-  validateInteger,
+  legacyValidateInteger,
 } from '@superset-ui/core';
 import {
   ControlConfig,
@@ -544,7 +544,7 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
             default: 100,
             choices: PAGE_SIZE_OPTIONS,
             description: t('Rows per page, 0 means no pagination'),
-            validators: [validateInteger]
+            validators: [legacyValidateInteger]
           },
         },
       ],
