@@ -77,6 +77,7 @@ export default function CccsGrid({
 
   const gridRef = useRef<AgGridReact>(null);
   const keyRefresh = useRef<number>(0);
+  const pageSize = useRef<number>(page_length === 0 ? rowData.length : page_length);
 
   const handleChange = useCallback(
     filters => {
@@ -240,6 +241,12 @@ export default function CccsGrid({
     params.columnApi.autoSizeColumns(allColumnIds.slice(0, 100), false);
   }
 
+  useEffect(() => {
+    pageSize.current = page_length <= 0 ? 0 : page_length;
+    gridRef.current?.props.api?.paginationSetPageSize(pageSize.current);
+    keyRefresh.current += 1
+  }, [page_length]);
+  
   function setSearch(e: ChangeEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement;
     e.preventDefault();
@@ -251,15 +258,6 @@ export default function CccsGrid({
       setSearchValue("");
     }
   }, [include_search])
-
-  useEffect(() => {
-    if (page_length <= 0) {
-      gridRef.current?.props.api?.paginationSetPageSize(rowData.length);
-    } else {
-      gridRef.current?.props.api?.paginationSetPageSize(page_length);
-    }
-    keyRefresh.current += 1
-  }, [page_length]);
 
   const gridOptions = {
     suppressColumnVirtualisation: true,
@@ -305,11 +303,11 @@ export default function CccsGrid({
         onRangeSelectionChanged={onRangeSelectionChanged}
         onSelectionChanged={onSelectionChanged}
         rowData={rowData}
+        paginationPageSize={pageSize.current}
+        pagination={pageSize.current !== 0}
         cacheQuickFilter={true}
         quickFilterText={searchValue}
         rowGroupPanelShow="always"
-        paginationPageSize={page_length == 0 ? rowData.length : page_length}
-        pagination={true}
       />
     </div>
   );
