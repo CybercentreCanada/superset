@@ -47,6 +47,14 @@ import { sliceUpdated } from 'src/explore/actions/exploreActions';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import ExploreActionButtons from '../ExploreActionButtons';
 import RowCountLabel from '../RowCountLabel';
+import ObjectTags from '../../components/ObjectTags';
+import {
+  addTag,
+  deleteTag,
+  fetchSuggestions,
+  fetchTags,
+  OBJECT_TYPES,
+} from '../../tags';
 
 const CHART_STATUS_MAP = {
   failed: 'danger',
@@ -121,6 +129,23 @@ export class ExploreChartHeader extends React.PureComponent {
     this.hideReportModal = this.hideReportModal.bind(this);
     this.renderReportModal = this.renderReportModal.bind(this);
     this.fetchChartDashboardData = this.fetchChartDashboardData.bind(this);
+    this.fetchTags = fetchTags.bind(this, {
+      objectType: OBJECT_TYPES.CHART,
+      objectId: props.chart.id,
+      includeTypes: false,
+    });
+    this.fetchSuggestions = fetchSuggestions.bind(this, {
+      includeTypes: false,
+    });
+    this.deleteTag = deleteTag.bind(this, {
+      objectType: OBJECT_TYPES.CHART,
+      objectId: props.chart.id,
+    });
+    this.addTag = addTag.bind(this, {
+      objectType: OBJECT_TYPES.CHART,
+      objectId: props.chart.id,
+      includeTypes: false,
+    });
   }
 
   componentDidMount() {
@@ -336,6 +361,21 @@ export class ExploreChartHeader extends React.PureComponent {
                   currentFormData={formData}
                 />
               )}
+              {/* {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && */}
+              <ObjectTags
+                fetchTags={this.fetchTags}
+                fetchSuggestions={this.fetchSuggestions}
+                deleteTag={this.deleteTag}
+                addTag={this.addTag}
+                editable={
+                  this.props.can_overwrite ||
+                  (this.props.slice?.owners || []).includes(
+                    this.props?.user?.userId,
+                  ) ||
+                  !!this.props.user?.roles?.Admin
+                }
+              />
+              {/* } */}
             </StyledButtons>
           )}
         </div>

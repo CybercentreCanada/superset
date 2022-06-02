@@ -34,6 +34,7 @@ import Icons from 'src/components/Icons';
 import Button from 'src/components/Button';
 import EditableTitle from 'src/components/EditableTitle';
 import FaveStar from 'src/components/FaveStar';
+import ObjectTags from 'src/components/ObjectTags';
 import { safeStringify } from 'src/utils/safeStringify';
 import HeaderActionsDropdown from 'src/dashboard/components/Header/HeaderActionsDropdown';
 import HeaderReportActionsDropdown from 'src/components/ReportModal/HeaderReportActionsDropdown';
@@ -55,6 +56,13 @@ import { options as PeriodicRefreshOptions } from 'src/dashboard/components/Refr
 import findPermission from 'src/dashboard/util/findPermission';
 import { FILTER_BOX_MIGRATION_STATES } from 'src/explore/constants';
 import { DashboardEmbedModal } from '../DashboardEmbedControls';
+import {
+  addTag,
+  deleteTag,
+  fetchSuggestions,
+  fetchTags,
+  OBJECT_TYPES,
+} from '../../../tags';
 
 const propTypes = {
   addSuccessToast: PropTypes.func.isRequired,
@@ -168,6 +176,23 @@ class Header extends React.PureComponent {
     this.showReportModal = this.showReportModal.bind(this);
     this.hideReportModal = this.hideReportModal.bind(this);
     this.renderReportModal = this.renderReportModal.bind(this);
+    this.fetchTags = fetchTags.bind(this, {
+      objectType: OBJECT_TYPES.DASHBOARD,
+      objectId: props.dashboardInfo.id,
+      includeTypes: false,
+    });
+    this.fetchSuggestions = fetchSuggestions.bind(this, {
+      includeTypes: false,
+    });
+    this.deleteTag = deleteTag.bind(this, {
+      objectType: OBJECT_TYPES.DASHBOARD,
+      objectId: props.dashboardInfo.id,
+    });
+    this.addTag = addTag.bind(this, {
+      objectType: OBJECT_TYPES.DASHBOARD,
+      objectId: props.dashboardInfo.id,
+      includeTypes: false,
+    });
   }
 
   componentDidMount() {
@@ -563,6 +588,15 @@ class Header extends React.PureComponent {
               showTooltip
             />
           )}
+          {/* {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && */}
+          <ObjectTags
+            fetchTags={this.fetchTags}
+            fetchSuggestions={this.fetchSuggestions}
+            deleteTag={this.deleteTag}
+            addTag={this.addTag}
+            editable={dashboardInfo.dash_edit_perm}
+          />
+          {/* } */}
         </div>
 
         <div className="button-container">
