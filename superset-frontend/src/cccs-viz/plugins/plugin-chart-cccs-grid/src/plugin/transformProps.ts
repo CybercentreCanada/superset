@@ -88,15 +88,15 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   const columns = datasource?.columns as Column[];
   const metrics = datasource?.metrics as Metric[];
 
-  // Map of column types, key is column name, value is column type
-  const columnTypeMap = new Map<string, string>();
+  // Map of column advanced types, key is column name, value is column type
+  const columnAdvancedTypeMap = new Map<string, string>();
   columns.reduce(function (columnMap, column: Column) {
     // @ts-ignore
     const name = column.column_name;
     // @ts-ignore
-    columnMap[name] = column.type;
+    columnMap[name] = (column.business_type as string ?? "").toUpperCase();
     return columnMap;
-  }, columnTypeMap);
+  }, columnAdvancedTypeMap);
 
   // Map of verbose names, key is column name, value is verbose name
   const columnVerboseNameMap = new Map<string, string>();
@@ -165,7 +165,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
 
   if (query_mode === QueryMode.raw) {
     columnDefs = formData.columns.map((column: any) => {
-      const columnType = columnTypeMap[column];
+      const columnAdvancedType = columnAdvancedTypeMap[column];
       const columnHeader = columnVerboseNameMap[column]
         ? columnVerboseNameMap[column]
         : column;
@@ -178,7 +178,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const sortIndex =
         column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
       const cellRenderer =
-        columnType in rendererMap ? rendererMap[columnType] : undefined;
+        columnAdvancedType in rendererMap ? rendererMap[columnAdvancedType] : undefined;
       const isSortable = true;
       const enableRowGroup = true;
       return {
@@ -194,12 +194,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   } else {
     if (formData.groupby) {
       const groupByColumnDefs = formData.groupby.map((column: any) => {
-        const columnType = columnTypeMap[column];
+        const columnAdvancedType = columnAdvancedTypeMap[column];
         const columnHeader = columnVerboseNameMap[column]
           ? columnVerboseNameMap[column]
           : column;
         const cellRenderer =
-          columnType in rendererMap ? rendererMap[columnType] : undefined;
+          columnAdvancedType in rendererMap ? rendererMap[columnAdvancedType] : undefined;
         const isSortable = true;
         const enableRowGroup = true;
         return {
