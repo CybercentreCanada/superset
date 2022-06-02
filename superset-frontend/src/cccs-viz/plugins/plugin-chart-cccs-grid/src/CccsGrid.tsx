@@ -77,7 +77,7 @@ export default function CccsGrid({
 
   const gridRef = useRef<AgGridReact>(null);
   const keyRefresh = useRef<number>(0);
-  const pageSize = useRef<number>(page_length === 0 ? rowData.length : page_length);
+  const pageSize = useRef<number>(page_length);
 
   const handleChange = useCallback(
     filters => {

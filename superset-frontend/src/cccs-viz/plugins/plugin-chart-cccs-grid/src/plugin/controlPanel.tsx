@@ -37,7 +37,7 @@ import {
   sharedControls,
   ControlPanelState,
   ControlState,
-  formatSelectOptions
+  formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
@@ -544,7 +544,7 @@ if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
             default: 100,
             choices: PAGE_SIZE_OPTIONS,
             description: t('Rows per page, 0 means no pagination'),
-            validators: [legacyValidateInteger]
+            validators: [legacyValidateInteger],
           },
         },
       ],
