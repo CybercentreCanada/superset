@@ -499,57 +499,50 @@ const config: ControlPanelConfig = {
   },
 };
 
-// CLDN-941: Only show the CUSTOMIZE tab if DASHBOARD_CROSS_FILTERS are enabled in the system.
-// When more customization is added in the future this code can be removed and the code above
-// can be re-enabled.
-if (isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)) {
-  config.controlPanelSections.push({
-    label: t('CCCS Grid Options'),
-    expanded: true,
-    controlSetRows: [
-      [
-        {
-          name: 'table_filter',
-          config: {
-            type: 'CheckboxControl',
-            label: t('Enable emitting filters'),
-            default: false,
-            renderTrigger: true,
-            description: t(
-              'Whether to apply filter to dashboards when grid cells are clicked.',
-            ),
-          },
+config.controlPanelSections.push({
+  label: t('CCCS Grid Options'),
+  expanded: true,
+  controlSetRows: [
+    [
+      {
+        name: 'include_search',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Search box'),
+          renderTrigger: true,
+          default: false,
+          description: t('Whether to include a client-side search box'),
         },
-      ],
-      [
-        {
-          name: 'include_search',
-          config: {
-            type: 'CheckboxControl',
-            label: t('Search box'),
-            renderTrigger: true,
-            default: false,
-            description: t('Whether to include a client-side search box'),
-          },
-        },
-      ],
-      [
-        {
-          name: 'page_length',
-          config: {
-            type: 'SelectControl',
-            freeForm: true,
-            renderTrigger: true,
-            label: t('Page length'),
-            default: 100,
-            choices: PAGE_SIZE_OPTIONS,
-            description: t('Rows per page, 0 means no pagination'),
-            validators: [legacyValidateInteger],
-          },
-        },
-      ],
+      },
     ],
-  });
-}
+    [
+      {
+        name: 'enable_grouping',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Row grouping'),
+          renderTrigger: true,
+          default: false,
+          description: t('Whether to enable row grouping'),
+        },
+      },
+    ],
+    [
+      {
+        name: 'page_length',
+        config: {
+          type: 'SelectControl',
+          freeForm: true,
+          renderTrigger: true,
+          label: t('Page length'),
+          default: 100,
+          choices: PAGE_SIZE_OPTIONS,
+          description: t('Rows per page, 0 means no pagination'),
+          validators: [legacyValidateInteger],
+        },
+      },
+    ],
+  ],
+});
 
 export default config;
