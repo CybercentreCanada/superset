@@ -94,7 +94,7 @@ const SavedQueryList = lazy(
       /* webpackChunkName: "SavedQueryList" */ 'src/views/CRUD/data/savedquery/SavedQueryList'
     ),
 );
-const Tags = lazy(
+const TagsPage = lazy(
   () => import(/* webpackChunkName: "Tags" */ 'src/views/CRUD/tags/Tags'),
 );
 
@@ -109,10 +109,6 @@ export const routes: Routes = [
   {
     path: '/superset/welcome/',
     Component: Welcome,
-  },
-  {
-    path: '/superset/tags/',
-    Component: Tags,
   },
   {
     path: '/dashboard/list/',
@@ -177,6 +173,13 @@ export const routes: Routes = [
     },
   },
 ];
+
+if (isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM)) {
+  routes.push({
+    path: '/superset/tags/',
+    Component: TagsPage,
+  });
+}
 
 const frontEndRoutes = routes
   .map(r => r.path)
