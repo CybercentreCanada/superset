@@ -208,7 +208,6 @@ class ChartRestApi(BaseSupersetModelRestApi):
         "description",
         "id",
         "owners",
-        "tags",
         "slice_name",
         "viz_type",
     ]
