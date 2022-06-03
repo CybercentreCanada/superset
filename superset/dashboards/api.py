@@ -178,7 +178,6 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "published",
         "roles",
         "slug",
-        # "tags",
     )
     search_filters = {
         "dashboard_title": [DashboardTitleOrSlugFilter],
