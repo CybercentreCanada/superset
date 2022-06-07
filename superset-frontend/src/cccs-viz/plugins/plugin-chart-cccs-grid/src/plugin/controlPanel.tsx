@@ -84,7 +84,7 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['columns', 'groupby', 'metrics'],
+  rerender: ['columns', 'groupby', 'metrics', 'percent_metrics'],
 };
 
 const validateAggControlValues = (
@@ -101,25 +101,36 @@ const validateAggControlValues = (
 const validateColumnValues = (
   controls: ControlStateMapping,
   values: any[],
-  state: ControlPanelState
+  state: ControlPanelState,
 ) => {
-  const invalidColumns = values.filter((val: any) => val !== undefined && !state.datasource?.columns.some(col => col.column_name === val));
+  const invalidColumns = values.filter(
+    (val: any) =>
+      val !== undefined &&
+      !state.datasource?.columns.some(col => col.column_name === val),
+  );
   return invalidColumns.length !== 0
-    ? [tn('Invalid column: %s', 'Invalid columns: %s', invalidColumns.length, invalidColumns.join(", "))]
+    ? [
+        tn(
+          'Invalid column: %s',
+          'Invalid columns: %s',
+          invalidColumns.length,
+          invalidColumns.join(', '),
+        ),
+      ]
     : [];
-}
+};
 
 const validateAggColumnValues = (
   controls: ControlStateMapping,
   values: any[],
-  state: ControlPanelState
+  state: ControlPanelState,
 ) => {
   const result = validateAggControlValues(controls, values);
   if (result.length === 0 && isAggMode({ controls })) {
     return validateColumnValues(controls, values[1], state);
-  };
+  }
   return result;
-}
+};
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
@@ -223,8 +234,9 @@ const config: ControlPanelConfig = {
               freeForm: true,
               allowAll: true,
               default: [],
-              valueKey: "column_name",
+              valueKey: 'column_name',
               includeTime: false,
+              canSelectAll: true,
               optionRenderer: c => <StyledColumnOption showType column={c} />,
               valueRenderer: c => <StyledColumnOption column={c} />,
               visibility: isAggMode,
@@ -239,8 +251,12 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors = validateAggColumnValues(
                   controls,
-                  [controls.metrics?.value, controlState.value, controls.percent_metrics?.value],
-                  state
+                  [
+                    controls.metrics?.value,
+                    controlState.value,
+                    controls.percent_metrics?.value,
+                  ],
+                  state,
                 );
                 return newState;
               },
@@ -266,7 +282,11 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors = validateAggControlValues(
                   controls,
-                  [controls.groupby?.value, controlState.value, controls.percent_metrics?.value],
+                  [
+                    controls.groupby?.value,
+                    controlState.value,
+                    controls.percent_metrics?.value,
+                  ],
                 );
                 return newState;
               },
@@ -304,14 +324,6 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'timeseries_limit_metric',
-            override: {
-              visibility: isAggMode
-            },
-          },
-        ],
-        [
-          {
             name: 'columns',
             config: {
               type: 'SelectControl',
@@ -321,6 +333,7 @@ const config: ControlPanelConfig = {
               freeForm: true,
               allowAll: true,
               default: [],
+              canSelectAll: true,
               optionRenderer: c => <StyledColumnOption showType column={c} />,
               valueRenderer: c => <StyledColumnOption column={c} />,
               valueKey: 'column_name',
@@ -335,12 +348,16 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors =
                   // @ts-ignore
-                  (isRawMode({ controls }) &&
+                  isRawMode({ controls }) &&
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : isRawMode({ controls })
-                    ? validateColumnValues(controls, ensureIsArray(controlState.value), state)
-                    : []);
+                    ? validateColumnValues(
+                        controls,
+                        ensureIsArray(controlState.value),
+                        state,
+                      )
+                    : [];
                 return newState;
               },
               visibility: isRawMode,
@@ -364,12 +381,19 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-
         [
           {
             name: 'adhoc_filters',
             override: {
               // validators: [adhocFilterValidator],
+            },
+          },
+        ],
+        [
+          {
+            name: 'timeseries_limit_metric',
+            override: {
+              visibility: isAggMode,
             },
           },
         ],
@@ -394,18 +418,20 @@ const config: ControlPanelConfig = {
           },
         ],
         [
-          isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS) ? {
-            name: 'table_filter',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Enable emitting filters'),
-              default: false,
-              renderTrigger: true,
-              description: t(
-                'Whether to apply filter to dashboards when grid cells are clicked.',
-              ),
-            },
-          } : null,
+          isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
+            ? {
+                name: 'table_filter',
+                config: {
+                  type: 'CheckboxControl',
+                  label: t('Emit dashboard cross filters'),
+                  default: false,
+                  renderTrigger: true,
+                  description: t(
+                    'Whether to apply filter to dashboards when grid cells are clicked.',
+                  ),
+                },
+              }
+            : null,
         ],
       ],
     },
