@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 from flask_babel import lazy_gettext as _
-from sqlalchemy import not_, or_, and_, JSON, type_coerce
+from sqlalchemy import not_, or_, JSON, type_coerce
 from sqlalchemy.orm.query import Query
 
 from superset.connectors.sqla.models import SqlaTable
