@@ -108,6 +108,7 @@ export enum FilterOperator {
   allText = 'all_text',
   chartAllText = 'chart_all_text',
   datasetIsNullOrEmpty = 'dataset_is_null_or_empty',
+  datasetIsCertified = 'dataset_is_certified',
   between = 'between',
   dashboardIsFav = 'dashboard_is_favorite',
   chartIsFav = 'chart_is_favorite',
