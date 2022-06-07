@@ -17,6 +17,7 @@
 import dataclasses
 import functools
 import logging
+import os
 import traceback
 from datetime import datetime
 from typing import Any, Callable, cast, Dict, List, Optional, TYPE_CHECKING, Union
@@ -311,6 +312,12 @@ def menu_data() -> Dict[str, Any]:
     if callable(brand_text):
         brand_text = brand_text()
     build_number = appbuilder.app.config["BUILD_NUMBER"]
+    environment_tag = (
+        appbuilder.app.config["ENVIRONMENT_TAG_CONFIG"]["values"][
+            os.environ.get(appbuilder.app.config["ENVIRONMENT_TAG_CONFIG"]["variable"])
+        ]
+        or {}
+    )
     return {
         "menu": menu,
         "brand": {
@@ -321,6 +328,7 @@ def menu_data() -> Dict[str, Any]:
             "tooltip": appbuilder.app.config["LOGO_TOOLTIP"],
             "text": brand_text,
         },
+        "environment_tag": environment_tag,
         "navbar_right": {
             # show the watermark if the default app icon has been overriden
             "show_watermark": ("superset-logo-horiz" not in appbuilder.app_icon),

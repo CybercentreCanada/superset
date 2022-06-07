@@ -33,6 +33,7 @@ import {
   RightMenuProps,
 } from './types';
 import { MenuObjectProps } from './Menu';
+import { Tag } from 'antd';
 
 const versionInfoStyles = (theme: SupersetTheme) => css`
   padding: ${theme.gridUnit * 1.5}px ${theme.gridUnit * 4}px
@@ -68,6 +69,7 @@ const RightMenu = ({
   settings,
   navbarRight,
   isFrontendRoute,
+  environmentTag,
 }: RightMenuProps) => {
   const { roles } = useSelector<any, UserWithPermissionsAndRoles>(
     state => state.user,
@@ -182,6 +184,11 @@ const RightMenu = ({
         show={showModal}
         dbEngine={engine}
       />
+      {environmentTag.text && (
+        <Tag css={{ borderRadius: '500px' }} color={environmentTag.color}>
+          {environmentTag.text}
+        </Tag>
+      )}
       <Menu selectable={false} mode="horizontal" onClick={handleMenuSelection}>
         {!navbarRight.user_is_anonymous && showActionDropdown && (
           <SubMenu
