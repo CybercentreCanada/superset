@@ -526,7 +526,7 @@ const config: ControlPanelConfig = {
 };
 
 config.controlPanelSections.push({
-  label: t('CCCS Grid Options'),
+  label: t('Options'),
   expanded: true,
   controlSetRows: [
     [
