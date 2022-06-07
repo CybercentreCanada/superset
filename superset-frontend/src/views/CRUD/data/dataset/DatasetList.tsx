@@ -343,6 +343,11 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         disableSortBy: true,
       },
       {
+        accessor: 'extra',
+        hidden: true,
+        disableSortBy: true,
+      },
+      {
         Cell: ({ row: { original } }: any) => {
           const handleEdit = () => openDatasetEditModal(original);
           const handleDelete = () => openDatasetDeleteModal(original);
@@ -472,6 +477,17 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         selects: [
           { label: 'Virtual', value: false },
           { label: 'Physical', value: true },
+        ],
+      },
+      {
+        Header: t('Certified'),
+        id: 'extra',
+        input: 'select',
+        operator: FilterOperator.datasetIsCertified,
+        unfilteredLabel: t('Any'),
+        selects: [
+          { label: t('Yes'), value: true },
+          { label: t('No'), value: false },
         ],
       },
       {
