@@ -24,6 +24,7 @@ import Icons from 'src/components/Icons';
 import findPermission from 'src/dashboard/util/findPermission';
 import { useSelector } from 'react-redux';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
+import { Tag } from 'antd';
 import LanguagePicker from './LanguagePicker';
 import DatabaseModal from '../CRUD/data/database/DatabaseModal';
 import { uploadUserPerms } from '../CRUD/utils';
@@ -33,7 +34,6 @@ import {
   RightMenuProps,
 } from './types';
 import { MenuObjectProps } from './Menu';
-import { Tag } from 'antd';
 
 const versionInfoStyles = (theme: SupersetTheme) => css`
   padding: ${theme.gridUnit * 1.5}px ${theme.gridUnit * 4}px
