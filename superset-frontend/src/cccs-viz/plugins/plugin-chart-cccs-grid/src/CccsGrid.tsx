@@ -339,7 +339,7 @@ export default function CccsGrid({
         onSelectionChanged={onSelectionChanged}
         rowData={rowData}
         paginationPageSize={pageSize}
-        pagination={pageSize !== 0}
+        pagination={pageSize > 0}
         cacheQuickFilter={true}
         quickFilterText={searchValue}
         rowGroupPanelShow="always"
