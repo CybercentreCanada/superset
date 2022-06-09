@@ -72,6 +72,7 @@ export default function CccsGrid({
   emitFilter = false,
   include_search,
   page_length = 0,
+  enable_grouping = false,
   filters: initialFilters = {},
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
@@ -270,6 +271,10 @@ export default function CccsGrid({
     }
   }, [include_search]);
 
+  useEffect(() => {
+    keyRefresh.current += 1
+  }, [enable_grouping]);
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -342,7 +347,7 @@ export default function CccsGrid({
         pagination={pageSize > 0}
         cacheQuickFilter={true}
         quickFilterText={searchValue}
-        rowGroupPanelShow="always"
+        rowGroupPanelShow={enable_grouping ? "always" : "never"}
       />
     </div>
   );
