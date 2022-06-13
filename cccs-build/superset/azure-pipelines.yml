@@ -5,7 +5,7 @@ trigger:
       - cccs-*
   paths:
     exclude:
-      - '*'
+      - '**'
     include:
       - cccs-build/superset/Dockerfile
 
