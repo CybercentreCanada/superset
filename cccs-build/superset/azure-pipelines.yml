@@ -3,6 +3,11 @@ trigger:
   branches:
     include:
       - cccs-*
+  paths:
+    exclude:
+      - /
+    include:
+      - cccs-build/superset/Dockerfile
 
 variables:
   containerRegistry: uchimera
