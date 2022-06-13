@@ -426,9 +426,7 @@ const config: ControlPanelConfig = {
                   label: t('Emit dashboard cross filters'),
                   default: false,
                   renderTrigger: true,
-                  description: t(
-                    'Whether to apply filter to dashboards when grid cells are clicked.',
-                  ),
+                  description: t('Emit dashboard cross filters.'),
                 },
               }
             : null,
