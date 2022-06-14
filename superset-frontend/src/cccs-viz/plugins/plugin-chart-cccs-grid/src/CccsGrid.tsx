@@ -283,7 +283,6 @@ export default function CccsGrid({
   }, [enable_grouping]);
 
   const onColumnMoved = useCallback(e => {
-    console.log('MOVED');
     setControlValue('column_state', e.columnApi.getColumnState());
   }, []);
 
