@@ -66,6 +66,7 @@ export default function CccsGrid({
   rowData,
   formData,
   setDataMask,
+  setControlValue,
   selectedValues,
   tooltipShowDelay,
   rowSelection,
@@ -73,6 +74,7 @@ export default function CccsGrid({
   include_search,
   page_length = 0,
   enable_grouping = false,
+  column_state,
   filters: initialFilters = {},
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
@@ -152,7 +154,12 @@ export default function CccsGrid({
   };
 
   const onGridReady = (params: any) => {
-    console.log('onGridReady called');
+    if (column_state) {
+      params.columnApi.applyColumnState({
+        state: column_state,
+        applyOrder: true,
+      });
+    }
   };
 
   const onSelectionChanged = (params: any) => {
@@ -275,6 +282,11 @@ export default function CccsGrid({
     keyRefresh.current += 1;
   }, [enable_grouping]);
 
+  const onColumnMoved = useCallback(e => {
+    console.log('MOVED');
+    setControlValue('column_state', e.columnApi.getColumnState());
+  }, []);
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -352,6 +364,7 @@ export default function CccsGrid({
         cacheQuickFilter={true}
         quickFilterText={searchValue}
         rowGroupPanelShow={enable_grouping ? 'always' : 'never'}
+        onColumnMoved={onColumnMoved}
       />
     </div>
   );

@@ -80,11 +80,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     query_mode,
     include_search,
     enable_grouping,
+    column_state,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
-  const { setDataMask = () => {} } = hooks;
+  const { setDataMask = () => {}, setControlValue } = hooks;
 
   const columns = datasource?.columns as Column[];
   const metrics = datasource?.metrics as Metric[];
@@ -95,7 +96,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     // @ts-ignore
     const name = column.column_name;
     // @ts-ignore
-    columnMap[name] = (column.business_type as string ?? "").toUpperCase();
+    columnMap[name] = ((column.business_type as string) ?? '').toUpperCase();
     return columnMap;
   }, columnAdvancedTypeMap);
 
@@ -159,8 +160,10 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   };
 
   const percentMetricValueFormatter = function (params: ValueFormatterParams) {
-    return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(params.value);
-  }
+    return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
+      params.value,
+    );
+  };
 
   let columnDefs: Column[] = [];
 
@@ -179,7 +182,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const sortIndex =
         column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
       const cellRenderer =
-        columnAdvancedType in rendererMap ? rendererMap[columnAdvancedType] : undefined;
+        columnAdvancedType in rendererMap
+          ? rendererMap[columnAdvancedType]
+          : undefined;
       const isSortable = true;
       const enableRowGroup = true;
       return {
@@ -200,7 +205,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           ? columnVerboseNameMap[column]
           : column;
         const cellRenderer =
-          columnAdvancedType in rendererMap ? rendererMap[columnAdvancedType] : undefined;
+          columnAdvancedType in rendererMap
+            ? rendererMap[columnAdvancedType]
+            : undefined;
         const isSortable = true;
         const enableRowGroup = true;
         return {
@@ -218,16 +225,16 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const metricsColumnDefs = formData.metrics
         .map(getMetricLabel)
         .map((metric: any) => {
-        const metricHeader = metricVerboseNameMap[metric]
-          ? metricVerboseNameMap[metric]
-          : metric;
-        return {
-          field: metric,
-          headerName: metricHeader,
-          sortable: true,
-          enableRowGroup: true,
-        };
-      });
+          const metricHeader = metricVerboseNameMap[metric]
+            ? metricVerboseNameMap[metric]
+            : metric;
+          return {
+            field: metric,
+            headerName: metricHeader,
+            sortable: true,
+            enableRowGroup: true,
+          };
+        });
       columnDefs = columnDefs.concat(metricsColumnDefs);
     }
 
@@ -252,6 +259,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   return {
     formData,
     setDataMask,
+    setControlValue,
     width,
     height,
     columnDefs,
@@ -264,6 +272,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     include_search,
     page_length,
     enable_grouping,
+    column_state,
     agGridLicenseKey,
   };
 }
