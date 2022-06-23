@@ -361,21 +361,21 @@ export class ExploreChartHeader extends React.PureComponent {
                   currentFormData={formData}
                 />
               )}
-              {/* {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && */}
-              <ObjectTags
-                fetchTags={this.fetchTags}
-                fetchSuggestions={this.fetchSuggestions}
-                deleteTag={this.deleteTag}
-                addTag={this.addTag}
-                editable={
-                  this.props.can_overwrite ||
-                  (this.props.slice?.owners || []).includes(
-                    this.props?.user?.userId,
-                  ) ||
-                  !!this.props.user?.roles?.Admin
-                }
-              />
-              {/* } */}
+              {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && (
+                <ObjectTags
+                  fetchTags={this.fetchTags}
+                  fetchSuggestions={this.fetchSuggestions}
+                  deleteTag={this.deleteTag}
+                  addTag={this.addTag}
+                  editable={
+                    this.props.can_overwrite ||
+                    (this.props.slice?.owners || []).includes(
+                      this.props?.user?.userId,
+                    ) ||
+                    !!this.props.user?.roles?.Admin
+                  }
+                />
+              )}
             </StyledButtons>
           )}
         </div>

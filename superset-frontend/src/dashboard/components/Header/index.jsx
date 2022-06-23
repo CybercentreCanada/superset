@@ -588,15 +588,15 @@ class Header extends React.PureComponent {
               showTooltip
             />
           )}
-          {/* {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && */}
-          <ObjectTags
-            fetchTags={this.fetchTags}
-            fetchSuggestions={this.fetchSuggestions}
-            deleteTag={this.deleteTag}
-            addTag={this.addTag}
-            editable={dashboardInfo.dash_edit_perm}
-          />
-          {/* } */}
+          {isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM) && (
+            <ObjectTags
+              fetchTags={this.fetchTags}
+              fetchSuggestions={this.fetchSuggestions}
+              deleteTag={this.deleteTag}
+              addTag={this.addTag}
+              editable={dashboardInfo.dash_edit_perm}
+            />
+          )}
         </div>
 
         <div className="button-container">

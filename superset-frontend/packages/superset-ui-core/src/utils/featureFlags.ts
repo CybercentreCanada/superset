@@ -54,6 +54,7 @@ export enum FeatureFlag {
   ALLOW_FULL_CSV_EXPORT = 'ALLOW_FULL_CSV_EXPORT',
   UX_BETA = 'UX_BETA',
   GENERIC_CHART_AXES = 'GENERIC_CHART_AXES',
+  TAGGING_SYSTEM = 'TAGGING_SYSTEM',
 }
 export type ScheduleQueriesProps = {
   JSONSCHEMA: {
