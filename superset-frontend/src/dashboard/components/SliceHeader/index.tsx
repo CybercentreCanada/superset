@@ -96,12 +96,17 @@ const SliceHeader: FC<SliceHeaderProps> = ({
     state => state.dataMask[slice?.slice_id]?.filterState?.value,
   );
 
+  const crossFilterColumn = useSelector<RootState, any>(
+    state => state.dataMask[slice?.slice_id]?.filterState?.column,
+  );
+
   const indicator = useMemo(
     () => ({
       value: crossFilterValue,
       name: t('Emitted values'),
+      column: crossFilterColumn,
     }),
-    [crossFilterValue],
+    [crossFilterValue, crossFilterColumn],
   );
 
   useEffect(() => {

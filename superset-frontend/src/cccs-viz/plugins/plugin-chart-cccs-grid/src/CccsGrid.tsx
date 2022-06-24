@@ -125,6 +125,8 @@ export default function CccsGrid({
         },
         filterState: {
           value: groupByValues.length ? groupByValues : null,
+          column: 'string1',
+          filters,
         },
       });
     },

@@ -19,7 +19,10 @@
 
 import { SearchOutlined } from '@ant-design/icons';
 import React, { FC } from 'react';
-import { getFilterValueForDisplay } from 'src/dashboard/components/nativeFilters/FilterBar/FilterSets/utils';
+import {
+  getFilterValueForDisplay,
+  getFilterValueForDisplayWithColumn,
+} from 'src/dashboard/components/nativeFilters/FilterBar/FilterSets/utils';
 import {
   FilterIndicatorText,
   FilterValue,
@@ -40,7 +43,7 @@ const FilterIndicator: FC<IndicatorProps> = ({
   onClick = () => {},
   text,
 }) => {
-  const resultValue = getFilterValueForDisplay(value);
+  const resultValue = getFilterValueForDisplayWithColumn(value, column);
   return (
     <>
       <Item onClick={() => onClick([...path, `LABEL-${column}`])}>

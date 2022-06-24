@@ -43,6 +43,31 @@ export const getFilterValueForDisplay = (
   return t('Unknown value');
 };
 
+export const getFilterValueForDisplayWithColumn = (
+  value?: string[] | null | string | number | object,
+  column?: string[] | string | null,
+): string => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    return `Magical columns: ${column} -- ${value}`;
+  }
+  if (Array.isArray(value) && column !== null && column !== undefined) {
+    if (typeof column === 'string') {
+      // return 'column string array of values';
+      return `Columns: ${column} Values: ${value.join(', ')}`;
+    }
+    if (Array.isArray(column)) {
+      return `Columns: ${column.join(', ')} Values: ${value.join(', ')}`;
+    }
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return t('Unknown value');
+};
+
 export const findExistingFilterSet = ({
   filterSetFilterValues,
   dataMaskSelected,
