@@ -50,16 +50,31 @@ export const getFilterValueForDisplayWithColumn = (
   if (value === null || value === undefined) {
     return '';
   }
+  // Not used by CCCS Grid
   if (typeof value === 'string' || typeof value === 'number') {
-    return `Magical columns: ${column} -- ${value}`;
+    return `${column}: ${value}`;
   }
+  // CCCS Grid only produces arrays for "value" currently
   if (Array.isArray(value) && column !== null && column !== undefined) {
     if (typeof column === 'string') {
       // return 'column string array of values';
-      return `Columns: ${column} Values: ${value.join(', ')}`;
+      return `${column}: ${value.join(', ')}`;
     }
     if (Array.isArray(column)) {
-      return `Columns: ${column.join(', ')} Values: ${value.join(', ')}`;
+      const values = value.flat(2);
+      const toolTip = [];
+      let valuesList = [];
+      let columnName = column[0];
+      for (let i = 0; i < column.length; i += 1) {
+        if (columnName !== column[i]) {
+          toolTip.push(`${columnName}: ${valuesList}`);
+          valuesList = [];
+          columnName = column[i];
+        }
+        valuesList.push(values[i]);
+      }
+      toolTip.push(`${columnName}: ${valuesList}`);
+      return `${toolTip.join(' ')}`;
     }
   }
   if (typeof value === 'object') {

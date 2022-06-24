@@ -104,6 +104,12 @@ export default function CccsGrid({
 
       const groupBy = Object.keys(filters);
       const groupByValues = Object.values(filters);
+      const columns = Object.entries(filters).flatMap(entry => {
+        if (Array.isArray(entry[1])) {
+          return new Array(entry[1].length).fill(entry[0]);
+        }
+        return null;
+      });
       setDataMask({
         extraFormData: {
           filters:
@@ -125,8 +131,7 @@ export default function CccsGrid({
         },
         filterState: {
           value: groupByValues.length ? groupByValues : null,
-          column: 'string1',
-          filters,
+          column: columns,
         },
       });
     },
