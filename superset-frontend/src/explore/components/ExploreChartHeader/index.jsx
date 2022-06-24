@@ -47,14 +47,14 @@ import { sliceUpdated } from 'src/explore/actions/exploreActions';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import ExploreActionButtons from '../ExploreActionButtons';
 import RowCountLabel from '../RowCountLabel';
-import ObjectTags from '../../components/ObjectTags';
+import ObjectTags from 'src/components/ObjectTags';
 import {
   addTag,
   deleteTag,
   fetchSuggestions,
   fetchTags,
   OBJECT_TYPES,
-} from '../../tags';
+} from 'src/tags';
 
 const CHART_STATUS_MAP = {
   failed: 'danger',
