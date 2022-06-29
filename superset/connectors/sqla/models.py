@@ -38,6 +38,7 @@ from typing import (
 import dateutil.parser
 import numpy as np
 import pandas as pd
+from pyrsistent import v
 import sqlalchemy as sa
 import sqlparse
 from flask import escape, Markup
@@ -92,6 +93,7 @@ from superset.jinja_context import (
 from superset.models.annotations import Annotation
 from superset.models.core import Database
 from superset.models.helpers import AuditMixinNullable, CertificationMixin, QueryResult
+from superset.models.tags import DatasetUpdater, Tag
 from superset.sql_parse import ParsedQuery, sanitize_clause
 from superset.superset_typing import (
     AdhocColumn,
@@ -560,6 +562,13 @@ class SqlaTable(Model, BaseDatasource):  # pylint: disable=too-many-public-metho
     database_id = Column(Integer, ForeignKey("dbs.id"), nullable=False)
     fetch_values_predicate = Column(Text)
     owners = relationship(owner_class, secondary=sqlatable_user, backref="tables")
+    tags = relationship(
+        Tag,
+        secondary="tagged_object",
+        primaryjoin="and_(SqlaTable.id == TaggedObject.object_id)",
+        secondaryjoin="and_(TaggedObject.tag_id == Tag.id, "
+            "TaggedObject.object_type == 'dataset')",
+    )
     database: Database = relationship(
         "Database",
         backref=backref("tables", cascade="all, delete-orphan"),
@@ -1941,6 +1950,12 @@ sa.event.listen(SqlaTable, "after_update", security_manager.set_perm)
 sa.event.listen(SqlaTable, "before_update", SqlaTable.before_update)
 sa.event.listen(SqlMetric, "after_update", SqlaTable.update_table)
 sa.event.listen(TableColumn, "after_update", SqlaTable.update_table)
+
+# events for updating tags
+if is_feature_enabled("TAGGING_SYSTEM"):
+    sa.event.listen(SqlaTable, "after_insert", DatasetUpdater.after_insert)
+    sa.event.listen(SqlaTable, "after_update", DatasetUpdater.after_update)
+    sa.event.listen(SqlaTable, "after_delete", DatasetUpdater.after_delete)
 
 RLSFilterRoles = Table(
     "rls_filter_roles",
