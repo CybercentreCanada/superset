@@ -25,24 +25,6 @@ export const generateFiltersSetId = () => `FILTERS_SET-${shortid.generate()}`;
 
 export const APPLY_FILTERS_HINT = t('Please apply filter changes');
 
-export const getFilterValueForDisplay = (
-  value?: string[] | null | string | number | object,
-): string => {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  if (typeof value === 'string' || typeof value === 'number') {
-    return `${value}`;
-  }
-  if (Array.isArray(value)) {
-    return value.join(', ');
-  }
-  if (typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-  return t('Unknown value');
-};
-
 export const getFilterValueForDisplayWithColumn = (
   value?: string[] | null | string | number | object,
   column?: string[] | string | null,
@@ -87,6 +69,10 @@ export const getFilterValueForDisplayWithColumn = (
   }
   return t('Unknown value');
 };
+
+export const getFilterValueForDisplay = (
+  value?: string[] | null | string | number | object,
+): string => getFilterValueForDisplayWithColumn(value);
 
 export const findExistingFilterSet = ({
   filterSetFilterValues,
