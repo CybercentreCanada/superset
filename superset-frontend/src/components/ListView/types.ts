@@ -113,4 +113,7 @@ export enum FilterOperator {
   chartIsFav = 'chart_is_favorite',
   chartIsCertified = 'chart_is_certified',
   dashboardIsCertified = 'dashboard_is_certified',
+  dashboardTags = 'dashboard_tags',
+  chartTags = 'chart_tags',
+  savedQueryTags = 'saved_query_tags',
 }
