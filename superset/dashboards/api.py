@@ -60,6 +60,7 @@ from superset.dashboards.filters import (
     DashboardCertifiedFilter,
     DashboardFavoriteFilter,
     DashboardTitleOrSlugFilter,
+    DashboardTagFilter,
     FilterRelatedRoles,
 )
 from superset.dashboards.schemas import (
@@ -214,10 +215,12 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "published",
         "roles",
         "slug",
+        "tags",
     )
     search_filters = {
         "dashboard_title": [DashboardTitleOrSlugFilter],
         "id": [DashboardFavoriteFilter, DashboardCertifiedFilter],
+        "tags": [DashboardTagFilter],
     }
     base_order = ("changed_on", "desc")
 

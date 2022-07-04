@@ -30,7 +30,7 @@ from superset.models.embedded_dashboard import EmbeddedDashboard
 from superset.models.slice import Slice
 from superset.security.guest_token import GuestTokenResourceType, GuestUser
 from superset.views.base import BaseFilter, is_user_admin
-from superset.views.base_api import BaseFavoriteFilter
+from superset.views.base_api import BaseFavoriteFilter, BaseTagFilter
 
 
 class DashboardTitleOrSlugFilter(BaseFilter):  # pylint: disable=too-few-public-methods
@@ -57,6 +57,18 @@ class DashboardFavoriteFilter(  # pylint: disable=too-few-public-methods
     """
 
     arg_name = "dashboard_is_favorite"
+    class_name = "Dashboard"
+    model = Dashboard
+
+
+class DashboardTagFilter(  # pylint: disable=too-few-public-methods
+    BaseTagFilter
+):
+    """
+    Custom filter for the GET list that filters all dashboards that a user has favored
+    """
+
+    arg_name = "dashboard_tags"
     class_name = "Dashboard"
     model = Dashboard
 
