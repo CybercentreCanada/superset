@@ -20,6 +20,7 @@ from sqlalchemy.orm.query import Query
 
 from superset.connectors.sqla.models import SqlaTable
 from superset.views.base import BaseFilter
+from superset.views.base_api import BaseTagFilter
 
 
 class DatasetIsNullOrEmptyFilter(BaseFilter):  # pylint: disable=too-few-public-methods
@@ -33,3 +34,15 @@ class DatasetIsNullOrEmptyFilter(BaseFilter):  # pylint: disable=too-few-public-
             filter_clause = not_(filter_clause)
 
         return query.filter(filter_clause)
+
+
+class DatasetTagFilter(  # pylint: disable=too-few-public-methods
+    BaseTagFilter
+):
+    """
+    Custom filter for the GET list that filters all dashboards that a user has favored
+    """
+
+    arg_name = "dataset_tags"
+    class_name = "dataset"
+    model = SqlaTable
