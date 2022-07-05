@@ -1371,6 +1371,8 @@ SQLALCHEMY_DISPLAY_TEXT = "SQLAlchemy docs"
 # Set to False to only allow viewing own recent activity
 ENABLE_BROAD_ACTIVITY_ACCESS = True
 
+DATAHUB_URL = "https://localhost:9002/"
+
 # -------------------------------------------------------------------
 # *                WARNING:  STOP EDITING  HERE                    *
 # -------------------------------------------------------------------

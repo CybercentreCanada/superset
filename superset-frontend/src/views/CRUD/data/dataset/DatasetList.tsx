@@ -65,6 +65,7 @@ import {
   PASSWORDS_NEEDED_MESSAGE,
   CONFIRM_OVERWRITE_MESSAGE,
 } from './constants';
+import { datahub_url } from 'src/preamble';
 
 const FlexRowContainer = styled.div`
   align-items: center;
@@ -300,6 +301,26 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Name'),
         accessor: 'table_name',
+      },
+      {
+        Cell: ({
+          row: {
+            original: { extra },
+          },
+        }: any) => {
+          const parsedExtra = JSON.parse(extra);
+          if (parsedExtra?.urn) {
+            return (
+              <a href={datahub_url + parsedExtra?.urn}>
+                <Icons.Datahub viewBox="0 0 180 180" />
+              </a>
+            );
+          }
+          return null;
+        },
+        accessor: 'datahub_link',
+        disableSortBy: true,
+        size: 'xs',
       },
       {
         Cell: ({
