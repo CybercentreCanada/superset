@@ -81,7 +81,7 @@ const getMe = makeApi<void, User>({
   endpoint: '/api/v1/me/',
 });
 
-export const datahub_url = bootstrapData?.common?.datahub_url;
+export const datahubUrl = bootstrapData?.common?.datahub_url;
 
 /**
  * When you re-open the window, we check if you are still logged in.

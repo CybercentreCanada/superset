@@ -57,7 +57,7 @@ import ImportModelsModal from 'src/components/ImportModal/index';
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 import { isUserAdmin } from 'src/dashboard/util/findPermission';
-import { datahub_url } from 'src/preamble';
+import { datahubUrl } from 'src/preamble';
 import AddDatasetModal from './AddDatasetModal';
 
 import {
@@ -311,7 +311,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
           const parsedExtra = JSON.parse(extra);
           if (parsedExtra?.urn) {
             return (
-              <a href={datahub_url + parsedExtra?.urn}>
+              <a href={datahubUrl + parsedExtra?.urn}>
                 <Icons.Datahub viewBox="0 0 180 180" />
               </a>
             );
