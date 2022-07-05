@@ -54,6 +54,7 @@ import setPeriodicRunner, {
 import { options as PeriodicRefreshOptions } from 'src/dashboard/components/RefreshIntervalModal';
 import findPermission from 'src/dashboard/util/findPermission';
 import { FILTER_BOX_MIGRATION_STATES } from 'src/explore/constants';
+import { datahub_url } from 'src/preamble';
 import { DashboardEmbedModal } from '../DashboardEmbedControls';
 
 const propTypes = {
@@ -563,6 +564,17 @@ class Header extends React.PureComponent {
               showTooltip
             />
           )}
+          <a
+            href={
+              datahub_url +
+              'dashboard/urn:li:dashboard:(superset,' +
+              dashboardInfo.id +
+              ')'
+            }
+            style={{ paddingLeft: '0.5em' }}
+          >
+            <Icons.Datahub viewBox="0 0 180 180" />
+          </a>
         </div>
 
         <div className="button-container">
