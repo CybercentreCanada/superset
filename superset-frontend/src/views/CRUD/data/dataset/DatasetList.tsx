@@ -57,6 +57,7 @@ import ImportModelsModal from 'src/components/ImportModal/index';
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 import { isUserAdmin } from 'src/dashboard/util/findPermission';
+import { datahub_url } from 'src/preamble';
 import AddDatasetModal from './AddDatasetModal';
 
 import {
@@ -65,7 +66,6 @@ import {
   PASSWORDS_NEEDED_MESSAGE,
   CONFIRM_OVERWRITE_MESSAGE,
 } from './constants';
-import { datahub_url } from 'src/preamble';
 
 const FlexRowContainer = styled.div`
   align-items: center;
