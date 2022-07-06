@@ -64,6 +64,7 @@ class ObjectTypes(enum.Enum):
     query = 1
     chart = 2
     dashboard = 3
+    dataset = 4
 
 
 class Tag(Model, AuditMixinNullable):

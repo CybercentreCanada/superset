@@ -374,6 +374,10 @@ dataset_config: Dict[str, Any] = {
     "filter_select_enabled": True,
     "fetch_values_predicate": None,
     "extra": '{ "certification": { "certified_by": "Data Platform Team", "details": "This table is the source of truth." }, "warning_markdown": "This is a warning." }',
+    "tags": [
+        "Gold",
+        "Example Tag"
+    ],
     "metrics": [
         {
             "metric_name": "count",

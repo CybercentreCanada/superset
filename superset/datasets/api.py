@@ -48,7 +48,7 @@ from superset.datasets.commands.exceptions import (
     DatasetUpdateFailedError,
 )
 from superset.datasets.commands.export import ExportDatasetsCommand
-from superset.datasets.commands.importers.dispatcher import ImportDatasetsCommand
+from superset.datasets.cccs_commands.importers.dispatcher import ImportDatasetsCommand
 from superset.datasets.commands.refresh import RefreshDatasetCommand
 from superset.datasets.commands.update import UpdateDatasetCommand
 from superset.datasets.dao import DatasetDAO
