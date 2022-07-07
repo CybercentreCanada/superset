@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { Suspense, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { hot } from 'react-hot-loader/root';
 import {
   BrowserRouter as Router,
@@ -24,6 +24,7 @@ import {
   Route,
   useLocation,
 } from 'react-router-dom';
+import { ShepherdTour, Tour } from 'react-shepherd';
 import { GlobalStyles } from 'src/GlobalStyles';
 import { initFeatureFlags } from 'src/featureFlags';
 import ErrorBoundary from 'src/components/ErrorBoundary';
@@ -35,6 +36,8 @@ import setupApp from 'src/setup/setupApp';
 import { routes, isFrontendRoute } from 'src/views/routes';
 import { Logger } from 'src/logger/LogUtils';
 import { RootContextProviders } from './RootContextProviders';
+
+import 'shepherd.js/dist/css/shepherd.css';
 
 setupApp();
 
@@ -58,24 +61,56 @@ const LocationPathnameLogger = () => {
   return <></>;
 };
 
+const tourOptions: Tour.TourOptions = {
+  defaultStepOptions: {
+    modalOverlayOpeningPadding: 5,
+    buttons: [
+      {
+        classes: 'shepherd-button-secondary',
+        text: 'Exit',
+        action(this) {
+          this.cancel();
+        },
+      },
+      {
+        text: 'Next',
+        action(this) {
+          this.next();
+        },
+      },
+    ],
+  },
+  useModalOverlay: true,
+};
+
+const TourLauncher = lazy(
+  () => import(/* webpackChunkName: "TourLauncher" */ 'src/views/TourLauncher'),
+);
+
 const App = () => (
   <Router>
     <LocationPathnameLogger />
     <RootContextProviders>
       <GlobalStyles />
-      <Menu data={menu} isFrontendRoute={isFrontendRoute} />
-      <Switch>
-        {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
-          <Route path={path} key={path}>
-            <Suspense fallback={<Fallback />}>
-              <ErrorBoundary>
-                <Component user={user} {...props} />
-              </ErrorBoundary>
-            </Suspense>
-          </Route>
-        ))}
-      </Switch>
-      <ToastContainer />
+      <ShepherdTour steps={[]} tourOptions={tourOptions}>
+        <Menu data={menu} isFrontendRoute={isFrontendRoute} />
+        <Switch>
+          {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
+            <Route path={path} key={path}>
+              <Suspense fallback={<Fallback />}>
+                <ErrorBoundary>
+                  <TourLauncher
+                    version={menu.navbar_right.version_string}
+                    {...props}
+                  />
+                  <Component user={user} {...props} />
+                </ErrorBoundary>
+              </Suspense>
+            </Route>
+          ))}
+        </Switch>
+        <ToastContainer />
+      </ShepherdTour>
     </RootContextProviders>
   </Router>
 );
