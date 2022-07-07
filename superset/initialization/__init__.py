@@ -199,7 +199,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             TabStateView,
         )
         from superset.views.tags import TagView
-        from superset.views.users.api import CurrentUserRestApi
+        from superset.views.users.api import CurrentUserRestApi, TourRestApi
 
         #
         # Setup API views
@@ -394,6 +394,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             ),
         )
         appbuilder.add_api(SecurityRestApi)
+        appbuilder.add_api(TourRestApi)
         #
         # Conditionally setup email views
         #

@@ -14,9 +14,19 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from flask import g, Response
-from flask_appbuilder.api import BaseApi, expose, safe
+from flask import g, request, Response
+from flask_appbuilder.api import BaseApi, expose, protect, safe
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from marshmallow import fields, Schema, ValidationError
+from sqlalchemy.exc import SQLAlchemyError
+
+from superset import event_logger
+from superset.extensions import db
+from superset.models.tour import UserTour
+from superset.views.base_api import (
+    requires_json,
+    statsd_metrics,
+)
 
 from .schemas import UserResponseSchema
 
@@ -59,3 +69,114 @@ class CurrentUserRestApi(BaseApi):
             return self.response_401()
 
         return self.response(200, result=user_response_schema.dump(g.user))
+
+
+class TourSchema(Schema):
+    last_tour = fields.Dict(allow_none=True)
+
+
+class TourRestApi(BaseApi):
+    """An api to get information about the current user's tour status"""
+
+    resource_name = "tour"
+    allow_browser_login = True
+    openapi_spec_tag = "Tour"
+
+    openapi_spec_component_schemas = (TourSchema,)
+
+    @expose("/", methods=["GET"])
+    @protect()
+    @safe
+    def get(self) -> Response:
+        """Gets Tour Data
+        ---
+        get:
+          description: >-
+            Get tour data
+          responses:
+            200:
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      result:
+                        $ref: '#/components/schemas/TourSchema'
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            422:
+              $ref: '#/components/responses/422'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        attrib = (
+            db.session.query(UserTour)
+            .filter(UserTour.user_id == g.user.id)
+            .one_or_none()
+        )
+        return self.response(200, result={'last_tour': attrib.last_tour})
+
+    @expose("/", methods=["PUT"])
+    @protect()
+    @safe
+    @requires_json
+    def put(self) -> Response:
+        """Edits Tour Data
+        ---
+        put:
+          description: >-
+            Edit tour data
+          requestBody:
+            description: Tour schema
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TourSchema'
+          responses:
+            200:
+              description: Tour data edited
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      result:
+                        $ref: '#/components/schemas/TourSchema'
+            400:
+              $ref: '#/components/responses/400'
+            401:
+              $ref: '#/components/responses/401'
+            422:
+              $ref: '#/components/responses/422'
+            500:
+              $ref: '#/components/responses/500'
+        """
+        try:
+            item = TourSchema().load(request.json)
+        # This validates custom Schema with custom validations
+        except ValidationError as error:
+            return self.response_400(message=error.messages)
+
+        attrib = (
+            db.session.query(UserTour)
+            .filter(UserTour.user_id == g.user.id)
+            .one_or_none()
+        )
+        try:
+            if attrib == None:
+                a = UserTour()
+                setattr(a, "user_id", g.user.id)
+                setattr(a, "last_tour", item.get("last_tour"))
+                db.session.add(a)
+            else:
+                setattr(attrib, "last_tour", item.get("last_tour"))
+                db.session.merge(attrib)
+            db.session.commit()
+        except SQLAlchemyError as ex:
+            db.session.rollback()
+            return self.response_422(message=str(ex))
+
+        return self.response(200, result=item)
