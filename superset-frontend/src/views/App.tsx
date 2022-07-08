@@ -37,8 +37,6 @@ import { routes, isFrontendRoute } from 'src/views/routes';
 import { Logger } from 'src/logger/LogUtils';
 import { RootContextProviders } from './RootContextProviders';
 
-import 'shepherd.js/dist/css/shepherd.css';
-
 setupApp();
 
 const user = { ...bootstrapData.user };
