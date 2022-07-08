@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { MainNav as Menu } from 'src/components/Menu';
 import { t, styled, css, SupersetTheme } from '@superset-ui/core';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Icons from 'src/components/Icons';
 import findPermission from 'src/dashboard/util/findPermission';
 import { useSelector } from 'react-redux';
@@ -33,6 +33,8 @@ import {
   RightMenuProps,
 } from './types';
 import { MenuObjectProps } from './Menu';
+import { ShepherdTourContext } from 'react-shepherd';
+import { getSteps } from 'src/tour';
 
 const versionInfoStyles = (theme: SupersetTheme) => css`
   padding: ${theme.gridUnit * 1.5}px ${theme.gridUnit * 4}px
@@ -153,6 +155,8 @@ const RightMenu = ({
       view: 'Dashboard',
     },
   ];
+  const tour = useContext(ShepherdTourContext);
+  const location = useLocation();
 
   const menuIconAndLabel = (menu: MenuObjectProps) => (
     <>
@@ -173,6 +177,12 @@ const RightMenu = ({
   const handleOnHideModal = () => {
     setEngine('');
     setShowModal(false);
+  };
+
+  const startTour = () => {
+    tour?.steps.forEach(step => tour?.removeStep(step.id));
+    tour?.addSteps(getSteps(location.pathname, {}));
+    tour?.start();
   };
 
   return (
@@ -305,6 +315,11 @@ const RightMenu = ({
                   </div>
                 )}
               </div>
+              <Menu.Item key="tour">
+                <a href="#" onClick={startTour}>
+                  {t('Take a Tour')}
+                </a>
+              </Menu.Item>
             </Menu.ItemGroup>,
           ]}
         </SubMenu>
