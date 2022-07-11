@@ -30,11 +30,19 @@ import sqlalchemy as sa
 from flask_appbuilder import Model
 from sqlalchemy.orm import relationship
 
+from superset import is_feature_enabled
 from superset.columns.models import Column
 from superset.models.helpers import (
     AuditMixinNullable,
     ExtraJSONMixin,
     ImportExportMixin,
+)
+from superset.models.tags import (
+    DatasetUpdater,
+    ObjectTypes,
+    Tag,
+    TaggedObject,
+    TagTypes,
 )
 from superset.tables.models import Table
 
@@ -50,6 +58,13 @@ table_association_table = sa.Table(
     Model.metadata,  # pylint: disable=no-member
     sa.Column("dataset_id", sa.ForeignKey("sl_datasets.id")),
     sa.Column("table_id", sa.ForeignKey("sl_tables.id")),
+)
+
+tags_association_table = sa.Table(
+    "sl_dataset_tags",
+    Model.metadata,  # pylint: disable=no-member
+    sa.Column("dataset_id", sa.ForeignKey("tagged_object.object_id")),
+    sa.Column("tag_id", sa.ForeignKey("tag.id")),
 )
 
 
@@ -78,6 +93,9 @@ class Dataset(Model, AuditMixinNullable, ExtraJSONMixin, ImportExportMixin):
     # n:n relationship
     tables: List[Table] = relationship("Table", secondary=table_association_table)
 
+    # n:n relationship
+    tags: List[Tag] = relationship("Tag", secondary=table_association_table)
+
     # The relationship between datasets and columns is 1:n, but we use a many-to-many
     # association to differentiate between the relationship between tables and columns.
     columns: List[Column] = relationship(
@@ -90,3 +108,10 @@ class Dataset(Model, AuditMixinNullable, ExtraJSONMixin, ImportExportMixin):
     # Column is managed externally and should be read-only inside Superset
     is_managed_externally = sa.Column(sa.Boolean, nullable=False, default=False)
     external_url = sa.Column(sa.Text, nullable=True)
+
+
+# events for updating tags
+if is_feature_enabled("TAGGING_SYSTEM"):
+    sa.event.listen(Dataset, "after_insert", DatasetUpdater.after_insert)
+    sa.event.listen(Dataset, "after_update", DatasetUpdater.after_update)
+    sa.event.listen(Dataset, "after_delete", DatasetUpdater.after_delete)

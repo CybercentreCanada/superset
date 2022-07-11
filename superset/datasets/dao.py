@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
+from re import T
 from typing import Any, Dict, List, Optional
 
 from flask import current_app
@@ -26,6 +27,8 @@ from superset.extensions import db
 from superset.models.core import Database
 from superset.models.dashboard import Dashboard
 from superset.models.slice import Slice
+from superset.models.tags import get_tag, Tag, TaggedObject
+from superset.tags.dao import TagDAO
 from superset.views.base import DatasourceFilter
 
 logger = logging.getLogger(__name__)
@@ -152,6 +155,27 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
         ).all()
         return len(dataset_query) == 0
 
+    # TODO: This method may need to be revisited, not sure I am doing this right...
+    @staticmethod
+    def validate_tags_exist(dataset_id: int, tags_ids: List[int]) -> bool:
+        dataset_query = (
+            db.session.query(TaggedObject.id).filter(
+                TaggedObject.object_id == dataset_id, TaggedObject.tag_id.in_(tags_ids)
+            )
+        ).all()
+        return len(tags_ids) == len(dataset_query)
+
+    # TODO: This method may need to be revisited. Not completed.
+    @staticmethod
+    def validate_tags_uniqueness(dataset_id: int, tags_names: List[str]) -> bool:
+        dataset_query = (
+            db.session.query(TaggedObject.id).filter(
+                TaggedObject.object_id == dataset_id,
+                tag=get_tag.name.in_(tags_names),
+            )
+        ).all()
+        return len(dataset_query) == 0
+
     @classmethod
     def update(
         cls, model: SqlaTable, properties: Dict[str, Any], commit: bool = True
@@ -159,7 +183,6 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
         """
         Updates a Dataset model on the metadata DB
         """
-
         if "columns" in properties:
             properties["columns"] = cls.update_columns(
                 model, properties.get("columns", []), commit=commit
@@ -170,6 +193,10 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
                 model, properties.get("metrics", []), commit=commit
             )
 
+        if "tags" in properties:
+            properties["tags"] = cls.update_tags(
+                model, properties.get("tags", []), commit=commit
+            )
         return super().update(model, properties, commit=False)
 
     @classmethod
@@ -236,6 +263,40 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
                 DatasetDAO.delete_metric(existing_metric)
         return new_metrics
 
+    # TODO: This method may need to be revisited, i am missing taggedObject stuff
+    @classmethod
+    def update_tags(
+        cls,
+        model: SqlaTable,
+        property_tags: List[Dict[str, Any]],
+        commit: bool = True,
+    ) -> List[Tag]:
+        """
+        Creates/updates and/or deletes a list of tags, based on a
+        list of Dict.
+
+        - If a tag Dict has an `id` property then we update.
+        - If a tag Dict does not have an `id` then we create a new tag.
+        - If there are extra tags on the metadata db that are not defined on the List
+        then we delete.
+        """
+        new_tags = []
+        for tag in property_tags:
+            tag_id = tag.get("id")
+
+            # I should be using the tags model methods here.
+            if tag_id:
+                tag_obj = db.session.query(Tag).get(tag_id)
+                tag_obj = DatasetDAO.update_tag(tag_obj, tag, commit=commit)
+            else:
+                tag_obj = DatasetDAO.create_tag(tag, commit=commit)
+            new_tags.append(tag_obj)
+        # Checks if an exiting tag is missing from properties and delete it
+        for existing_tag in model.tags:
+            if existing_tag.id not in [tag.id for tag in new_tags]:
+                DatasetDAO.delete_tag(existing_tag)
+        return new_tags
+
     @classmethod
     def find_dataset_column(
         cls, dataset_id: int, column_id: int
@@ -271,6 +332,49 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
     ) -> Optional[TableColumn]:
         """
         Deletes a Dataset column
+        """
+        return cls.delete(model, commit=commit)
+
+    # TODO: This method may need to be revisited
+    @classmethod
+    def find_dataset_tag(cls, dataset_id: int, tag_id: int) -> Optional[Tag]:
+        # We want to apply base dataset filters
+        dataset = DatasetDAO.find_by_id(dataset_id)
+        if not dataset:
+            return None
+        return db.session.query(Tag).get(tag_id)
+
+    # TODO: This method may need to be revisited
+    @classmethod
+    def update_tag(
+        cls, model: Tag, properties: Dict[str, Any], commit: bool = True
+    ) -> Optional[Tag]:
+        return DatasetTagDAO.update(model, properties, commit=commit)
+
+    # TODO: This method may need to be revisited
+    def create_tag(
+        cls, properties: Dict[str, Any], commit: bool = True
+    ) -> Optional[Tag]:
+        """
+        Creates a Dataset tag model on the metadata DB
+        """
+        return DatasetTagDAO.create(properties, commit=commit)
+
+    # TODO: This method may need to be revisited
+    # I think I need this too
+    def create_taggged_object(
+        cls, properties: Dict[str, Any], commit: bool = True
+    ) -> Optional[TaggedObject]:
+        """
+        Creates a Dataset tag model on the metadata DB
+        """
+        return DatasetTaggedObjectDAO.create_tagged_objects(properties, commit=commit)
+
+    # TODO: This method may need to be revisited
+    @classmethod
+    def delete_tag(cls, model: Tag, commit: bool = True) -> Optional[Tag]:
+        """
+        Deletes a Dataset tag
         """
         return cls.delete(model, commit=commit)
 
@@ -341,3 +445,11 @@ class DatasetColumnDAO(BaseDAO):
 
 class DatasetMetricDAO(BaseDAO):
     model_cls = SqlMetric
+
+
+class DatasetTagDAO(BaseDAO):
+    model_cls = Tag
+
+
+class DatasetTaggedObjectDAO(TagDAO):
+    model_cls = TaggedObject

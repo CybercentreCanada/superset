@@ -631,6 +631,38 @@ class TestDatasetApi(SupersetTestCase):
         assert rv.status_code == 422
         assert data == {"message": "Dataset could not be created."}
 
+    # TODO: This test needs to be modified to be properly implemented to test the addition of tags
+    # with overwrite (mmrouet)
+    def test_update_dataset_item_w_override_tags(self):
+        """
+        Dataset API: Test update dataset with override tags
+        """
+        # Add default dataset
+        dataset = self.insert_default_dataset()
+        self.login(username="admin")
+        new_tag_dict = {
+            "id": "1",
+            "name": "Gold",
+            "type": "1",
+        }
+        dataset_data = {
+            "tags": [new_tag_dict],
+        }
+        uri = f"api/v1/dataset/{dataset.id}?override_tags=true"
+        # this assert nostl likely needs to be modified.
+        rv = self.put_assert_metric(uri, dataset_data, "put")
+        assert rv.status_code == 200
+
+        # I think this call needs to be modified
+        columns = db.session.query(TableColumn).filter_by(table_id=dataset.id).all()
+
+        assert new_tag_dict["id"] in [tag.id for tag in tags]
+        assert new_tag_dict["name"] in [tag.name for col in tags]
+        assert new_tag_dict["type"] in [tag.type for col in tags]
+
+        db.session.delete(dataset)
+        db.session.commit()
+
     def test_update_dataset_item(self):
         """
         Dataset API: Test update dataset item

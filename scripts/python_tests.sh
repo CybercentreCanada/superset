@@ -25,11 +25,19 @@ set -e
 export LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6
 export SUPERSET_CONFIG=${SUPERSET_CONFIG:-tests.integration_tests.superset_test_config}
 export SUPERSET_TESTENV=true
+
+export SUPERSET__SQLALCHEMY_DATABASE_URI=sqlite:///$HOME/.temp/unittest.db
+
+mkdir -p ~/.temp
+
+sqlite3 ~/.temp/unittest.db ".quit"
+
 echo "Superset config module: $SUPERSET_CONFIG"
 
 superset db upgrade
+
 superset init
 
 echo "Running tests"
 
-pytest --durations=0 --maxfail=1 --cov=superset "$@"
+pytest tests/integration_tests/datasets/api_tests.py -k  test_create_dataset_item --durations-min=2 --maxfail=1 --cov-report= --cov=superset "$@" || rm -rf ~/.temp
