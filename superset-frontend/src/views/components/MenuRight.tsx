@@ -156,7 +156,10 @@ const RightMenu = ({
     },
   ];
   const tour = useContext(ShepherdTourContext);
-  const location = useLocation();
+  let location: any = null;
+  try {
+    location = useLocation();
+  } catch (e) {}
 
   const menuIconAndLabel = (menu: MenuObjectProps) => (
     <>

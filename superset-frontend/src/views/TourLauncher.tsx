@@ -29,11 +29,21 @@ import { createErrorHandler } from 'src/views/CRUD/utils';
 interface TourLauncherProps {
   addDangerToast: (msg: string) => void;
   version: string;
+  location?: string;
 }
 
-function TourLauncher({ addDangerToast, version }: TourLauncherProps) {
+function TourLauncher({
+  addDangerToast,
+  version,
+  location,
+}: TourLauncherProps) {
   const tour = useContext(ShepherdTourContext);
-  const location = useLocation();
+  if (!location) {
+    const routerLocation = useLocation();
+    useEffect(() => {
+      location = routerLocation.pathname;
+    }, [routerLocation.pathname]);
+  }
 
   useEffect(() => {
     SupersetClient.get({
@@ -46,12 +56,12 @@ function TourLauncher({ addDangerToast, version }: TourLauncherProps) {
 
         const lastTour = response.json.result.last_tour;
         let startingVersion = new semver.SemVer('0.0.0');
-        if (lastTour[location.pathname]) {
+        if (lastTour[location ?? '']) {
           startingVersion =
-            semver.parse(lastTour[location.pathname]) ??
+            semver.parse(lastTour[location ?? '']) ??
             new semver.SemVer('0.0.0');
         }
-        const steps = getSteps(location.pathname, {
+        const steps = getSteps(location ?? '', {
           start: startingVersion,
           end: new semver.SemVer(version),
         });
@@ -67,7 +77,7 @@ function TourLauncher({ addDangerToast, version }: TourLauncherProps) {
               jsonPayload: {
                 last_tour: {
                   ...lastTour,
-                  [location.pathname]: version,
+                  [location ?? '']: version,
                 },
               },
             });

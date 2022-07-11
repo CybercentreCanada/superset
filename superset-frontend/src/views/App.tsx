@@ -59,7 +59,7 @@ const LocationPathnameLogger = () => {
   return <></>;
 };
 
-const tourOptions: Tour.TourOptions = {
+export const tourOptions: Tour.TourOptions = {
   defaultStepOptions: {
     modalOverlayOpeningPadding: 5,
     buttons: [

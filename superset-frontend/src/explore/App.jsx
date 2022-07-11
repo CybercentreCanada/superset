@@ -22,6 +22,7 @@ import { Provider } from 'react-redux';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ThemeProvider } from '@superset-ui/core';
+import { ShepherdTour } from 'react-shepherd';
 import { GlobalStyles } from 'src/GlobalStyles';
 import { DynamicPluginProvider } from 'src/components/DynamicPlugins';
 import ToastContainer from 'src/components/MessageToasts/ToastContainer';
@@ -29,23 +30,31 @@ import setupApp from 'src/setup/setupApp';
 import setupPlugins from 'src/setup/setupPlugins';
 import './main.less';
 import '../assets/stylesheets/reactable-pagination.less';
-import { theme } from 'src/preamble';
+import { bootstrapData, theme } from 'src/preamble';
 import ExploreViewContainer from './components/ExploreViewContainer';
+import { tourOptions } from 'src/views/App';
+import TourLauncher from 'src/views/TourLauncher';
 
 setupApp();
 setupPlugins();
 
 const App = ({ store }) => (
   <Provider store={store}>
-    <DndProvider backend={HTML5Backend}>
-      <ThemeProvider theme={theme}>
-        <GlobalStyles />
-        <DynamicPluginProvider>
-          <ExploreViewContainer />
-          <ToastContainer />
-        </DynamicPluginProvider>
-      </ThemeProvider>
-    </DndProvider>
+    <ShepherdTour steps={[]} tourOptions={tourOptions}>
+      <TourLauncher
+        location={'/superset/explore/'}
+        version={bootstrapData.common.menu_data.navbar_right.version_string}
+      />
+      <DndProvider backend={HTML5Backend}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyles />
+          <DynamicPluginProvider>
+            <ExploreViewContainer />
+            <ToastContainer />
+          </DynamicPluginProvider>
+        </ThemeProvider>
+      </DndProvider>
+    </ShepherdTour>
   </Provider>
 );
 
