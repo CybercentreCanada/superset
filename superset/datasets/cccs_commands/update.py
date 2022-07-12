@@ -28,8 +28,8 @@ from superset.connectors.sqla.models import SqlaTable
 from superset.dao.exceptions import DAOUpdateFailedError
 from superset.datasets.cccs_commands.exceptions import (
     DatasetTagsDuplicateValidationError,
-    DatasetTagsExistsValidationError,
-    DatasetTagsNotFoundValidationError,
+    DatasetTagExistsValidationError,
+    DatasetTagNotFoundValidationError,
 )
 from superset.datasets.commands.exceptions import (
     DatabaseChangeValidationError,
@@ -65,6 +65,7 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
         self._properties = data.copy()
         self._model: Optional[SqlaTable] = None
         self.override_columns = override_columns
+        # mmrouet: Do we need an override_tags?
 
     def run(self) -> Model:
         self.validate()
@@ -179,14 +180,14 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
         if self._get_duplicates(tags, "name"):
             exceptions.append(DatasetTagsDuplicateValidationError())
         else:
-            # validate invalid id's
-            tags_ids: List[int] = [tag["id"] for tag in tags if "id" in tag]
-            if not DatasetDAO.validate_tags_exist(self._model_id, tags_ids):
-                exceptions.append(DatasetTagsNotFoundValidationError())
-            # validate new tag names uniqueness
-            tag_names: List[str] = [tag["name"] for tag in tags if "id" not in tag]
-            if not DatasetDAO.validate_tags_uniqueness(self._model_id, tag_names):
-                exceptions.append(DatasetTagsExistsValidationError())
+            # Loop through each tag to validate if it is exists then if it is unique
+            for tag in tags:
+                # validate invalid id
+                if not DatasetDAO.validate_tag_exist(self._model_id, tag):
+                    exceptions.append(DatasetTagNotFoundValidationError())
+                # validate new tag name uniqueness
+                if not DatasetDAO.validate_tags_uniqueness(self._model_id, tag):
+                    exceptions.append(DatasetTagExistsValidationError())
 
     @staticmethod
     def _get_duplicates(data: List[Dict[str, Any]], key: str) -> List[str]:

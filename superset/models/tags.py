@@ -90,7 +90,8 @@ class TaggedObject(Model, AuditMixinNullable):
 
     tag = relationship("Tag", backref="objects")
 
-
+# mmrouet:  I think we need that one in the tags/dao.py, I have copied it there
+# but I beleive it should be moved there.
 def get_tag(name: str, session: Session, type_: TagTypes) -> Tag:
     tag = session.query(Tag).filter_by(name=name, type=type_).one_or_none()
     if tag is None:

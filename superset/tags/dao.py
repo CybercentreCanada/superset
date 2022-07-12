@@ -58,3 +58,12 @@ class TagDAO(BaseDAO):
             tag = Tag(name=name, type=type_)
         # security_manager.raise_for_tag_access(tag)
         return tag
+
+    @staticmethod
+    def create_tag(name: str, type_: TagTypes) -> Tag:
+        tag = db.session.query(Tag).filter_by(name=name, type=type_).one_or_none()
+        if tag is None:
+            tag = Tag(name=name, type=type_)
+            session.add(tag)
+            session.commit()
+        return tag

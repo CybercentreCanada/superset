@@ -18,7 +18,7 @@ from flask_babel import lazy_gettext as _
 from marshmallow.validate import ValidationError
 
 
-class DatasetTagsNotFoundValidationError(ValidationError):
+class DatasetTagNotFoundValidationError(ValidationError):
     """
     Marshmallow validation error when dataset tag for update does not exist
     """
@@ -36,7 +36,7 @@ class DatasetTagsDuplicateValidationError(ValidationError):
         super().__init__([_("One or more tags are duplicated")], field_name="tags")
 
 
-class DatasetTagsExistsValidationError(ValidationError):
+class DatasetTagExistsValidationError(ValidationError):
     """
     Marshmallow validation error when dataset tags already exist
     """

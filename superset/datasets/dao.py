@@ -27,7 +27,7 @@ from superset.extensions import db
 from superset.models.core import Database
 from superset.models.dashboard import Dashboard
 from superset.models.slice import Slice
-from superset.models.tags import get_tag, Tag, TaggedObject
+from superset.models.tags import ObjectTypes, get_tag, Tag, TaggedObject, TagTypes
 from superset.tags.dao import TagDAO
 from superset.views.base import DatasourceFilter
 
@@ -155,26 +155,45 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
         ).all()
         return len(dataset_query) == 0
 
-    # TODO: This method may need to be revisited, not sure I am doing this right...
+    # To validate a tag exists we need to ensure its id and type are the same.
+    # Tag.name doesn't matter as when we update the tag, name is most likely what will 
+    # change. We also need to ensure that the relationship exists in the TaggedObject table
     @staticmethod
-    def validate_tags_exist(dataset_id: int, tags_ids: List[int]) -> bool:
-        dataset_query = (
-            db.session.query(TaggedObject.id).filter(
-                TaggedObject.object_id == dataset_id, TaggedObject.tag_id.in_(tags_ids)
+    def validate_tag_exist(dataset_id: int, tag: Tag) -> bool:
+        dataset_tag_query = (
+            db.session.query(Tag).filter(
+                Tag.id == tag.id,
+                Tag.type == TagTypes.custom
             )
-        ).all()
-        return len(tags_ids) == len(dataset_query)
+        ).first() # There should be just 1
+        dataset_tagged_object_query = (
+            db.session.query(TaggedObject).filter(
+                TaggedObject.object_id == dataset_id, 
+                TaggedObject.tag_id == tag.id,
+                TaggedObject.object_type == ObjectTypes.dataset
+            )
+        ).first() # There should be just one
+        return len(dataset_tag_query) == 1 and len(dataset_tagged_object_query) == 1
 
-    # TODO: This method may need to be revisited. Not completed.
+    # To validate if a tag is unique, we need to ensure its id, name and type are the same.
+    # We also need to ensure that the relationship exists in the TaggedObject table
     @staticmethod
-    def validate_tags_uniqueness(dataset_id: int, tags_names: List[str]) -> bool:
-        dataset_query = (
+    def validate_tag_uniqueness(dataset_id: int,  tag: Tag) -> bool:
+        dataset_tag_query = (
+            db.session.query(Tag).filter(
+                Tag.id == tag.id,
+                Tag.name == tag.name,
+                Tag.type == TagTypes.custom
+            )
+        ).all() # There should be none
+        dataset_tagged_object_query = (
             db.session.query(TaggedObject.id).filter(
                 TaggedObject.object_id == dataset_id,
-                tag=get_tag.name.in_(tags_names),
+                TaggedObject.tag_id == tag.id,
+                TaggedObject.object_type == ObjectTypes.dataset
             )
-        ).all()
-        return len(dataset_query) == 0
+        ).all() # There should be none
+        return len(dataset_tag_query) == 0 and len(dataset_tagged_object_query) == 0
 
     @classmethod
     def update(
@@ -287,9 +306,9 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
             # I should be using the tags model methods here.
             if tag_id:
                 tag_obj = db.session.query(Tag).get(tag_id)
-                tag_obj = DatasetDAO.update_tag(tag_obj, tag, commit=commit)
+                tag_obj = DatasetTagDAO.get_by_name(tag.name, commit=commit)
             else:
-                tag_obj = DatasetDAO.create_tag(tag, commit=commit)
+                tag_obj = TagDAO.create(tag, commit=commit)
             new_tags.append(tag_obj)
         # Checks if an exiting tag is missing from properties and delete it
         for existing_tag in model.tags:
@@ -335,48 +354,49 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
         """
         return cls.delete(model, commit=commit)
 
-    # TODO: This method may need to be revisited
-    @classmethod
-    def find_dataset_tag(cls, dataset_id: int, tag_id: int) -> Optional[Tag]:
-        # We want to apply base dataset filters
-        dataset = DatasetDAO.find_by_id(dataset_id)
-        if not dataset:
-            return None
-        return db.session.query(Tag).get(tag_id)
+    # # TODO: This method may need to be revisited
+    # @classmethod
+    # def find_dataset_tag(cls, dataset_id: int, tag_id: int) -> Optional[Tag]:
+    #     # We want to apply base dataset filters
+    #     dataset = DatasetDAO.find_by_id(dataset_id)
+    #     if not dataset:
+    #         return None
+    #     return db.session.query(Tag).get(tag_id)
 
-    # TODO: This method may need to be revisited
-    @classmethod
-    def update_tag(
-        cls, model: Tag, properties: Dict[str, Any], commit: bool = True
-    ) -> Optional[Tag]:
-        return DatasetTagDAO.update(model, properties, commit=commit)
+    # # TODO: This method may need to be revisited
+    # @classmethod
+    # def update_tag(
+    #     cls, model: Tag, properties: Dict[str, Any], commit: bool = True
+    # ) -> Optional[Tag]:
+    #     return DatasetTagDAO.update(model, properties, commit=commit)
 
-    # TODO: This method may need to be revisited
+    # TODO: This method is to be continued... not done yet 
+
     def create_tag(
         cls, properties: Dict[str, Any], commit: bool = True
     ) -> Optional[Tag]:
         """
         Creates a Dataset tag model on the metadata DB
         """
-        return DatasetTagDAO.create(properties, commit=commit)
+        return DatasetTagDAO.create_tag(tag, commit=commit)
 
-    # TODO: This method may need to be revisited
-    # I think I need this too
-    def create_taggged_object(
-        cls, properties: Dict[str, Any], commit: bool = True
-    ) -> Optional[TaggedObject]:
-        """
-        Creates a Dataset tag model on the metadata DB
-        """
-        return DatasetTaggedObjectDAO.create_tagged_objects(properties, commit=commit)
+    # # TODO: This method may need to be revisited
+    # # I think I need this too
+    # def create_taggged_object(
+    #     cls, properties: Dict[str, Any], commit: bool = True
+    # ) -> Optional[TaggedObject]:
+    #     """
+    #     Creates a Dataset tag model on the metadata DB
+    #     """
+    #     return DatasetTaggedObjectDAO.create_tagged_objects(properties, commit=commit)
 
-    # TODO: This method may need to be revisited
-    @classmethod
-    def delete_tag(cls, model: Tag, commit: bool = True) -> Optional[Tag]:
-        """
-        Deletes a Dataset tag
-        """
-        return cls.delete(model, commit=commit)
+    # # TODO: This method may need to be revisited
+    # @classmethod
+    # def delete_tag(cls, model: Tag, commit: bool = True) -> Optional[Tag]:
+    #     """
+    #     Deletes a Dataset tag
+    #     """
+    #     return cls.delete(model, commit=commit)
 
     @classmethod
     def find_dataset_metric(
@@ -447,7 +467,7 @@ class DatasetMetricDAO(BaseDAO):
     model_cls = SqlMetric
 
 
-class DatasetTagDAO(BaseDAO):
+class DatasetTagDAO(TagDAO):
     model_cls = Tag
 
 
