@@ -93,13 +93,13 @@ class Dataset(Model, AuditMixinNullable, ExtraJSONMixin, ImportExportMixin):
     # n:n relationship
     tables: List[Table] = relationship("Table", secondary=table_association_table)
 
-    # n:n relationship
+    # n:n relationship, 
     tags = relationship(
         Tag,
         secondary="tagged_object",
-        primaryjoin="and_(Slice.id == TaggedObject.object_id)",
+        primaryjoin="and_(Dataset.id == TaggedObject.object_id)",
         secondaryjoin="and_(TaggedObject.tag_id == Tag.id, "
-            "TaggedObject.object_type == 'chart')",
+            "TaggedObject.object_type == 'dataset')"
     )
     # The relationship between datasets and columns is 1:n, but we use a many-to-many
     # association to differentiate between the relationship between tables and columns.

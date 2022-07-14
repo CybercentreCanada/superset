@@ -124,7 +124,7 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
         # Validate tags
         tags = self._properties.get("tags")
         if tags:
-            self._validate_tags(tags, exceptions)
+            self._validate_custom_tags(tags, exceptions)
 
         if exceptions:
             exception = DatasetInvalidError()
@@ -174,7 +174,7 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
             if not DatasetDAO.validate_metrics_uniqueness(self._model_id, metric_names):
                 exceptions.append(DatasetMetricsExistsValidationError())
 
-    def _validate_tags(
+    def _validate_custom_tags(
         self, tags: List[Dict[str, Any]], exceptions: List[ValidationError]
     ) -> None:
         if self._get_duplicates(tags, "name"):
@@ -183,10 +183,10 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
             # Loop through each tag to validate if it is exists then if it is unique
             for tag in tags:
                 # validate invalid id
-                if not DatasetDAO.validate_tag_exist(self._model_id, tag):
+                if not DatasetDAO.validate_custom_tag_exist(self._model_id, tag):
                     exceptions.append(DatasetTagNotFoundValidationError())
                 # validate new tag name uniqueness
-                if not DatasetDAO.validate_tags_uniqueness(self._model_id, tag):
+                if not DatasetDAO.validate_custom_tag_uniqueness(self._model_id, tag):
                     exceptions.append(DatasetTagExistsValidationError())
 
     @staticmethod

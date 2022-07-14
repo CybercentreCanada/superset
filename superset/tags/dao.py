@@ -15,12 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
+
+from sqlalchemy.exc import SQLAlchemyError
 from typing import Any, Dict
 
 from superset import security_manager
 from superset.dao.base import BaseDAO
 from superset.extensions import db
 from superset.models.tags import ObjectTypes, Tag, TaggedObject, TagTypes
+
+from superset.dao.exceptions import (
+    DAOConfigError,
+    DAOCreateFailedError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +37,7 @@ class TagDAO(BaseDAO):
     # base_filter = TagAccessFilter
 
     @staticmethod
-    def create_tagged_objects(object_type: ObjectTypes, object_id: int, properties: Dict[str, Any]) -> None:
+    def create_tagged_objects(object_type: ObjectTypes, object_id: int, properties: Dict[str, Any], commit: bool = True) -> None:
         tag_names = properties["tags"]
 
         tagged_objects = []
@@ -45,11 +52,34 @@ class TagDAO(BaseDAO):
             tagged_objects.append(
                 TaggedObject(object_id=object_id, object_type=object_type, tag=tag)
             )
-
-        db.session.add_all(tagged_objects)
-        db.session.commit()
-
+        try:
+            db.session.add_all(tagged_objects)
+            if commit:
+                db.session.commit()
+        except SQLAlchemyError as ex:  # pragma: no cover
+            db.session.rollback()
+            raise DAOCreateFailedError(exception=ex) from ex
         return tag
+
+# mmrouet: I think we need this but am not sure...
+    @staticmethod
+    def delete_tagged_objects(properties: Dict[str, Any], commit: bool = True) -> None:
+        tag_names = properties["tags"]
+
+        for name in tag_names:
+            if ":" in name:
+                type_name = name.split(":", 1)[0]
+                type_ = TagTypes[type_name]
+            else:
+                type_ = TagTypes.custom
+        try:
+            tag = db.session.query(Tag).filter(Tag.name == name, Tag.type == type_).first().delete()
+            if commit:
+                db.session.commit()
+        except SQLAlchemyError as ex:  # pragma: no cover
+            db.session.rollback()
+            raise DAOCreateFailedError(exception=ex) from ex
+
 
     @staticmethod
     def get_by_name(name: str, type_: str) -> Tag:
@@ -57,13 +87,4 @@ class TagDAO(BaseDAO):
         if not tag:
             tag = Tag(name=name, type=type_)
         # security_manager.raise_for_tag_access(tag)
-        return tag
-
-    @staticmethod
-    def create_tag(name: str, type_: TagTypes) -> Tag:
-        tag = db.session.query(Tag).filter_by(name=name, type=type_).one_or_none()
-        if tag is None:
-            tag = Tag(name=name, type=type_)
-            session.add(tag)
-            session.commit()
         return tag

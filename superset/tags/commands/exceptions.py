@@ -16,9 +16,12 @@
 # under the License.
 from flask_babel import lazy_gettext as _
 
+
 from superset.commands.exceptions import (
     CommandInvalidError,
     CreateFailedError,
+    DeleteFailedError,
+    ForbiddenError,
 )
 
 
@@ -27,3 +30,12 @@ class TagInvalidError(CommandInvalidError):
 
 class TagCreateFailedError(CreateFailedError):
     message = _("Tag could not be created.")
+
+class TagDeleteFailedError(DeleteFailedError):
+    message = _("Tag could not be deleted.")
+
+class TagForbiddenError(ForbiddenError):
+    message = _("Editing this tag is forbidden.")
+
+class TagNotFoundError(CommandException):
+    message = _("Tag could not found.")

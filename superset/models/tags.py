@@ -26,6 +26,7 @@ from sqlalchemy.orm import relationship, Session, sessionmaker
 from sqlalchemy.orm.mapper import Mapper
 
 from superset.models.helpers import AuditMixinNullable
+from superset.superset.datasets.models import Dataset
 
 if TYPE_CHECKING:
     from superset.models.core import FavStar
@@ -90,8 +91,7 @@ class TaggedObject(Model, AuditMixinNullable):
 
     tag = relationship("Tag", backref="objects")
 
-# mmrouet:  I think we need that one in the tags/dao.py, I have copied it there
-# but I beleive it should be moved there.
+
 def get_tag(name: str, session: Session, type_: TagTypes) -> Tag:
     tag = session.query(Tag).filter_by(name=name, type=type_).one_or_none()
     if tag is None:
@@ -119,9 +119,15 @@ class ObjectUpdater:
 
     @classmethod
     def get_owners_ids(
-        cls, target: Union["Dashboard", "FavStar", "Slice"]
+        cls, target: Union["Dashboard", "FavStar", "Slice", "Dataset"]
     ) -> List[int]:
         raise NotImplementedError("Subclass should implement `get_owners_ids`")
+
+    @classmethod
+    def _add_custom_tags(
+        cls, session: Session, target: Union["Dashboard", "FavStar", "Slice", "Dataset"]
+    ) -> List[int]:
+        raise NotImplementedError("Subclass should implement `add_custom_tags`")
 
     @classmethod
     def _add_owners(
@@ -135,6 +141,7 @@ class ObjectUpdater:
             )
             session.add(tagged_object)
 
+
     @classmethod
     def after_insert(
         cls,
@@ -144,10 +151,10 @@ class ObjectUpdater:
     ) -> None:
         session = Session(bind=connection)
 
-        # add `owner:` tags
+        # add `owner:` related tagged_objects
         cls._add_owners(session, target)
 
-        # add `type:` tags
+        # add `type:` related tagged_objects
         tag = get_tag("type:{0}".format(cls.object_type), session, TagTypes.type)
         tagged_object = TaggedObject(
             tag_id=tag.id, object_id=target.id, object_type=cls.object_type
@@ -165,7 +172,7 @@ class ObjectUpdater:
     ) -> None:
         session = Session(bind=connection)
 
-        # delete current `owner:` tags
+        # delete current `owner:` related tagged_objects
         query = (
             session.query(TaggedObject.id)
             .join(Tag)
@@ -180,8 +187,26 @@ class ObjectUpdater:
             synchronize_session=False
         )
 
-        # add `owner:` tags
+        # delete current `type: custom` related tagged_objects
+        query = (
+            session.query(TaggedObject.id)
+            .join(Tag)
+            .filter(
+                TaggedObject.object_type == cls.object_type,
+                TaggedObject.object_id == target.id,
+                Tag.type == TagTypes.custom,
+            )
+        )
+        ids = [row[0] for row in query]
+        session.query(TaggedObject).filter(TaggedObject.id.in_(ids)).delete(
+            synchronize_session=False
+        )
+
+        # add the new list of `owner:` related tagged_objects
         cls._add_owners(session, target)
+
+        # add the new list of `type:custom` related tagged_objects
+        cls._add_custom_tags(session, target)
 
         session.commit()
 
@@ -236,6 +261,15 @@ class DatasetUpdater(ObjectUpdater):
     def get_owners_ids(cls, target: "SqlaTable") -> List[int]:
         return [owner.id for owner in target.owners]
 
+    @classmethod
+    def _add_custom_tags(
+        cls, session: Session, target: Union["Dashboard", "FavStar", "Slice", "Dataset"]
+    ) -> None:
+        for  tag in target.tags:
+            tagged_object = TaggedObject(
+                tag_id=tag.id, object_id=target.id, object_type=cls.object_type
+            )
+            session.add(tagged_object)
 
 class FavStarUpdater:
     @classmethod
