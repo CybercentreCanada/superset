@@ -14,7 +14,9 @@ describe('CccsGrid tranformProps', () => {
     emitFilter: false,
     include_search: false,
     page_length: 0,
+    enable_grouping: false,
     viz_type: 'my_chart',
+    column_state: [],
   };
   const chartProps = new CccsGridChartProps({
     formData,
