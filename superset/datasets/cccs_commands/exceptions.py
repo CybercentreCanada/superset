@@ -15,31 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 from flask_babel import lazy_gettext as _
-from marshmallow.validate import ValidationError
+from superset.commands.exceptions import CommandException
+
+class DatasetTagNotFoundValidationError(CommandException):
+   message = _("One or more tags do not exist")
 
 
-class DatasetTagNotFoundValidationError(ValidationError):
-    """
-    Marshmallow validation error when dataset tag for update does not exist
-    """
-
-    def __init__(self) -> None:
-        super().__init__([_("One or more tags do not exist")], field_name="tags")
+class DatasetTagsDuplicateValidationError(CommandException):
+   message =_("One or more tags are duplicated")
 
 
-class DatasetTagsDuplicateValidationError(ValidationError):
-    """
-    Marshmallow validation error when dataset tags have a duplicate on the list
-    """
-
-    def __init__(self) -> None:
-        super().__init__([_("One or more tags are duplicated")], field_name="tags")
-
-
-class DatasetTagExistsValidationError(ValidationError):
-    """
-    Marshmallow validation error when dataset tags already exist
-    """
-
-    def __init__(self) -> None:
-        super().__init__([_("One or more tags already exist")], field_name="tags")
+class DatasetTagExistsValidationError(CommandException):
+   message =_("One or more tags already exist")

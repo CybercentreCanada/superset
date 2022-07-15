@@ -61,7 +61,6 @@ class TagDAO(BaseDAO):
             raise DAOCreateFailedError(exception=ex) from ex
         return tag
 
-# mmrouet: I think we need this but am not sure...
     @staticmethod
     def delete_tagged_objects(properties: Dict[str, Any], commit: bool = True) -> None:
         tag_names = properties["tags"]

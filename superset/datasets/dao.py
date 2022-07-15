@@ -27,7 +27,7 @@ from superset.extensions import db
 from superset.models.core import Database
 from superset.models.dashboard import Dashboard
 from superset.models.slice import Slice
-from superset.models.tags import ObjectTypes, get_tag, Tag, TaggedObject, TagTypes
+from superset.models.tags import ObjectTypes, Tag, TaggedObject, TagTypes
 from superset.tags.dao import TagDAO, TaggedObject
 from superset.views.base import DatasourceFilter
 
@@ -367,10 +367,26 @@ class DatasetDAO(BaseDAO):  # pylint: disable=too-many-public-methods
         """
         Deletes a Dataset tag
         """
-        tag = DatasetTagDAO.delete(model, commit=commit)
-        DatasetTagDAO.delete_tagged_objects(["tags", tag], commit=commit)
-    
-        return tag
+        tag = model
+        try:
+            db.session.query(TaggedObject).filter(
+                TaggedObject.object_id == dataset_id,
+                TaggedObject.tag_id == model.id,
+                TaggedObject.object_type == ObjectTypes.dataset
+            ).first().delete()
+            if commit:
+                db.session.commit()
+        except SQLAlchemyError as ex:
+            if commit:
+                db.session.rollback()
+            raise ex
+        tagged_objects =  db.session.query(TaggedObject).filter(
+                TaggedObject.tag_id == model.id,
+                TaggedObject.object_type == ObjectTypes.dataset
+            ).all()
+        if len(tagged_objects) == 0:
+            tag = cls.delete(model, commit=commit)
+        return  tag
 
     @classmethod
     def find_dataset_metric(
