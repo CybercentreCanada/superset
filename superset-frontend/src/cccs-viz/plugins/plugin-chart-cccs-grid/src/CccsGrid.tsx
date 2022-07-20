@@ -23,15 +23,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-// import { styled } from '@superset-ui/core';
 import { AgGridReact } from '@ag-grid-community/react';
+import { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
   AllModules,
   LicenseManager,
   MenuItemDef,
   GetContextMenuItemsParams,
 } from '@ag-grid-enterprise/all-modules';
-import { NULL_STRING } from 'src/utils/common';
 import { ensureIsArray } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearDataMask } from 'src/dataMask/actions';
@@ -89,14 +88,10 @@ export default function CccsGrid({
   );
 
   const [filters, setFilters] = useState(initialFilters);
-
-  const [prevRow, setPrevRow] = useState(-1);
-  const [prevColumn, setPrevColumn] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
 
-  const gridRef = useRef<AgGridReact>(null);
-  const keyRefresh = useRef<number>(0);
+  const gridRef = useRef<AgGridReactType>(null);
 
   const handleChange = useCallback(
     filters => {
@@ -198,54 +193,13 @@ export default function CccsGrid({
       selectedRows.length === 1 ? selectedRows[0].athlete : '';
   };
 
-  function isSingleCellSelection(cellRanges: any): boolean {
-    if (cellRanges.length !== 1) {
-      return false;
-    }
-    const range = cellRanges[0];
-    return (
-      range.startRow.rowIndex === range.endRow.rowIndex &&
-      range.columns.length === 1
-    );
-  }
-
-  function isSameSingleSelection(range: any): boolean {
-    const singleRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
-    return prevRow === singleRow && prevColumn === range.columns[0].colId;
-  }
-
-  function cacheSingleSelection(range: any) {
-    const singleRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
-    setPrevRow(singleRow);
-    setPrevColumn(range.columns[0].colId);
-  }
-
-  function clearSingleSelection() {
-    setPrevRow(-1);
-    setPrevColumn(NULL_STRING);
-  }
-
   const onRangeSelectionChanged = (params: any) => {
     if (params.finished === false) {
       return;
     }
 
     const gridApi = params.api;
-    let cellRanges = gridApi.getCellRanges();
-    if (isSingleCellSelection(cellRanges)) {
-      // Did user re-select the same single cell
-      if (isSameSingleSelection(cellRanges[0])) {
-        // clear selection in ag-grid
-        gridApi.clearRangeSelection();
-        // new cell ranges should be empty now
-        cellRanges = gridApi.getCellRanges();
-        // Clear previous selection
-        clearSingleSelection();
-      } else {
-        // remember the single cell selection
-        cacheSingleSelection(cellRanges[0]);
-      }
-    }
+    const cellRanges = gridApi.getCellRanges();
 
     const updatedFilters = {};
     cellRanges.forEach((range: any) => {
@@ -285,9 +239,8 @@ export default function CccsGrid({
   }
 
   const updatePageSize = (newSize: number) => {
-    gridRef.current?.props.api?.paginationSetPageSize(pageSize);
+    gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
-    keyRefresh.current += 1;
   };
 
   useEffect(() => {
@@ -305,10 +258,6 @@ export default function CccsGrid({
       setSearchValue('');
     }
   }, [include_search]);
-
-  useEffect(() => {
-    keyRefresh.current += 1;
-  }, [enable_grouping]);
 
   const onColumnMoved = useCallback(e => {
     setControlValue('column_state', e.columnApi.getColumnState());
@@ -378,7 +327,6 @@ export default function CccsGrid({
       </div>
       <div style={{ flex: '1 1 auto' }}>
         <AgGridReact
-          key={keyRefresh.current}
           ref={gridRef}
           modules={AllModules}
           columnDefs={columnDefs}
