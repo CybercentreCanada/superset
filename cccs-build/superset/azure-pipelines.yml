@@ -11,7 +11,7 @@ variables:
   buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
   DOCKER_BUILDKIT: 1
 
-pool: "cauldron-vmss"
+pool: cauldron-vmss
 
 steps:
   - bash: |
