@@ -567,6 +567,7 @@ class Header extends React.PureComponent {
           <a
             href={`${datahubUrl}dashboard/urn:li:dashboard:(superset,${dashboardInfo.id})`}
             style={{ paddingLeft: '0.5em' }}
+            data-test="datahub_link"
           >
             <Icons.Datahub viewBox="0 0 180 180" />
           </a>
