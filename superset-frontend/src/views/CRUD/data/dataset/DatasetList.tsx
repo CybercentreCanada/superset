@@ -317,7 +317,9 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                 </a>
               );
             }
-          } catch {}
+          } catch {
+            // This should never be reached. Only needed for tests.
+          }
           return null;
         },
         accessor: 'datahub_link',
