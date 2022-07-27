@@ -308,14 +308,16 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
             original: { extra },
           },
         }: any) => {
-          const parsedExtra = JSON.parse(extra);
-          if (parsedExtra?.urn) {
-            return (
-              <a href={datahubUrl + parsedExtra?.urn}>
-                <Icons.Datahub viewBox="0 0 180 180" />
-              </a>
-            );
-          }
+          try {
+            const parsedExtra = JSON.parse(extra);
+            if (parsedExtra?.urn) {
+              return (
+                <a href={datahubUrl + parsedExtra?.urn}>
+                  <Icons.Datahub viewBox="0 0 180 180" />
+                </a>
+              );
+            }
+          } catch {}
           return null;
         },
         accessor: 'datahub_link',
