@@ -24,6 +24,7 @@ import Icons from 'src/components/Icons';
 import findPermission from 'src/dashboard/util/findPermission';
 import { useSelector } from 'react-redux';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
+import { Tag } from 'antd';
 import LanguagePicker from './LanguagePicker';
 import DatabaseModal from '../CRUD/data/database/DatabaseModal';
 import { uploadUserPerms } from '../CRUD/utils';
@@ -68,6 +69,7 @@ const RightMenu = ({
   settings,
   navbarRight,
   isFrontendRoute,
+  environmentTag,
 }: RightMenuProps) => {
   const { roles } = useSelector<any, UserWithPermissionsAndRoles>(
     state => state.user,
@@ -182,6 +184,11 @@ const RightMenu = ({
         show={showModal}
         dbEngine={engine}
       />
+      {environmentTag.text && (
+        <Tag css={{ borderRadius: '500px' }} color={environmentTag.color}>
+          {environmentTag.text}
+        </Tag>
+      )}
       <Menu selectable={false} mode="horizontal" onClick={handleMenuSelection}>
         {!navbarRight.user_is_anonymous && showActionDropdown && (
           <SubMenu

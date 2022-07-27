@@ -559,7 +559,21 @@ config.controlPanelSections.push({
           label: t('Row grouping'),
           renderTrigger: true,
           default: false,
-          description: t('Whether to enable row grouping'),
+          description: t(
+            'Whether to enable row grouping (this will only take affect after a save)',
+          ),
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_row_numbers',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Row numbers'),
+          renderTrigger: true,
+          default: true,
+          description: t('Whether to enable row numbers'),
         },
       },
     ],
