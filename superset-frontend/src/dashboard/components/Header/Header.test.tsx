@@ -324,6 +324,12 @@ test('should refresh the charts', async () => {
   expect(mockedProps.onRefresh).toHaveBeenCalledTimes(1);
 });
 
+test('should show datahub link', async () => {
+  const mockedProps = createProps();
+  setup(mockedProps);
+  expect(screen.getByTestId('datahub_link')).toBeInTheDocument();
+});
+
 describe('Email Report Modal', () => {
   let isFeatureEnabledMock: any;
   let dispatch: any;
