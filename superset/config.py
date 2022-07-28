@@ -1371,6 +1371,8 @@ SQLALCHEMY_DISPLAY_TEXT = "SQLAlchemy docs"
 # Set to False to only allow viewing own recent activity
 ENABLE_BROAD_ACTIVITY_ACCESS = True
 
+DATAHUB_URL = "https://localhost:9002/"
+
 # Configuration for environment tag shown on the navbar. Setting 'text' to '' will hide the tag.
 ENVIRONMENT_TAG_CONFIG = {
     "variable": "FLASK_ENV",
