@@ -51,6 +51,7 @@ import { options as PeriodicRefreshOptions } from 'src/dashboard/components/Refr
 import findPermission from 'src/dashboard/util/findPermission';
 import { FILTER_BOX_MIGRATION_STATES } from 'src/explore/constants';
 import { PageHeaderWithActions } from 'src/components/PageHeaderWithActions';
+import { datahubUrl } from 'src/preamble';
 import { DashboardEmbedModal } from '../DashboardEmbedControls';
 
 const propTypes = {
@@ -510,6 +511,7 @@ class Header extends React.PureComponent {
             showTooltip: true,
           }}
           titlePanelAdditionalItems={
+          <>
             <PublishedStatus
               dashboardId={dashboardInfo.id}
               isPublished={isPublished}
@@ -517,6 +519,14 @@ class Header extends React.PureComponent {
               canEdit={userCanEdit}
               canSave={userCanSaveAs}
             />
+            <a
+              href={`${datahubUrl}dashboard/urn:li:dashboard:(superset,${dashboardInfo.id})`}
+              style={{ paddingLeft: '0.5em' }}
+              data-test="datahub_link"
+            >
+              <Icons.Datahub viewBox="0 0 180 180" />
+            </a>
+          </>
           }
           rightPanelAdditionalItems={
             <div className="button-container">
