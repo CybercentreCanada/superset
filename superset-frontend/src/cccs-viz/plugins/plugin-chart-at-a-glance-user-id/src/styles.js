@@ -70,7 +70,7 @@ const AtAGlance = {
 };
 
 const Table = {
-  width: '500px',
+  width: '600px',
 };
 
 const AtAGlanceLists = {
