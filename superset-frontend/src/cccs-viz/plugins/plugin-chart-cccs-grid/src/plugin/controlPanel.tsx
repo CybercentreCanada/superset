@@ -18,7 +18,6 @@
  */
 import {
   t,
-  tn,
   FeatureFlag,
   isFeatureEnabled,
   DEFAULT_METRICS,
