@@ -322,7 +322,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
             const parsedExtra = JSON.parse(extra);
             if (parsedExtra?.urn) {
               return (
-                <a href={datahubUrl + parsedExtra?.urn}>
+                <a href={`${datahubUrl}dataset/${parsedExtra?.urn}`}>
                   <Icons.Datahub viewBox="0 0 180 180" />
                 </a>
               );
