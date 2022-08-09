@@ -44,7 +44,7 @@ import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import { SLOW_DEBOUNCE } from 'src/constants';
 import { rankedSearchCompare } from 'src/utils/rankedSearchCompare';
 import { getValue, hasOption, isLabeledValue } from './utils';
-import BaseSelect, { BaseSelectProps, DEFAULT_SORT_COMPARATOR, EMPTY_OPTIONS, OptionsPagePromise, OptionsType } from './BaseSelect';
+import BaseSelect, { BaseSelectProps, DEFAULT_SORT_COMPARATOR, EMPTY_OPTIONS, OptionsPagePromise, OptionsType, OptionsTypePage } from './BaseSelect';
 
 const { Option } = AntdSelect;
 
@@ -512,6 +512,7 @@ const AsyncSelect = (
       getPopupContainer={getPopupContainer}
       loading={isLoading}
       labelInValue
+      name={name}
       notFoundContent={notFoundContent}
       onDeselect={handleOnDeselect}
       onDropdownVisibleChange={handleOnDropdownVisibleChange}
@@ -519,12 +520,12 @@ const AsyncSelect = (
       onSearch={showSearch ? handleOnSearch : undefined}
       onSelect={handleOnSelect}
       onChange={onChange}
-      baseSelectOptions={fullSelectOptions}
       placeholder={placeholder}
       showSearch={showSearch}
       value={selectValue}
       ref={ref}
       {...props}
+      baseSelectOptions={fullSelectOptions}
       />
   );
 };
