@@ -328,7 +328,6 @@ test('should refresh the charts', async () => {
   expect(mockedProps.onRefresh).toHaveBeenCalledTimes(1);
 });
 
-
 test('should show datahub link', async () => {
   const mockedProps = createProps();
   setup(mockedProps);
