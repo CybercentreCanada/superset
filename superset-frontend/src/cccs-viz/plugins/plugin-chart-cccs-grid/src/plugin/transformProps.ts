@@ -318,22 +318,24 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
-  let parsed_jump_action_configs = {}
-  jump_action_configs?.forEach( (e: any) =>
-  {
+  const parsed_jump_action_configs = {};
+  jump_action_configs?.forEach((e: any) => {
     if (e.dashboardID in parsed_jump_action_configs) {
-      parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[e.dashboardID].concat({
+      parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[
+        e.dashboardID
+      ].concat({
         advancedDataType: e.advancedDataType,
         nativefilters: e.filters,
-        name: e.dashBoardName
-      })
-    }
-    else {
-      parsed_jump_action_configs[e.dashboardID] = [{
-        advancedDataType: e.advancedDataType,
-        nativefilters: e.filters,
-        name: e.dashBoardName
-      }]
+        name: e.dashBoardName,
+      });
+    } else {
+      parsed_jump_action_configs[e.dashboardID] = [
+        {
+          advancedDataType: e.advancedDataType,
+          nativefilters: e.filters,
+          name: e.dashBoardName,
+        },
+      ];
     }
   });
 
@@ -357,6 +359,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     column_state,
     agGridLicenseKey,
     datasetColumns: columns,
-    jumpActionConfigs: parsed_jump_action_configs
+    jumpActionConfigs: parsed_jump_action_configs,
   };
 }

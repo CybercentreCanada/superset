@@ -59,6 +59,7 @@ import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 import { GenericLink } from 'src/components/GenericLink/GenericLink';
+import { datahubUrl } from 'src/preamble';
 
 import {
   PAGE_SIZE,

@@ -349,3 +349,9 @@ test('should render an extension component if one is supplied', () => {
     screen.getByText('dashboard.nav.right extension component'),
   ).toBeInTheDocument();
 });
+
+test('should show datahub link', async () => {
+  const mockedProps = createProps();
+  setup(mockedProps);
+  expect(screen.getByTestId('datahub_link')).toBeInTheDocument();
+});
