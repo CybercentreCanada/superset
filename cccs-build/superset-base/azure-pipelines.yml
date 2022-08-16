@@ -41,7 +41,7 @@ steps:
   - task: Docker@2
     displayName: Push image
     inputs:
-      command: "push"
+      command: push
       repository: $(imageRepository)
       tags: |
         $(BRANCH_NAME)
