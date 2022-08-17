@@ -47,11 +47,11 @@ const options: SelectOptionsType = [
     label: 'Another incredibly awesome long long label',
     value: 'Another incredibly awesome long long label',
   },
-  {
-    label: 'JSX Label',
-    customLabel: <div style={{ color: 'red' }}>JSX Label</div>,
-    value: 'JSX Label',
-  },
+  // {
+  //   label: 'JSX Label',
+  //   customLabel: <div style={{ color: 'red' }}>JSX Label</div>,
+  //   value: 'JSX Label',
+  // },
   { label: 'A', value: 'A' },
   { label: 'B', value: 'B' },
   { label: 'C', value: 'C' },
@@ -140,6 +140,13 @@ const ARG_TYPES = {
       By default label and value.
     `,
   },
+  selectAll: {
+    defaultValue: false,
+    description: `It defines whether the Select should show the option
+      for selecting all options. This requires that the mode
+      is also set to multiple
+    `,
+  }
 };
 
 const mountHeader = (type: String) => {
@@ -205,6 +212,7 @@ InteractiveSelect.args = {
   invertSelection: false,
   placeholder: 'Select ...',
   optionFilterProps: ['value', 'label', 'custom'],
+  selectAll: false,
 };
 
 InteractiveSelect.argTypes = {

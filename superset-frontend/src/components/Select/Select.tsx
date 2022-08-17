@@ -30,7 +30,7 @@ import { ensureIsArray, t } from '@superset-ui/core';
 import { LabeledValue as AntdLabeledValue } from 'antd/lib/select';
 import { DownOutlined, SearchOutlined } from '@ant-design/icons';
 import { isEqual } from 'lodash';
-import { getValue, hasOption, isLabeledValue } from './utils';
+import { getValue, hasOption, isLabeledValue, isSelectAllOption } from './utils';
 import {
   BaseSelect,
   DEFAULT_SORT_COMPARATOR,
@@ -38,6 +38,8 @@ import {
   MAX_TAG_COUNT,
   PickedSelectProps,
   SelectOptionsType,
+  SELECT_ALL_LABEL,
+  SELECT_ALL_OPTION,
   StyledCheckOutlined,
   StyledLoadingText,
   StyledSpin,
@@ -69,6 +71,12 @@ export interface SelectProps extends PickedSelectProps {
    * Single by default.
    */
   mode?: 'single' | 'multiple';
+  /**
+   * It defines whether the Select should show the option
+   * for selecting all options. This requires that the mode
+   * is also set to multiple
+   */
+  selectAll?: boolean;
   /**
    * Deprecated.
    * Prefer ariaLabel instead.
@@ -135,6 +143,7 @@ const Select = forwardRef(
       onDropdownVisibleChange,
       optionFilterProps = ['label', 'value'],
       options,
+      selectAll=false,
       placeholder = t('Select ...'),
       showSearch = true,
       sortComparator = DEFAULT_SORT_COMPARATOR,
@@ -156,7 +165,10 @@ const Select = forwardRef(
       : allowNewOptions
       ? 'tags'
       : 'multiple';
-
+    const showSelectAll = useMemo(() => {
+      console.log(selectAll);
+      return (selectAll && mode === 'multiple')
+    }, [selectAll, mode]);
     const sortSelectedFirst = useCallback(
       (a: AntdLabeledValue, b: AntdLabeledValue) =>
         selectValue && a.value !== undefined && b.value !== undefined
@@ -187,7 +199,7 @@ const Select = forwardRef(
     // add selected values to options list if they are not in it
     const fullSelectOptions = useMemo(() => {
       const missingValues: SelectOptionsType = ensureIsArray(selectValue)
-        .filter(opt => !hasOption(getValue(opt), selectOptions))
+        .filter(opt => !hasOption(getValue(opt), selectOptions) && !isSelectAllOption(opt))
         .map(opt =>
           isLabeledValue(opt) ? opt : { value: opt, label: String(opt) },
         );
@@ -205,9 +217,22 @@ const Select = forwardRef(
         setSelectValue(previousState => {
           const array = ensureIsArray(previousState);
           const value = getValue(selectedItem);
+          if (isSelectAllOption(selectedItem)) {
+            // in sync select all options are included in full select options
+            const result = [selectedItem, ...ensureIsArray(fullSelectOptions) as (string | number | AntdLabeledValue)[]];
+            return isLabeledValue(selectedItem)
+            ? (result as AntdLabeledValue[])
+            : (result as (string | number)[]);
+          }
+          
           // Tokenized values can contain duplicated values
           if (!hasOption(value, array)) {
             const result = [...array, selectedItem];
+            if(selectAll && (result.length === ensureIsArray(fullSelectOptions).length)) {
+              return isLabeledValue(selectedItem)
+                ? ([SELECT_ALL_OPTION, ...result] as AntdLabeledValue[])
+                : ([SELECT_ALL_LABEL, ...result] as (string | number)[]);
+            }
             return isLabeledValue(selectedItem)
               ? (result as AntdLabeledValue[])
               : (result as (string | number)[]);
@@ -222,14 +247,16 @@ const Select = forwardRef(
       value: string | number | AntdLabeledValue | undefined,
     ) => {
       if (Array.isArray(selectValue)) {
-        if (isLabeledValue(value)) {
-          const array = selectValue as AntdLabeledValue[];
-          setSelectValue(
-            array.filter(element => element.value !== value.value),
-          );
+        if(isSelectAllOption(value)){
+          setSelectValue(undefined)
         } else {
-          const array = selectValue as (string | number)[];
-          setSelectValue(array.filter(element => element !== value));
+          if(isLabeledValue(value)){
+            const array = selectValue as AntdLabeledValue[];
+            setSelectValue(array.filter(element => element.value !== value.value && !isSelectAllOption(element.value)));
+          } else {
+            const array = selectValue as (string | number)[];
+            setSelectValue(array.filter(element => element !== value && !isSelectAllOption(element)));
+          }
         }
       }
       setInputValue('');
@@ -360,6 +387,7 @@ const Select = forwardRef(
         onChange={onChange}
         options={fullSelectOptions}
         placeholder={placeholder}
+        showSelectAll={showSelectAll}
         showSearch={shouldShowSearch}
         showArrow
         tokenSeparators={tokenSeparators || TOKEN_SEPARATORS}

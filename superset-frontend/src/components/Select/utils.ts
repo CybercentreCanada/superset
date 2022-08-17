@@ -25,6 +25,7 @@ import {
   GroupedOptionsType,
 } from 'react-select';
 import { LabeledValue as AntdLabeledValue } from 'antd/lib/select';
+import { SELECT_ALL_OPTION } from './common';
 
 export function isObject(value: unknown): value is Record<string, unknown> {
   return (
@@ -95,5 +96,13 @@ export function hasOption<V>(
           (('value' in x && x.value === value) ||
             (checkLabel && 'label' in x && x.label === value))),
     ) !== undefined
+  );
+}
+
+export function isSelectAllOption<V>(option: V | LabeledValue<V> | RawValue ): boolean {
+  return (
+    option === SELECT_ALL_OPTION.value ||
+    (isObject(option) &&
+      (('value' in option && option.value === SELECT_ALL_OPTION.value)))
   );
 }

@@ -35,6 +35,14 @@ import React, {
 
 const { Option } = AntdSelect;
 
+export const SELECT_ALL_LABEL = 'Select all';
+export const SELECT_ALL = 'SELECT_ALL';
+
+export const SELECT_ALL_OPTION: AntdLabeledValue = {
+  label: t(SELECT_ALL_LABEL),
+  value: SELECT_ALL,
+};
+
 export type AntdSelectAllProps = AntdSelectProps<AntdSelectValue>;
 
 export type PickedSelectProps = Pick<
@@ -213,9 +221,7 @@ export interface BaseSelectProps extends PickedSelectProps {
    */
   lazyLoading?: boolean;
   /**
-   * It allows to define which properties of the option object
-   * should be looked for when searching.
-   * By default label and value.
+   * mode that is passed to antd select
    */
   mappedMode?: 'multiple' | 'tags';
   /**
@@ -230,6 +236,12 @@ export interface BaseSelectProps extends PickedSelectProps {
    * an array of options.
    */
   options: SelectOptionsType;
+  /**
+   * It defines whether the Select should show the option
+   * for selecting all options. This requires that the mode
+   * is also set to multiple
+   */
+  showSelectAll?: boolean;
   /**
    * It defines how many results should be included
    * in the query response.
@@ -294,6 +306,7 @@ export const BaseSelect = forwardRef(
     onSearch,
     optionFilterProps = ['label', 'value'],
     options,
+    showSelectAll=false,
     pageSize = DEFAULT_PAGE_SIZE,
     placeholder = t('Select ...'),
     showSearch = true,
@@ -308,7 +321,6 @@ export const BaseSelect = forwardRef(
     ref,
     ...props
   }: BaseSelectProps) => {
-    const hasCustomLabels = options?.some(opt => !!opt?.customLabel);
 
     return (
       <StyledContainer>
@@ -331,7 +343,6 @@ export const BaseSelect = forwardRef(
           onSelect={onSelect}
           onClear={onClear}
           onChange={onChange}
-          options={hasCustomLabels ? undefined : options}
           placeholder={placeholder}
           showSearch={showSearch}
           showArrow={showArrow}
@@ -342,18 +353,26 @@ export const BaseSelect = forwardRef(
           ref={ref}
           {...props}
         >
-          {hasCustomLabels &&
-            options.map(opt => {
-              const isOptObject = typeof opt === 'object';
-              const label = isOptObject ? opt?.label || opt.value : opt;
-              const value = isOptObject ? opt.value : opt;
-              const { customLabel, ...optProps } = opt;
-              return (
-                <Option {...optProps} key={value} label={label} value={value}>
-                  {isOptObject && customLabel ? customLabel : label}
-                </Option>
-              );
-            })}
+          {showSelectAll && (
+          <Option
+            id="select-all"
+            key={SELECT_ALL_OPTION.value}
+            value={SELECT_ALL_OPTION.value}
+          >
+            {SELECT_ALL_LABEL}
+          </Option>
+        )}
+          {options.map(opt => {
+            const isOptObject = typeof opt === 'object';
+            const label = isOptObject ? opt?.label || opt.value : opt;
+            const value = isOptObject ? opt.value : opt;
+            const { customLabel, ...optProps } = opt;
+            return (
+              <Option {...optProps} key={value} label={label} value={value}>
+                {isOptObject && customLabel ? customLabel : label}
+              </Option>
+            );
+          })}
         </StyledSelect>
       </StyledContainer>
     );
