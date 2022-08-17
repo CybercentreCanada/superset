@@ -25,7 +25,7 @@ import Alert from 'src/components/Alert';
 import Badge from 'src/components/Badge';
 import shortid from 'shortid';
 import { styled, SupersetClient, t, withTheme } from '@superset-ui/core';
-import { Select, AsyncSelect, Row, Col } from 'src/components';
+import { Select, AsyncSelect, Row, Col, AntdSelect } from 'src/components';
 import { FormLabel } from 'src/components/Form';
 import Button from 'src/components/Button';
 import Tabs from 'src/components/Tabs';
@@ -44,6 +44,7 @@ import SpatialControl from 'src/explore/components/controls/SpatialControl';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
 import Icons from 'src/components/Icons';
+import { bootstrapData } from 'src/preamble';
 import CollectionTable from './CollectionTable';
 import Fieldset from './Fieldset';
 import Field from './Field';
@@ -280,9 +281,15 @@ function ColumnCollectionTable({
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
                 control={
-                  <TextControl
-                    controlId="advanced_data_type"
-                    placeholder={t('Advanced Data type')}
+                  <Select
+                    ariaLabel={t('Select advanced data type')}
+                    name="advanced_data_type"
+                    options={bootstrapData?.common?.advanced_data_types.map(
+                      v => ({
+                        value: v.id,
+                        label: v.verbose_name,
+                      }),
+                    )}
                   />
                 }
               />
