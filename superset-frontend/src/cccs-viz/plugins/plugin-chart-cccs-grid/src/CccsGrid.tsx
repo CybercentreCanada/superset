@@ -273,7 +273,12 @@ export default function CccsGrid({
 
   return (
     <div
-      style={{ width, height, display: 'flex', flexFlow: 'column' }}
+      style={{
+        height,
+        display: 'flex',
+        flexFlow: 'column',
+        overflow: 'hidden',
+      }}
       className="ag-theme-balham"
     >
       <div
