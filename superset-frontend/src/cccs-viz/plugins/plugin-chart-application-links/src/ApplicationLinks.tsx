@@ -20,6 +20,19 @@ export default function ApplicationLinks(props: ApplicationsProps) {
     }
   }
 
+  const link_formatter = () => {
+    let tempString = '';
+    if (appVal.length > 1) {
+      tempString = appVal[0];
+      for (let i = 1; i < appVal.length; i += 1) {
+        tempString += `%22%2C%20%22${appVal[i]}`;
+      }
+    } else if (appVal.length === 1) {
+      tempString = appVal[0];
+    }
+    return tempString;
+  };
+
   useEffect(() => {
     fetch(
       // eslint-disable-next-line no-restricted-globals
@@ -36,11 +49,15 @@ export default function ApplicationLinks(props: ApplicationsProps) {
 
         if (appType === 'USER_ID') {
           setAlfredURL(
-            `${response.payload?.url}/?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20email.value%2C%20email.maliciousness%2C%20email.uri`,
+            `${
+              response.payload?.url
+            }/?expression=MATCH%20(email%3AEMAIL_ADDRESS)%20WHERE%20email.value%20IN%20%5B%22${link_formatter()}%22%5D%20RETURN%20email.value%2C%20email.maliciousness%2C%20email.uri`,
           );
         } else if (appType === 'IP') {
           setAlfredURL(
-            `${response.payload?.url}/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${appVal}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`,
+            `${
+              response.payload?.url
+            }/?expression=MATCH%20(ip%3AIP_ADDRESS)%20WHERE%20ip.value%20IN%20%5B%22${link_formatter()}%22%5D%20RETURN%20ip.value%2C%20ip.maliciousness%2C%20ip.creation_date%2C%20ip.created_by%2C%20ip.uri%2C%20ip.report_uri`,
           );
         } else {
           setAlfredURL(`${response.payload?.url}`);
@@ -59,7 +76,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
   return (
     <div>
       <div style={styles.InlineBlock}>
-        {appVal === '' && appType === '' ? (
+        {appVal.length === 0 && appType === '' ? (
           <div>
             <img
               height="17"
@@ -89,8 +106,10 @@ export default function ApplicationLinks(props: ApplicationsProps) {
             </a>
             {alfredCount > 0 ? (
               <p style={styles.InlineText}>
-                Alfred has seen this {infoType} {alfredCount} time(s). Search
-                the{' '}
+                Alfred has seen {appVal.length > 1 ? 'these' : 'this'}{' '}
+                {infoType}
+                {appVal.length > 1 ? "'s" : ''} {alfredCount} time
+                {alfredCount > 1 ? 's' : ''}. Search the{' '}
                 <a href={alfredURL} target="_blank" rel="noreferrer">
                   Alfred
                 </a>{' '}
@@ -98,7 +117,9 @@ export default function ApplicationLinks(props: ApplicationsProps) {
               </p>
             ) : (
               <p style={styles.InlineText}>
-                Alfred has not seen this {infoType}. Search the{' '}
+                Alfred has not seen {appVal.length > 1 ? 'these' : 'this'}{' '}
+                {infoType}
+                {appVal.length > 1 ? "'s" : ''}. Search the{' '}
                 <a href={alfredURL} target="_blank" rel="noreferrer">
                   Alfred
                 </a>{' '}
