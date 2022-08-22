@@ -110,7 +110,7 @@ export default function ApplicationLinks(props: ApplicationsProps) {
               <p style={styles.InlineText}>
                 Alfred has seen {appVal.length > 1 ? 'these' : 'this'}{' '}
                 {infoType}
-                {appVal.length > 1 ? "'s" : ''} {alfredCount} time
+                {appVal.length > 1 ? "s" : ''} {alfredCount} time
                 {alfredCount > 1 ? 's' : ''}. Search the{' '}
                 <a href={alfredURL} target="_blank" rel="noreferrer">
                   Alfred
