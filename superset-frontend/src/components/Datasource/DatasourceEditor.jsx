@@ -25,7 +25,7 @@ import Alert from 'src/components/Alert';
 import Badge from 'src/components/Badge';
 import shortid from 'shortid';
 import { styled, SupersetClient, t, withTheme } from '@superset-ui/core';
-import { Select, AsyncSelect, Row, Col, AntdSelect } from 'src/components';
+import { Select, Row, Col } from 'src/components';
 import { FormLabel } from 'src/components/Form';
 import Button from 'src/components/Button';
 import Tabs from 'src/components/Tabs';
@@ -283,8 +283,8 @@ function ColumnCollectionTable({
                   <Select
                     ariaLabel={t('Select advanced data type')}
                     name="advanced_data_type"
-                    allowClear={true}
-                    allowNewOptions={true}
+                    allowClear
+                    allowNewOptions
                     options={bootstrapData?.common?.advanced_data_types.map(
                       v => ({
                         value: v.id,
