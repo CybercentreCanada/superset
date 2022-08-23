@@ -64,7 +64,8 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
             // Changed due to removal of status field
             validHandler(!json.result.error_message);
           })
-          .catch(() => {
+          .catch((e) => {
+            console.log(e)
             setAdvancedDataTypesState({
               parsedAdvancedDataType: '',
               advancedDataTypeOperatorList:
