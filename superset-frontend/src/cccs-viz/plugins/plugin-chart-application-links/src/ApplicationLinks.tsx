@@ -22,13 +22,11 @@ export default function ApplicationLinks(props: ApplicationsProps) {
 
   const link_formatter = () => {
     let tempString = '';
-    if (appVal.length > 1) {
+    if (appVal.length > 0) {
       tempString = appVal[0];
       for (let i = 1; i < appVal.length; i += 1) {
         tempString += `%22%2C%20%22${appVal[i]}`;
       }
-    } else if (appVal.length === 1) {
-      tempString = appVal[0];
     }
     return tempString;
   };

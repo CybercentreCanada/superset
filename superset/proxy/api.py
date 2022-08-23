@@ -165,12 +165,10 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         user_emails = user_id.split(",")
         user_email_string = ''
 
-        if len(user_emails) > 1:
+        if len(user_emails) > 0:
             user_email_string = user_emails[0]
             for index in range(1, len(user_emails)):
                 user_email_string += "%22%2C%20%22" + user_emails[index]
-        elif len(user_emails) == 1:
-            user_email_string = user_emails[0]
 
         url = (
                 self.ALFRED_URL
@@ -199,12 +197,10 @@ class ProxyRestAPI(BaseSupersetModelRestApi):
         user_ips = ip_string.split(",")
         user_ip_string = ''
 
-        if len(user_ips) > 1:
+        if len(user_ips) > 0:
             user_ip_string = user_ips[0]
             for index in range(1, len(user_ips)):
                 user_ip_string += "%22%2C%20%22" + user_ips[index]
-        elif len(user_ips) == 1:
-            user_ip_string = user_ips[0]
             
         url = (
             self.ALFRED_URL
