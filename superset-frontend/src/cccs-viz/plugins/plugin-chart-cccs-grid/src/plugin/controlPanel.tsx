@@ -370,22 +370,6 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'order_by_cols',
-            config: {
-              type: 'SelectControl',
-              label: t('Ordering'),
-              description: t('Order results by selected columns'),
-              multi: true,
-              default: [],
-              mapStateToProps: ({ datasource }) => ({
-                choices: columnChoices(datasource),
-              }),
-              visibility: isRawMode,
-            },
-          },
-        ],
-        [
-          {
             name: 'timeseries_limit_metric',
             override: {
               visibility: isAggMode,
