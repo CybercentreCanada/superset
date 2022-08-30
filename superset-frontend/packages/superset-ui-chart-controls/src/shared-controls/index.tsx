@@ -313,7 +313,7 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
       }
     } else {
       const sortedQueryColumns = (datasource as QueryResponse)?.columns?.filter(
-        query => {return query?.is_dttm }
+        query => query?.is_dttm,
       );
       props.options = sortedQueryColumns;
       if (props?.options) props.default = props.options[0]?.name;
