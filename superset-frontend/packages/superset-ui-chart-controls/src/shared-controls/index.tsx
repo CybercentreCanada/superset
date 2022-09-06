@@ -302,7 +302,7 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
   mapStateToProps: state => {
     const props: Partial<SelectControlConfig<ColumnMeta | QueryColumn>> = {};
     const { datasource } = state;
-  
+
     if (datasource?.hasOwnProperty('main_dttm_col')) {
       const dataset = datasource as Dataset;
       props.options = dataset.columns.filter((c: ColumnMeta) => c.is_dttm);
@@ -317,9 +317,9 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
         query => query?.is_dttm,
       );
       props.options = sortedQueryColumns;
-      const default_option = sortedQueryColumns.find(
-        option => option?.hasOwnProperty('main_dttm_col')
-      )
+      const default_option = sortedQueryColumns.find(option =>
+        option?.hasOwnProperty('main_dttm_col'),
+      );
       props.default = default_option;
     }
     return props;
