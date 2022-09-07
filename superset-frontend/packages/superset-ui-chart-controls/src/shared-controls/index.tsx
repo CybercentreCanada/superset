@@ -307,10 +307,21 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
       const dataset = datasource as Dataset;
       props.options = dataset.columns.filter((c: ColumnMeta) => c.is_dttm);
       props.default = null;
-      if (dataset.main_dttm_col) {
-        props.default = dataset.main_dttm_col;
-      } else if (props?.options) {
-        props.default = (props.options[0] as ColumnMeta).column_name;
+      if (dataset.main_dttm_col !== null) {
+        if (dataset.main_dttm_col) {
+          props.default = dataset.main_dttm_col;
+        } else if (props?.options) {
+          props.default = (props.options[0] as ColumnMeta).column_name;
+        }
+      } else {
+        const sortedQueryColumns = (
+          datasource as QueryResponse
+        )?.columns?.filter(query => query?.is_dttm);
+        props.options = sortedQueryColumns;
+        const default_option = sortedQueryColumns.find(option =>
+          option?.hasOwnProperty('main_dttm_col'),
+        );
+        props.default = default_option;
       }
     } else {
       const sortedQueryColumns = (datasource as QueryResponse)?.columns?.filter(
