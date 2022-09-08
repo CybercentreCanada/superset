@@ -310,15 +310,15 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
       if (dataset.main_dttm_col !== null) {
         if (dataset.main_dttm_col) {
           props.default = dataset.main_dttm_col;
-        } else if (props?.options) {
+        } else if (props?.options.length > 0) {
           props.default = (props.options[0] as ColumnMeta).column_name;
         }
       } else {
-        const sortedQueryColumns = (datasource as QueryResponse)?.columns?.sort(
-          query => (query?.is_dttm ? -1 : 1),
-        );
+        const sortedQueryColumns = (datasource as QueryResponse)?.columns
+          ?.filter(query => query?.is_dttm === true)
+          .sort();
         props.options = sortedQueryColumns;
-        if (props?.options) {
+        if (props?.options.length > 0) {
           props.default =
             'column_name' in props.options[0]
               ? props.options[0]?.column_name
@@ -326,11 +326,11 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
         }
       }
     } else {
-      const sortedQueryColumns = (datasource as QueryResponse)?.columns?.sort(
-        query => (query?.is_dttm ? -1 : 1),
-      );
+      const sortedQueryColumns = (datasource as QueryResponse)?.columns
+        ?.filter(query => query?.is_dttm === true)
+        .sort();
       props.options = sortedQueryColumns;
-      if (props?.options) {
+      if (props?.options.length > 0) {
         props.default =
           'column_name' in props.options[0]
             ? props.options[0]?.column_name
