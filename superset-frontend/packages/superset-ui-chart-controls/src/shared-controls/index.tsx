@@ -314,24 +314,28 @@ const granularity_sqla: SharedControlConfig<'SelectControl', ColumnMeta> = {
           props.default = (props.options[0] as ColumnMeta).column_name;
         }
       } else {
-        const sortedQueryColumns = (
-          datasource as QueryResponse
-        )?.columns?.filter(query => query?.is_dttm);
-        props.options = sortedQueryColumns;
-        const default_option = sortedQueryColumns.find(option =>
-          option?.hasOwnProperty('main_dttm_col'),
+        const sortedQueryColumns = (datasource as QueryResponse)?.columns?.sort(
+          query => (query?.is_dttm ? -1 : 1),
         );
-        props.default = default_option;
+        props.options = sortedQueryColumns;
+        if (props?.options) {
+          props.default =
+            'column_name' in props.options[0]
+              ? props.options[0]?.column_name
+              : props.options[0]?.name;
+        }
       }
     } else {
-      const sortedQueryColumns = (datasource as QueryResponse)?.columns?.filter(
-        query => query?.is_dttm,
+      const sortedQueryColumns = (datasource as QueryResponse)?.columns?.sort(
+        query => (query?.is_dttm ? -1 : 1),
       );
       props.options = sortedQueryColumns;
-      const default_option = sortedQueryColumns.find(option =>
-        option?.hasOwnProperty('main_dttm_col'),
-      );
-      props.default = default_option;
+      if (props?.options) {
+        props.default =
+          'column_name' in props.options[0]
+            ? props.options[0]?.column_name
+            : props.options[0]?.name;
+      }
     }
     return props;
   },
