@@ -25,14 +25,16 @@ on Explore.
 In order to do that, we reproduce the post-processing in Python
 for these chart types.
 """
-
+import logging
 from io import StringIO
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import pandas as pd
 from flask_babel import gettext as __
 
+from superset import app
 from superset.common.chart_data import ChartDataResultFormat
+from superset.common.query_context import QueryContext
 from superset.utils.core import (
     DTTM_ALIAS,
     extract_dataframe_dtypes,
@@ -42,6 +44,9 @@ from superset.utils.core import (
 
 if TYPE_CHECKING:
     from superset.connectors.base.models import BaseDatasource
+
+logger = logging.getLogger(__name__)
+config = app.config
 
 
 def get_column_key(label: Tuple[str, ...], metrics: List[str]) -> Tuple[Any, ...]:
@@ -304,11 +309,50 @@ def table(
     return df
 
 
+def AgGrid(result: Dict[Any, Any], form_data: Dict[str, Any]) -> Dict[Any, Any]:
+    """
+    CCCS Grid.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
+def AtAGlanceUserIDCore(
+    result: Dict[Any, Any], form_data: Dict[str, Any]
+) -> Dict[Any, Any]:
+    """
+    AAG User ID.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
 post_processors = {
     "pivot_table": pivot_table,
     "pivot_table_v2": pivot_table_v2,
     "table": table,
+    "cccs_grid": AgGrid,
+    "at_a_glance_user_id": AgGrid,
+    "at_a_glance_ip": AgGrid,
+    "at_a_glance_dns": AgGrid,
+    "at_a_glance_user_id_sas": AgGrid,
 }
+
+rawPostProcess = [
+    "cccs_grid",
+    "at_a_glance_user_id",
+    "at_a_glance_ip",
+    "at_a_glance_dns",
+    "at_a_glance_user_id_sas",
+]
 
 
 def apply_post_process(
@@ -324,52 +368,70 @@ def apply_post_process(
 
     post_processor = post_processors[viz_type]
 
-    for query in result["queries"]:
-        if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
-            raise Exception(f"Result format {query['result_format']} not supported")
-
-        if not query["data"]:
-            # do not try to process empty data
-            continue
-
-        if query["result_format"] == ChartDataResultFormat.JSON:
-            df = pd.DataFrame.from_dict(query["data"])
-        elif query["result_format"] == ChartDataResultFormat.CSV:
+    if result["query_context"].result_format == ChartDataResultFormat.CSV:
+        for query in result["queries"]:
             df = pd.read_csv(StringIO(query["data"]))
+            processed_df = post_processor(df, form_data)  # type: ignore
 
-        # convert all columns to verbose (label) name
-        if datasource:
-            df.rename(columns=datasource.data["verbose_map"], inplace=True)
-
-        processed_df = post_processor(df, form_data, datasource)
-
-        query["colnames"] = list(processed_df.columns)
-        query["indexnames"] = list(processed_df.index)
-        query["coltypes"] = extract_dataframe_dtypes(processed_df, datasource)
-        query["rowcount"] = len(processed_df.index)
-
-        # Flatten hierarchical columns/index since they are represented as
-        # `Tuple[str]`. Otherwise encoding to JSON later will fail because
-        # maps cannot have tuples as their keys in JSON.
-        processed_df.columns = [
-            " ".join(str(name) for name in column).strip()
-            if isinstance(column, tuple)
-            else column
-            for column in processed_df.columns
-        ]
-        processed_df.index = [
-            " ".join(str(name) for name in index).strip()
-            if isinstance(index, tuple)
-            else index
-            for index in processed_df.index
-        ]
-
-        if query["result_format"] == ChartDataResultFormat.JSON:
-            query["data"] = processed_df.to_dict()
-        elif query["result_format"] == ChartDataResultFormat.CSV:
             buf = StringIO()
             processed_df.to_csv(buf)
             buf.seek(0)
+
             query["data"] = buf.getvalue()
+            query["colnames"] = list(processed_df.columns)
+            query["coltypes"] = extract_dataframe_dtypes(processed_df)
+            query["rowcount"] = len(processed_df.index)
+    else:
+        result = post_processor(result, form_data)  # type: ignore
+    if viz_type in rawPostProcess:
+        result = post_processor(result, form_data)  # type: ignore
+    else:
+        for query in result["queries"]:
+            if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
+                raise Exception(f"Result format {query['result_format']} not supported")
+
+            if not query["data"]:
+                # do not try to process empty data
+                continue
+
+            if query["result_format"] == ChartDataResultFormat.JSON:
+                df = pd.DataFrame.from_dict(query["data"])
+            elif query["result_format"] == ChartDataResultFormat.CSV:
+                df = pd.read_csv(StringIO(query["data"]))
+
+            # convert all columns to verbose (label) name
+            if datasource:
+                df.rename(columns=datasource.data["verbose_map"], inplace=True)
+
+            processed_df = post_processor(df, form_data, datasource)  # type: ignore
+
+            query["colnames"] = list(processed_df.columns)
+            query["indexnames"] = list(processed_df.index)
+            query["coltypes"] = extract_dataframe_dtypes(processed_df, datasource)
+            query["rowcount"] = len(processed_df.index)
+
+            # Flatten hierarchical columns/index since they are represented as
+            # `Tuple[str]`. Otherwise encoding to JSON later will fail because
+            # maps cannot have tuples as their keys in JSON.
+            processed_df.columns = [
+                " ".join(str(name) for name in column).strip()
+                if isinstance(column, tuple)
+                else column
+                for column in processed_df.columns
+            ]
+            processed_df.index = [
+                " ".join(str(name) for name in index).strip()
+                if isinstance(index, tuple)
+                else index
+                for index in processed_df.index
+            ]
+
+            if query["result_format"] == ChartDataResultFormat.JSON:
+                query["data"] = processed_df.to_dict()
+            elif query["result_format"] == ChartDataResultFormat.CSV:
+                buf = StringIO()
+                processed_df.to_csv(buf)
+                buf.seek(0)
+                query["data"] = buf.getvalue()
 
     return result
