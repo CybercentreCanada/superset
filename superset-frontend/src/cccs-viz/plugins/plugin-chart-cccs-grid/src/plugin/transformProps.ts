@@ -122,6 +122,16 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return columnMap;
   }, columnVerboseNameMap);
 
+  // Map of column descriptions, key is column name, value is the description
+  const columnDescriptionMap = new Map<string, string>();
+  columns.reduce(function (columnMap, column: Column) {
+    // @ts-ignore
+    const name = column.column_name;
+    // @ts-ignore
+    columnMap[name] = column.description;
+    return columnMap;
+  }, columnDescriptionMap);
+
   // Map of verbose names, key is metric name, value is verbose name
   const metricVerboseNameMap = new Map<string, string>();
   metrics.reduce(function (metricMap, metric: Metric) {
@@ -216,6 +226,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           : undefined;
       const isSortable = true;
       const enableRowGroup = true;
+      const columnDescription = columnDescriptionMap[column];
       return {
         field: column,
         headerName: columnHeader,
@@ -225,6 +236,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sortIndex,
         enableRowGroup,
         getQuickFilterText: (params: any) => advancedTypeValueFormatter(params),
+        headerTooltip: columnDescription,
       };
     });
   } else {
@@ -243,6 +255,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
             : undefined;
         const isSortable = true;
         const enableRowGroup = true;
+        const columnDescription = columnDescriptionMap[column];
         return {
           field: column,
           headerName: columnHeader,
@@ -251,6 +264,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           enableRowGroup,
           getQuickFilterText: (params: any) =>
             advancedTypeValueFormatter(params),
+          headerTooltip: columnDescription,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);
