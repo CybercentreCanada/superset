@@ -187,7 +187,7 @@ export default class MainPreset extends Preset {
         new EchartsTimeseriesStepChartPlugin().configure({
           key: 'echarts_timeseries_step',
         }),
-        new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
+        new AdhocFilterPlugin().configure({ key: 'adhoc_filter ' }),
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
