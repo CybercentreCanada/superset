@@ -21,7 +21,6 @@ import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
 import EventFlowChartPlugin from '@superset-ui/legacy-plugin-chart-event-flow';
-import HeatmapChartPlugin from '@superset-ui/legacy-plugin-chart-heatmap';
 import HistogramChartPlugin from '@superset-ui/legacy-plugin-chart-histogram';
 import HorizonChartPlugin from '@superset-ui/legacy-plugin-chart-horizon';
 import MapBoxChartPlugin from '@superset-ui/legacy-plugin-chart-map-box';
@@ -63,6 +62,7 @@ import {
   EchartsTimeseriesStepChartPlugin,
   EchartsGraphChartPlugin,
   EchartsGaugeChartPlugin,
+  EchartsHeatmapPlugin,
   EchartsRadarChartPlugin,
   EchartsFunnelChartPlugin,
   EchartsTreemapChartPlugin,
@@ -112,12 +112,12 @@ export default class MainPreset extends Preset {
         new EchartsFunnelChartPlugin().configure({ key: 'funnel' }),
         new EchartsTreemapChartPlugin().configure({ key: 'treemap_v2' }),
         new EchartsGaugeChartPlugin().configure({ key: 'gauge_chart' }),
+        new EchartsHeatmapPlugin().configure({ key: 'heatmap_chart' }),
         new EchartsGraphChartPlugin().configure({ key: 'graph_chart' }),
         new EchartsRadarChartPlugin().configure({ key: 'radar' }),
         new EchartsMixedTimeseriesChartPlugin().configure({
           key: 'mixed_timeseries',
         }),
-        new HeatmapChartPlugin().configure({ key: 'heatmap' }),
         new HistogramChartPlugin().configure({ key: 'histogram' }),
         new HorizonChartPlugin().configure({ key: 'horizon' }),
         new LineChartPlugin().configure({ key: 'line' }),

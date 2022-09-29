@@ -49,7 +49,7 @@ export default class EchartsHeatmapPlugin extends ChartPlugin<
           },
           { url: employment, caption: t('Employment and education') },
         ],
-        name: t('Heatmap'),
+        name: t('Heatmap (NEW)'),
         tags: [
           t('Business'),
           t('Intensity'),
