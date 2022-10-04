@@ -20,7 +20,7 @@ import { styled, NO_TIME_RANGE } from '@superset-ui/core';
 import React, { useCallback, useEffect } from 'react';
 import DateFilterControl from 'src/explore/components/controls/DateFilterControl';
 import { PluginFilterTimeProps } from './types';
-import { FilterPluginStyle } from '../common';
+import { ControlContainer, FilterPluginStyle } from '../common';
 
 const TimeFilterStyles = styled(FilterPluginStyle)`
   display: flex;
