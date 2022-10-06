@@ -174,7 +174,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
-  const canCreate = hasPerm('can_write');
+  const canCreate = isUserAdmin(user);
   const canExport =
     hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
 
