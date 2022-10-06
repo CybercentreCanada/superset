@@ -122,6 +122,16 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return columnMap;
   }, columnVerboseNameMap);
 
+  // Map of column descriptions, key is column name, value is the description
+  const columnDescriptionMap = new Map<string, string>();
+  columns.reduce(function (columnMap, column: Column) {
+    // @ts-ignore
+    const name = column.column_name;
+    // @ts-ignore
+    columnMap[name] = column.description;
+    return columnMap;
+  }, columnDescriptionMap);
+
   // Map of verbose names, key is metric name, value is verbose name
   const metricVerboseNameMap = new Map<string, string>();
   metrics.reduce(function (metricMap, metric: Metric) {
@@ -171,6 +181,20 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     JSON: 'jsonValueRenderer',
   };
 
+  const formatIpV4 = (v: any) => {
+    const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
+      (v >> 8) & 0xff
+    }.${v & 0xff}`;
+    return converted;
+  };
+
+  const advancedTypeValueFormatter = (params: any) => {
+    if (params.colDef.cellRenderer === 'ipv4ValueRenderer') {
+      return formatIpV4(params.value.toString());
+    }
+    return params.value.toString();
+  };
+
   const percentMetricValueFormatter = function (params: ValueFormatterParams) {
     return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
       params.value,
@@ -202,6 +226,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           : undefined;
       const isSortable = true;
       const enableRowGroup = true;
+      const columnDescription = columnDescriptionMap[column];
       return {
         field: column,
         headerName: columnHeader,
@@ -210,6 +235,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sort: sortDirection,
         sortIndex,
         enableRowGroup,
+        getQuickFilterText: (params: any) => advancedTypeValueFormatter(params),
+        headerTooltip: columnDescription,
       };
     });
   } else {
@@ -228,12 +255,16 @@ export default function transformProps(chartProps: CccsGridChartProps) {
             : undefined;
         const isSortable = true;
         const enableRowGroup = true;
+        const columnDescription = columnDescriptionMap[column];
         return {
           field: column,
           headerName: columnHeader,
           cellRenderer,
           sortable: isSortable,
           enableRowGroup,
+          getQuickFilterText: (params: any) =>
+            advancedTypeValueFormatter(params),
+          headerTooltip: columnDescription,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);

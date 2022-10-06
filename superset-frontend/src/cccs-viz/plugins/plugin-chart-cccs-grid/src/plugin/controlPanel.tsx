@@ -100,8 +100,6 @@ const validateAggControlValues = (
     : [];
 };
 
-
-
 const validateAggColumnValues = (
   controls: ControlStateMapping,
   values: any[],
@@ -191,10 +189,7 @@ const validateAggColumnValues = (
 //   return false;
 // }
 
-
-const defineSavedMetrics = (
-  datasource: Dataset | QueryResponse | null,
-) =>
+const defineSavedMetrics = (datasource: Dataset | QueryResponse | null) =>
   datasource?.hasOwnProperty('metrics')
     ? (datasource as Dataset)?.metrics || []
     : DEFAULT_METRICS;
@@ -395,7 +390,7 @@ const config: ControlPanelConfig = {
         [
           isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
             ? {
-                name: 'table_filter',
+                name: 'emitFilter',
                 config: {
                   type: 'CheckboxControl',
                   label: t('Emit dashboard cross filters'),
