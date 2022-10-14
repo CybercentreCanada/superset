@@ -405,12 +405,12 @@ const config: ControlPanelConfig = {
         [
           isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
             ? {
-                name: 'principalColumns',
+                name: 'defaultEmitFilterColumn',
                 config: {
                   type: 'SelectControl',
-                  label: t('Principal Column(s) to Emit'),
+                  label: t('Default Emit Filter Column'),
                   description: t(
-                    'Preselect a set of principal columns that can easily be emitted from the context menu',
+                    'Select a column that the emit filter button will use by default',
                   ),
                   multi: true,
                   freeForm: true,
@@ -431,36 +431,10 @@ const config: ControlPanelConfig = {
                     state: ControlPanelState,
                     controlState: ControlState,
                   ) => {
-                    const { controls } = state;
-                    const originalMapStateToProps = isRawMode({ controls })
-                      ? sharedControls?.columns?.mapStateToProps
-                      : sharedControls?.groupby?.mapStateToProps;
+                    const originalMapStateToProps =
+                      sharedControls?.columns?.mapStateToProps;
                     const newState =
                       originalMapStateToProps?.(state, controlState) ?? {};
-                    const choices = isRawMode({ controls })
-                      ? controls?.columns?.value
-                      : controls?.groupby?.value;
-                    newState.options = newState.options.filter(
-                      (o: { column_name: string }) =>
-                        ensureIsArray(choices).includes(o.column_name),
-                    );
-                    const invalidOptions = ensureIsArray(
-                      controlState.value,
-                    ).filter(c => !ensureIsArray(choices).includes(c));
-                    newState.externalValidationErrors =
-                      invalidOptions.length > 0
-                        ? invalidOptions.length > 1
-                          ? [
-                              `'${invalidOptions.join(', ')}'${t(
-                                ' are not valid options',
-                              )}`,
-                            ]
-                          : [
-                              `'${invalidOptions}'${t(
-                                ' is not a valid option',
-                              )}`,
-                            ]
-                        : [];
                     return newState;
                   },
                   visibility: ({ controls }) =>

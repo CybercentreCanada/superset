@@ -71,7 +71,7 @@ export interface CccsGridTransformedProps extends CccsGridStylesProps {
   setControlValue: HandlerFunction;
   selectedValues: Record<number, string>;
   emitFilter: boolean;
-  principalColumns: any;
+  defaultEmitFilterColumn: any;
   data: TimeseriesDataRecord[];
   columnDefs: any;
   rowData: any;
