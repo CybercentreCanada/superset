@@ -58,11 +58,11 @@ export default function transformProps(chartProps: ChartProps) {
 
 
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < formData?.adhocFilters?.length; i++) {
+  for (let i = 0; i < formData?.extraFormData?.filters?.length; i++) {
     
-    const adhocfilter = formData?.adhocFilters[i];
-    if (adhocfilter.subject === parameterColumnName) {
-      url_parameter_value = adhocfilter.comparator;
+    const adhocfilter = formData?.extraFormData?.filters[i];
+    if (adhocfilter.col === parameterColumnName) {
+      url_parameter_value = adhocfilter.val;
       break;
     } 
   }
