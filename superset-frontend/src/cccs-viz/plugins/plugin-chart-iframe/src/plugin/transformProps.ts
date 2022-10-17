@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, QueryFormData, TimeseriesDataRecord, AdhocFilter } from '@superset-ui/core';
-import { string } from 'yargs';
+import { ChartProps, QueryFormData, AdhocFilter } from '@superset-ui/core';
 
 
 const extractFiltersFromFormData = (formData: QueryFormData): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] } | null)[] | undefined => {
@@ -93,7 +92,6 @@ export default function transformProps(chartProps: ChartProps) {
 
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < formData?.extraFormData?.filters?.length; i++) {
-    
     const adhocfilter = formData?.extraFormData?.filters[i];
     if (adhocfilter.col === parameterColumnName) {
       url_parameter_value = adhocfilter.val;
