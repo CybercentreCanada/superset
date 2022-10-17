@@ -16,7 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, TimeseriesDataRecord } from '@superset-ui/core';
+import { ChartProps, QueryFormData, TimeseriesDataRecord, AdhocFilter } from '@superset-ui/core';
+import { string } from 'yargs';
+
+
+const extractFiltersFromFormData = (formData: QueryFormData): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] } | null)[] | undefined => {
+
+  const adhoc = formData?.adhoc_filters?.map( (filter: AdhocFilter)  => { 
+    if ( ("subject" in filter) && ("comparator" in filter)  ) {
+      return {columnName: filter.subject, value: filter.comparator}
+    }
+    else {
+      return null
+    }
+  }) || []
+
+  const adhocExtra = formData?.extra_form_data?.adhoc_filters?.map( (filter: AdhocFilter)  => { 
+    if ( ("subject" in filter) && ("comparator" in filter)  ) {
+      return {columnName: filter.subject, value: filter.comparator}
+    }
+    else {
+      return null
+    }
+  }) || []
+
+  const simpleExtra = formData?.extra_form_data?.filters?.map( (filter)  => { 
+    if ( ("col" in filter) && ("val" in filter)  ) {
+      return {columnName: filter.col.toString(), value: filter.val}
+    }
+    else {
+      return null
+    }
+  }) || []
+  
+  return [...adhoc, ...adhocExtra, ...simpleExtra]
+}
 
 export default function transformProps(chartProps: ChartProps) {
   /**
