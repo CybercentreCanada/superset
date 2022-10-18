@@ -21,7 +21,7 @@ import { ChartProps, PlainObject, } from '@superset-ui/core';
 
 const extractFiltersFromFormData = (formData: PlainObject): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] })[] => {
 
-  const filters = [...(formData?.adhoc_filters || []),  ...(formData?.extra_form_data?.adhoc_filters || []), ...(formData?.extra_form_data?.filters || [])]
+  const filters = [...(formData?.adhocFilters || []),  ...(formData?.extraFormData?.adhocFilters || []), ...(formData?.extraFormData?.filters || [])]
   
   const simpleAdhocFilters = filters.reduce(
     (acc, filter) => {
