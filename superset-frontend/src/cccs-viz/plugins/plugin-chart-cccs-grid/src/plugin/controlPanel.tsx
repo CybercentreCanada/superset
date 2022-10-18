@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import {
   t,
   FeatureFlag,
@@ -44,6 +45,20 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 //import cidrRegex from 'cidr-regex';
+
+interface Props {
+  foo?: number;
+  bar?: number;
+};
+
+const myElement: React.FC<Props> = props => {
+  
+  const {foo} = props
+  
+  return <div> foo </div>;
+}
+
+
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -552,6 +567,21 @@ config.controlPanelSections.push({
         name: 'page_length',
         config: {
           type: 'SelectControl',
+          freeForm: true,
+          renderTrigger: true,
+          label: t('Page length'),
+          default: 0,
+          choices: PAGE_SIZE_OPTIONS,
+          description: t('Rows per page, 0 means no pagination'),
+          validators: [legacyValidateInteger],
+        },
+      },
+    ],
+    [
+      {
+        name: 'test',
+        config: {
+          type: myElement,
           freeForm: true,
           renderTrigger: true,
           label: t('Page length'),
