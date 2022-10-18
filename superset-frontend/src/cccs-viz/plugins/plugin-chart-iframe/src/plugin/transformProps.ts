@@ -76,9 +76,11 @@ export default function transformProps(chartProps: ChartProps) {
 
   const allFilters = extractFiltersFromFormData(formData);
   
-  const url_parameter_value = String(allFilters.find( e => {
+  const url_parameter_values = allFilters.filter( e => {
     return e.columnName == parameterColumnName
-  })?.value);
+  });
+  
+  const url_parameter_value = url_parameter_values.length === 1 ? url_parameter_values[0].value : 'invalid'
 
   return {
     url_parameter_value,
