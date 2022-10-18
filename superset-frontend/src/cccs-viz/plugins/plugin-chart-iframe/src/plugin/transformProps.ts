@@ -16,39 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, QueryFormData, AdhocFilter } from '@superset-ui/core';
+import { ChartProps, PlainObject, } from '@superset-ui/core';
 
 
-const extractFiltersFromFormData = (formData: QueryFormData): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] } | null)[] | undefined => {
+const extractFiltersFromFormData = (formData: PlainObject): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] })[] => {
 
-  const adhoc = formData?.adhoc_filters?.map( (filter: AdhocFilter)  => { 
-    if ( ("subject" in filter) && ("comparator" in filter)  ) {
-      return {columnName: filter.subject, value: filter.comparator}
-    }
-    else {
-      return null
-    }
-  }) || []
-
-  const adhocExtra = formData?.extra_form_data?.adhoc_filters?.map( (filter: AdhocFilter)  => { 
-    if ( ("subject" in filter) && ("comparator" in filter)  ) {
-      return {columnName: filter.subject, value: filter.comparator}
-    }
-    else {
-      return null
-    }
-  }) || []
-
-  const simpleExtra = formData?.extra_form_data?.filters?.map( (filter)  => { 
-    if ( ("col" in filter) && ("val" in filter)  ) {
-      return {columnName: filter.col.toString(), value: filter.val}
-    }
-    else {
-      return null
-    }
-  }) || []
+  const filters = [...(formData?.adhoc_filters || []),  ...(formData?.extra_form_data?.adhoc_filters || []), ...(formData?.extra_form_data?.filters || [])]
   
-  return [...adhoc, ...adhocExtra, ...simpleExtra]
+  const simpleAdhocFilters = filters.reduce(
+    (acc, filter) => {
+      
+      if ( ("subject" in filter) && ("comparator" in filter)  ) {
+        acc.push( {columnName: filter.subject, value: filter.comparator} )
+      }
+      else if ( ("col" in filter) && ("val" in filter)  ) {
+        acc.push( {columnName: filter.col.toString(), value: filter.val} )
+      }
+      return acc
+    }, <({columnName: string, value: string | number | boolean | (string | number | boolean)[]})[]> []
+  )
+
+  return simpleAdhocFilters
 }
 
 export default function transformProps(chartProps: ChartProps) {
@@ -81,23 +69,15 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const { formData,  } = chartProps;
+  const formData = chartProps.formData;
 
   const { url, parameterColumnName, parameterName } = formData
 
-
-
-  let url_parameter_value = '';
-
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < formData?.extraFormData?.filters?.length; i++) {
-    const adhocfilter = formData?.extraFormData?.filters[i];
-    if (adhocfilter.col === parameterColumnName) {
-      url_parameter_value = adhocfilter.val;
-      break;
-    } 
-  }
+  const allFilters = extractFiltersFromFormData(formData);
+  
+  const url_parameter_value = String(allFilters.find( e => {
+    return e.columnName == parameterColumnName
+  })?.value);
 
   return {
     url_parameter_value,
