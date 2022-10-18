@@ -80,11 +80,20 @@ export default function transformProps(chartProps: ChartProps) {
     return e.columnName == parameterColumnName
   });
   
-  const url_parameter_value = url_parameter_values.length === 1 ? url_parameter_values[0].value : 'invalid'
+  const url_parameter_value = url_parameter_values.length === 1 ? url_parameter_values[0].value : ""
+
+  const error_message = url_parameter_values.length === 0 ? 
+  `Please provide a value for ${ parameterColumnName }` 
+  : 
+  url_parameter_values.length > 1 ? 
+  `Please only provide one value for ${ parameterColumnName }` 
+  : 
+  ''
 
   return {
     url_parameter_value,
     parameter_name: parameterName,
     url,
+    error_message
   };
 }
