@@ -183,6 +183,18 @@ const config: ControlPanelConfig = {
               description: t('The name for the URL parameter.'),
             },
           },
+        ],
+        [
+          {
+            name: 'parameter_prefix',
+            config: {
+              type: 'TextControl',
+              label: t('Parameter Prefix'),
+              renderTrigger: true,
+              default: '',
+              description: t('A value that will be predened the parameter value.'),
+            },
+          },
         ]
       ],
     },

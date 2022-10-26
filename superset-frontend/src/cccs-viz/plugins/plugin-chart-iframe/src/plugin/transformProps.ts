@@ -71,7 +71,7 @@ export default function transformProps(chartProps: ChartProps) {
    */
   const formData = chartProps.formData;
 
-  const { url, parameterColumnName, parameterName } = formData
+  const { url, parameterColumnName, parameterName, parameterPrefix } = formData
 
   const allFilters = extractFiltersFromFormData(formData);
   
@@ -83,5 +83,6 @@ export default function transformProps(chartProps: ChartProps) {
     url_parameter_value,
     parameter_name: parameterName,
     url,
+    parameter_prefix: parameterPrefix,
   };
 }
