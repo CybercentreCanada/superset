@@ -25,6 +25,7 @@ import {
   SetDataMaskHook,
   supersetTheme,
   TimeseriesDataRecord,
+  Column,
 } from '@superset-ui/core';
 
 export type CccsGridQueryFormData = QueryFormData & {
@@ -84,6 +85,7 @@ export interface CccsGridTransformedProps extends CccsGridStylesProps {
   column_state: ColumnState[];
   // add typing here for the props you pass in from transformProps.ts!
   agGridLicenseKey: string;
+  datasetColumns: Column[];
 }
 
 export type EventHandlers = Record<string, { (props: any): void }>;

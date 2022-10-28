@@ -333,5 +333,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_grouping,
     column_state,
     agGridLicenseKey,
+    datasetColumns: columns,
   };
 }
