@@ -65,7 +65,7 @@ export default function EchartsHeatmap(props: HeatmapChartTransformedProps) {
         },
       });
     },
-    [groupby, labelMap, setDataMask, selectedValues],
+    [groupby, labelMap, setDataMask, emitFilter],
   );
 
   const eventHandlers = allEventHandlers(props, handleChange);

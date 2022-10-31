@@ -18,13 +18,13 @@
  */
 
 import { emitFilterControl } from '@superset-ui/chart-controls';
+import { DataRecord, getColumnLabel } from '@superset-ui/core';
+import { EChartsCoreOption } from 'echarts';
 import {
   EchartsHeatmapFormData,
   HeatmapChartTransformedProps,
   EchartsHeatmapChartProps,
 } from './types';
-import { DataRecord, getColumnLabel } from '@superset-ui/core';
-import { EChartsCoreOption } from 'echarts';
 
 export default function transformProps(
   chartProps: EchartsHeatmapChartProps,
@@ -32,7 +32,7 @@ export default function transformProps(
   const { width, height, formData, queriesData, hooks, filterState, theme } =
     chartProps;
 
-  const { emitFilter, groupby } = formData;
+  const { emitFilter } = formData;
 
   const echartOptions: EChartsCoreOption = {
     tooltip: {
@@ -43,18 +43,8 @@ export default function transformProps(
 
   const { setDataMask = () => {}, onContextMenu } = hooks;
 
-  const groupbyLabels = groupby.map(getColumnLabel);
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const columnsLabelMap = new Map<string, string[]>();
-  data.map((data_point, index) => {
-    const name = groupbyLabels
-      .map(column => `${column}: ${data_point[column]}`)
-      .join(', ');
-    columnsLabelMap.set(
-      name,
-      groupbyLabels.map(col => data_point[col] as string),
-    );
-  });
 
   return {
     width,
@@ -64,7 +54,6 @@ export default function transformProps(
     setDataMask,
     emitFilter,
     labelMap: Object.fromEntries(columnsLabelMap),
-    groupby,
     selectedValues: filterState.selectedValues || [],
     onContextMenu,
   };
