@@ -31,7 +31,6 @@ export type EchartsHeatmapFormData = QueryFormData & {
   bottomMargin: number | string;
   canvasImageRendering: string; // TODO
   colorScheme?: string;
-  groupby: QueryFormColumn[];
   columnX: string;
   columnY: string;
   leftMargin: number | string;
@@ -50,18 +49,17 @@ export type EchartsHeatmapFormData = QueryFormData & {
 };
 
 export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
-  //...DEFAULT_LEGEND_FORM_DATA,
+  // ...DEFAULT_LEGEND_FORM_DATA,
   width: 150,
   height: 150,
   bottomMargin: 'auto',
   canvasImageRendering: 'pixelated (Sharp)', // TODO
-  groupby: [],
   columnX: '',
   columnY: '',
   leftMargin: 'auto',
   metric: '',
   normalized: false,
-  numberFormat: 'SMART_NUMBER',
+  numberFormat: 'SMART_NUMBERS',
   showLegend: true,
   showPercentage: true,
   showValues: false,
