@@ -44,6 +44,7 @@ from typing import (
 
 import pkg_resources
 from cachelib.base import BaseCache
+from cachelib.redis import RedisCache
 from celery.schedules import crontab
 from dateutil import tz
 from flask import Blueprint
@@ -397,7 +398,7 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     # Feature is under active development and breaking changes are expected
     "DASHBOARD_NATIVE_FILTERS_SET": False,
     "DASHBOARD_FILTERS_EXPERIMENTAL": False,
-    "GLOBAL_ASYNC_QUERIES": False,
+    "GLOBAL_ASYNC_QUERIES": True,
     "VERSIONED_EXPORT": True,
     "EMBEDDED_SUPERSET": False,
     # Enables Alerts and reports new implementation
@@ -580,7 +581,10 @@ CACHE_DEFAULT_TIMEOUT = int(timedelta(days=1).total_seconds())
 CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "NullCache"}
 
 # Cache for datasource metadata and query results
-DATA_CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "NullCache"}
+DATA_CACHE_CONFIG: CacheConfig = {
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": "cache",
+}
 
 # Cache for dashboard filter state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
@@ -593,6 +597,8 @@ FILTER_STATE_CACHE_CONFIG: CacheConfig = {
 # Cache for explore form data state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
 EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = {
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": "cache",
     "CACHE_DEFAULT_TIMEOUT": int(timedelta(days=7).total_seconds()),
     # should the timeout be reset when retrieving a cached value
     "REFRESH_TIMEOUT_ON_RETRIEVAL": True,
@@ -742,19 +748,24 @@ DASHBOARD_AUTO_REFRESH_MODE: Literal["fetch", "force"] = "force"
 # http://docs.celeryproject.org/en/latest/getting-started/brokers/index.html
 
 
-class CeleryConfig:  # pylint: disable=too-few-public-methods
-    broker_url = "sqla+sqlite:///celerydb.sqlite"
-    imports = ("superset.sql_lab",)
-    result_backend = "db+sqlite:///celery_results.sqlite"
+class CeleryConfig(object):
+    broker_url = "redis://cache:6379/0"
+    imports = (
+        "superset.sql_lab",
+        "superset.tasks",
+    )
+    result_backend = "redis://cache:6379/0"
     worker_log_level = "DEBUG"
-    worker_prefetch_multiplier = 1
-    task_acks_late = False
+    worker_prefetch_multiplier = 10
+    task_acks_late = True
     task_annotations = {
-        "sql_lab.get_sql_results": {"rate_limit": "100/s"},
+        "sql_lab.get_sql_results": {
+            "rate_limit": "100/s",
+        },
         "email_reports.send": {
             "rate_limit": "1/s",
-            "time_limit": int(timedelta(seconds=120).total_seconds()),
-            "soft_time_limit": int(timedelta(seconds=150).total_seconds()),
+            "time_limit": 120,
+            "soft_time_limit": 150,
             "ignore_result": True,
         },
     }
@@ -762,14 +773,6 @@ class CeleryConfig:  # pylint: disable=too-few-public-methods
         "email_reports.schedule_hourly": {
             "task": "email_reports.schedule_hourly",
             "schedule": crontab(minute=1, hour="*"),
-        },
-        "reports.scheduler": {
-            "task": "reports.scheduler",
-            "schedule": crontab(minute="*", hour="*"),
-        },
-        "reports.prune_log": {
-            "task": "reports.prune_log",
-            "schedule": crontab(minute=0, hour=0),
         },
     }
 
@@ -871,7 +874,9 @@ SQLLAB_CTAS_SCHEMA_NAME_FUNC: Optional[
 
 # If enabled, it can be used to store the results of long-running queries
 # in SQL Lab by using the "Run Async" button/feature
-RESULTS_BACKEND: Optional[BaseCache] = None
+RESULTS_BACKEND: Optional[BaseCache] = RedisCache(
+    host="cache", port=6379, key_prefix="superset_results", db=0
+)
 
 # Use PyArrow and MessagePack for async query results serialization,
 # rather than JSON. This feature requires additional testing from the
@@ -1231,7 +1236,7 @@ SQLA_TABLE_MUTATOR = lambda table: table
 # Requires GLOBAL_ASYNC_QUERIES feature flag to be enabled.
 GLOBAL_ASYNC_QUERIES_REDIS_CONFIG = {
     "port": 6379,
-    "host": "127.0.0.1",
+    "host": "cache",
     "password": "",
     "db": 0,
     "ssl": False,
@@ -1242,12 +1247,14 @@ GLOBAL_ASYNC_QUERIES_REDIS_STREAM_LIMIT_FIREHOSE = 1000000
 GLOBAL_ASYNC_QUERIES_JWT_COOKIE_NAME = "async-token"
 GLOBAL_ASYNC_QUERIES_JWT_COOKIE_SECURE = False
 GLOBAL_ASYNC_QUERIES_JWT_COOKIE_DOMAIN = None
-GLOBAL_ASYNC_QUERIES_JWT_SECRET = "test-secret-change-me"
+GLOBAL_ASYNC_QUERIES_JWT_SECRET = (
+    "053218be59ebe99a028c28b91b7939200eafc79a2a9863055c23e8e88c9ba7e5"
+)
 GLOBAL_ASYNC_QUERIES_TRANSPORT = "polling"
 GLOBAL_ASYNC_QUERIES_POLLING_DELAY = int(
     timedelta(milliseconds=500).total_seconds() * 1000
 )
-GLOBAL_ASYNC_QUERIES_WEBSOCKET_URL = "ws://127.0.0.1:8080/"
+GLOBAL_ASYNC_QUERIES_WEBSOCKET_URL = "ws://localhost:8080/"
 
 # Embedded config options
 GUEST_ROLE_NAME = "Public"
