@@ -75,9 +75,9 @@ export default function transformProps(chartProps: ChartProps) {
 
   const allFilters = extractFiltersFromFormData(formData);
   
-  const url_parameter_raw_value = String(allFilters.find( e => {
+  const url_parameter_raw_value = allFilters.find( e => {
     return e.columnName == parameterColumnName
-  })?.value);
+  })?.value;
   
   let errorMessage = "";
 
@@ -93,7 +93,7 @@ export default function transformProps(chartProps: ChartProps) {
     errorMessage = "No value received, please emit a single value."
   }
 
-  const url_parameter_value = url_parameter_raw_value.toString()
+  const url_parameter_value = String(url_parameter_raw_value)
 
   return {
     url_parameter_value,

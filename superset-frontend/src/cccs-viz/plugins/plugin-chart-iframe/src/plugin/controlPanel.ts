@@ -115,31 +115,6 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        ['adhoc_filters'],
-        [
-          {
-            name: 'metrics',
-            override: {
-              // visibility: () => true,
-              validators: [],
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const { controls } = state;
-                const originalMapStateToProps =
-                  sharedControls?.metrics?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggControlValues(
-                  controls,
-                  [controlState.value],
-                );
-                return newState;
-              },
-            },
-          },
-        ],
         [
           {
             name: 'row_limit',
@@ -154,6 +129,17 @@ const config: ControlPanelConfig = {
             config: {
               type: 'TextControl',
               label: t('URL'),
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =  controlState.value ? [] : ["Please add a value for URL."]
+                return newState;
+              },
               renderTrigger: true,
               default: '',
               description: t('The Base URL for the Iframe.'),
@@ -166,6 +152,17 @@ const config: ControlPanelConfig = {
             config: {
               type: 'TextControl',
               label: t('Parameter Column Name'),
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =  controlState.value ? [] : ["Please add a value for Parameter Column Name."]
+                return newState;
+              },
               renderTrigger: true,
               default: '',
               description: t('The Column name for the value that will populate the url parameter.'),
@@ -178,6 +175,17 @@ const config: ControlPanelConfig = {
             config: {
               type: 'TextControl',
               label: t('Parameter Name'),
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =  controlState.value ? [] : ["Please add a value for Parameter Name."]
+                return newState;
+              },
               renderTrigger: true,
               default: '',
               description: t('The name for the URL parameter.'),
