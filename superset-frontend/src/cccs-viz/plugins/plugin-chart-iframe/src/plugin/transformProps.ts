@@ -75,14 +75,31 @@ export default function transformProps(chartProps: ChartProps) {
 
   const allFilters = extractFiltersFromFormData(formData);
   
-  const url_parameter_value = String(allFilters.find( e => {
+  const url_parameter_raw_value = String(allFilters.find( e => {
     return e.columnName == parameterColumnName
   })?.value);
+  
+  let errorMessage = "";
+
+  if(Array.isArray(url_parameter_raw_value) && url_parameter_raw_value.length > 1) {
+    errorMessage = "More than one value received, please emit a single value."
+  }
+  
+  if(Array.isArray(url_parameter_raw_value) && url_parameter_raw_value.length === 0) {
+    errorMessage = "No value received, please emit a single value."
+  }
+
+  if(url_parameter_raw_value === undefined || url_parameter_raw_value === "undefined") {
+    errorMessage = "No value received, please emit a single value."
+  }
+
+  const url_parameter_value = url_parameter_raw_value.toString()
 
   return {
     url_parameter_value,
     parameter_name: parameterName,
     url,
     parameter_prefix: parameterPrefix,
+    errorMessage,
   };
 }

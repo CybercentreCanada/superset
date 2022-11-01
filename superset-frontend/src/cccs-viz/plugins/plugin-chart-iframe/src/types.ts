@@ -5,4 +5,5 @@ export type IFrameVisualizationProps = QueryFormData & {
   parameter_name: string;
   url: string;
   parameter_prefix: string;
+  errorMessage: string;
 };
