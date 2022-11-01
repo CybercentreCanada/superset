@@ -47,13 +47,7 @@ import CustomTooltip from './CustomTooltip';
 /// / jcc
 
 // 'use strict';
-{
-  advancedtype {
-    [
-     {value, columnname}
-    ]
-  }
-}
+
 import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
@@ -95,20 +89,22 @@ export default function CccsGrid({
     state => state.dataMask[formData.slice_id]?.filterState?.value,
   );
   
-  const [selectedData, setSelectedData] = useState<{[key: string]: { advancedDataType: string, data: string[] }}>(initialFilters);
-  const [selectedDataByAdvancedType, setselectedDataByAdvancedType] = useState<{[key: string]:string[]}>(initialFilters);
+  const [selectedDataByColumnName, setSelectedDataColumnName] = useState<{[key: string]: string[] }>(initialFilters);
+  const [selectedDataByAdvancedType, setselectedDataByAdvancedType] = useState<{[key: string]: string[]}>(initialFilters);
 
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
 
   const gridRef = useRef<AgGridReactType>(null);
   const FORMDATALINKINGSTUFF = {
-    bsajdjdol: {
-      data: {
-              advancedDataType: "email",
-              nativefilterIDs: []
-            }
-    }
+    'RYANCOOLDASHBOARD': [{
+            advancedDataType: "internet_address",
+            nativefilterIDs: ['k4rrsCohb','c-WJQnFbP']
+    }],
+    '13': [{
+      advancedDataType: "internet_address",
+      nativefilterIDs: ['k4rrsCohb']
+}]
   }
   const handleChange = useCallback(
     filters => {
@@ -144,13 +140,56 @@ export default function CccsGrid({
     },
     [emitFilter, setDataMask],
   ); // only take relevant page size options
-  const getDrillToDashboardContextMenuItems = (selectedData: {[key: string]: { advancedDataType: string, data: string[] }}): (string | MenuItemDef)[] => {
-    for (let key in selectedData) {
-      let value = selectedData[key];
-      let advancedDataType = value.advancedDataType
 
+  const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[] ): string =>{
+
+    return `NATIVE_FILTER-${nativefilterID}:(filterState:(label:!(${urlSelectedData.join(',')}),validateStatus:!f,value:!(${urlSelectedData.join(',')})),id:NATIVE_FILTER-${nativefilterID},ownState:())`
+  
+  } 
+  const getDrillToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
+    
+    let sub_menu: any = []
+
+    for (let key in FORMDATALINKINGSTUFF) {
+          
+      let businessTypeNativeFilters = FORMDATALINKINGSTUFF[key];
+      let nativeFilterUrls: string[] = [];
+
+      businessTypeNativeFilters.forEach((element: any) => {
+        
+        let advancedDataType = element['advancedDataType'];
+        let nativefilterIDs: string[] = element["nativefilterIDs"];
+        let selectedDataForUrl = selectedData[advancedDataType];
+        
+        if (selectedDataForUrl && nativefilterIDs) {
+          nativefilterIDs.forEach( id => {
+            nativeFilterUrls.push(
+              generateNativeFilterUrlString(id, selectedDataForUrl)
+            )
+          });
+        }
+
+      });
+      
+      if (nativeFilterUrls?.length > 0){
+        
+        let action = () => {
+          let url = `http://localhost:9000/superset/dashboard/${key}/?native_filters=(${nativeFilterUrls.join(',')})`
+          window.open(url, '_blank');
+        }
+        
+        let DashboardMenuItem = {
+          name: key,
+          action
+        }
+    
+        sub_menu.push(DashboardMenuItem) 
+      }
+    
     }
-    return []
+      
+    const menu = {name: "Drill to dashboard", subMenu: sub_menu, disabled: sub_menu.length < 1}  
+    return [ menu ]
   }
 
   const getContextMenuItems = useCallback(
@@ -166,7 +205,7 @@ export default function CccsGrid({
               {
                 name: 'Emit Filter(s)',
                 disabled: params.value === null,
-                action: () => handleChange(selectedData),
+                action: () => handleChange(selectedDataByColumnName),
                 // eslint-disable-next-line theme-colors/no-literal-colors
                 icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class=""><path fill-rule="evenodd" clip-rule="evenodd" d="M18.1573 17.864C21.2763 14.745 21.2763 9.66935 18.1573 6.5503C15.0382 3.43125 9.96264 3.43125 6.84359 6.5503L5.42938 5.13609C9.32836 1.2371 15.6725 1.2371 19.5715 5.13609C23.4705 9.03507 23.4705 15.3792 19.5715 19.2782C15.6725 23.1772 9.32836 23.1772 5.42938 19.2782L6.84359 17.864C9.96264 20.9831 15.0375 20.9838 18.1573 17.864ZM2.00035 11.5C2.00035 11.2239 2.2242 11 2.50035 11H5.00035L5.00035 10C5.00035 9.58798 5.47073 9.35279 5.80035 9.60001L9.00035 12C9.17125 12.1032 6.98685 13.637 5.77613 14.4703C5.44613 14.6975 5.00035 14.4601 5.00035 14.0595V13L2.50035 13C2.22421 13 2.00035 12.7761 2.00035 12.5L2.00035 11.5ZM9.67202 9.37873C11.2319 7.81885 13.7697 7.81956 15.3289 9.37873C16.888 10.9379 16.8887 13.4757 15.3289 15.0356C13.769 16.5955 11.2312 16.5948 9.67202 15.0356L8.2578 16.4498C10.5976 18.7896 14.4033 18.7896 16.7431 16.4498C19.0829 14.11 19.0829 10.3043 16.7431 7.96451C14.4033 5.6247 10.5976 5.6247 8.2578 7.96451L9.67202 9.37873Z" fill="#20A7C9"></path></svg>',
               },
@@ -180,6 +219,9 @@ export default function CccsGrid({
         )
       } 
       result = result.concat(
+        getDrillToDashboardContextMenuItems(selectedDataByAdvancedType)
+      )
+      result = result.concat(
         [
           'separator',
           'export'
@@ -192,7 +234,7 @@ export default function CccsGrid({
       crossFilterValue,
       dispatch,
       emitFilter,
-      selectedData,
+      selectedDataByColumnName,
       formData.slice_id,
       handleChange,
     ],
@@ -231,7 +273,7 @@ export default function CccsGrid({
     const gridApi = params.api;
     const cellRanges = gridApi.getCellRanges();
 
-    const updatedSlectedData: {[key: string]: { advancedDataType: string, data: string[] }} = {};
+    const updatedSelectedData: {[key: string]: string[] } = {};
     const newSelectedbyAdvancedType: {[key: string]: string[] } = {};
 
     cellRanges.forEach((range: any) => {
@@ -240,7 +282,7 @@ export default function CccsGrid({
         let advancedDataType = datasetColumns.find( (column)  => { return column.column_name == col })?.advanced_data_type || ""
 
 
-        updatedSlectedData[col] = updatedSlectedData[col] || {advancedDataType: advancedDataType, data: []};
+        updatedSelectedData[col] = updatedSelectedData[col] || [];
         
         newSelectedbyAdvancedType[advancedDataType] = newSelectedbyAdvancedType[advancedDataType]  || []
         
@@ -255,8 +297,8 @@ export default function CccsGrid({
             column,
             gridApi.getModel().getRow(rowIndex),
           );
-          if (!updatedSlectedData[col].data.includes(value)) {
-            updatedSlectedData[col].data.push(value);
+          if (!updatedSelectedData[col].includes(value)) {
+            updatedSelectedData[col].push(value);
           }
           if (!newSelectedbyAdvancedType[advancedDataType].includes(value)) {
             newSelectedbyAdvancedType[advancedDataType].push(value);
@@ -265,7 +307,7 @@ export default function CccsGrid({
       });
     });
     setselectedDataByAdvancedType(newSelectedbyAdvancedType);
-    setSelectedData(updatedSlectedData);
+    setSelectedDataColumnName(updatedSelectedData);
   };
 
   function getEmitTarget(col: string) {
