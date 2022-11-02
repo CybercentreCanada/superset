@@ -23,7 +23,7 @@ import {
   QueryFormData,
 } from '@superset-ui/core';
 import { EChartTransformedProps } from '../types';
-//import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
+import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
 
 export type EchartsHeatmapFormData = QueryFormData & {
   width: number;
@@ -49,11 +49,11 @@ export type EchartsHeatmapFormData = QueryFormData & {
 };
 
 export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
-  // ...DEFAULT_LEGEND_FORM_DATA,
+  ...DEFAULT_LEGEND_FORM_DATA,
   width: 150,
   height: 150,
   bottomMargin: 'auto',
-  canvasImageRendering: 'pixelated (Sharp)', // TODO
+  canvasImageRendering: 'pixelated', // 'pixelated (Sharp)'? TODO
   columnX: '',
   columnY: '',
   leftMargin: 'auto',
