@@ -578,17 +578,25 @@ IMG_UPLOAD_URL = "/static/uploads/"
 CACHE_DEFAULT_TIMEOUT = int(timedelta(days=1).total_seconds())
 
 # Default cache for Superset objects
-CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "NullCache"}
+CACHE_CONFIG: CacheConfig = {
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": "cache",
+    "CACHE_KEY_PREFIX": "superset_results",
+}
 
 # Cache for datasource metadata and query results
 DATA_CACHE_CONFIG: CacheConfig = {
     "CACHE_TYPE": "RedisCache",
     "CACHE_REDIS_HOST": "cache",
+    "CACHE_KEY_PREFIX": "superset_results",
 }
 
 # Cache for dashboard filter state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
 FILTER_STATE_CACHE_CONFIG: CacheConfig = {
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": "cache",
+    "CACHE_KEY_PREFIX": "superset_results",
     "CACHE_DEFAULT_TIMEOUT": int(timedelta(days=90).total_seconds()),
     # should the timeout be reset when retrieving a cached value
     "REFRESH_TIMEOUT_ON_RETRIEVAL": True,
@@ -599,6 +607,7 @@ FILTER_STATE_CACHE_CONFIG: CacheConfig = {
 EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = {
     "CACHE_TYPE": "RedisCache",
     "CACHE_REDIS_HOST": "cache",
+    "CACHE_KEY_PREFIX": "superset_results",
     "CACHE_DEFAULT_TIMEOUT": int(timedelta(days=7).total_seconds()),
     # should the timeout be reset when retrieving a cached value
     "REFRESH_TIMEOUT_ON_RETRIEVAL": True,
