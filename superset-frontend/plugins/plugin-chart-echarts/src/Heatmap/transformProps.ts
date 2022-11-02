@@ -19,7 +19,9 @@
 
 import { emitFilterControl } from '@superset-ui/chart-controls';
 import { DataRecord, getColumnLabel } from '@superset-ui/core';
-import { EChartsCoreOption } from 'echarts';
+import { EChartsCoreOption, HeatmapSeriesOption } from 'echarts';
+import { HeatmapDataItemOption } from 'echarts/types/src/chart/heatmap/HeatmapSeries';
+import { OptionDataValue } from 'echarts/types/src/util/types';
 import {
   EchartsHeatmapFormData,
   HeatmapChartTransformedProps,
@@ -29,10 +31,28 @@ import {
 export default function transformProps(
   chartProps: EchartsHeatmapChartProps,
 ): HeatmapChartTransformedProps {
-  const { width, height, formData, queriesData, hooks, filterState, theme } =
-    chartProps;
-
-  const { emitFilter } = formData;
+  const { width, height, formData, queriesData, hooks } = chartProps;
+  const {
+    bottomMargin,
+    canvasImageRendering,
+    allColumnsX,
+    allColumnsY,
+    linearColorScheme,
+    leftMargin,
+    metric,
+    normalized,
+    showLegend,
+    showPerc,
+    showValues,
+    sortXAxis,
+    sortYAxis,
+    xscaleInterval,
+    yscaleInterval,
+    yAxisBounds,
+    yAxisFormat,
+    emitFilter,
+  } = formData as EchartsHeatmapFormData;
+  const data = (queriesData[0]?.data || []) as DataRecord[];
 
   const echartOptions: EChartsCoreOption = {
     tooltip: {
@@ -41,20 +61,44 @@ export default function transformProps(
     },
   };
 
+  const transformedData: HeatmapDataItemOption[] = data.map(
+    (data_point, index) => {
+      const item: HeatmapDataItemOption = {
+        value: data_point[index] as HeatmapDataValue, // TODO
+      };
+      return item;
+    },
+  );
+
   const { setDataMask = () => {}, onContextMenu } = hooks;
 
-  const data = (queriesData[0]?.data || []) as DataRecord[];
-  const columnsLabelMap = new Map<string, string[]>();
+  const heatmapSeriesOptions: HeatmapSeriesOption[] = [
+    {
+      type: 'heatmap',
+      coordinateSystem: 'cartesian2d', // TODO
+      blurSize: 1, // TODO
+      maxOpacity: 100, // TODO
+      minOpacity: 0, // TODO
+      data: transformedData,
+    },
+  ];
+  // type?: 'heatmap';
+  // coordinateSystem?: 'cartesian2d' | 'geo' | 'calendar';
+  // blurSize?: number;
+  // pointSize?: number;
+  // maxOpacity?: number;
+  // minOpacity?: number;
+  // data?: (HeatmapDataItemOption | HeatmapDataValue)[];
 
   return {
     width,
     height,
+    emitFilter,
     formData,
     echartOptions,
+    labelMap,
+    groupby,
+    selectedValues,
     setDataMask,
-    emitFilter,
-    labelMap: Object.fromEntries(columnsLabelMap),
-    selectedValues: filterState.selectedValues || [],
-    onContextMenu,
   };
 }
