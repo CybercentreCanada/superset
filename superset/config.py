@@ -186,6 +186,16 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
 # SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
 
+# Custom Redis Cache configuration
+DEFAULT_CACHE_CONFIG = {
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": os.environ.get("REDIS_HOST"),
+    "CACHE_REDIS_PORT": os.environ.get("REDIS_PORT"),
+    "CACHE_REDIS_DB": os.environ.get("REDIS_DB"),
+    "CACHE_REDIS_PASSWORD": os.environ.get("REDIS_PASSWORD"),
+    "CACHE_KEY_PREFIX": "superset_results",
+}
+
 # In order to hook up a custom password store for all SQLACHEMY connections
 # implement a function that takes a single argument of type 'sqla.engine.url',
 # returns a password and set SQLALCHEMY_CUSTOM_PASSWORD_STORE.
@@ -578,43 +588,29 @@ IMG_UPLOAD_URL = "/static/uploads/"
 CACHE_DEFAULT_TIMEOUT = int(timedelta(days=1).total_seconds())
 
 # Default cache for Superset objects
-CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "RedisCache",
-    "CACHE_REDIS_HOST": "cache",
-    "CACHE_KEY_PREFIX": "superset_results",
-}
+CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
 
 # Cache for datasource metadata and query results
-DATA_CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "RedisCache",
-    "CACHE_REDIS_HOST": "cache",
-    "CACHE_KEY_PREFIX": "superset_results",
-}
+DATA_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
 
 # Cache for dashboard filter state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
-FILTER_STATE_CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "RedisCache",
-    "CACHE_REDIS_HOST": "cache",
-    "CACHE_KEY_PREFIX": "superset_results",
-    "CACHE_DEFAULT_TIMEOUT": int(timedelta(days=90).total_seconds()),
-    # should the timeout be reset when retrieving a cached value
-    "REFRESH_TIMEOUT_ON_RETRIEVAL": True,
-}
+FILTER_STATE_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
+FILTER_STATE_CACHE_CONFIG["CACHE_DEFAULT_TIMEOUT"] = int(
+    timedelta(days=90).total_seconds()
+)
+FILTER_STATE_CACHE_CONFIG["REFRESH_TIMEOUT_ON_RETRIEVAL"] = True
 
 # Cache for explore form data state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
-EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "RedisCache",
-    "CACHE_REDIS_HOST": "cache",
-    "CACHE_KEY_PREFIX": "superset_results",
-    "CACHE_DEFAULT_TIMEOUT": int(timedelta(days=7).total_seconds()),
-    # should the timeout be reset when retrieving a cached value
-    "REFRESH_TIMEOUT_ON_RETRIEVAL": True,
-}
+EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
+EXPLORE_FORM_DATA_CACHE_CONFIG["CACHE_DEFAULT_TIMEOUT"] = int(
+    timedelta(days=7).total_seconds()
+)
+EXPLORE_FORM_DATA_CACHE_CONFIG["REFRESH_TIMEOUT_ON_RETRIEVAL"] = True
 
 # store cache keys by datasource UID (via CacheKey) for custom processing/invalidation
-STORE_CACHE_KEYS_IN_METADATA_DB = False
+STORE_CACHE_KEYS_IN_METADATA_DB = True
 
 # CORS Options
 ENABLE_CORS = False
@@ -884,7 +880,10 @@ SQLLAB_CTAS_SCHEMA_NAME_FUNC: Optional[
 # If enabled, it can be used to store the results of long-running queries
 # in SQL Lab by using the "Run Async" button/feature
 RESULTS_BACKEND: Optional[BaseCache] = RedisCache(
-    host="cache", port=6379, key_prefix="superset_results", db=0
+    host=DEFAULT_CACHE_CONFIG["CACHE_REDIS_HOST"],
+    port=DEFAULT_CACHE_CONFIG["CACHE_REDIS_PORT"],
+    key_prefix=DEFAULT_CACHE_CONFIG["CACHE_KEY_PREFIX"],
+    db=DEFAULT_CACHE_CONFIG["CACHE_REDIS_DB"],
 )
 
 # Use PyArrow and MessagePack for async query results serialization,
