@@ -21,10 +21,12 @@ import { buildQueryContext, QueryFormData } from '@superset-ui/core';
 export default function buildQuery(formData: QueryFormData) {
   const { metric, sort_by_metric } = formData;
 
-  return buildQueryContext(formData, baseQueryObject => [
+  const ret = buildQueryContext(formData, baseQueryObject => [
     {
       ...baseQueryObject,
       ...(sort_by_metric && { orderby: [[metric, false]] }),
     },
   ]);
+
+  return ret;
 }
