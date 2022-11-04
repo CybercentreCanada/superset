@@ -588,29 +588,21 @@ IMG_UPLOAD_URL = "/static/uploads/"
 CACHE_DEFAULT_TIMEOUT = int(timedelta(days=1).total_seconds())
 
 # Default cache for Superset objects
-CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
+CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "NullCache"}
 
 # Cache for datasource metadata and query results
-DATA_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
+DATA_CACHE_CONFIG: CacheConfig = {"CACHE_TYPE": "NullCache"}
 
 # Cache for dashboard filter state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
 FILTER_STATE_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
-FILTER_STATE_CACHE_CONFIG["CACHE_DEFAULT_TIMEOUT"] = int(
-    timedelta(days=90).total_seconds()
-)
-FILTER_STATE_CACHE_CONFIG["REFRESH_TIMEOUT_ON_RETRIEVAL"] = True
 
 # Cache for explore form data state (`CACHE_TYPE` defaults to `SimpleCache` when
 #  running in debug mode unless overridden)
 EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = DEFAULT_CACHE_CONFIG
-EXPLORE_FORM_DATA_CACHE_CONFIG["CACHE_DEFAULT_TIMEOUT"] = int(
-    timedelta(days=7).total_seconds()
-)
-EXPLORE_FORM_DATA_CACHE_CONFIG["REFRESH_TIMEOUT_ON_RETRIEVAL"] = True
 
 # store cache keys by datasource UID (via CacheKey) for custom processing/invalidation
-STORE_CACHE_KEYS_IN_METADATA_DB = True
+STORE_CACHE_KEYS_IN_METADATA_DB = False
 
 # CORS Options
 ENABLE_CORS = False
@@ -754,12 +746,12 @@ DASHBOARD_AUTO_REFRESH_MODE: Literal["fetch", "force"] = "force"
 
 
 class CeleryConfig(object):
-    broker_url = "redis://cache:6379/0"
+    broker_url = f"redis://{DEFAULT_CACHE_CONFIG['CACHE_REDIS_HOST']}:{DEFAULT_CACHE_CONFIG['CACHE_REDIS_PORT']}/{DEFAULT_CACHE_CONFIG['CACHE_REDIS_DB']}"
     imports = (
         "superset.sql_lab",
         "superset.tasks",
     )
-    result_backend = "redis://cache:6379/0"
+    result_backend = f"redis://{DEFAULT_CACHE_CONFIG['CACHE_REDIS_HOST']}:{DEFAULT_CACHE_CONFIG['CACHE_REDIS_PORT']}/{DEFAULT_CACHE_CONFIG['CACHE_REDIS_DB']}"
     worker_log_level = "DEBUG"
     worker_prefetch_multiplier = 10
     task_acks_late = True
@@ -1243,10 +1235,10 @@ SQLA_TABLE_MUTATOR = lambda table: table
 # Global async query config options.
 # Requires GLOBAL_ASYNC_QUERIES feature flag to be enabled.
 GLOBAL_ASYNC_QUERIES_REDIS_CONFIG = {
-    "port": 6379,
-    "host": "cache",
-    "password": "",
-    "db": 0,
+    "port": DEFAULT_CACHE_CONFIG["CACHE_REDIS_PORT"],
+    "host": DEFAULT_CACHE_CONFIG["CACHE_REDIS_HOST"],
+    "password": DEFAULT_CACHE_CONFIG["CACHE_REDIS_PASSWORD"],
+    "db": DEFAULT_CACHE_CONFIG["CACHE_REDIS_DB"],
     "ssl": False,
 }
 GLOBAL_ASYNC_QUERIES_REDIS_STREAM_PREFIX = "async-events-"
