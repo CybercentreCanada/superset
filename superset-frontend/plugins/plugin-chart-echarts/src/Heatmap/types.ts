@@ -19,6 +19,7 @@
 import {
   ChartDataResponseResult,
   ChartProps,
+  isQueryFormColumn,
   QueryFormColumn,
   QueryFormData,
 } from '@superset-ui/core';
@@ -50,6 +51,7 @@ export type EchartsHeatmapFormData = QueryFormData & {
 
 export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   ...DEFAULT_LEGEND_FORM_DATA,
+  groupby: [],
   width: 150,
   height: 150,
   bottomMargin: 'auto',
