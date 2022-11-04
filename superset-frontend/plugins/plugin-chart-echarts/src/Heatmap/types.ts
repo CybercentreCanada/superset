@@ -27,6 +27,7 @@ import { EChartTransformedProps } from '../types';
 import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
 
 export type EchartsHeatmapFormData = QueryFormData & {
+  groupby: QueryFormColumn[];
   width: number;
   height: number;
   bottomMargin: number | string;

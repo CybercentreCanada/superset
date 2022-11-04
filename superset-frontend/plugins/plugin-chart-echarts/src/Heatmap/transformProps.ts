@@ -40,7 +40,7 @@ export default function transformProps(
   const { width, height, formData, queriesData, hooks, filterState } =
     chartProps;
   const {
-    groupby = [],
+    groupby,
     bottomMargin,
     canvasImageRendering,
     allColumnsX,
