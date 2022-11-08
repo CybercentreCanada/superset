@@ -24,8 +24,6 @@ import {
   sharedControls,
 } from '@superset-ui/chart-controls';
 
-import { StyledColumnOption } from 'src/explore/components/optionRenderers';
-
 const config: ControlPanelConfig = {
 
   /**
