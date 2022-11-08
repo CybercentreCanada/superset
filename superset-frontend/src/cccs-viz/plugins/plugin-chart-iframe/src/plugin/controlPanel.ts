@@ -138,7 +138,7 @@ const config: ControlPanelConfig = {
             config: {
               type: 'SelectControl',
               label: t('Parameter Column Name'),
-              description: sharedControls.groupby.description,
+              description: "The name of the column that will populate the url parameter value.",
               multi: false,
               allowAll: false,
               default: [],
@@ -189,7 +189,7 @@ const config: ControlPanelConfig = {
               label: t('Parameter Prefix'),
               renderTrigger: true,
               default: '',
-              description: t('A value that will be predened the parameter value.'),
+              description: t('A value that will be prefix the parameter value.'),
             },
           },
         ]
