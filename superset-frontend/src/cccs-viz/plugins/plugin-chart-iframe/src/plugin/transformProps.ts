@@ -16,28 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, PlainObject, TimeseriesDataRecord, } from '@superset-ui/core';
-
-
-const extractFiltersFromFormData = (formData: PlainObject): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] })[] => {
-
-  const filters = [...(formData?.adhocFilters || []),  ...(formData?.extraFormData?.adhocFilters || []), ...(formData?.extraFormData?.filters || [])]
-  
-  const simpleAdhocFilters = filters.reduce(
-    (acc, filter) => {
-      
-      if ( ("subject" in filter) && ("comparator" in filter)  ) {
-        acc.push( {columnName: filter.subject, value: filter.comparator} )
-      }
-      else if ( ("col" in filter) && ("val" in filter)  ) {
-        acc.push( {columnName: filter.col.toString(), value: filter.val} )
-      }
-      return acc
-    }, <({columnName: string, value: string | number | boolean | (string | number | boolean)[]})[]> []
-  )
-
-  return simpleAdhocFilters
-}
+import { ChartProps, TimeseriesDataRecord, } from '@superset-ui/core';
 
 export default function transformProps(chartProps: ChartProps) {
   /**
