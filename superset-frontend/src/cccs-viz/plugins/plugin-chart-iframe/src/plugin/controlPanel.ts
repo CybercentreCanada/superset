@@ -120,38 +120,6 @@ const config: ControlPanelConfig = {
         ['adhoc_filters'],
         [
           {
-            name: 'metrics',
-            override: {
-              // visibility: () => true,
-              validators: [],
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const { controls } = state;
-                const originalMapStateToProps =
-                  sharedControls?.metrics?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggControlValues(
-                  controls,
-                  [controlState.value],
-                );
-                return newState;
-              },
-            },
-          },
-        ],
-        [
-          {
-            name: 'row_limit',
-            override: {
-              default: 1,
-            },
-          },
-        ],
-        [
-          {
             name: 'url',
             config: {
               type: 'TextControl',

@@ -19,6 +19,7 @@
 import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
+import buildQuery from './buildQuery';
 import thumbnail from '../images/thumbnail.png';
 
 export default class IFrameVisualizationChartPlugin extends ChartPlugin {
@@ -40,6 +41,7 @@ export default class IFrameVisualizationChartPlugin extends ChartPlugin {
     });
 
     super({
+      buildQuery,
       controlPanel,
       loadChart: () => import('../IFrameVisualization'),
       metadata,
