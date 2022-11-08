@@ -16,24 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
+import { t, validateNonEmpty } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelState,
   ControlState,
-  ControlStateMapping,
   sharedControls,
 } from '@superset-ui/chart-controls';
-
-
-const validateAggControlValues = (
-  controls: ControlStateMapping,
-  values: any[],
-) => {
-  const areControlsEmpty = values.every(val => ensureIsArray(val).length === 0);
-  // @ts-ignore
-  return areControlsEmpty ? [t('Metrics must have a value')] : [];
-};
 
 const config: ControlPanelConfig = {
 
