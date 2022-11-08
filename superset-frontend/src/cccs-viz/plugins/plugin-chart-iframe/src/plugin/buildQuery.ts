@@ -46,11 +46,10 @@
    return buildQueryContext(formDataCopy, baseQueryObject => {
      // RAW mode (not aggregated)
      // eslint-disable-next-line no-param-reassign
-     baseQueryObject.metrics = ["count"];
- 
      return [
        {
          ...baseQueryObject,
+         row_limit: 10,
        },
      ];
    });

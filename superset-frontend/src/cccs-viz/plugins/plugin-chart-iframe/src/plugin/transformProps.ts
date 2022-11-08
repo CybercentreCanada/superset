@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, PlainObject, } from '@superset-ui/core';
+import { ChartProps, PlainObject, TimeseriesDataRecord, } from '@superset-ui/core';
 
 
 const extractFiltersFromFormData = (formData: PlainObject): ({columnName: string, value: string | number | boolean | (string | number | boolean)[] })[] => {
@@ -70,33 +70,33 @@ export default function transformProps(chartProps: ChartProps) {
    * be seen until restarting the development server.
    */
   const formData = chartProps.formData;
-
-  const { url, parameterColumnName, parameterName, parameterPrefix } = formData
-
-  const allFilters = extractFiltersFromFormData(formData);
+  const queriesData = chartProps.queriesData;
   
-  const url_parameter_raw_value = allFilters.find( e => {
-    return e.columnName == parameterColumnName
-  })?.value;
-  
+
+
+  const { url, parameterName, parameterPrefix, groupby } = formData
+
+  const data = queriesData[0]?.data as TimeseriesDataRecord[];
+
+  let value: string | number | true | Date = ""
   let errorMessage = "";
 
-  if(Array.isArray(url_parameter_raw_value) && url_parameter_raw_value.length > 1) {
+  if(Array.isArray(data) && data.length > 1) {
     errorMessage = "More than one value received, please emit a single value."
   }
   
-  if(Array.isArray(url_parameter_raw_value) && url_parameter_raw_value.length === 0) {
+  if(Array.isArray(data) && data.length === 0) {
     errorMessage = "No value received, please emit a single value."
   }
 
-  if(url_parameter_raw_value === undefined || url_parameter_raw_value === "undefined") {
-    errorMessage = "No value received, please emit a single value."
+  if(Array.isArray(data) && data.length === 1) {
+    value = data[0][groupby] || ""
   }
 
-  const url_parameter_value = String(url_parameter_raw_value)
 
+  
   return {
-    url_parameter_value,
+    url_parameter_value: value,
     parameter_name: parameterName,
     url,
     parameter_prefix: parameterPrefix,

@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelState,
   ControlState,
   sharedControls,
 } from '@superset-ui/chart-controls';
+
+import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 const config: ControlPanelConfig = {
 
@@ -132,10 +134,16 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'parameter_column_name',
+            name: 'groupby',
             config: {
-              type: 'TextControl',
+              type: 'SelectControl',
               label: t('Parameter Column Name'),
+              description: sharedControls.groupby.description,
+              multi: false,
+              allowAll: false,
+              default: [],
+              valueKey: 'column_name',
+              includeTime: false,
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
@@ -144,12 +152,9 @@ const config: ControlPanelConfig = {
                   sharedControls?.groupby?.mapStateToProps;
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors =  controlState.value ? [] : ["Please add a value for Parameter Column Name."]
+                newState.externalValidationErrors = ensureIsArray(controlState.value).length > 0 ? [] : ["Please add a value for Parameter Column Name."]
                 return newState;
               },
-              renderTrigger: true,
-              default: '',
-              description: t('The Column name for the value that will populate the url parameter.'),
             },
           },
         ],
