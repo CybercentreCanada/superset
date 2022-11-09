@@ -76,7 +76,7 @@ export default function CccsGrid({
   tooltipShowDelay,
   rowSelection,
   emitFilter,
-  defaultEmitFilterColumn,
+  principalColumns,
   include_search,
   page_length = 0,
   enable_grouping = false,
@@ -97,7 +97,7 @@ export default function CccsGrid({
     useState<{ [key: string]: string[] }>(initialFilters);
 
   const [filters, setFilters] = useState(initialFilters);
-  const [defaultFilters, setDefaultFilters] = useState({});
+  const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
 
@@ -134,7 +134,7 @@ export default function CccsGrid({
         },
       });
     },
-    [emitFilter, setDataMask, filters, defaultFilters],
+    [emitFilter, setDataMask, filters, principalColumnFilters],
   ); // only take relevant page size options
 
   const generateNativeFilterUrlString = (
@@ -282,11 +282,11 @@ export default function CccsGrid({
     },
     [
       emitFilter,
-      defaultEmitFilterColumn,
+      principalColumns,
       crossFilterValue,
       handleChange,
       filters,
-      defaultFilters,
+      principalColumnFilters,
       dispatch,
       formData.slice_id,
     ],
@@ -334,7 +334,7 @@ export default function CccsGrid({
     const updatedPrincipalColumnFilters = {};
 
     const updatedFilters = {};
-    const updatedDefaultFilters = {};
+    const updatedPrincipalColumnFilters = {};
 
     cellRanges.forEach((range: any) => {
       range.columns.forEach((column: any) => {
@@ -408,9 +408,10 @@ export default function CccsGrid({
           }
         }
       });
-      ensureIsArray(defaultEmitFilterColumn).forEach((column: any) => {
+      ensureIsArray(principalColumns).forEach((column: any) => {
         const col = getEmitTarget(column);
-        updatedDefaultFilters[col] = updatedDefaultFilters[col] || [];
+        updatedPrincipalColumnFilters[col] =
+          updatedPrincipalColumnFilters[col] || [];
         const startRow = Math.min(
           range.startRow.rowIndex,
           range.endRow.rowIndex,
@@ -421,15 +422,15 @@ export default function CccsGrid({
             column,
             gridApi.getModel().getRow(rowIndex),
           );
-          if (!updatedDefaultFilters[col].includes(defaultValue)) {
-            updatedDefaultFilters[col].push(defaultValue);
+          if (!updatedPrincipalColumnFilters[col].includes(defaultValue)) {
+            updatedPrincipalColumnFilters[col].push(defaultValue);
           }
         }
       });
     });
 
     setFilters(updatedFilters);
-    setDefaultFilters(updatedDefaultFilters);
+    setPrincipalColumnFilters(updatedPrincipalColumnFilters);
   };
 
   function autoSizeFirst100Columns(params: any) {
