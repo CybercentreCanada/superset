@@ -23,21 +23,31 @@ import {
   getColumnLabel,
   QueryFormMetric,
   getMetricLabel,
+  DataRecordValue,
+  CategoricalColorNamespace,
+  getSequentialSchemeRegistry,
 } from '@superset-ui/core';
 import { EChartsCoreOption, HeatmapSeriesOption } from 'echarts';
 import { HeatmapDataItemOption } from 'echarts/types/src/chart/heatmap/HeatmapSeries';
 import { OptionDataValue } from 'echarts/types/src/util/types';
+import { defaultGrid, defaultTooltip } from '../defaults';
 import {
   DEFAULT_FORM_DATA,
   EchartsHeatmapFormData,
   HeatmapChartTransformedProps,
   EchartsHeatmapChartProps,
 } from './types';
+import {
+  extractGroupbyLabel,
+  getChartPadding,
+  getLegendProps,
+  sanitizeHtml,
+} from '../utils/series';
 
 export default function transformProps(
   chartProps: EchartsHeatmapChartProps,
 ): HeatmapChartTransformedProps {
-  const { width, height, formData, queriesData, hooks, filterState } =
+  const { width, height, formData, queriesData, hooks, filterState, theme } =
     chartProps;
   const {
     groupby,
@@ -59,9 +69,21 @@ export default function transformProps(
     yAxisBounds,
     yAxisFormat,
     emitFilter,
+    legendMargin,
+    legendOrientation,
+    legendType,
+    sliceId,
   }: EchartsHeatmapFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const groupbyLabels = groupby.map(getColumnLabel);
+  // const colorFn = CategoricalColorNamespace.getScale(linearColorScheme);
+  const minBound = yAxisBounds[0] || 0;
+  const maxBound = yAxisBounds[1] || 1;
+
+  const scheme_colors = getSequentialSchemeRegistry()
+    ?.get(linearColorScheme)
+    ?.getColors();
+  const colors = scheme_colors ? [...scheme_colors].reverse() : [];
 
   const columnsLabelMap = new Map<string, string[]>();
 
@@ -125,13 +147,20 @@ export default function transformProps(
     return [x_index, y_index, datum[metric.toString()]];
   });
 
+  // TODO sketchyy number cast? Is 0 an okay default?
+  // Could have all other negative numbers.
+  // Is it possible an item won't have a count?
+  const max_data_value = Math.max(...data.map(item => Number(item.count)), 0);
+  const min_data_value = Math.min(...data.map(item => Number(item.count)), 0);
+
   const echartOptions: EChartsCoreOption = {
     tooltip: {
       position: 'top',
     },
     grid: {
-      height: '50%',
-      top: '10%',
+      ...defaultGrid,
+      // height: '90%',
+      // top: 'top',
     },
     xAxis: {
       type: 'category',
@@ -148,16 +177,19 @@ export default function transformProps(
       },
     },
     visualMap: {
-      min: 0,
-      max: 10,
+      min: min_data_value,
+      max: max_data_value,
       calculable: true,
-      orient: 'horizontal',
-      left: 'center',
-      bottom: '15%',
+      orient: legendOrientation, // 'vertical',
+      top: '15%',
+      left: 'right',
+      show: showLegend,
+      itemWidth: 15,
+      itemHeight: 80,
+      color: colors,
     },
     series: [
       {
-        name: 'Punch Card',
         type: 'heatmap',
         data: my_data2,
         label: {
