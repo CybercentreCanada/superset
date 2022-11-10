@@ -44,8 +44,8 @@ export type EchartsHeatmapFormData = QueryFormData & {
   showValues: boolean;
   sortXAxis: string;
   sortYAxis: string;
-  xScaleInterval: number;
-  yScaleInterval: number;
+  xscaleInterval: number;
+  yscaleInterval: number;
   yAxisBounds: Array<number>;
   emitFilter: boolean;
 };
@@ -68,8 +68,8 @@ export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   showValues: false,
   sortXAxis: 'Axis ascending',
   sortYAxis: 'Axis ascending',
-  xScaleInterval: 1,
-  yScaleInterval: 1,
+  xscaleInterval: 1,
+  yscaleInterval: 1,
   yAxisBounds: [],
   emitFilter: false,
 };
