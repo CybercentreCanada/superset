@@ -43,6 +43,7 @@ import {
   getLegendProps,
   sanitizeHtml,
 } from '../utils/series';
+import { DataFormatMixin } from 'echarts/types/src/model/mixin/dataFormat';
 
 export default function transformProps(
   chartProps: EchartsHeatmapChartProps,
@@ -59,6 +60,7 @@ export default function transformProps(
     leftMargin,
     metric,
     normalized,
+    normalizeAcross,
     showLegend,
     showPerc,
     showValues,
@@ -77,8 +79,8 @@ export default function transformProps(
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const groupbyLabels = groupby.map(getColumnLabel);
   // const colorFn = CategoricalColorNamespace.getScale(linearColorScheme);
-  const minBound = yAxisBounds[0] || 0;
-  const maxBound = yAxisBounds[1] || 1;
+  // const minBound = yAxisBounds[0] || 0;
+  // const maxBound = yAxisBounds[1] || 1;
 
   const scheme_colors = getSequentialSchemeRegistry()
     ?.get(linearColorScheme)
@@ -153,6 +155,23 @@ export default function transformProps(
   const max_data_value = Math.max(...data.map(item => Number(item.count)), 0);
   const min_data_value = Math.min(...data.map(item => Number(item.count)), 0);
 
+  const normalized_value_index = 3;
+  const value_index = 2;
+  let dimension_index = -1;
+  if (normalizeAcross === 'x') {
+    dimension_index = 0;
+  } else if (normalizeAcross === 'y') {
+    dimension_index = 1;
+  }
+
+  const normalized_data = getNormalizedData(
+    my_data2,
+    normalizeAcross === 'x' ? x_categories.length : y_categories.length,
+    dimension_index,
+    value_index,
+    max_data_value,
+  );
+
   const echartOptions: EChartsCoreOption = {
     tooltip: {
       position: 'top',
@@ -165,6 +184,9 @@ export default function transformProps(
     xAxis: {
       type: 'category',
       data: x_categories,
+      axisLabel: {
+        interval: xscaleInterval,
+      },
       splitArea: {
         show: true,
       },
@@ -172,12 +194,15 @@ export default function transformProps(
     yAxis: {
       type: 'category',
       data: y_categories,
+      axisLabel: {
+        interval: yscaleInterval,
+      },
       splitArea: {
         show: true,
       },
     },
     visualMap: {
-      min: min_data_value,
+      min: min_data_value, // TODO test 'dataMin',
       max: max_data_value,
       calculable: true,
       orient: legendOrientation, // 'vertical',
@@ -187,11 +212,12 @@ export default function transformProps(
       itemWidth: 15,
       itemHeight: 80,
       color: colors,
+      dimension: normalized_value_index,
     },
     series: [
       {
         type: 'heatmap',
-        data: my_data2,
+        data: normalized_data,
         label: {
           show: true,
         },
@@ -217,4 +243,60 @@ export default function transformProps(
     selectedValues: filterState.selectedValues || [],
     setDataMask,
   };
+}
+
+function getNormalizedData(
+  data: DataRecordValue[][],
+  category_length: number,
+  dimension_index = -1,
+  value_index = 2,
+  max_data_value: number,
+): DataRecordValue[][] {
+  // data = [[x, y, value], ... ]
+
+  let normalized_data = data;
+
+  if (dimension_index >= 0) {
+    const sums: number[] = new Array(category_length).fill(0);
+    const mins: number[] = new Array(category_length).fill(
+      Number.MIN_SAFE_INTEGER,
+    );
+    const maxes: number[] = new Array(category_length).fill(
+      Number.MAX_SAFE_INTEGER,
+    );
+
+    // TODO error handling for if category length is wrong, or if a value is undefined?
+    data.forEach(value => {
+      sums[value[dimension_index] as number] =
+        sums[value[dimension_index] as number] + (value[value_index] as number);
+
+      if (
+        mins[value[dimension_index] as number] === Number.MIN_SAFE_INTEGER ||
+        (value[value_index] as number) < mins[value[dimension_index] as number]
+      ) {
+        mins[value[dimension_index] as number] = value[value_index] as number;
+      }
+
+      if (
+        maxes[value[dimension_index] as number] === Number.MAX_SAFE_INTEGER ||
+        (value[value_index] as number) > maxes[value[dimension_index] as number]
+      ) {
+        maxes[value[dimension_index] as number] = value[value_index] as number;
+      }
+    });
+
+    normalized_data = data.map(value => {
+      const normalized_value: number =
+        (((value[value_index] as number) -
+          mins[value[dimension_index] as number]) /
+          (maxes[value[dimension_index] as number] -
+            mins[value[dimension_index] as number])) *
+        max_data_value;
+      return [...value, normalized_value];
+    });
+  } else {
+    normalized_data = data.map(value => [...value, value[value_index]]);
+  }
+
+  return normalized_data;
 }
