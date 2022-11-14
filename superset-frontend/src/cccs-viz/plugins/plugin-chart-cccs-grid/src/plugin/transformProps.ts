@@ -82,6 +82,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_grouping,
     column_state,
     enable_row_numbers,
+    drill_action_configs,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
@@ -314,6 +315,23 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
+  let parsed_drill_action_configs = {}
+
+  drill_action_configs?.forEach( (e: any) =>
+  {
+    if (e.dashboardID in parsed_drill_action_configs) {
+      parsed_drill_action_configs[e.dashboardID].concat({
+        advancedDataType: e.advancedDataTypeName,
+        nativefilterIDs: e.filterIDs
+      })
+    }
+    else {
+      parsed_drill_action_configs[e.dashboardID] = [{
+        advancedDataType: e.advancedDataTypeName,
+        nativefilterIDs: e.filterIDs
+      }]
+    }
+  });
 
   return {
     formData,
@@ -334,5 +352,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     column_state,
     agGridLicenseKey,
     datasetColumns: columns,
+    drillActionConfigs: parsed_drill_action_configs
   };
 }

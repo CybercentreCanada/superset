@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import React from 'react'
 
 import {
   t,
@@ -44,6 +45,7 @@ import {
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
+import DrillActionConfig from '../components/controls/DrillActionConfigControll';
 //import cidrRegex from 'cidr-regex';
 
 interface Props {
@@ -579,16 +581,15 @@ config.controlPanelSections.push({
     ],
     [
       {
-        name: 'test',
+        name: 'drill_action_configs',
         config: {
-          type: myElement,
+          type: DrillActionConfig,
           freeForm: true,
           renderTrigger: true,
-          label: t('Page length'),
+          label: t('Drill Action Configs'),
           default: 0,
           choices: PAGE_SIZE_OPTIONS,
           description: t('Rows per page, 0 means no pagination'),
-          validators: [legacyValidateInteger],
         },
       },
     ],

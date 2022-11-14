@@ -82,6 +82,7 @@ export default function CccsGrid({
   column_state,
   filters: initialFilters = {},
   datasetColumns,
+  drillActionConfigs,
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
   const dispatch = useDispatch();
@@ -143,16 +144,16 @@ export default function CccsGrid({
 
   const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[] ): string =>{
 
-    return `NATIVE_FILTER-${nativefilterID}:(filterState:(label:!(${urlSelectedData.join(',')}),validateStatus:!f,value:!(${urlSelectedData.join(',')})),id:NATIVE_FILTER-${nativefilterID},ownState:())`
+    return `${nativefilterID}:(filterState:(label:!(${urlSelectedData.join(',')}),validateStatus:!f,value:!(${urlSelectedData.join(',')})),id:${nativefilterID},ownState:())`
   
   } 
   const getDrillToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
     
     let sub_menu: any = []
 
-    for (let key in FORMDATALINKINGSTUFF) {
+    for (let key in drillActionConfigs) {
           
-      let businessTypeNativeFilters = FORMDATALINKINGSTUFF[key];
+      let businessTypeNativeFilters = drillActionConfigs[key];
       let nativeFilterUrls: string[] = [];
 
       businessTypeNativeFilters.forEach((element: any) => {
