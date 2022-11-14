@@ -61,11 +61,11 @@ export default function transformProps(chartProps: ChartProps) {
   let errorMessage = "";
 
   if(Array.isArray(data) && data.length > 1) {
-    errorMessage = "More than one value received, please emit a single value."
+    errorMessage = "The query returned too many rows when only one was expected."
   }
   
   if(Array.isArray(data) && data.length === 0) {
-    errorMessage = "No value received, please emit a single value."
+    errorMessage = "The query returned no rows."
   }
 
   if(Array.isArray(data) && data.length === 1) {

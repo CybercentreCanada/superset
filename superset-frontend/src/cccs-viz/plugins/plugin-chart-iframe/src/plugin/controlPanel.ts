@@ -133,14 +133,12 @@ const config: ControlPanelConfig = {
         [
           {
             name: 'groupby',
-            config: {
-              type: 'SelectControl',
+            override: {
               label: t('Parameter Column Name'),
               description: "The name of the column that will populate the url parameter value.",
               multi: false,
               allowAll: false,
               default: [],
-              valueKey: 'column_name',
               includeTime: false,
               mapStateToProps: (
                 state: ControlPanelState,
@@ -173,7 +171,6 @@ const config: ControlPanelConfig = {
                 newState.externalValidationErrors =  controlState.value ? [] : ["Please add a value for Parameter Name."]
                 return newState;
               },
-              renderTrigger: true,
               default: '',
               description: t('The name for the URL parameter.'),
             },
@@ -185,7 +182,6 @@ const config: ControlPanelConfig = {
             config: {
               type: 'TextControl',
               label: t('Parameter Prefix'),
-              renderTrigger: true,
               default: '',
               description: t('A value that will be prefix the parameter value.'),
             },
