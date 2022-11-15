@@ -25,6 +25,7 @@ import {
 } from '@superset-ui/core';
 import { EChartTransformedProps } from '../types';
 import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
+import { CallbackDataParams } from 'echarts/types/src/util/types';
 
 export type EchartsHeatmapFormData = QueryFormData & {
   groupby: QueryFormColumn[];
@@ -50,6 +51,7 @@ export type EchartsHeatmapFormData = QueryFormData & {
   emitFilter: boolean;
 };
 
+// TODO review these values
 export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   ...DEFAULT_LEGEND_FORM_DATA,
   groupby: [],
@@ -82,3 +84,7 @@ export interface EchartsHeatmapChartProps
 
 export type HeatmapChartTransformedProps =
   EChartTransformedProps<EchartsHeatmapFormData>;
+
+export interface HeatmapSeriesCallbackDataParams extends CallbackDataParams {
+  magic_value?: number;
+}
