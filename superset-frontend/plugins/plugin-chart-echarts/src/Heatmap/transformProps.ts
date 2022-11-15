@@ -26,6 +26,9 @@ import {
   DataRecordValue,
   CategoricalColorNamespace,
   getSequentialSchemeRegistry,
+  NumberFormatter,
+  getNumberFormatter,
+  NumberFormats,
 } from '@superset-ui/core';
 import { EChartsCoreOption, HeatmapSeriesOption } from 'echarts';
 import { HeatmapDataItemOption } from 'echarts/types/src/chart/heatmap/HeatmapSeries';
@@ -36,6 +39,7 @@ import {
   EchartsHeatmapFormData,
   HeatmapChartTransformedProps,
   EchartsHeatmapChartProps,
+  HeatmapSeriesCallbackDataParams,
 } from './types';
 import {
   extractGroupbyLabel,
@@ -61,6 +65,7 @@ export default function transformProps(
     metric,
     normalized,
     normalizeAcross,
+    numberFormat,
     showLegend,
     showPerc,
     showValues,
@@ -134,56 +139,91 @@ export default function transformProps(
   //   heatmapSeriesOptions,
   // };
 
-  const x_categories = [...new Set(data.map(item => item[allColumnsX]))];
-  const y_categories = [...new Set(data.map(item => item[allColumnsY]))];
+  const xCategories = [...new Set(data.map(item => item[allColumnsX]))];
+  const yCategories = [...new Set(data.map(item => item[allColumnsY]))];
 
   const my_data2 = data.map(datum => {
-    const x_index = x_categories.findIndex(
+    const xIndex = xCategories.findIndex(
       category => category === datum[allColumnsX],
     );
 
-    const y_index = y_categories.findIndex(
+    const yIndex = yCategories.findIndex(
       category => category === datum[allColumnsY],
     );
 
-    return [x_index, y_index, datum[metric.toString()]];
+    return [xIndex, yIndex, datum[metric.toString()]];
   });
 
   // TODO sketchyy number cast? Is 0 an okay default?
   // Could have all other negative numbers.
   // Is it possible an item won't have a count?
-  const max_data_value = Math.max(...data.map(item => Number(item.count)), 0);
-  const min_data_value = Math.min(...data.map(item => Number(item.count)), 0);
+  const maxDataValue = Math.max(...data.map(item => Number(item.count)), 0);
+  const minDataValue = Math.min(...data.map(item => Number(item.count)), 0);
 
-  const normalized_value_index = 3;
-  const value_index = 2;
-  let dimension_index = -1;
+  const normalizedValueIndex = 3;
+  const valueIndex = 2;
+  let dimensionIndex = -1;
   if (normalizeAcross === 'x') {
-    dimension_index = 0;
+    dimensionIndex = 0;
   } else if (normalizeAcross === 'y') {
-    dimension_index = 1;
+    dimensionIndex = 1;
   }
 
-  const normalized_data = getNormalizedData(
+  const minBound = yAxisBounds[0] || minDataValue;
+  // TODO this and legend always spanned from 0 to 1 in old version
+  const maxBound = yAxisBounds[1] || maxDataValue;
+
+  const normalizedData = getNormalizedData(
     my_data2,
-    normalizeAcross === 'x' ? x_categories.length : y_categories.length,
-    dimension_index,
-    value_index,
-    max_data_value,
+    normalizeAcross === 'x' ? xCategories.length : yCategories.length,
+    dimensionIndex,
+    valueIndex,
+    minBound,
+    maxBound,
   );
+
+  const numberFormatter = getNumberFormatter(numberFormat);
+  const formatter = (params: HeatmapSeriesCallbackDataParams) => {
+    const { value, seriesName, data, percent } = params;
+
+    console.log('test!!!! ');
+    console.log(params);
+
+    const stats = [
+      // x
+      // y
+      // count
+      // percent
+      `<b>${allColumnsX}</b>: ${xCategories[data[0]]}`,
+      `<b>${allColumnsY}</b>: ${yCategories[data[1]]}`,
+      `<b>${metric}</b>: ${value}`,
+      `${seriesName}`,
+      `${data}`,
+      `${percent}`,
+      // TODO can we get the platform (y axis value) from transformed data?
+    ];
+
+    // TODO if show percent
+    const percentage = `<b>%</b>: PERCENT HERE`;
+
+    return [...stats, percentage].join('<br/>');
+  };
 
   const echartOptions: EChartsCoreOption = {
     tooltip: {
       position: 'top',
+      appendToBody: true,
+      trigger: 'item',
+      formatter,
     },
     grid: {
       ...defaultGrid,
-      // height: '90%',
-      // top: 'top',
+      // height: '100%',
+      // width: '100%',
     },
     xAxis: {
       type: 'category',
-      data: x_categories,
+      data: xCategories,
       axisLabel: {
         interval: xscaleInterval,
       },
@@ -193,7 +233,7 @@ export default function transformProps(
     },
     yAxis: {
       type: 'category',
-      data: y_categories,
+      data: yCategories,
       axisLabel: {
         interval: yscaleInterval,
       },
@@ -202,8 +242,8 @@ export default function transformProps(
       },
     },
     visualMap: {
-      min: min_data_value, // TODO test 'dataMin',
-      max: max_data_value,
+      min: minDataValue, // TODO test 'dataMin',
+      max: maxDataValue,
       calculable: true,
       orient: legendOrientation, // 'vertical',
       top: '15%',
@@ -212,12 +252,12 @@ export default function transformProps(
       itemWidth: 15,
       itemHeight: 80,
       color: colors,
-      dimension: normalized_value_index,
+      dimension: normalizedValueIndex,
     },
     series: [
       {
         type: 'heatmap',
-        data: normalized_data,
+        data: normalizedData,
         label: {
           show: true,
         },
@@ -247,56 +287,117 @@ export default function transformProps(
 
 function getNormalizedData(
   data: DataRecordValue[][],
-  category_length: number,
-  dimension_index = -1,
-  value_index = 2,
-  max_data_value: number,
+  categoryLength: number,
+  dimensionIndex = -1,
+  valueIndex = 2,
+  minBound: number,
+  maxBound: number,
 ): DataRecordValue[][] {
   // data = [[x, y, value], ... ]
 
-  let normalized_data = data;
+  let normalizedData = data;
 
-  if (dimension_index >= 0) {
-    const sums: number[] = new Array(category_length).fill(0);
-    const mins: number[] = new Array(category_length).fill(
+  if (dimensionIndex >= 0) {
+    const sums: number[] = new Array(categoryLength).fill(0);
+    const mins: number[] = new Array(categoryLength).fill(
       Number.MIN_SAFE_INTEGER,
     );
-    const maxes: number[] = new Array(category_length).fill(
+    const maxes: number[] = new Array(categoryLength).fill(
       Number.MAX_SAFE_INTEGER,
     );
 
     // TODO error handling for if category length is wrong, or if a value is undefined?
     data.forEach(value => {
-      sums[value[dimension_index] as number] =
-        sums[value[dimension_index] as number] + (value[value_index] as number);
+      sums[value[dimensionIndex] as number] =
+        sums[value[dimensionIndex] as number] + (value[valueIndex] as number);
 
       if (
-        mins[value[dimension_index] as number] === Number.MIN_SAFE_INTEGER ||
-        (value[value_index] as number) < mins[value[dimension_index] as number]
+        mins[value[dimensionIndex] as number] === Number.MIN_SAFE_INTEGER ||
+        (value[valueIndex] as number) < mins[value[dimensionIndex] as number]
       ) {
-        mins[value[dimension_index] as number] = value[value_index] as number;
+        mins[value[dimensionIndex] as number] = value[valueIndex] as number;
       }
 
       if (
-        maxes[value[dimension_index] as number] === Number.MAX_SAFE_INTEGER ||
-        (value[value_index] as number) > maxes[value[dimension_index] as number]
+        maxes[value[dimensionIndex] as number] === Number.MAX_SAFE_INTEGER ||
+        (value[valueIndex] as number) > maxes[value[dimensionIndex] as number]
       ) {
-        maxes[value[dimension_index] as number] = value[value_index] as number;
+        maxes[value[dimensionIndex] as number] = value[valueIndex] as number;
       }
     });
 
-    normalized_data = data.map(value => {
-      const normalized_value: number =
-        (((value[value_index] as number) -
-          mins[value[dimension_index] as number]) /
-          (maxes[value[dimension_index] as number] -
-            mins[value[dimension_index] as number])) *
-        max_data_value;
+    // normalized value in [a, b] = (b - a) * (x - minx)/(maxx - minx) + a
+    normalizedData = data.map(value => {
+      const normalized_value: number = getNormalizedValue(
+        minBound,
+        maxBound,
+        value[valueIndex] as number,
+        mins[value[dimensionIndex] as number],
+        maxes[value[dimensionIndex] as number],
+      );
       return [...value, normalized_value];
     });
   } else {
-    normalized_data = data.map(value => [...value, value[value_index]]);
+    const maxDataValue = Math.max(
+      ...data.map(item => Number(item[valueIndex])),
+      Number.MIN_SAFE_INTEGER,
+    );
+    const minDataValue = Math.min(
+      ...data.map(item => Number(item[valueIndex])),
+      Number.MAX_SAFE_INTEGER,
+    );
+    normalizedData = data.map(value => {
+      const normalized_value: number = getNormalizedValue(
+        minBound,
+        maxBound,
+        value[valueIndex] as number,
+        minDataValue,
+        maxDataValue,
+      );
+      return [...value, normalized_value];
+    });
+    // normalizedData = data.map(value => [...value, value[valueIndex]]);
   }
 
-  return normalized_data;
+  return normalizedData;
+}
+
+function getNormalizedValue(
+  a: number,
+  b: number,
+  x: number,
+  min_x: number,
+  max_x: number,
+): number {
+  return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
+}
+
+export function formatTooltip({
+  params,
+  numberFormatter,
+}: {
+  params: HeatmapSeriesCallbackDataParams;
+  numberFormatter: NumberFormatter;
+}): string {
+  const { value } = params;
+  const formattedValue = numberFormatter(value as number);
+  const percentFormatter = getNumberFormatter(NumberFormats.PERCENT_2_POINT);
+
+  // let formattedPercent = '';
+  // if (parentNode) {
+  //   const percent: number = parentNode.value
+  //     ? (currentNode.value as number) / (parentNode.value as number)
+  //     : 0;
+  //   formattedPercent = percentFormatter(percent);
+  // }
+
+  // x axis
+  // y axis
+  // count
+  // percent if enabled
+  return [
+    `<div>${value}</div>`,
+    `Test: ${formattedValue}`,
+    // formattedPercent ? ` (${formattedPercent})` : '',
+  ].join('');
 }
