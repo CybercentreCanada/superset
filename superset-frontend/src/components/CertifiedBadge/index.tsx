@@ -22,7 +22,7 @@ import Icons, { IconType } from 'src/components/Icons';
 import { Tooltip } from 'src/components/Tooltip';
 
 export interface CertifiedBadgeProps {
-  certifiedBy?: string;
+  certifiedBy?: string | string[];
   details?: string;
   size?: IconType['iconSize'];
 }
