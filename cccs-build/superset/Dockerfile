@@ -21,6 +21,10 @@ RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection
   && pip install --no-cache-dir -r /tmp/requirements.txt \
   && rm /tmp/requirements.txt
 
+COPY user_cleanup.py ${SUPERSET_HOME}
+
+RUN echo "0 0 * * * python ${SUPERSET_HOME}/user_cleanup.py" > /var/spool/cron/crontabs/superset
+
 ENV BUILD_NUMBER_VAR=${BUILD_NUMBER}
 
 
