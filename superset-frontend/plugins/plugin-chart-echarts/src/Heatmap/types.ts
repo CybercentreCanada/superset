@@ -86,5 +86,10 @@ export type HeatmapChartTransformedProps =
   EChartTransformedProps<EchartsHeatmapFormData>;
 
 export interface HeatmapSeriesCallbackDataParams extends CallbackDataParams {
-  magic_value?: number;
+  xCategory: string;
+  yCategory: string;
+  xCategoryValue: string;
+  yCategoryValue: string;
+  metric: string;
+  showPerc: boolean;
 }
