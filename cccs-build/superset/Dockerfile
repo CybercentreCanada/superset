@@ -10,6 +10,8 @@ COPY *requirements.txt /tmp/
 
 ARG BUILD_NUMBER=0-development
 
+RUN apt install cron
+
 # Copy Vault CA certs
 COPY --from=vault_ca /usr/local/share/ca-certificates/ /usr/local/share/ca-certificates/
 # Make pip use analytical-platform feed
@@ -23,7 +25,7 @@ RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection
 
 COPY user_cleanup.py ${SUPERSET_HOME}
 
-RUN echo "0 0 * * * python ${SUPERSET_HOME}/user_cleanup.py" > /var/spool/cron/crontabs/superset
+RUN mkdir -p /var/spool/cron/crontabs && echo "0 0 * * * python ${SUPERSET_HOME}/user_cleanup.py" > /var/spool/cron/crontabs/superset
 
 ENV BUILD_NUMBER_VAR=${BUILD_NUMBER}
 
