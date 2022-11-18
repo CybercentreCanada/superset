@@ -10,7 +10,7 @@ COPY *requirements.txt /tmp/
 
 ARG BUILD_NUMBER=0-development
 
-RUN apt install cron
+RUN apt update && apt install cron
 
 # Copy Vault CA certs
 COPY --from=vault_ca /usr/local/share/ca-certificates/ /usr/local/share/ca-certificates/
