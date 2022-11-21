@@ -53,7 +53,6 @@ import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 import { PAGE_SIZE_OPTIONS } from './plugin/controlPanel';
-import { data } from 'jquery';
 
 const DEFAULT_COLUMN_DEF = {
   editable: false,
@@ -97,16 +96,7 @@ export default function CccsGrid({
   const [pageSize, setPageSize] = useState<number>(page_length);
 
   const gridRef = useRef<AgGridReactType>(null);
-  const FORMDATALINKINGSTUFF = {
-    'RYANCOOLDASHBOARD': [{
-            advancedDataType: "internet_address",
-            nativefilterIDs: ['k4rrsCohb','c-WJQnFbP']
-    }],
-    '13': [{
-      advancedDataType: "internet_address",
-      nativefilterIDs: ['k4rrsCohb']
-}]
-  }
+
   const handleChange = useCallback(
     filters => {
       if (!emitFilter) {

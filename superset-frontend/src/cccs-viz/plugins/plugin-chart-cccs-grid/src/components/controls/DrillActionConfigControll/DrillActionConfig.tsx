@@ -2,16 +2,11 @@ import React, { useState, useCallback, useEffect } from "react";
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import TextControl from 'src/explore/components/controls/TextControl';
 import PopoverSection from 'src/components/PopoverSection';
-import { StartEditingCellParams } from "@ag-grid-enterprise/all-modules";
 import Button from 'src/components/Button';
 import {
     t,
     SupersetClient,
-    getCategoricalSchemeRegistry,
-    getChartMetadataRegistry,
     validateNonEmpty,
-    isValidExpression,
-    styled,
     withTheme,
   } from '@superset-ui/core';
 

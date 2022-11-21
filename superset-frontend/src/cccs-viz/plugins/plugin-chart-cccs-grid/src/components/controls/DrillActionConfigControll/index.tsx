@@ -23,8 +23,6 @@ import { t, withTheme } from '@superset-ui/core';
 import AsyncEsmComponent from 'src/components/AsyncEsmComponent';
 import { List } from 'src/components';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover'
-import { InfoTooltipWithTrigger } from '@superset-ui/chart-controls';
-import { getChartKey } from 'src/explore/exploreUtils';
 import { connect } from 'react-redux';
 
 
@@ -187,9 +185,6 @@ const DrillActionConfig = AsyncEsmComponent(
 // Tried to hook this up through stores/control.jsx instead of using redux
 // directly, could not figure out how to get access to the color_scheme
 function mapStateToProps({ charts, explore }: any) {
-  const chartKey = getChartKey(explore);
-  const chart = charts[chartKey] || charts[0] || {};
-
   return {
     // eslint-disable-next-line camelcase
     colorScheme: explore.controls?.color_scheme?.value,

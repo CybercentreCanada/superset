@@ -46,20 +46,6 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/DrillActionConfigControll';
-//import cidrRegex from 'cidr-regex';
-
-interface Props {
-  foo?: number;
-  bar?: number;
-};
-
-const myElement: React.FC<Props> = props => {
-  
-  const {foo} = props
-  
-  return <div> foo </div>;
-}
-
 
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
