@@ -88,24 +88,56 @@ export function formatTooltip({
 }
 
 function sortCategoryList(
-  categories: DataRecordValue[],
   sortOption: string,
   axis: string,
+  sums: Map<string, number>,
 ): DataRecordValue[] {
-  let sortedCategories = categories;
+  let sortedCategories = [...sums.keys()];
 
   if (
     (sortOption === 'alpha_asc' && axis === 'x') ||
     (sortOption === 'alpha_desc' && axis === 'y')
   ) {
-    sortedCategories = [...categories].sort();
-  }
-
-  if (
+    sortedCategories = [...sums.keys()].sort();
+  } else if (
     (sortOption === 'alpha_desc' && axis === 'x') ||
     (sortOption === 'alpha_asc' && axis === 'y')
   ) {
-    sortedCategories = [...categories].sort().reverse();
+    sortedCategories = [...sums.keys()].sort().reverse();
+  } else if (
+    (sortOption === 'value_asc' && axis === 'x') ||
+    (sortOption === 'value_desc' && axis === 'y')
+  ) {
+    sortedCategories = [...sums.entries()]
+      .sort((a, b) => {
+        let ret = 0;
+
+        if (a[1] < b[1]) {
+          ret = -1;
+        } else if (a[1] > b[1]) {
+          ret = 1;
+        }
+
+        return ret;
+      })
+      .map(entry => entry[0]);
+  } else if (
+    (sortOption === 'value_desc' && axis === 'x') ||
+    (sortOption === 'value_asc' && axis === 'y')
+  ) {
+    sortedCategories = [...sums.entries()]
+      .sort((a, b) => {
+        let ret = 0;
+
+        if (a[1] > b[1]) {
+          ret = -1;
+        } else if (a[1] < b[1]) {
+          ret = 1;
+        }
+
+        return ret;
+      })
+      .map(entry => entry[0]);
   }
 
   return sortedCategories;
@@ -119,109 +151,6 @@ function getNormalizedValue(
   max_x: number,
 ): number {
   return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
-}
-
-function getNormalizedData(
-  data: DataRecordValue[][],
-  xCategoryLength: number,
-  yCategoryLength: number,
-  normalizedCategoryLength: number,
-  dimensionIndex = -1,
-  valueIndex = VALUE_INDEX,
-  minBound: number,
-  maxBound: number,
-): DataRecordValue[][] {
-  // data = [[x, y, value], ... ]
-
-  let normalizedData = data; // TODO COPY?? start with empty?
-
-  const x_sums: number[] = new Array(xCategoryLength).fill(0);
-  const y_sums: number[] = new Array(yCategoryLength).fill(0);
-
-  // TODO optimize
-  data.forEach(value => {
-    x_sums[value[X_INDEX] as number] =
-      x_sums[value[X_INDEX] as number] + (value[valueIndex] as number);
-
-    y_sums[value[Y_INDEX] as number] =
-      y_sums[value[Y_INDEX] as number] + (value[valueIndex] as number);
-  });
-
-  if (dimensionIndex >= 0) {
-    const mins: number[] = new Array(normalizedCategoryLength).fill(
-      Number.MIN_SAFE_INTEGER,
-    );
-    const maxes: number[] = new Array(normalizedCategoryLength).fill(
-      Number.MAX_SAFE_INTEGER,
-    );
-
-    // TODO error handling for if category length is wrong, or if a value is undefined?
-    data.forEach(value => {
-      if (
-        mins[value[dimensionIndex] as number] === Number.MIN_SAFE_INTEGER ||
-        (value[valueIndex] as number) < mins[value[dimensionIndex] as number]
-      ) {
-        mins[value[dimensionIndex] as number] = value[valueIndex] as number;
-      }
-
-      if (
-        maxes[value[dimensionIndex] as number] === Number.MAX_SAFE_INTEGER ||
-        (value[valueIndex] as number) > maxes[value[dimensionIndex] as number]
-      ) {
-        maxes[value[dimensionIndex] as number] = value[valueIndex] as number;
-      }
-    });
-
-    // normalized value in [a, b] = (b - a) * (x - minx)/(maxx - minx) + a
-    normalizedData = data.map(value => {
-      const normalized_value: number = getNormalizedValue(
-        minBound,
-        maxBound,
-        value[valueIndex] as number,
-        mins[value[dimensionIndex] as number],
-        maxes[value[dimensionIndex] as number],
-      );
-      const percent: number =
-        ((value[valueIndex] as number) /
-          maxes[value[dimensionIndex] as number]) *
-        100;
-      return [
-        ...value,
-        normalized_value,
-        percent,
-        x_sums[value[X_INDEX] as number],
-        y_sums[value[Y_INDEX] as number],
-      ];
-    });
-  } else {
-    const maxDataValue = Math.max(
-      ...data.map(item => Number(item[valueIndex])),
-    );
-    const minDataValue = Math.min(
-      ...data.map(item => Number(item[valueIndex])),
-    );
-    normalizedData = data.map(value => {
-      const normalized_value: number = getNormalizedValue(
-        minBound,
-        maxBound,
-        value[valueIndex] as number,
-        minDataValue,
-        maxDataValue,
-      );
-      const percent: number =
-        ((value[valueIndex] as number) / maxDataValue) * 100;
-      return [
-        ...value,
-        normalized_value,
-        percent,
-        x_sums[value[X_INDEX] as number],
-        y_sums[value[Y_INDEX] as number],
-      ];
-    });
-    // normalizedData = data.map(value => [...value, value[valueIndex]]);
-  }
-
-  return normalizedData;
 }
 
 export default function transformProps(
@@ -258,9 +187,6 @@ export default function transformProps(
   }: EchartsHeatmapFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const groupbyLabels = groupby.map(getColumnLabel);
-  // const colorFn = CategoricalColorNamespace.getScale(linearColorScheme);
-  // const minBound = yAxisBounds[0] || 0;
-  // const maxBound = yAxisBounds[1] || 1;
 
   const scheme_colors = getSequentialSchemeRegistry()
     ?.get(linearColorScheme)
@@ -269,147 +195,160 @@ export default function transformProps(
 
   const columnsLabelMap = new Map<string, string[]>();
 
-  const transformedData: HeatmapDataItemOption[] = data.map(
-    (data_point, index) => {
-      const name = groupbyLabels
-        .map(column => `${column}: ${data_point[column]}`)
-        .join(', ');
-      columnsLabelMap.set(
-        name,
-        groupbyLabels.map(col => data_point[col] as string),
-      );
-      const item = {
-        value: [100], // [data_point[index]] || [0], // TODO
-      };
-      return item; // item;
-    },
-  );
+  // const transformedData: HeatmapDataItemOption[] = data.map(
+  //   (data_point, index) => {
+  //     const name = groupbyLabels
+  //       .map(column => `${column}: ${data_point[column]}`)
+  //       .join(', ');
+  //     columnsLabelMap.set(
+  //       name,
+  //       groupbyLabels.map(col => data_point[col] as string),
+  //     );
+  //     const item = {
+  //       value: [100], // [data_point[index]] || [0], // TODO
+  //     };
+  //     return item; // item;
+  //   },
+  // );
 
   const { setDataMask = () => {}, onContextMenu } = hooks;
 
-  const heatmapSeriesOptions: HeatmapSeriesOption[] = [
-    {
-      type: 'heatmap',
-      coordinateSystem: 'cartesian2d', // TODO
-      pointSize: 10,
-      blurSize: 100, // TODO
-      maxOpacity: 100, // TODO
-      minOpacity: 0, // TODO
-      data: transformedData,
-    },
-  ];
+  // const heatmapSeriesOptions: HeatmapSeriesOption[] = [
+  //   {
+  //     type: 'heatmap',
+  //     coordinateSystem: 'cartesian2d', // TODO
+  //     pointSize: 10,
+  //     blurSize: 100, // TODO
+  //     maxOpacity: 100, // TODO
+  //     minOpacity: 0, // TODO
+  //     data: transformedData,
+  //   },
+  // ];
 
   // const X_CATEGORY_INDEX = 5;
   // const Y_CATEGORY_INDEX = 6;
 
-  const xCategories = sortCategoryList(
-    [...new Set(data.map(item => item[allColumnsX]))],
-    sortXAxis,
-    'x',
+  const xSums = new Map<string, number>(); // key = xValue
+  const ySums = new Map<string, number>(); // key = yValue
+  const xMins = new Map<string, number>();
+  const xMaxes = new Map<string, number>();
+  const yMins = new Map<string, number>();
+  const yMaxes = new Map<string, number>();
+
+  const xCategory = allColumnsX;
+  const yCategory = allColumnsY;
+
+  const overallMaxValue = Math.max(
+    ...data.map(datum => datum[metric.toString()] as number),
   );
-  const yCategories = sortCategoryList(
-    [...new Set(data.map(item => item[allColumnsY]))],
-    sortYAxis,
-    'y',
+  const overallMinValue = Math.min(
+    ...data.map(datum => datum[metric.toString()] as number),
   );
 
-  // data = [{count: 40, genre: "Misc", platform: "DS"} ...]
-  // ==>
-  // data = [{x_index, y_index, value, normalized_value} ...]
-  // sorted by category at x_index/y_index or value
-  const my_data2 = data.map(datum => {
-    const xIndex = xCategories.findIndex(
-      category => category === datum[allColumnsX],
+  data.forEach(datum => {
+    const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
+    const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
+    const yCategoryValue: string = datum[yCategory] as string;
+
+    xSums.set(xCategoryValue, (xSums.get(xCategoryValue) || 0) + value);
+
+    ySums.set(yCategoryValue, (ySums.get(yCategoryValue) || 0) + value);
+
+    xMins.set(
+      xCategoryValue,
+      Math.min(xMins.get(xCategoryValue) || Number.MAX_SAFE_INTEGER, value),
     );
 
-    const yIndex = yCategories.findIndex(
-      category => category === datum[allColumnsY],
+    xMaxes.set(
+      xCategoryValue,
+      Math.max(xMaxes.get(xCategoryValue) || Number.MIN_SAFE_INTEGER, value),
     );
 
-    return [xIndex, yIndex, datum[metric.toString()]];
+    yMins.set(
+      yCategoryValue,
+      Math.min(yMins.get(yCategoryValue) || Number.MAX_SAFE_INTEGER, value),
+    );
+
+    yMaxes.set(
+      yCategoryValue,
+      Math.max(yMaxes.get(yCategoryValue) || Number.MIN_SAFE_INTEGER, value),
+    );
   });
-
-  if (sortXAxis === 'value_asc' || sortYAxis === 'value_asc') {
-    my_data2.sort((a, b) => {
-      let ret = 0; // TODO handle alleged possible undefinted values better
-      if (a[VALUE_INDEX] && b[VALUE_INDEX]) {
-        if (b[VALUE_INDEX] > a[VALUE_INDEX]) {
-          ret = -1;
-        } else {
-          ret = 1;
-        }
-      }
-      return ret; // TODO handle alleged possible undefinted values better
-    });
-  }
-
-  if (sortXAxis === 'value_desc' || sortYAxis === 'value_desc') {
-    my_data2.sort((a, b) => {
-      let ret = 0; // TODO handle alleged possible undefinted values better
-      if (a[VALUE_INDEX] && b[VALUE_INDEX]) {
-        if (a[VALUE_INDEX] > b[VALUE_INDEX]) {
-          ret = -1;
-        } else {
-          ret = 1;
-        }
-      }
-      return ret; // TODO handle alleged possible undefinted values better
-    });
-  }
-
-  // TODO sketchyy number cast? Is 0 an okay default?
-  // Could have all other negative numbers.
-  // Is it possible an item won't have a count?
-  const maxDataValue = Math.max(...data.map(item => Number(item.count)), 0);
-  const minDataValue = Math.min(...data.map(item => Number(item.count)), 0);
-
-  let dimensionIndex = -1;
-  if (normalizeAcross === 'x') {
-    dimensionIndex = X_INDEX;
-  } else if (normalizeAcross === 'y') {
-    dimensionIndex = Y_INDEX;
-  }
 
   const minBound =
     normalizeAcross === 'heatmap'
-      ? yAxisBounds[0] || minDataValue
-      : minDataValue;
+      ? yAxisBounds[0] || overallMinValue
+      : overallMinValue;
   // TODO this and legend always spanned from 0 to 1 in old version
   const maxBound =
     normalizeAcross === 'heatmap'
-      ? yAxisBounds[1] || maxDataValue
-      : maxDataValue;
+      ? yAxisBounds[1] || overallMaxValue
+      : overallMaxValue;
 
-  const normalizedData = getNormalizedData(
-    my_data2,
-    xCategories.length,
-    yCategories.length,
-    normalizeAcross === 'x' ? xCategories.length : yCategories.length,
-    dimensionIndex,
-    VALUE_INDEX,
-    minBound,
-    maxBound,
-  );
+  const enrichedData = data.map(datum => {
+    const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
+    const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
+    const yCategoryValue: string = datum[yCategory] as string;
 
-  normalizedData.sort((a, b) => {
-    let ret = 0;
-    // TODO check for/handle nulls better
-    if (a[X_SUM_INDEX] && b[X_SUM_INDEX]) {
-      if (sortXAxis === 'value_asc') {
-        ret = a[X_SUM_INDEX] > b[X_SUM_INDEX] ? -1 : 1;
-      } else if (sortXAxis === 'value_desc') {
-        ret = b[X_SUM_INDEX] > a[X_SUM_INDEX] ? -1 : 1;
-      }
-    }
-    if (a[Y_SUM_INDEX] && b[Y_SUM_INDEX]) {
-      if (sortYAxis === 'value_asc') {
-        ret = a[Y_SUM_INDEX] > b[Y_SUM_INDEX] ? -1 : 1;
-      } else if (sortYAxis === 'value_desc') {
-        ret = b[Y_SUM_INDEX] > a[Y_SUM_INDEX] ? -1 : 1;
-      }
+    let normalizedValue: number = value;
+    let percent = 0;
+    let maxDataValue: number;
+    let minDataValue: number;
+
+    if (normalizeAcross === 'x') {
+      maxDataValue = xMaxes.get(xCategoryValue) || overallMaxValue;
+      minDataValue = xMins.get(xCategoryValue) || overallMinValue;
+    } else if (normalizeAcross === 'y') {
+      maxDataValue = yMaxes.get(yCategoryValue) || overallMaxValue;
+      minDataValue = yMins.get(yCategoryValue) || overallMinValue;
+    } else {
+      // normalizeAcross === 'heatmap'
+      maxDataValue = overallMaxValue;
+      minDataValue = overallMinValue;
     }
 
-    return ret;
+    normalizedValue = getNormalizedValue(
+      minBound,
+      maxBound,
+      value,
+      minDataValue,
+      maxDataValue,
+    );
+
+    percent = (value / maxDataValue) * 100;
+
+    return {
+      value,
+      xCategoryValue,
+      yCategoryValue,
+      xSum: xSums.get(xCategoryValue),
+      ySum: ySums.get(yCategoryValue),
+      normalizedValue,
+      percent,
+    };
+  });
+
+  const xCategories = sortCategoryList(sortXAxis, 'x', xSums);
+  const yCategories = sortCategoryList(sortYAxis, 'y', ySums);
+
+  const transformedData = enrichedData.map(datum => {
+    const xIndex = xCategories.findIndex(
+      category => category === datum.xCategoryValue,
+    );
+
+    const yIndex = yCategories.findIndex(
+      category => category === datum.yCategoryValue,
+    );
+    // [xIndex, yIndex, value, normalized, percent, x_sum, y_sum]
+    return [
+      xIndex,
+      yIndex,
+      datum.value,
+      datum.normalizedValue,
+      datum.percent,
+      datum.xSum,
+      datum.ySum,
+    ];
   });
 
   const echartOptions: EChartsCoreOption = {
@@ -437,7 +376,8 @@ export default function transformProps(
       type: 'category',
       data: xCategories,
       axisLabel: {
-        interval: xscaleInterval,
+        interval: xscaleInterval - 1,
+        rotate: 45, // TODO pull into constants or defaults?
       },
       splitArea: {
         show: true,
@@ -447,7 +387,7 @@ export default function transformProps(
       type: 'category',
       data: yCategories,
       axisLabel: {
-        interval: yscaleInterval,
+        interval: yscaleInterval - 1,
       },
       splitArea: {
         show: true,
@@ -474,7 +414,7 @@ export default function transformProps(
     series: [
       {
         type: 'heatmap',
-        data: normalizedData,
+        data: transformedData,
         label: {
           show: true,
         },
@@ -500,20 +440,4 @@ export default function transformProps(
     selectedValues: filterState.selectedValues || [],
     setDataMask,
   };
-}
-
-function getCategories(
-  allColumnsX: string,
-  allColumnsY: string,
-  data: DataRecordValue[][],
-  sortXAxis: string,
-  sortYAxis: string,
-) {
-  // data = [{count: 40, genre: "Misc", platform: "DS"} ...]
-  const xCategories = [...new Set(data.map(item => item[allColumnsX]))];
-  const yCategories = [...new Set(data.map(item => item[allColumnsY]))];
-
-  if (sortXAxis === 'alpha_asc') {
-    xCategories.sort();
-  }
 }
