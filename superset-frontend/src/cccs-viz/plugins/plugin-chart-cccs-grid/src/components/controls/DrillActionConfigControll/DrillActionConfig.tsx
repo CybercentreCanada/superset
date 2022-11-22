@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import SelectControl from 'src/explore/components/controls/SelectControl';
-import TextControl from 'src/explore/components/controls/TextControl';
+import { bootstrapData } from 'src/preamble';
 import PopoverSection from 'src/components/PopoverSection';
 import Button from 'src/components/Button';
 import {
@@ -16,7 +16,7 @@ import {
 interface Props {
     dashboardID: number;
     filterIDs: string[];
-    advancedDataTypeName: string;
+    advancedDataType: string;
     error: string;
     
     close: () => void;
@@ -25,9 +25,9 @@ interface Props {
 }
 const useDashboardState = () => {
 
-    const [dashboardList, setDashboardList] = useState();
+    const [dashboardList, setDashboardList] = useState([]);
     
-    const [filterList, setFilterList] = useState(); 
+    const [filterList, setFilterList] = useState([]); 
 
     const fetchDashboardList = useCallback(() => {
         const endpoint = `/api/v1/dashboard`;
@@ -45,7 +45,7 @@ const useDashboardState = () => {
         ).catch(error => {});
     }, [])
 
-    const fetchFilterList = (dashboardId: number) => {
+    const fetchFilterList =  useCallback((dashboardId: number) => {
         const endpoint = `/api/v1/dashboard/${dashboardId}`;
         if(dashboardId < 0 )
             return
@@ -59,7 +59,7 @@ const useDashboardState = () => {
 
             }
         ).catch(error => {});
-    }
+    }, [])
 
     return {
         dashboardList,
@@ -70,7 +70,7 @@ const useDashboardState = () => {
 }
 
 const DrillActionConfig: React.FC<Props> = (props : Props) => {
-    const {dashboardID, filterIDs, } =  props
+    const {dashboardID, filterIDs, advancedDataType } =  props
 
     const {dashboardList, filterList, fetchDashboardList, fetchFilterList} = useDashboardState()
     
@@ -78,8 +78,10 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
     
     const [selectedFilters, setSelectedFilters] = useState(filterIDs)
 
+
+    const [advancedDataTypeName, setAdvancedDataTypeName] = useState<string>(advancedDataType)
+
     const [state, setState] = useState({
-        advancedDataTypeName: props.advancedDataTypeName,
         isNew: !props.dashboardID,
     })
     
@@ -92,12 +94,9 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
     }, [fetchFilterList, selectedDashboardID])
     
     
-    const {advancedDataTypeName, isNew } = state
+    const { isNew } = state
     
     const isValidForm = () => {
-        const {
-          advancedDataTypeName,
-        } = state;
         const errors = [
           validateNonEmpty(selectedDashboardID),
           validateNonEmpty(selectedFilters),
@@ -115,7 +114,8 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
             const newDrillActionConfig = {
                 dashboardID: selectedDashboardID,
                 filterIDs: selectedFilters,
-                advancedDataTypeName: state["advancedDataTypeName"],
+                dashBoardName: element?.label || "",
+                advancedDataType: advancedDataTypeName,
                 name
             }
             props.addDrillActionConfig(newDrillActionConfig)
@@ -149,6 +149,22 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     onChange={setSelectedDashboardID}
                 />
                 <SelectControl
+                    ariaLabel={'Advanced Data Type Name'}
+                    name="advanced-data-type-value"
+                    label={'Advanced Data Type Name'}
+                    showHeader
+                    hovered
+                    freeForm
+                    placeholder=""
+                    options={ bootstrapData?.common?.advanced_data_types.map(
+                        ( v: { id: any; verbose_name: any; }) => ({
+                          value: v.id,
+                          label: v.verbose_name,
+                        }))}
+                    value={advancedDataTypeName}
+                    onChange={setAdvancedDataTypeName}
+                />
+                <SelectControl
                     ariaLabel={t('Annotation layer value')}
                     name="annotation-layer-value"
                     label={t('Filters')}
@@ -159,12 +175,6 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     options={filterList}
                     value={selectedFilters}
                     onChange={setSelectedFilters}
-                />
-                <TextControl
-                    label={'Advanced Data Type Name'}
-                    placeholder=""
-                    value={advancedDataTypeName}
-                    onChange={(v, e) => { setState({...state, advancedDataTypeName: v }); return {} }}
                 />
             </PopoverSection>
         </div>

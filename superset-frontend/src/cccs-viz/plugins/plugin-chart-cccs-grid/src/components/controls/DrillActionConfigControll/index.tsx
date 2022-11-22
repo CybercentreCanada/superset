@@ -117,13 +117,6 @@ const DrillActionConfig = AsyncEsmComponent(
         </div>
       );
     }
-  
-    const renderInfo = (drillActionConfig: any) => {
-      if (!drillActionConfig.show) {
-        return <span style={{ color: theme.colors.error.base }}> Hidden </span>;
-      }
-      return '';
-    }
 
     const { addedDrillActionConfigIndex } = state;
     const addedDrillActionConfig = value[addedDrillActionConfigIndex];
@@ -148,7 +141,6 @@ const DrillActionConfig = AsyncEsmComponent(
       >
         <CustomListItem selectable>
           <span>{anno.name}</span>
-          <span style={{ float: 'right' }}>{renderInfo(anno)}</span>
         </CustomListItem>
       </ControlPopover>
     ));

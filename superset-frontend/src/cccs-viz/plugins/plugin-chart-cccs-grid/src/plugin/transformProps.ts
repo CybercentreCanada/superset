@@ -316,19 +316,21 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     } as any);
   }
   let parsed_drill_action_configs = {}
-
+  console.log(drill_action_configs)
   drill_action_configs?.forEach( (e: any) =>
   {
     if (e.dashboardID in parsed_drill_action_configs) {
       parsed_drill_action_configs[e.dashboardID].concat({
-        advancedDataType: e.advancedDataTypeName,
-        nativefilterIDs: e.filterIDs
+        advancedDataType: e.advancedDataType,
+        nativefilterIDs: e.filterIDs,
+        name: e.dashBoardName
       })
     }
     else {
       parsed_drill_action_configs[e.dashboardID] = [{
-        advancedDataType: e.advancedDataTypeName,
-        nativefilterIDs: e.filterIDs
+        advancedDataType: e.advancedDataType,
+        nativefilterIDs: e.filterIDs,
+        name: e.dashBoardName
       }]
     }
   });

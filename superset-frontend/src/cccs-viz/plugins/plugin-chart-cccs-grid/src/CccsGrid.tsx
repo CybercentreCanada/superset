@@ -53,6 +53,7 @@ import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 import { PAGE_SIZE_OPTIONS } from './plugin/controlPanel';
+import rison from 'rison';
 
 const DEFAULT_COLUMN_DEF = {
   editable: false,
@@ -132,45 +133,55 @@ export default function CccsGrid({
     [emitFilter, setDataMask],
   ); // only take relevant page size options
 
-  const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[] ): string =>{
-
-    return `${nativefilterID}:(filterState:(label:!(${urlSelectedData.join(',')}),validateStatus:!f,value:!(${urlSelectedData.join(',')})),id:${nativefilterID},ownState:())`
-  
+  const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[] ) =>{
+    const stringSelectedData = urlSelectedData.map( e => {
+      return `${e.toString()}`
+    }) 
+    const navtiveFilter = {
+      filterState: {
+        label: stringSelectedData,
+        validateStatus: false,
+        value: stringSelectedData
+      },
+      id: nativefilterID,
+      ownState: {}
+    }
+   return navtiveFilter
   } 
   const getDrillToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
     
     let sub_menu: any = []
-
+    console.log(drillActionConfigs)
     for (let key in drillActionConfigs) {
           
-      let businessTypeNativeFilters = drillActionConfigs[key];
-      let nativeFilterUrls: string[] = [];
-
-      businessTypeNativeFilters.forEach((element: any) => {
-        
+      let advancedDataTypeNativeFilters = drillActionConfigs[key];
+      let nativeFilterUrls: any = {};
+      let drillActionName: string = ""
+      advancedDataTypeNativeFilters.forEach((element: any) => {
+        drillActionName = element.name
         let advancedDataType = element['advancedDataType'];
         let nativefilterIDs: string[] = element["nativefilterIDs"];
         let selectedDataForUrl = selectedData[advancedDataType];
         
         if (selectedDataForUrl && nativefilterIDs) {
           nativefilterIDs.forEach( id => {
-            nativeFilterUrls.push(
-              generateNativeFilterUrlString(id, selectedDataForUrl)
-            )
+            nativeFilterUrls[id] = generateNativeFilterUrlString(id, selectedDataForUrl)
           });
         }
 
       });
       
-      if (nativeFilterUrls?.length > 0){
+      if (Object.keys(nativeFilterUrls).length !== 0){
         
         let action = () => {
-          let url = `http://localhost:9000/superset/dashboard/${key}/?native_filters=(${nativeFilterUrls.join(',')})`
+          let baseUrl =  location.protocol + '//' + location.host;
+          let url = `${baseUrl}/superset/dashboard/${key}/?native_filters=${rison.encode(nativeFilterUrls)}`
+          console.log(url)
           window.open(url, '_blank');
         }
         
         let DashboardMenuItem = {
-          name: key,
+          name: drillActionName,
           action
         }
     
@@ -209,6 +220,7 @@ export default function CccsGrid({
             ]
         )
       } 
+      console.log(selectedDataByAdvancedType)
       result = result.concat(
         getDrillToDashboardContextMenuItems(selectedDataByAdvancedType)
       )
