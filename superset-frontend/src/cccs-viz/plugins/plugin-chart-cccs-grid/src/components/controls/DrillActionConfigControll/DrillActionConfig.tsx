@@ -54,7 +54,8 @@ const useDashboardState = () => {
                 const metadata = JSON.parse((json.result.json_metadata))
 
                 setFilterList(metadata?.native_filter_configuration.map( (e: any) => {
-                    return {value: e.id, label: e.name }
+                    console.log(e);
+                    return {value: e.id, label: e.name, column: e?.targets[0].column?.name || "" }
                 }))
 
             }
@@ -110,6 +111,7 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
             const element: any = (dashboardList || []).find(
                 (e: any) => e.value === selectedDashboardID
             )
+           
             const name = `${ element?.label } | ${ advancedDataTypeName }`
             const newDrillActionConfig = {
                 dashboardID: selectedDashboardID,
@@ -128,7 +130,10 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
         props.removeDrillActionConfig();
         props.close();
     }
-    
+    const selectedFiltersOnChange = (e: any ) => {
+        console.log(e)
+    } 
+
     return(
         <>
         <div style={{ marginRight: '2rem' }}>
@@ -174,7 +179,7 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     placeholder=""
                     options={filterList}
                     value={selectedFilters}
-                    onChange={setSelectedFilters}
+                    onChange={selectedFiltersOnChange}
                 />
             </PopoverSection>
         </div>
