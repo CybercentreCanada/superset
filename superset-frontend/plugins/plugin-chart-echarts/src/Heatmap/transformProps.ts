@@ -65,6 +65,7 @@ export function formatTooltip({
   yCategories,
   metric,
   showPerc,
+  numberFormatter,
 }: {
   params: HeatmapSeriesCallbackDataParams;
   xCategory: string;
@@ -73,6 +74,7 @@ export function formatTooltip({
   yCategories: DataRecordValue[];
   metric: string | object;
   showPerc: boolean;
+  numberFormatter: NumberFormatter;
 }): string {
   const { value } = params;
 
@@ -80,7 +82,7 @@ export function formatTooltip({
   const stats = [
     `<b>${xCategory}</b>: ${xCategories[value[X_INDEX]]}`,
     `<b>${yCategory}</b>: ${yCategories[value[Y_INDEX]]}`,
-    `<b>${metric}</b>: ${value[VALUE_INDEX]}`,
+    `<b>${metric}</b>: ${numberFormatter(value[VALUE_INDEX])}`,
     showPerc ? `<b>%</b>: ${value[PERCENT_INDEX].toFixed(2)}%` : '',
   ];
 
@@ -187,7 +189,7 @@ export default function transformProps(
   }: EchartsHeatmapFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const groupbyLabels = groupby.map(getColumnLabel);
-
+  const numberFormatter = getNumberFormatter(yAxisFormat);
   const scheme_colors = getSequentialSchemeRegistry()
     ?.get(linearColorScheme)
     ?.getColors();
@@ -339,6 +341,10 @@ export default function transformProps(
     const yIndex = yCategories.findIndex(
       category => category === datum.yCategoryValue,
     );
+
+    // TODO heatmap seems to require a number, so no formatting allowed?
+    // (e.g., for 1k or 4,000%)
+    const formattedData = Number(numberFormatter(datum.value));
     // [xIndex, yIndex, value, normalized, percent, x_sum, y_sum]
     return [
       xIndex,
@@ -365,6 +371,7 @@ export default function transformProps(
           yCategories,
           metric,
           showPerc,
+          numberFormatter,
         }),
     },
     grid: {
@@ -416,7 +423,7 @@ export default function transformProps(
         type: 'heatmap',
         data: transformedData,
         label: {
-          show: true,
+          show: showValues,
         },
         emphasis: {
           itemStyle: {

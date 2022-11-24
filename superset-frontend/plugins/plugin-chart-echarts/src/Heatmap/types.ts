@@ -64,7 +64,7 @@ export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   leftMargin: 'auto',
   metric: '',
   normalized: false,
-  numberFormat: 'SMART_NUMBERS',
+  numberFormat: 'SMART_NUMBER',
   showLegend: true,
   showPercentage: true,
   showValues: false,
