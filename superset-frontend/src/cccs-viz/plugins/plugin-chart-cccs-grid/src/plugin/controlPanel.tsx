@@ -101,17 +101,6 @@ const validateAggControlValues = (
     : [];
 };
 
-const validateAggColumnValues = (
-  controls: ControlStateMapping,
-  values: any[],
-  state: ControlPanelState,
-) => {
-  const result = validateAggControlValues(controls, values);
-  if (result.length === 0 && isAggMode({ controls })) {
-    return [];
-  }
-  return result;
-};
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
