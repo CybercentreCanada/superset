@@ -15,7 +15,7 @@ import {
 
 interface Props {
     dashboardID: number;
-    filterIDs: string[];
+    filters: any[];
     advancedDataType: string;
     error: string;
     
@@ -71,13 +71,13 @@ const useDashboardState = () => {
 }
 
 const DrillActionConfig: React.FC<Props> = (props : Props) => {
-    const {dashboardID, filterIDs, advancedDataType } =  props
+    const {dashboardID, filters, advancedDataType } =  props
 
     const {dashboardList, filterList, fetchDashboardList, fetchFilterList} = useDashboardState()
     
     const [selectedDashboardID, setSelectedDashboardID] = useState<number>(dashboardID)
     
-    const [selectedFilters, setSelectedFilters] = useState(filterIDs)
+    const [selectedFilters, setSelectedFilters] = useState(filters?.map( (filter: any) => filter.value) || [])
 
 
     const [advancedDataTypeName, setAdvancedDataTypeName] = useState<string>(advancedDataType)
@@ -111,11 +111,11 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
             const element: any = (dashboardList || []).find(
                 (e: any) => e.value === selectedDashboardID
             )
-           
+            const selectedFiltersWithColumn = filterList.filter( (filter: any) => selectedFilters.includes(filter.value) )
             const name = `${ element?.label } | ${ advancedDataTypeName }`
             const newDrillActionConfig = {
                 dashboardID: selectedDashboardID,
-                filterIDs: selectedFilters,
+                filters: selectedFiltersWithColumn,
                 dashBoardName: element?.label || "",
                 advancedDataType: advancedDataTypeName,
                 name
@@ -130,9 +130,7 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
         props.removeDrillActionConfig();
         props.close();
     }
-    const selectedFiltersOnChange = (e: any ) => {
-        console.log(e)
-    } 
+
 
     return(
         <>
@@ -179,7 +177,7 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     placeholder=""
                     options={filterList}
                     value={selectedFilters}
-                    onChange={selectedFiltersOnChange}
+                    onChange={setSelectedFilters}
                 />
             </PopoverSection>
         </div>
