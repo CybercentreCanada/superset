@@ -47,6 +47,17 @@ export const getAdhocExtraFormData = (
   return extra;
 };
 
+export const getDatasetExtraFormData = (
+  dataset: { label: string, value: number }
+) => {
+  const extra: ExtraFormData = {};
+  extra.custom_form_data = [{
+    datasetOverride: { datasetId: dataset.value }
+  }]
+  return extra;
+}
+
+
 export const getSelectExtraFormData = (
   col: string,
   value?: null | (string | number | boolean | null)[],
