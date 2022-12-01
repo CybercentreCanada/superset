@@ -220,8 +220,8 @@ class ChartDataRestApi(ChartRestApi):
         if json_body is None:
             return self.response_400(message=_("Request is not JSON"))
 
-        if 'custom_form_data' in json_body['form_data']:
-            new_id = json_body['form_data']['custom_form_data']['datasetOverride']['datasetId']
+        if 'extra_form_data' in json_body['form_data']:
+            new_id = json_body['form_data']['extra_form_data']['custom_form_data'][0]['datasetOverride']['datasetId']
             json_body['datasource']['id'] = new_id
             sample = SamplesDatasetCommand(g.user, new_id, True).run()
             columns = sample['data'][0].keys()
