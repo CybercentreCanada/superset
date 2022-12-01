@@ -41,6 +41,7 @@ from superset.charts.post_processing import apply_post_process
 from superset.charts.schemas import ChartDataQueryContextSchema
 from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
 from superset.connectors.base.models import BaseDatasource
+from superset.datasets.commands.samples import SamplesDatasetCommand
 from superset.exceptions import QueryObjectValidationError
 from superset.extensions import event_logger
 from superset.utils.async_query_manager import AsyncQueryTokenException
@@ -218,6 +219,14 @@ class ChartDataRestApi(ChartRestApi):
 
         if json_body is None:
             return self.response_400(message=_("Request is not JSON"))
+
+        if 'custom_form_data' in json_body['form_data']:
+            new_id = json_body['form_data']['custom_form_data']['datasetOverride']['datasetId']
+            json_body['datasource']['id'] = new_id
+            sample = SamplesDatasetCommand(g.user, new_id, True).run()
+            columns = sample['data'][0].keys()
+            json_body['queries'][0]['columns'] = columns
+            json_body['viz_type'] = 'cccs_grid'
 
         try:
             query_context = self._create_query_context_from_form(json_body)
