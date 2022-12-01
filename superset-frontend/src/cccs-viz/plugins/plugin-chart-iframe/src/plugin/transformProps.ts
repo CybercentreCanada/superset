@@ -50,8 +50,6 @@ export default function transformProps(chartProps: ChartProps) {
    */
   const formData = chartProps.formData;
   const queriesData = chartProps.queriesData;
-  
-
 
   const { url, parameterName, parameterPrefix, groupby } = formData
 
