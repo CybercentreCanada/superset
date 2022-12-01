@@ -133,7 +133,7 @@ export default function CccsGrid({
     [emitFilter, setDataMask],
   ); // only take relevant page size options
 
-  const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[] ) =>{
+  const generateNativeFilterUrlString = (nativefilterID: string, urlSelectedData: any[], column: string = "" ) =>{
     const stringSelectedData = urlSelectedData.map( e => {
       return `${e.toString()}`
     }) 
@@ -160,12 +160,12 @@ export default function CccsGrid({
       advancedDataTypeNativeFilters.forEach((element: any) => {
         drillActionName = element.name
         let advancedDataType = element['advancedDataType'];
-        let nativefilterIDs: string[] = element["nativefilterIDs"];
+        let nativefilters: any[] = element["nativefilters"];
         let selectedDataForUrl = selectedData[advancedDataType];
         
-        if (selectedDataForUrl && nativefilterIDs) {
-          nativefilterIDs.forEach( id => {
-            nativeFilterUrls[id] = generateNativeFilterUrlString(id, selectedDataForUrl)
+        if (selectedDataForUrl && nativefilters) {
+          nativefilters.forEach( filter => {
+            nativeFilterUrls[filter["value"]] = generateNativeFilterUrlString(filter["value"], selectedDataForUrl, filter["column"])
           });
         }
 

@@ -322,7 +322,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     if (e.dashboardID in parsed_drill_action_configs) {
       parsed_drill_action_configs[e.dashboardID].concat({
         advancedDataType: e.advancedDataType,
-        nativefilterIDs: e.filterIDs,
+        nativefilters: e.filters,
         name: e.dashBoardName
       })
     }
