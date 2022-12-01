@@ -1,0 +1,65 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - cccs-*
+
+variables:
+  containerRegistry: uchimera
+  imageRepository: cccs/superset
+  dockerfile: $(Build.SourcesDirectory)/cccs-build/superset/Dockerfile
+  buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
+  DOCKER_BUILDKIT: 1
+
+pool: cauldron-vmss
+
+steps:
+  - bash: |
+      BRANCH_NAME=$(echo "$SYSTEM_PULLREQUEST_SOURCEBRANCH $BUILD_SOURCEBRANCH" | sed -r 's/^\s*(refs\/heads\/)?(\S*).*$/\2/' | sed 's/\//_/g')
+      echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
+    displayName: Parse Source Control Branch Name
+  - task: PipAuthenticate@1
+    displayName: Authentication to Azure Artifacts feed
+    inputs:
+      artifactFeeds: Analytical Platform/analytical-platform
+      onlyAddExtraIndex: true
+
+  - bash: |
+      echo "[global]" > $(Build.SourcesDirectory)/pip.conf
+      echo "extra-index-url=$PIP_EXTRA_INDEX_URL" >> $(Build.SourcesDirectory)/pip.conf
+    displayName: Export Artifactory URL
+
+  - task: Docker@2
+    displayName: Login to $(containerRegistry)
+    inputs:
+      command: login
+      containerRegistry: $(containerRegistry)
+
+  - task: Docker@2
+    displayName: Build the image
+    inputs:
+      command: build
+      containerRegistry: $(containerRegistry)
+      repository: $(imageRepository)
+      dockerfile: $(dockerfile)
+      arguments: --secret id=pipconfig,src=$(Build.SourcesDirectory)/pip.conf --progress=plain --build-arg BUILD_NUMBER=$(Build.BuildNumber)
+      tags: |
+        $(BRANCH_NAME)
+        $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+
+  - task: Docker@2
+    displayName: Push the image to $(containerRegistry)
+    inputs:
+      command: push
+      containerRegistry: $(containerRegistry)
+      repository: $(imageRepository)
+      tags: |
+        $(BRANCH_NAME)
+        $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+
+  - task: Docker@2
+    displayName: Logout of $(containerRegistry)
+    inputs:
+      command: logout
+      containerRegistry: $(containerRegistry)
+    condition: always()
