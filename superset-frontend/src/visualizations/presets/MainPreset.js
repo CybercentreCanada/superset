@@ -70,6 +70,7 @@ import {
 } from '@superset-ui/plugin-chart-echarts';
 import {
   AdhocFilterPlugin,
+  DatasetFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
@@ -185,6 +186,7 @@ export default class MainPreset extends Preset {
           key: 'echarts_timeseries_step',
         }),
         new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
+        new DatasetFilterPlugin().configure({ key: 'filter_dataset' }),
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
