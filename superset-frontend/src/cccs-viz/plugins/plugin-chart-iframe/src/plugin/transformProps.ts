@@ -69,8 +69,6 @@ export default function transformProps(chartProps: ChartProps) {
   if(Array.isArray(data) && data.length === 1) {
     value = data[0][groupby] || ""
   }
-
-
   
   return {
     url_parameter_value: value,
