@@ -16,11 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as AdhocFilterPlugin } from './Adhoc';
-export { default as SelectFilterPlugin } from './Select';
-export { default as MultiSelectFilterPlugin } from './MultiSelect';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as GroupByFilterPlugin } from './GroupBy';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
+import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
+import buildQuery from './buildQuery';
+import controlPanel from './controlPanel';
+import transformProps from './transformProps';
+import thumbnail from './images/thumbnail.png';
+
+export default class FilterMultiSelectPlugin extends ChartPlugin {
+  constructor() {
+    const metadata = new ChartMetadata({
+      name: t('MultiSelect filter'),
+      description: t('MultiSelect filter plugin using AntD'),
+      behaviors: [Behavior.INTERACTIVE_CHART, Behavior.NATIVE_FILTER],
+      enableNoResults: false,
+      tags: [t('Experimental')],
+      thumbnail,
+    });
+
+    super({
+      buildQuery,
+      controlPanel,
+      loadChart: () => import('./MultiSelectFilterPlugin'),
+      metadata,
+      transformProps,
+    });
+  }
+}

@@ -71,6 +71,7 @@ import {
 import {
   AdhocFilterPlugin,
   SelectFilterPlugin,
+  MultiSelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
   TimeColumnFilterPlugin,
@@ -186,6 +187,7 @@ export default class MainPreset extends Preset {
         }),
         new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
+        new MultiSelectFilterPlugin().configure({ key: 'filter_multiselect' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
         new TimeColumnFilterPlugin().configure({ key: 'filter_timecolumn' }),

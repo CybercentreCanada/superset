@@ -16,11 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export { default as AdhocFilterPlugin } from './Adhoc';
-export { default as SelectFilterPlugin } from './Select';
-export { default as MultiSelectFilterPlugin } from './MultiSelect';
-export { default as RangeFilterPlugin } from './Range';
-export { default as TimeFilterPlugin } from './Time';
-export { default as TimeColumnFilterPlugin } from './TimeColumn';
-export { default as GroupByFilterPlugin } from './GroupBy';
-export { default as TimeGrainFilterPlugin } from './TimeGrain';
+import { t, validateNonEmpty } from '@superset-ui/core';
+import {
+  ControlPanelConfig,
+  sections,
+  sharedControls,
+} from '@superset-ui/chart-controls';
+
+const config: ControlPanelConfig = {
+  controlPanelSections: [
+    // @ts-ignore
+    sections.legacyRegularTime,
+    {
+      label: t('Query'),
+      expanded: true,
+      controlSetRows: [
+        [
+          {
+            name: 'groupby',
+            config: {
+              ...sharedControls.groupby,
+              label: 'Column',
+              required: true,
+            },
+          },
+        ],
+      ],
+    },
+  ],
+  controlOverrides: {
+    groupby: {
+      multi: false,
+      validators: [validateNonEmpty],
+    },
+  },
+};
+
+export default config;
