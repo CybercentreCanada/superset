@@ -47,16 +47,26 @@ export const getAdhocExtraFormData = (
   return extra;
 };
 
-export const getDatasetExtraFormData = (
-  dataset: { label: string, value: number }
+export const getDrilldownExtraFormData = (
+  datasetId: number,
+  selectorType: string,
+  selectorValue: string,
+  timeRangeValue: string,
 ) => {
+  const selectors = {};
+  selectors[selectorType] = selectorValue;
   const extra: ExtraFormData = {};
-  extra.custom_form_data = [{
-    datasetOverride: { datasetId: dataset.value }
-  }]
+  extra.time_range = timeRangeValue;
+  extra.custom_form_data = [
+    {
+      datasetOverride: {
+        datasetId,
+      },
+      selectors,
+    },
+  ];
   return extra;
-}
-
+};
 
 export const getSelectExtraFormData = (
   col: string,
