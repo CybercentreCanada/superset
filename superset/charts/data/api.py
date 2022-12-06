@@ -243,6 +243,15 @@ class ChartDataRestApi(ChartRestApi):
             if json_body['viz_type'] == 'cccs_grid':
                 json_body['queries'][0]['columns'] = sample['data'][0].keys()
 
+            temp_col = [cn for cn in sample['colnames'] if str(sample['coltypes'][sample['colnames'].index(cn)]) == 'GenericDataType.TEMPORAL']
+
+            if len(temp_col) > 0:
+                temp_col = temp_col[0] #we can thin about how to decide better
+                if custom_params['timeSince'] != '':
+                    json_body['queries'][0]['filters'].append({'col': 'year', 'op': '>=', 'val': [custom_params['timeSince']]})
+                if custom_params['timeUntil'] != '':
+                    json_body['queries'][0]['filters'].append({'col': 'year', 'op': '<=', 'val': [custom_params['timeUntil']]})
+                
             if 'selectors' in custom_params:
                 adv_type_do_sql = True
 
