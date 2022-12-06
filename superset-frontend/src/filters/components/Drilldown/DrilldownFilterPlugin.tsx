@@ -186,7 +186,8 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
         datasetId || -1,
         selectorType || '',
         selectorValue || '',
-        timeRangeValue,
+        retSince,
+        retUntil,
       ),
     });
   }, [
