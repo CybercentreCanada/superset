@@ -41,6 +41,15 @@ if TYPE_CHECKING:
 
 config = app.config
 
+def extract_dataframe_adv_dtypes(
+    datasource: Optional["BaseDatasource"] = None,
+) -> List[str]:
+
+    adv_dtypes = []
+    for column in datasource.columns:
+        adv_dtypes.append(column.advanced_data_type)
+
+    return adv_dtypes
 
 def _get_datasource(
     query_context: QueryContext, query_obj: QueryObject
@@ -109,6 +118,7 @@ def _get_full(
         payload["colnames"] = list(df.columns)
         payload["indexnames"] = list(df.index)
         payload["coltypes"] = extract_dataframe_dtypes(df, datasource)
+        payload["coladvtypes"] = extract_dataframe_adv_dtypes(datasource)
         payload["data"] = query_context.get_data(df)
         payload["result_format"] = query_context.result_format
     del payload["df"]
