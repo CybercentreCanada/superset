@@ -236,15 +236,15 @@ class ChartDataRestApi(ChartRestApi):
             if 'datasetOverride' in custom_params:
                 json_body['datasource']['id'] = custom_params['datasetOverride']['datasetId']
 
-        dataset_id = json_body['datasource']['id']
+            dataset_id = json_body['datasource']['id']
 
-        sample = SamplesDatasetCommand(g.user, dataset_id, True).run()
+            sample = SamplesDatasetCommand(g.user, dataset_id, True).run()
 
-        if json_body['viz_type'] == 'cccs_grid':
-            json_body['queries'][0]['columns'] = sample['data'][0].keys()
+            if json_body['viz_type'] == 'cccs_grid':
+                json_body['queries'][0]['columns'] = sample['data'][0].keys()
 
-        if 'selectors' in custom_params:
-            adv_type_do_sql = True
+            if 'selectors' in custom_params:
+                adv_type_do_sql = True
 
         try:
             query_context = self._create_query_context_from_form(json_body)
