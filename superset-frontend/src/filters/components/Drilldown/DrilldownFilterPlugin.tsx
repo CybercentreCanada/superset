@@ -306,6 +306,7 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
       >
         <Select
           ariaLabel=""
+          allowClear
           options={selectorTypes}
           onChange={e => {
             setSelectorType(e);
