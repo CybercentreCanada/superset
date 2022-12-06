@@ -227,7 +227,7 @@ class ChartDataRestApi(ChartRestApi):
 
         #json_body['form_data']['extra_form_data']['custom_form_data'] = {'data_source': 22, 'viz_type': 'echarts_timeseries_line', 'col': 'eu_sales'}
         #json_body['form_data']['extra_form_data']['custom_form_data'][0]['datasetOverride']['datasetId'] = 22
-        json_body['form_data']['extra_form_data'] = {'custom_form_data': [{'selectors': {'port': 33}}]}
+        #json_body['form_data']['extra_form_data'] = {'custom_form_data': [{'selectors': {'port': 33}}]}
 
         adv_type_do_sql = False
 
