@@ -25,8 +25,8 @@ import thumbnail from './images/thumbnail.png';
 export default class FilterDatasetPlugin extends ChartPlugin {
   constructor() {
     const metadata = new ChartMetadata({
-      name: t('Dataset filter'),
-      description: t('Dataset filter plugin using AntD'),
+      name: t('Drilldown filter'),
+      description: t('Drilldown filter plugin using AntD'),
       behaviors: [Behavior.INTERACTIVE_CHART, Behavior.NATIVE_FILTER],
       enableNoResults: false,
       tags: [t('Experimental')],
@@ -37,7 +37,7 @@ export default class FilterDatasetPlugin extends ChartPlugin {
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('./DatasetFilterPlugin'),
+      loadChart: () => import('./DrilldownFilterPlugin'),
       metadata,
       transformProps,
     });
