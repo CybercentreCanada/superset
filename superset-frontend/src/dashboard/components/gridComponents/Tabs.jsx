@@ -38,7 +38,7 @@ import { NEW_TAB_ID, DASHBOARD_ROOT_ID } from '../../util/constants';
 import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
 
-const TAB_HIDE_LOOKUP = {
+window.TAB_HIDE_LOOKUP = {
   "port": [
     "Port",
     "Port and IP"
@@ -51,8 +51,8 @@ const TAB_HIDE_LOOKUP = {
 
 const shouldTabShow = (selectorType, tabName) => {
   console.log("shouldTabShow", selectorType, tabName);
-  if (selectorType in TAB_HIDE_LOOKUP) {
-    if (TAB_HIDE_LOOKUP[selectorType].includes(tabName)) {
+  if (selectorType in window.TAB_HIDE_LOOKUP) {
+    if (window.TAB_HIDE_LOOKUP[selectorType].includes(tabName)) {
       console.log("Yes, tab should show!");
       return true;
     }
