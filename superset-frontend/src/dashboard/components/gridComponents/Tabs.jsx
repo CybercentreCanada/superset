@@ -30,8 +30,7 @@ import DashboardComponent from '../../containers/DashboardComponent';
 import DeleteComponentButton from '../DeleteComponentButton';
 import HoverMenu from '../menu/HoverMenu';
 import findTabIndexByComponentId from '../../util/findTabIndexByComponentId';
-import getDirectPathToTabIndex from '../../util/getDirectPathToTabIndex';
-import { getIndirectPathToTabIndex }  from '../../util/getDirectPathToTabIndex';
+import { getIndirectPathToTabIndex } from '../../util/getDirectPathToTabIndex';
 import getLeafComponentIdFromPath from '../../util/getLeafComponentIdFromPath';
 import { componentShape } from '../../util/propShapes';
 import { NEW_TAB_ID, DASHBOARD_ROOT_ID } from '../../util/constants';
@@ -39,26 +38,18 @@ import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
 
 window.TAB_HIDE_LOOKUP = {
-  "port": [
-    "Port",
-    "Port and IP"
-  ],
-  "internet_address": [
-    "Port and IP",
-    "IP"
-  ]
+  port: ['Port', 'Port and IP'],
+  internet_address: ['Port and IP', 'IP'],
 };
 
 const shouldTabShow = (selectorType, tabName) => {
-  console.log("shouldTabShow", selectorType, tabName);
   if (selectorType in window.TAB_HIDE_LOOKUP) {
     if (window.TAB_HIDE_LOOKUP[selectorType].includes(tabName)) {
-      console.log("Yes, tab should show!");
       return true;
     }
   }
   return false;
-}
+};
 
 const propTypes = {
   id: PropTypes.string.isRequired,
@@ -144,8 +135,9 @@ export class Tabs extends React.PureComponent {
     );
     const { children: tabIds } = props.component;
     const activeKey = tabIds[tabIndex];
-    this.tabNames = new Map(tabIds.map(t => [t, props.getComponentById(t).meta.text]));
-    console.log(this.tabNames);
+    this.tabNames = new Map(
+      tabIds.map(t => [t, props.getComponentById(t).meta.text]),
+    );
 
     this.state = {
       tabIndex,
@@ -269,9 +261,8 @@ export class Tabs extends React.PureComponent {
       tabIds = allTabIds.filter(t => {
         const tName = this.tabNames.get(t);
         return shouldTabShow(selectorType, tName);
-      })
-      if (!(tabIds.includes(activeKey))) {
-        // this.handleClickTab(0);
+      });
+      if (!tabIds.includes(activeKey)) {
         this.setState(() => ({ activeKey: tabIds[0] }));
       }
     }
@@ -280,12 +271,14 @@ export class Tabs extends React.PureComponent {
 
   handleClickTab(tabIndex) {
     const { component } = this.props;
-    // const { children: tabIds } = component;
     const tabIds = this.filteredTabIds();
 
     if (tabIndex !== this.state.tabIndex) {
-      // const pathToTabIndex = getDirectPathToTabIndex(component, tabIndex);
-      const pathToTabIndex = getIndirectPathToTabIndex(component, tabIds, tabIndex);
+      const pathToTabIndex = getIndirectPathToTabIndex(
+        component,
+        tabIds,
+        tabIndex,
+      );
       const targetTabId = pathToTabIndex[pathToTabIndex.length - 1];
       this.props.logEvent(LOG_ACTIONS_SELECT_DASHBOARD_TAB, {
         target_id: targetTabId,
@@ -351,31 +344,10 @@ export class Tabs extends React.PureComponent {
       isComponentVisible: isCurrentTabVisible,
       editMode,
       nativeFilters,
-      tabHider,
     } = this.props;
 
-    // const { children: allTabIds } = tabsComponent;
-    let { tabIndex: selectedTabIndex, activeKey } = this.state;
-    let tabIds = this.filteredTabIds();
-
-    // KTODO: filter children based on tab names
-    // this.props.getComponentId(tabId).meta.text to get the tab name
-    // let tabIds;
-    // if (editMode && tabsComponent.parents.length === 2) {
-    //   tabIds = allTabIds;
-    // } else {
-    //   const selectorType = tabHider.appliedSelectorType;
-    //   tabIds = allTabIds.filter(t => {
-    //     const tName = this.tabNames.get(t);
-    //     return shouldTabShow(selectorType, tName);
-    //   })
-    //   if (!(tabIds.includes(activeKey))) {
-    //     activeKey = tabIds[0];
-    //     selectedTabIndex = 0;
-    //     this.handleClickTab(0);
-    //     // this.setState(() => ({ activeKey: tabIds[0] }));
-    //   }
-    // }
+    const { tabIndex: selectedTabIndex, activeKey } = this.state;
+    const tabIds = this.filteredTabIds();
 
     let tabsToHighlight;
     if (nativeFilters?.focusedFilterId) {
