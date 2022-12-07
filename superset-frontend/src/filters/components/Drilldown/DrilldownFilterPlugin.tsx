@@ -23,7 +23,6 @@ import {
   DataMask,
   ExtraFormData,
   JsonObject,
-  smartDateDetailedFormatter,
   SupersetClient,
   t,
 } from '@superset-ui/core';
@@ -52,7 +51,7 @@ import { SLOW_DEBOUNCE } from 'src/constants';
 import { useDispatch } from 'react-redux';
 import { PluginFilterDatasetProps } from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
-import { getDataRecordFormatter, getDrilldownExtraFormData } from '../../utils';
+import { getDrilldownExtraFormData } from '../../utils';
 
 type DataMaskAction =
   | { type: 'ownState'; ownState: JsonObject }
@@ -90,17 +89,7 @@ export const tabHideUpdate = (selectorType: string) => ({
 });
 
 export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
-  const {
-    filterState,
-    formData,
-    height,
-    width,
-    setDataMask,
-    setFocusedFilter,
-    unsetFocusedFilter,
-    appSection,
-  } = props;
-  const { defaultToFirstItem } = formData;
+  const { filterState, height, width, setDataMask } = props;
   const [datasetId, setDatasetId] = useState<number>(-1);
   const [selectorType, setSelectorType] = useState<string>('');
   const [selectorValue, setSelectorValue] = useState<string>('');
@@ -329,8 +318,10 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
         <Select
           ariaLabel=""
           allowClear
+          // @ts-ignore
           options={selectorTypes}
           onChange={e => {
+            // @ts-ignore
             setSelectorType(e);
           }}
         />

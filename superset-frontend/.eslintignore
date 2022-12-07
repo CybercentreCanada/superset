@@ -34,3 +34,6 @@ esm/
 lib/
 tmp/
 storybook-static/
+
+# For the sake of Big Dig.
+cypress-base/cypress/support/index.ts
