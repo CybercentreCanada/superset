@@ -161,6 +161,7 @@ if (!isDevMode) {
         memoryLimit: 4096,
         options: {
           ignorePath: './.eslintignore',
+          emitError: false,
         },
       },
     }),
