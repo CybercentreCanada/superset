@@ -29,10 +29,7 @@ Object.entries(packageConfig.dependencies).forEach(([pkg]) => {
 let ignorePatterns = [];
 if (process.env.NODE_ENV === 'production') {
   ignorePatterns = [
-    '*.test.{js,ts,jsx,tsx}',
-    'plugins/**/test/**/*',
-    'packages/**/test/**/*',
-    'packages/generator-superset/**/*',
+    '*'
   ];
 }
 
