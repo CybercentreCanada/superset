@@ -43,11 +43,18 @@ import debounce from 'lodash/debounce';
 import { SLOW_DEBOUNCE } from 'src/constants';
 import { useImmerReducer } from 'use-immer';
 import { propertyComparator } from 'src/components/Select/Select';
-import { Input, InputRef, Tag, Tooltip } from 'antd';
-import { PluginFilterMultiSelectProps, SelectValue } from './types';
+import { Button, Input, InputRef, Tag, Tooltip } from 'antd';
+import {
+  ClearAllButton,
+  ClearAllButtonContainer,
+  PluginFilterMultiSelectProps,
+  SelectValue,
+} from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
 import { getDataRecordFormatter, getSelectExtraFormData } from '../../utils';
 import { PlusOutlined } from '@ant-design/icons';
+import Icon from 'src/components/Icons/Icon';
+import Icons from 'src/components/Icons';
 
 type DataMaskAction =
   | { type: 'ownState'; ownState: JsonObject }
@@ -261,6 +268,11 @@ export default function PluginFilterMultiSelect(
       handleChange(newTags);
     };
 
+    const handleClearAll = () => {
+      setTags([]);
+      handleChange([]);
+    };
+
     const showInput = () => {
       if (!isDisabled) {
         setInputVisible(true);
@@ -307,72 +319,83 @@ export default function PluginFilterMultiSelect(
     };
 
     return (
-      <div
-        onBlur={handleBlur}
-        onMouseEnter={setFocusedFilter}
-        onMouseLeave={unsetFocusedFilter}
-      >
-        {tags.map((tag, index) => {
-          if (editInputIndex === index) {
-            return (
-              <Input
-                ref={editInputRef}
+      <div>
+        <div
+          onBlur={handleBlur}
+          onMouseEnter={setFocusedFilter}
+          onMouseLeave={unsetFocusedFilter}
+        >
+          {tags.map((tag, index) => {
+            if (editInputIndex === index) {
+              return (
+                <Input
+                  ref={editInputRef}
+                  key={tag}
+                  size="small"
+                  className="tag-input"
+                  value={editInputValue}
+                  onChange={handleEditInputChange}
+                  onBlur={handleEditInputConfirm}
+                  onPressEnter={handleEditInputConfirm}
+                />
+              );
+            }
+
+            const isLongTag: boolean = tag.length > 20;
+
+            const tagElem = (
+              <Tag
+                className="edit-tag"
                 key={tag}
-                size="small"
-                className="tag-input"
-                value={editInputValue}
-                onChange={handleEditInputChange}
-                onBlur={handleEditInputConfirm}
-                onPressEnter={handleEditInputConfirm}
-              />
-            );
-          }
-
-          const isLongTag: boolean = tag.length > 20;
-
-          const tagElem = (
-            <Tag
-              className="edit-tag"
-              key={tag}
-              closable
-              onClose={() => handleClose(tag)}
-            >
-              <span
-                onDoubleClick={e => {
-                  setEditInputIndex(index);
-                  setEditInputValue(tag);
-                  e.preventDefault();
-                }}
+                closable
+                onClose={() => handleClose(tag)}
               >
-                {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-              </span>
+                <span
+                  onDoubleClick={e => {
+                    setEditInputIndex(index);
+                    setEditInputValue(tag);
+                    e.preventDefault();
+                  }}
+                >
+                  {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                </span>
+              </Tag>
+            );
+            return isLongTag ? (
+              <Tooltip title={tag} key={tag}>
+                {tagElem}
+              </Tooltip>
+            ) : (
+              tagElem
+            );
+          })}
+          {inputVisible && (
+            <Input
+              ref={inputRef}
+              type="text"
+              size="small"
+              className="tag-input"
+              value={inputValue}
+              onChange={handleInputChange}
+              onBlur={handleInputConfirm}
+              onPressEnter={handleInputConfirm}
+            />
+          )}
+          {!inputVisible && (
+            <Tag className="site-tag-plus" onClick={showInput}>
+              <PlusOutlined /> New Value
             </Tag>
-          );
-          return isLongTag ? (
-            <Tooltip title={tag} key={tag}>
-              {tagElem}
-            </Tooltip>
-          ) : (
-            tagElem
-          );
-        })}
-        {inputVisible && (
-          <Input
-            ref={inputRef}
-            type="text"
-            size="small"
-            className="tag-input"
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputConfirm}
-            onPressEnter={handleInputConfirm}
-          />
-        )}
-        {!inputVisible && (
-          <Tag className="site-tag-plus" onClick={showInput}>
-            <PlusOutlined /> New Value
-          </Tag>
-        )}
+          )}
+        </div>
+        <Button
+          size="small"
+          type="text"
+          // eslint-disable-next-line theme-colors/no-literal-colors
+          style={{ fontWeight: 'bold', fontSize: '8pt', color: '#1A85A0' }}
+          onClick={handleClearAll}
+        >
+          Clear
+        </Button>
       </div>
     );
   };
