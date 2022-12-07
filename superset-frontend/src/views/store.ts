@@ -47,6 +47,33 @@ const noopReducer =
 const container = document.getElementById('app');
 const bootstrap = JSON.parse(container?.getAttribute('data-bootstrap') ?? '{}');
 
+const tabHiderInitialState = {
+  dataset: null,
+  selectorType: null,
+  appliedDataset: null,
+  appliedSelectorType: null,
+};
+const tabHider = (state = tabHiderInitialState, action: any) => {
+  switch (action.type) {
+    case 'TAB_HIDE_UPDATE': {
+      console.log('TAB HIDE UPDATE', action.payload);
+      return {
+        ...state,
+        selectorType: action.payload.selectorType,
+      };
+    }
+    case 'TAB_HIDE_APPLY': {
+      console.log('TAB HIDE APPLY');
+      return {
+        ...state,
+        appliedSelectorType: state.selectorType,
+      };
+    }
+    default:
+  }
+  return state;
+};
+
 // reducers used only in the dashboard page
 const dashboardReducers = {
   charts,
@@ -59,6 +86,7 @@ const dashboardReducers = {
   dashboardLayout,
   sliceEntities,
   reports,
+  tabHider,
 };
 
 export const USER_LOADED = 'USER_LOADED';

@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import json
-import os
+import datetime
 import logging
 from typing import Any, Dict, Optional, TYPE_CHECKING
 
@@ -223,7 +223,7 @@ class ChartDataRestApi(ChartRestApi):
 
         #'filters': [{'col': 'na_sales', 'op': 'IN', 'val': [29.08]}
 
-        template = {'datasource': {'id': 22, 'type': 'table'}, 'force': False, 'queries': [{'time_range': 'No filter', 'granularity': 'year', 'filters': [], 'extras': {'time_grain_sqla': 'P1D', 'having': '', 'having_druid': [], 'where': ''}, 'applied_time_extras': {}, 'columns': ['global_sales'], 'metrics': [{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}], 'orderby': [[{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}, False]], 'annotation_layers': [], 'row_limit': 10000, 'series_columns': [], 'timeseries_limit': 0, 'order_desc': True, 'url_params': {'native_filters_key': '23-Kwo7HXWYNfcxZcQIBEVtlAVZ_j7svt-fPfXkyfelI94CrjH2dvPmRJXALe3xW'}, 'custom_params': {}, 'custom_form_data': {}, 'is_timeseries': False, 'time_offsets': [], 'post_processing': [{'operation': 'pivot', 'options': {'index': ['global_sales'], 'columns': [], 'aggregates': {'SUM(na_sales)': {'operator': 'mean'}}, 'drop_missing_columns': False, 'flatten_columns': False, 'reset_index': False}}, {'operation': 'flatten'}]}], 'form_data': {'datasource': '22__table', 'viz_type': 'echarts_timeseries_line', 'slice_id': 134, 'url_params': {'native_filters_key': '23-Kwo7HXWYNfcxZcQIBEVtlAVZ_j7svt-fPfXkyfelI94CrjH2dvPmRJXALe3xW'}, 'granularity_sqla': 'year', 'time_grain_sqla': 'P1D', 'time_range': 'No filter', 'x_axis': 'global_sales', 'metrics': [{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}], 'groupby': [], 'adhoc_filters': [], 'order_desc': True, 'row_limit': 10000, 'truncate_metric': True, 'comparison_type': 'values', 'annotation_layers': [], 'forecastPeriods': 10, 'forecastInterval': 0.8, 'x_axis_title_margin': 15, 'y_axis_title_margin': 15, 'y_axis_title_position': 'Left', 'color_scheme': 'supersetColors', 'only_total': True, 'markerSize': 6, 'show_legend': True, 'legendType': 'scroll', 'legendOrientation': 'top', 'x_axis_time_format': 'smart_date', 'rich_tooltip': True, 'tooltipTimeFormat': 'smart_date', 'y_axis_format': 'SMART_NUMBER', 'y_axis_bounds': [None, None], 'extra_form_data': {}, 'label_colors': {}, 'shared_label_colors': {}, 'extra_filters': [], 'dashboardId': 11, 'force': None, 'result_format': 'json', 'result_type': 'full'}, 'result_format': 'json', 'result_type': 'full', 'viz_type': 'echarts_timeseries_line'}
+        #template = {'datasource': {'id': 22, 'type': 'table'}, 'force': False, 'queries': [{'time_range': 'No filter', 'granularity': 'year', 'filters': [], 'extras': {'time_grain_sqla': 'P1D', 'having': '', 'having_druid': [], 'where': ''}, 'applied_time_extras': {}, 'columns': ['global_sales'], 'metrics': [{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}], 'orderby': [[{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}, False]], 'annotation_layers': [], 'row_limit': 10000, 'series_columns': [], 'timeseries_limit': 0, 'order_desc': True, 'url_params': {'native_filters_key': '23-Kwo7HXWYNfcxZcQIBEVtlAVZ_j7svt-fPfXkyfelI94CrjH2dvPmRJXALe3xW'}, 'custom_params': {}, 'custom_form_data': {}, 'is_timeseries': False, 'time_offsets': [], 'post_processing': [{'operation': 'pivot', 'options': {'index': ['global_sales'], 'columns': [], 'aggregates': {'SUM(na_sales)': {'operator': 'mean'}}, 'drop_missing_columns': False, 'flatten_columns': False, 'reset_index': False}}, {'operation': 'flatten'}]}], 'form_data': {'datasource': '22__table', 'viz_type': 'echarts_timeseries_line', 'slice_id': 134, 'url_params': {'native_filters_key': '23-Kwo7HXWYNfcxZcQIBEVtlAVZ_j7svt-fPfXkyfelI94CrjH2dvPmRJXALe3xW'}, 'granularity_sqla': 'year', 'time_grain_sqla': 'P1D', 'time_range': 'No filter', 'x_axis': 'global_sales', 'metrics': [{'aggregate': 'SUM', 'column': {'advanced_data_type': None, 'certification_details': None, 'certified_by': None, 'column_name': 'na_sales', 'description': None, 'expression': None, 'filterable': True, 'groupby': True, 'id': 751, 'is_certified': False, 'is_dttm': False, 'python_date_format': None, 'type': 'FLOAT64', 'type_generic': 0, 'verbose_name': None, 'warning_markdown': None}, 'expressionType': 'SIMPLE', 'hasCustomLabel': False, 'isNew': False, 'label': 'SUM(na_sales)', 'optionName': 'metric_zq0nbyks6tf_6d789rpnyy6', 'sqlExpression': None}], 'groupby': [], 'adhoc_filters': [], 'order_desc': True, 'row_limit': 10000, 'truncate_metric': True, 'comparison_type': 'values', 'annotation_layers': [], 'forecastPeriods': 10, 'forecastInterval': 0.8, 'x_axis_title_margin': 15, 'y_axis_title_margin': 15, 'y_axis_title_position': 'Left', 'color_scheme': 'supersetColors', 'only_total': True, 'markerSize': 6, 'show_legend': True, 'legendType': 'scroll', 'legendOrientation': 'top', 'x_axis_time_format': 'smart_date', 'rich_tooltip': True, 'tooltipTimeFormat': 'smart_date', 'y_axis_format': 'SMART_NUMBER', 'y_axis_bounds': [None, None], 'extra_form_data': {}, 'label_colors': {}, 'shared_label_colors': {}, 'extra_filters': [], 'dashboardId': 11, 'force': None, 'result_format': 'json', 'result_type': 'full'}, 'result_format': 'json', 'result_type': 'full', 'viz_type': 'echarts_timeseries_line'}
 
         #json_body['form_data']['extra_form_data']['custom_form_data'] = {'data_source': 22, 'viz_type': 'echarts_timeseries_line', 'col': 'eu_sales'}
         #json_body['form_data']['extra_form_data']['custom_form_data'][0]['datasetOverride']['datasetId'] = 22
@@ -236,15 +236,23 @@ class ChartDataRestApi(ChartRestApi):
             if 'datasetOverride' in custom_params:
                 json_body['datasource']['id'] = custom_params['datasetOverride']['datasetId']
 
-        dataset_id = json_body['datasource']['id']
+            dataset_id = json_body['datasource']['id']
 
-        sample = SamplesDatasetCommand(g.user, dataset_id, True).run()
+            sample = SamplesDatasetCommand(g.user, dataset_id, True).run()
 
-        if json_body['viz_type'] == 'cccs_grid':
-            json_body['queries'][0]['columns'] = sample['data'][0].keys()
+            if json_body['viz_type'] == 'cccs_grid':
+                json_body['queries'][0]['columns'] = sample['colnames']
 
-        if 'selectors' in custom_params:
-            adv_type_do_sql = True
+            temp_col = [cn for cn in sample['colnames'] if str(sample['coltypes'][sample['colnames'].index(cn)]) == 'GenericDataType.TEMPORAL']
+            if len(temp_col) > 0:
+                temp_col = temp_col[0]
+                if 'timeSince' in  custom_params and custom_params['timeSince'] != '':
+                    json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '>=', 'val': [custom_params['timeSince']]})
+                if 'timeUntil' in custom_params and custom_params['timeUntil'] != '':
+                    json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '<=', 'val': [custom_params['timeUntil']]})
+                
+            if 'selectors' in custom_params:
+                adv_type_do_sql = True
 
         try:
             query_context = self._create_query_context_from_form(json_body)
@@ -252,15 +260,18 @@ class ChartDataRestApi(ChartRestApi):
             if adv_type_do_sql:
                 list_of_big_queries = []
                 for adv_type, adv_filter_val in custom_params['selectors'].items():
-                        if adv_type in sample['coladvtypes']:
-                            adv_cols = [cn for cn in sample['colnames'] if sample['coladvtypes'][sample['colnames'].index(cn)] == adv_type]
-                            list_of_queries = []
-                            for col in adv_cols:
-                                list_of_queries.append(col + ' = ' + str(adv_filter_val))
-                            list_of_big_queries.append('(' + ' OR '.join(list_of_queries) + ')')
+                    if adv_type == '' or adv_filter_val == '': #re move check later if no longer hard coded
+                        break
+                    if adv_type in sample['coladvtypes']:
+                        adv_cols = [cn for cn in sample['colnames'] if sample['coladvtypes'][sample['colnames'].index(cn)] == adv_type]
+                        list_of_queries = []
+                        for col in adv_cols:
+                            adv_filter_vals = adv_filter_val.split(', ')
+                            for adfv in adv_filter_vals:
+                                list_of_queries.append(col + ' = ' + str(adfv))
+                        list_of_big_queries.append('(' + ' OR '.join(list_of_queries) + ')')
 
                 query_context.queries[0].extras['where'] = ' AND '.join(list_of_big_queries)
-
             command = ChartDataCommand(query_context)
             command.validate()
         except QueryObjectValidationError as error:

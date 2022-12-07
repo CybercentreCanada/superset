@@ -205,6 +205,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   let columnDefs: Column[] = [];
 
   if (query_mode === QueryMode.raw) {
+    // Hacky way to reset the columns based on the data
+    if (data.length > 0) {
+      const firstRow = data[0];
+      formData.columns = Object.keys(firstRow);
+    }
+
     columnDefs = formData.columns.map((column: any) => {
       const columnType = columnTypeMap[column];
       const columnAdvancedType = columnAdvancedTypeMap[column];

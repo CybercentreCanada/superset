@@ -51,18 +51,20 @@ export const getDrilldownExtraFormData = (
   datasetId: number,
   selectorType: string,
   selectorValue: string,
-  timeRangeValue: string,
+  since: string,
+  until: string,
 ) => {
   const selectors = {};
   selectors[selectorType] = selectorValue;
   const extra: ExtraFormData = {};
-  extra.time_range = timeRangeValue;
   extra.custom_form_data = [
     {
       datasetOverride: {
         datasetId,
       },
       selectors,
+      timeSince: since,
+      timeUntil: until,
     },
   ];
   return extra;

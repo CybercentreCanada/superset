@@ -23,3 +23,13 @@ export default function getDirectPathToTabIndex(tabsComponent, tabIndex) {
 
   return directPathToFilter;
 }
+
+
+export function getIndirectPathToTabIndex(tabsComponent, tabIds, tabIndex) {
+  const directPathToFilter = (tabsComponent.parents || []).slice();
+  directPathToFilter.push(tabsComponent.id);
+  // directPathToFilter.push(tabsComponent.children[tabIndex]);
+  directPathToFilter.push(tabIds[tabIndex]);
+
+  return directPathToFilter;
+}

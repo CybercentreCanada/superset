@@ -219,6 +219,11 @@ const publishDataMask = debounce(
   SLOW_DEBOUNCE,
 );
 
+export const tabHideApply = () => ({
+  type: 'TAB_HIDE_APPLY',
+  payload: {},
+});
+
 export const FilterBarScrollContext = createContext(false);
 const FilterBar: React.FC<FiltersBarProps> = ({
   filtersOpen,
@@ -320,6 +325,7 @@ const FilterBar: React.FC<FiltersBarProps> = ({
   }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
 
   const handleApply = useCallback(() => {
+    dispatch(tabHideApply());
     const filterIds = Object.keys(dataMaskSelected);
     setUpdateKey(1);
     filterIds.forEach(filterId => {
