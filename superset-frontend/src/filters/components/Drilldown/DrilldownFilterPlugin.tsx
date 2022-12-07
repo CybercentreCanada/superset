@@ -54,9 +54,6 @@ import { PluginFilterDatasetProps } from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
 import { getDataRecordFormatter, getDrilldownExtraFormData } from '../../utils';
 
-// KTODO: this will need to be changed.
-const DEFAULT_DATASET = { label: 'KRAGLE KTODO', value: 25 };
-
 type DataMaskAction =
   | { type: 'ownState'; ownState: JsonObject }
   | {
@@ -104,7 +101,7 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
     appSection,
   } = props;
   const { defaultToFirstItem } = formData;
-  const [datasetId, setDatasetId] = useState<number>(DEFAULT_DATASET.value);
+  const [datasetId, setDatasetId] = useState<number>(-1);
   const [selectorType, setSelectorType] = useState<string>('');
   const [selectorValue, setSelectorValue] = useState<string>('');
   const [since, setSince] = useState<string>('');
@@ -306,7 +303,6 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
           onChange={(value: { label: string; value: number }) => {
             setDatasetId(value.value);
           }}
-          value={{ ...DEFAULT_DATASET }}
         />
       </StyledFormItem>
       <StyledFormItem
