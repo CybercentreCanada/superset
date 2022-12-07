@@ -260,13 +260,13 @@ class ChartDataRestApi(ChartRestApi):
             if adv_type_do_sql:
                 list_of_big_queries = []
                 for adv_type, adv_filter_val in custom_params['selectors'].items():
-                    adv_filter_vals = adv_filter_val.split(', ')
                     if adv_type == '' or adv_filter_val == '': #re move check later if no longer hard coded
                         break
                     if adv_type in sample['coladvtypes']:
                         adv_cols = [cn for cn in sample['colnames'] if sample['coladvtypes'][sample['colnames'].index(cn)] == adv_type]
                         list_of_queries = []
                         for col in adv_cols:
+                            adv_filter_vals = adv_filter_val.split(', ')
                             for adfv in adv_filter_vals:
                                 list_of_queries.append(col + ' = ' + str(adfv))
                         list_of_big_queries.append('(' + ' OR '.join(list_of_queries) + ')')
