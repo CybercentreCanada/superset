@@ -248,7 +248,7 @@ class ChartDataRestApi(ChartRestApi):
                 temp_col = temp_col[0]
                 if 'timeSince' in  custom_params and custom_params['timeSince'] != '':
                     json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '>=', 'val': [custom_params['timeSince']]})
-                if 'timeUntil' in custom_params custom_params['timeUntil'] != '':
+                if 'timeUntil' in custom_params and custom_params['timeUntil'] != '':
                     json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '<=', 'val': [custom_params['timeUntil']]})
                 
             if 'selectors' in custom_params:
