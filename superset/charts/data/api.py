@@ -241,7 +241,7 @@ class ChartDataRestApi(ChartRestApi):
             sample = SamplesDatasetCommand(g.user, dataset_id, True).run()
 
             if json_body['viz_type'] == 'cccs_grid':
-                json_body['queries'][0]['columns'] = sample['data'][0].keys()
+                json_body['queries'][0]['columns'] = sample['colnames']
 
             temp_col = [cn for cn in sample['colnames'] if str(sample['coltypes'][sample['colnames'].index(cn)]) == 'GenericDataType.TEMPORAL']
             if len(temp_col) > 0:
