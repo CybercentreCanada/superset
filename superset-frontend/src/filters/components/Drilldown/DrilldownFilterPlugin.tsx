@@ -49,9 +49,13 @@ import rison from 'rison';
 import { DEFAULT_TIME_RANGE } from 'src/explore/constants';
 import { useDebouncedEffect } from 'src/explore/exploreUtils';
 import { SLOW_DEBOUNCE } from 'src/constants';
+import { useDispatch } from 'react-redux';
 import { PluginFilterDatasetProps } from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
 import { getDataRecordFormatter, getDrilldownExtraFormData } from '../../utils';
+
+// KTODO: this will need to be changed.
+const DEFAULT_DATASET = { label: 'KRAGLE KTODO', value: 25 };
 
 type DataMaskAction =
   | { type: 'ownState'; ownState: JsonObject }
@@ -83,6 +87,11 @@ function reducer(
   }
 }
 
+export const tabHideUpdate = (selectorType: string) => ({
+  type: 'TAB_HIDE_UPDATE',
+  payload: { selectorType },
+});
+
 export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
   const {
     filterState,
@@ -95,13 +104,14 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
     appSection,
   } = props;
   const { defaultToFirstItem } = formData;
-  const [datasetId, setDatasetId] = useState<number>(-1);
+  const [datasetId, setDatasetId] = useState<number>(DEFAULT_DATASET.value);
   const [selectorType, setSelectorType] = useState<string>('');
   const [selectorValue, setSelectorValue] = useState<string>('');
   const [since, setSince] = useState<string>('');
   const [until, setUntil] = useState<string>('');
   const [retSince, setRetSince] = useState<string>('');
   const [retUntil, setRetUntil] = useState<string>('');
+  const dispatch = useDispatch();
 
   const [columns, setColumns] = useState<[{ advanced_data_type: string }]>();
   const [dataMask, dispatchDataMask] = useImmerReducer(reducer, {
@@ -111,6 +121,7 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
 
   useEffect(() => {
     // Hacky way to set filterState, to update the "Apply Filters" button
+    dispatch(tabHideUpdate(selectorType));
 
     // Had issues with "Object is not extensible" when "since" and "until" are filled at the same time
     if (
@@ -123,10 +134,20 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
       datasetId,
       selectorType,
       selectorValue,
+      since,
+      until,
       retSince,
       retUntil,
     };
-  }, [datasetId, selectorType, selectorValue, retSince, retUntil]);
+  }, [
+    datasetId,
+    selectorType,
+    selectorValue,
+    since,
+    until,
+    retSince,
+    retUntil,
+  ]);
 
   const [lastFetchedTimeRange, setLastFetchedTimeRange] =
     useState(DEFAULT_TIME_RANGE);
@@ -212,9 +233,13 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
       );
       if (response?.json?.result?.since) {
         setRetSince(response.json.result.since);
+      } else {
+        setRetSince('');
       }
       if (response?.json?.result?.until) {
         setRetUntil(response.json.result.until);
+      } else {
+        setRetUntil('');
       }
       return {
         value: formatTimeRange(timeRangeString),
@@ -281,7 +306,7 @@ export default function PluginFilterDataset(props: PluginFilterDatasetProps) {
           onChange={(value: { label: string; value: number }) => {
             setDatasetId(value.value);
           }}
-          value={{ label: 'None', value: -1 }}
+          value={{ ...DEFAULT_DATASET }}
         />
       </StyledFormItem>
       <StyledFormItem
