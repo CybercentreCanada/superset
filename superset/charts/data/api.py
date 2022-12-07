@@ -227,7 +227,7 @@ class ChartDataRestApi(ChartRestApi):
 
         #json_body['form_data']['extra_form_data']['custom_form_data'] = {'data_source': 22, 'viz_type': 'echarts_timeseries_line', 'col': 'eu_sales'}
         #json_body['form_data']['extra_form_data']['custom_form_data'][0]['datasetOverride']['datasetId'] = 22
-        #json_body['form_data']['extra_form_data'] = {'custom_form_data': [{'selectors': {'port': 33}}]}
+        json_body['form_data']['extra_form_data'] = {'custom_form_data': [{'selectors': {'port': 33}}]}
 
         adv_type_do_sql = False
 
@@ -246,15 +246,13 @@ class ChartDataRestApi(ChartRestApi):
             temp_col = [cn for cn in sample['colnames'] if str(sample['coltypes'][sample['colnames'].index(cn)]) == 'GenericDataType.TEMPORAL']
             if len(temp_col) > 0:
                 temp_col = temp_col[0]
-                if custom_params['timeSince'] != '':
+                if 'timeSince' in  custom_params and custom_params['timeSince'] != '':
                     json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '>=', 'val': [custom_params['timeSince']]})
-                if custom_params['timeUntil'] != '':
+                if 'timeUntil' in custom_params custom_params['timeUntil'] != '':
                     json_body['queries'][0]['filters'].append({'col': temp_col, 'op': '<=', 'val': [custom_params['timeUntil']]})
                 
             if 'selectors' in custom_params:
                 adv_type_do_sql = True
-
-        print('oh no', json_body['queries'])
 
         try:
             query_context = self._create_query_context_from_form(json_body)
