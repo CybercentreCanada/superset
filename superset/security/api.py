@@ -170,6 +170,7 @@ class UsersApi(BaseSupersetModelRestApi):
     datamodel = SQLAInterface(security_manager.user_model)
 
     resource_name = "users"
+    allow_browser_login = True
     method_permission_name = MODEL_API_RW_METHOD_PERMISSION_MAP
     include_route_methods = {RouteMethod.GET_LIST, RouteMethod.GET, RouteMethod.DELETE}
     openapi_spec_tag = "Users"
