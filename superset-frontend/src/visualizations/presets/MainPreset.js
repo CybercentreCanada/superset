@@ -69,6 +69,7 @@ import {
   EchartsTreeChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
+  AdhocFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
@@ -89,6 +90,7 @@ import {
   AtAGlanceUserIdChartPlugin,
   AtAGlanceUserIDSasChartPlugin,
   ApplicationLinksChartPlugin,
+  IFrameVisualizationChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable';
@@ -116,6 +118,7 @@ export default class MainPreset extends Preset {
         }),
         new AtAGlanceChartIpPlugin().configure({ key: 'at_a_glance_ip' }),
         new AtAGlanceChartDnsPlugin().configure({ key: 'at_a_glance_dns' }),
+        new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new GwwkChartsChartPlugin().configure({ key: 'gwwk_charts' }),
         new GwwkDatasetsChartPlugin().configure({ key: 'gwwk_datasets' }),
         new GwwkDashboardsChartPlugin().configure({ key: 'gwwk_dashboards' }),
@@ -183,6 +186,7 @@ export default class MainPreset extends Preset {
         new EchartsTimeseriesStepChartPlugin().configure({
           key: 'echarts_timeseries_step',
         }),
+        new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),
