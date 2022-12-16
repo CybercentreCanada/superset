@@ -8,5 +8,6 @@ python-json-logger==2.0.2
 trino==0.318.0
 mysql-connector-python==8.0.33
 elasticsearch-dbapi==0.2.10
+sqlalchemy-kusto>=2.0.0
 cachetools~=5.0.0
 typing-extensions>=4, <5
