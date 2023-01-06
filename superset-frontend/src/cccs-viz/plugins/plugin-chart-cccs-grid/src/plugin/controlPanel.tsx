@@ -45,7 +45,7 @@ import {
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
-import DrillActionConfig from '../components/controls/DrillActionConfigControll';
+import DrillActionConfig from '../components/controls/JumpActionConfigControll';
 
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
@@ -570,12 +570,9 @@ config.controlPanelSections.push({
         name: 'drill_action_configs',
         config: {
           type: DrillActionConfig,
-          freeForm: true,
           renderTrigger: true,
-          label: t('Drill Action Configs'),
-          default: 0,
-          choices: PAGE_SIZE_OPTIONS,
-          description: t('Rows per page, 0 means no pagination'),
+          label: t('Jump Actions'),
+          description: t('Configure dashboard jump actions.'),
         },
       },
     ],

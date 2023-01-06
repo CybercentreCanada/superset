@@ -82,7 +82,7 @@ export default function CccsGrid({
   column_state,
   filters: initialFilters = {},
   datasetColumns,
-  drillActionConfigs,
+  jumpActionConfigs,
 }: CccsGridTransformedProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
   const dispatch = useDispatch();
@@ -138,6 +138,13 @@ export default function CccsGrid({
       return `${e.toString()}`
     }) 
     const navtiveFilter = {
+      extraFormData: {
+        filters: [
+          {col: column,
+          op: "IN",
+          val: stringSelectedData}
+        ]
+      },
       filterState: {
         label: stringSelectedData,
         validateStatus: false,
@@ -148,17 +155,17 @@ export default function CccsGrid({
     }
    return navtiveFilter
   } 
-  const getDrillToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
+  const getJumpToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
     
     let sub_menu: any = []
-    console.log(drillActionConfigs)
-    for (let key in drillActionConfigs) {
+    console.log(jumpActionConfigs)
+    for (let key in jumpActionConfigs) {
           
-      let advancedDataTypeNativeFilters = drillActionConfigs[key];
+      let advancedDataTypeNativeFilters = jumpActionConfigs[key];
       let nativeFilterUrls: any = {};
-      let drillActionName: string = ""
+      let jumpActionName: string = ""
       advancedDataTypeNativeFilters.forEach((element: any) => {
-        drillActionName = element.name
+        jumpActionName = element.name
         let advancedDataType = element['advancedDataType'];
         let nativefilters: any[] = element["nativefilters"];
         let selectedDataForUrl = selectedData[advancedDataType];
@@ -181,7 +188,7 @@ export default function CccsGrid({
         }
         
         let DashboardMenuItem = {
-          name: drillActionName,
+          name: jumpActionName,
           action
         }
     
@@ -190,7 +197,7 @@ export default function CccsGrid({
     
     }
       
-    const menu = {name: "Drill to dashboard", subMenu: sub_menu, disabled: sub_menu.length < 1}  
+    const menu = {name: "Jump to dashboard", subMenu: sub_menu, disabled: sub_menu.length < 1}  
     return [ menu ]
   }
 
@@ -222,7 +229,7 @@ export default function CccsGrid({
       } 
       console.log(selectedDataByAdvancedType)
       result = result.concat(
-        getDrillToDashboardContextMenuItems(selectedDataByAdvancedType)
+        getJumpToDashboardContextMenuItems(selectedDataByAdvancedType)
       )
       result = result.concat(
         [
@@ -296,15 +303,28 @@ export default function CccsGrid({
 
         const endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
         for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+
+
+          const rowNode  = gridApi.getModel().getRow(rowIndex)
           const value = gridApi.getValue(
             column,
-            gridApi.getModel().getRow(rowIndex),
+            rowNode,
           );
+          
+          const valueRendererName = column.colDef.cellRenderer
+          let valueRendererObjt = null
+          let renderedValue = null
+          if (valueRendererName) {
+            const valueRenderer = valueRendererName ? frameworkComponents[valueRendererName] : undefined
+            valueRendererObjt = new valueRenderer({value, valueFormatted: null})
+          }
+          renderedValue = valueRendererObjt ? valueRendererObjt.render() : value
+
           if (!updatedSelectedData[col].includes(value)) {
             updatedSelectedData[col].push(value);
           }
-          if (!newSelectedbyAdvancedType[advancedDataType].includes(value)) {
-            newSelectedbyAdvancedType[advancedDataType].push(value);
+          if (!newSelectedbyAdvancedType[advancedDataType].includes(renderedValue)) {
+            newSelectedbyAdvancedType[advancedDataType].push(renderedValue);
           }
         }
       });

@@ -82,7 +82,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_grouping,
     column_state,
     enable_row_numbers,
-    drill_action_configs,
+    jump_action_configs,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
@@ -315,21 +315,21 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
-  let parsed_drill_action_configs = {}
-  console.log(drill_action_configs)
-  drill_action_configs?.forEach( (e: any) =>
+  let parsed_jump_action_configs = {}
+  console.log(jump_action_configs)
+  jump_action_configs?.forEach( (e: any) =>
   {
-    if (e.dashboardID in parsed_drill_action_configs) {
-      parsed_drill_action_configs[e.dashboardID].concat({
+    if (e.dashboardID in parsed_jump_action_configs) {
+      parsed_jump_action_configs[e.dashboardID].concat({
         advancedDataType: e.advancedDataType,
         nativefilters: e.filters,
         name: e.dashBoardName
       })
     }
     else {
-      parsed_drill_action_configs[e.dashboardID] = [{
+      parsed_jump_action_configs[e.dashboardID] = [{
         advancedDataType: e.advancedDataType,
-        nativefilterIDs: e.filterIDs,
+        nativefilters: e.filters,
         name: e.dashBoardName
       }]
     }
@@ -354,6 +354,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     column_state,
     agGridLicenseKey,
     datasetColumns: columns,
-    drillActionConfigs: parsed_drill_action_configs
+    jumpActionConfigs: parsed_jump_action_configs
   };
 }

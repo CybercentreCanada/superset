@@ -19,12 +19,19 @@
 
 import React, { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
-import { t, withTheme } from '@superset-ui/core';
+import { styled, t, withTheme, SupersetTheme } from '@superset-ui/core';
 import AsyncEsmComponent from 'src/components/AsyncEsmComponent';
 import { List } from 'src/components';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover'
 import { connect } from 'react-redux';
-
+import {
+  AddControlLabel,
+  AddIconButton,
+  HeaderContainer,
+  LabelsContainer,
+} from 'src/explore/components/controls/OptionControls'
+import Icons from 'src/components/Icons';
+import ControlHeader from 'src/explore/components/ControlHeader';
 
 export interface Props {
     colorScheme: string;
@@ -39,10 +46,9 @@ export interface Props {
     value?: object[];
     onChange: (a: any) => void,
 };
-  
 
 const DrillActionConfig = AsyncEsmComponent(
-  () => import('./DrillActionConfig'),
+  () => import('./JumpActionConfig'),
   // size of overlay inner content
   () => <div style={{ width: 450, height: 368 }} />,
 );
@@ -59,7 +65,6 @@ const DrillActionConfig = AsyncEsmComponent(
     name,
     actions,
     onChange,
-    label,
     value = [],
     ...props
   }
@@ -125,7 +130,7 @@ const DrillActionConfig = AsyncEsmComponent(
       <ControlPopover
         key={i}
         trigger="click"
-        title={t('Edit Drill Action Config')}
+        title={t('Edit Jump Action')}
         css={theme => ({
           '&:hover': {
             cursor: 'pointer',
@@ -140,36 +145,46 @@ const DrillActionConfig = AsyncEsmComponent(
         onVisibleChange={visible => handleVisibleChange(visible, i)}
       >
         <CustomListItem selectable>
-          <span>{anno.name}</span>
+          <i
+              onClick={() => removeDrillActionConfig(anno)}
+              data-test="add-annotation-layer-button"
+              className="fa fa-times"
+          />{' '}
+          &nbsp; {anno.name}
         </CustomListItem>
       </ControlPopover>
     ));
 
     const addLayerPopoverKey = 'add';
     return (
-      <div>
-        <List bordered css={theme => ({ borderRadius: theme.gridUnit })}>
-          {drillactionConfigs}
-          <ControlPopover
-            trigger="click"
-            content={renderPopover(addLayerPopoverKey, addedDrillActionConfig)}
-            title={t('Add Drill Action Config')}
-            visible={visiblePopoverIndex === addLayerPopoverKey}
-            destroyTooltipOnHide
-            onVisibleChange={visible =>
-              handleVisibleChange(visible, addLayerPopoverKey)
-            }
-          >
-            <CustomListItem selectable>
-              <i
-                data-test="add-annotation-layer-button"
-                className="fa fa-plus"
-              />{' '}
-              &nbsp; {t('Add Drill Action Config')}
-            </CustomListItem>
-          </ControlPopover>
-        </List>
-      </div>
+      <>
+        <HeaderContainer>
+          <ControlHeader {...props} />
+        </HeaderContainer>
+        <LabelsContainer>
+            <List bordered css={theme => ({ borderRadius: theme.gridUnit })}>
+              {drillactionConfigs}
+              <ControlPopover
+                trigger="click"
+                content={renderPopover(addLayerPopoverKey, addedDrillActionConfig)}
+                title={t('Add Jump Action')}
+                visible={visiblePopoverIndex === addLayerPopoverKey}
+                destroyTooltipOnHide
+                onVisibleChange={visible =>
+                  handleVisibleChange(visible, addLayerPopoverKey)
+                }
+              >
+                <CustomListItem selectable>
+                  <i
+                    data-test="add-annotation-layer-button"
+                    className="fa fa-plus"
+                  />{' '}
+                  &nbsp; {t('Add Jump Action')}
+                </CustomListItem>
+              </ControlPopover>
+            </List>
+          </LabelsContainer>
+        </>
     );
  }
 

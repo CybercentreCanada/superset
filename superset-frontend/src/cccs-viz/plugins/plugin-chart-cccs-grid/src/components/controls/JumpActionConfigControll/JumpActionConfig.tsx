@@ -8,6 +8,7 @@ import {
     SupersetClient,
     validateNonEmpty,
     withTheme,
+    SupersetTheme
   } from '@superset-ui/core';
 
 
@@ -111,8 +112,9 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
             const element: any = (dashboardList || []).find(
                 (e: any) => e.value === selectedDashboardID
             )
+            const advancedDataTypeNameLabel = bootstrapData?.common?.advanced_data_types.find( (e: { id: string; }) => e.id === advancedDataTypeName)?.verbose_name || advancedDataTypeName
             const selectedFiltersWithColumn = filterList.filter( (filter: any) => selectedFilters.includes(filter.value) )
-            const name = `${ element?.label } | ${ advancedDataTypeName }`
+            const name = `${ element?.label } | ${ advancedDataTypeNameLabel }`
             const newDrillActionConfig = {
                 dashboardID: selectedDashboardID,
                 filters: selectedFiltersWithColumn,
@@ -131,16 +133,15 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
         props.close();
     }
 
-
+    const onDashboardChange = (v: any) => {
+        setSelectedDashboardID(v)
+        setSelectedFilters([])
+    }
     return(
-        <>
-        <div style={{ marginRight: '2rem' }}>
-            <PopoverSection
-            isSelected
-            title={'Configure'}
-            info={'Configure the basics of your Drill action.'}
-            >
+        <div style={{ width: 400 }}>
+        <div style={{ width: '9000', paddingBottom: 25 }}>
                 <SelectControl
+                    css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
                     ariaLabel={t('Annotation layer value')}
                     name="annotation-layer-value"
                     label={t('DashBoard')}
@@ -149,9 +150,10 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     placeholder=""
                     options={dashboardList}
                     value={selectedDashboardID}
-                    onChange={setSelectedDashboardID}
+                    onChange={onDashboardChange}
                 />
                 <SelectControl
+                    style = {{length: '100%'}}
                     ariaLabel={'Advanced Data Type Name'}
                     name="advanced-data-type-value"
                     label={'Advanced Data Type Name'}
@@ -179,7 +181,6 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                     value={selectedFilters}
                     onChange={setSelectedFilters}
                 />
-            </PopoverSection>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             {isNew ? (
@@ -203,7 +204,7 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                 </Button>
             </div>
         </div>
-        </>
+        </div>
     );
 
 }

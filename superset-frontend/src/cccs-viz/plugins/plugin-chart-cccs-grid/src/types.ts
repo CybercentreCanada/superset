@@ -38,7 +38,7 @@ export type CccsGridQueryFormData = QueryFormData & {
   enable_grouping: boolean;
   column_state: ColumnState[];
   enable_row_numbers: boolean;
-  drill_action_configs?: any[];
+  jump_action_configs?: any[];
 };
 
 export interface CccsGridStylesProps {
@@ -87,7 +87,7 @@ export interface CccsGridTransformedProps extends CccsGridStylesProps {
   // add typing here for the props you pass in from transformProps.ts!
   agGridLicenseKey: string;
   datasetColumns: Column[];
-  drillActionConfigs?: any[]
+  jumpActionConfigs?: any[]
 }
 
 export type EventHandlers = Record<string, { (props: any): void }>;
