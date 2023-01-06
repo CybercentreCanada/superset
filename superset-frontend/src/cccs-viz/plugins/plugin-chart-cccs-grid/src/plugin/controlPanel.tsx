@@ -567,7 +567,7 @@ config.controlPanelSections.push({
     ],
     [
       {
-        name: 'drill_action_configs',
+        name: 'jump_action_configs',
         config: {
           type: DrillActionConfig,
           renderTrigger: true,
