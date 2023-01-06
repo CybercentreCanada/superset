@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import { bootstrapData } from 'src/preamble';
-import PopoverSection from 'src/components/PopoverSection';
 import Button from 'src/components/Button';
 import {
     t,

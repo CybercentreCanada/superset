@@ -19,18 +19,15 @@
 
 import React, { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
-import { styled, t, withTheme, SupersetTheme } from '@superset-ui/core';
+import { t, withTheme } from '@superset-ui/core';
 import AsyncEsmComponent from 'src/components/AsyncEsmComponent';
 import { List } from 'src/components';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover'
 import { connect } from 'react-redux';
 import {
-  AddControlLabel,
-  AddIconButton,
   HeaderContainer,
   LabelsContainer,
 } from 'src/explore/components/controls/OptionControls'
-import Icons from 'src/components/Icons';
 import ControlHeader from 'src/explore/components/ControlHeader';
 
 export interface Props {
