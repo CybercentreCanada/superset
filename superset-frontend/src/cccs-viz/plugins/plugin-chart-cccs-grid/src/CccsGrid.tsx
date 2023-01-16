@@ -158,7 +158,6 @@ export default function CccsGrid({
   const getJumpToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
     
     let sub_menu: any = []
-    console.log(jumpActionConfigs)
     for (let key in jumpActionConfigs) {
           
       let advancedDataTypeNativeFilters = jumpActionConfigs[key];
@@ -172,7 +171,7 @@ export default function CccsGrid({
         
         if (selectedDataForUrl && nativefilters) {
           nativefilters.forEach( filter => {
-            nativeFilterUrls[filter["value"]] = generateNativeFilterUrlString(filter["value"], selectedDataForUrl, filter["column"])
+            nativeFilterUrls[filter["value"]] =  generateNativeFilterUrlString(filter["value"], selectedDataForUrl, filter["column"])
           });
         }
 
@@ -183,7 +182,6 @@ export default function CccsGrid({
         let action = () => {
           let baseUrl =  location.protocol + '//' + location.host;
           let url = `${baseUrl}/superset/dashboard/${key}/?native_filters=${rison.encode(nativeFilterUrls)}`
-          console.log(url)
           window.open(url, '_blank');
         }
         
@@ -227,7 +225,6 @@ export default function CccsGrid({
             ]
         )
       } 
-      console.log(selectedDataByAdvancedType)
       result = result.concat(
         getJumpToDashboardContextMenuItems(selectedDataByAdvancedType)
       )

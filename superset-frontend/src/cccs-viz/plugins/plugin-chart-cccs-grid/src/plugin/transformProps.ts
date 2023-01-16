@@ -316,11 +316,10 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     } as any);
   }
   let parsed_jump_action_configs = {}
-  console.log(jump_action_configs)
   jump_action_configs?.forEach( (e: any) =>
   {
     if (e.dashboardID in parsed_jump_action_configs) {
-      parsed_jump_action_configs[e.dashboardID].concat({
+      parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[e.dashboardID].concat({
         advancedDataType: e.advancedDataType,
         nativefilters: e.filters,
         name: e.dashBoardName

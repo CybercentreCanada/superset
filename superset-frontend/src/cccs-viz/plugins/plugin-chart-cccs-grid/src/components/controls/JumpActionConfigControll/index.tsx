@@ -107,6 +107,7 @@ const DrillActionConfig = AsyncEsmComponent(
           <DrillActionConfig
             {...drillActionConfig}
             error={error}
+            visiblePopoverIndex={visiblePopoverIndex}
             addDrillActionConfig={(newAnnotation: any) =>
               addDrillActionConfig(drillActionConfig, newAnnotation)
             }
@@ -115,6 +116,7 @@ const DrillActionConfig = AsyncEsmComponent(
               handleVisibleChange(false, popoverKey);
               setState({...state, addedDrillActionConfigIndex: -1 });
             }}
+            visi
           />
         </div>
       );

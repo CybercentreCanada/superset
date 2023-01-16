@@ -18,7 +18,7 @@ interface Props {
     filters: any[];
     advancedDataType: string;
     error: string;
-    
+    visiblePopoverIndex: number;
     close: () => void;
     addDrillActionConfig: (drillactionConfig: any) => boolean;
     removeDrillActionConfig: () => boolean
@@ -33,7 +33,6 @@ const useDashboardState = () => {
         const endpoint = `/api/v1/dashboard`;
         SupersetClient.get({ endpoint }).then(
             ({json}) => {
-                console.log(json)
                 const dashboards = json.result.filter( (e: any) => {          
                     return JSON.parse((e.json_metadata))?.native_filter_configuration
                 })
@@ -54,7 +53,6 @@ const useDashboardState = () => {
                 const metadata = JSON.parse((json.result.json_metadata))
 
                 setFilterList(metadata?.native_filter_configuration.map( (e: any) => {
-                    console.log(e);
                     return {value: e.id, label: e.name, column: e?.targets[0].column?.name || "" }
                 }))
 
@@ -71,7 +69,7 @@ const useDashboardState = () => {
 }
 
 const DrillActionConfig: React.FC<Props> = (props : Props) => {
-    const {dashboardID, filters, advancedDataType } =  props
+    const {dashboardID, filters, advancedDataType, visiblePopoverIndex } =  props
 
     const {dashboardList, filterList, fetchDashboardList, fetchFilterList} = useDashboardState()
     
@@ -86,6 +84,13 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
         isNew: !props.dashboardID,
     })
     
+    useEffect (()=> {
+        setSelectedFilters(filters?.map( (filter: any) => filter.value) || [])
+        setSelectedDashboardID(dashboardID)
+        setAdvancedDataTypeName(advancedDataType)
+    }, [dashboardID, filters, advancedDataType, visiblePopoverIndex]
+    
+    )
     useEffect(() => {
         fetchDashboardList()
     },[fetchDashboardList] )
