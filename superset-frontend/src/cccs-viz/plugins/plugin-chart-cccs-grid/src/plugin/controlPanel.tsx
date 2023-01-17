@@ -103,18 +103,6 @@ const validateAggControlValues = (
     : [];
 };
 
-const validateAggColumnValues = (
-  controls: ControlStateMapping,
-  values: any[],
-  state: ControlPanelState,
-) => {
-  const result = validateAggControlValues(controls, values);
-  if (result.length === 0 && isAggMode({ controls })) {
-    return [];
-  }
-  return result;
-};
-
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
 //     //console.log(v.trim());
@@ -239,13 +227,8 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: [
-                'metrics',
-                'percent_metrics',
-                'principalEmitFilterColumn',
-              ],
-              canCopy: true,
-            } as typeof sharedControls.groupby,
+              rerender: ['metrics', 'percent_metrics'],
+            },
           },
         ],
         [
@@ -437,8 +420,9 @@ const config: ControlPanelConfig = {
                     controlState: ControlState,
                   ) => {
                     const { controls } = state;
-                    const originalMapStateToProps =
-                      sharedControls?.columns?.mapStateToProps;
+                    const originalMapStateToProps = isRawMode({ controls })
+                      ? sharedControls?.columns?.mapStateToProps
+                      : sharedControls?.groupby?.mapStateToProps;
                     const newState =
                       originalMapStateToProps?.(state, controlState) ?? {};
                     const choices = isRawMode({ controls })
