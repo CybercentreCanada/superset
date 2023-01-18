@@ -156,7 +156,7 @@ export default function CccsGrid({
     }
    return navtiveFilter
   } 
-  const getJumpToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }): (string | MenuItemDef)[] => {
+  const getJumpToDashboardContextMenuItems = (selectedData: {[key: string]: string[] }, disableOveride: boolean): (string | MenuItemDef)[] => {
     
     let sub_menu: any = []
     for (let key in jumpActionConfigs) {
@@ -196,7 +196,7 @@ export default function CccsGrid({
     
     }
       
-    const menu = {name: "Jump to dashboard", subMenu: sub_menu, disabled: sub_menu.length < 1}  
+    const menu = {name: "Jump to dashboard", subMenu: sub_menu, disabled: disableOveride || sub_menu.length < 1, icon: '<span class="ag-icon ag-icon-pivot" unselectable="on" role="presentation"></span>' }  
     return [ menu ]
   }
 
@@ -239,7 +239,7 @@ export default function CccsGrid({
         )
       } 
       result = result.concat(
-        getJumpToDashboardContextMenuItems(selectedDataByAdvancedType)
+        getJumpToDashboardContextMenuItems(selectedDataByAdvancedType, (params.value === null))
       )
       result = result.concat(
         [

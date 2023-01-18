@@ -143,7 +143,7 @@ const DrillActionConfig = AsyncEsmComponent(
         visible={visiblePopoverIndex === i}
         onVisibleChange={visible => handleVisibleChange(visible, i)}
       >
-        <CustomListItem selectable>
+        <CustomListItem selectable style={{fontSize: 12}}>
           <i
               onClick={() => removeDrillActionConfig(anno)}
               data-test="add-annotation-layer-button"
@@ -173,8 +173,8 @@ const DrillActionConfig = AsyncEsmComponent(
                   handleVisibleChange(visible, addLayerPopoverKey)
                 }
               >
-                <CustomListItem selectable>
-                  <i
+                <CustomListItem selectable style={{fontSize: 12}}>
+                  <i 
                     data-test="add-annotation-layer-button"
                     className="fa fa-plus"
                   />{' '}

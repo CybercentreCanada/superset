@@ -158,9 +158,9 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                 />
                 <SelectControl
                     style = {{length: '100%'}}
-                    ariaLabel={'Advanced Data Type Name'}
+                    ariaLabel={'Advanced Data Type'}
                     name="advanced-data-type-value"
-                    label={'Advanced Data Type Name'}
+                    label={'Advanced Data Type'}
                     showHeader
                     hovered
                     freeForm
@@ -187,15 +187,9 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
                 />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            {isNew ? (
             <Button buttonSize="small" onClick={() => props.close()}>
                 {t('Cancel')}
             </Button>
-            ) : (
-            <Button buttonSize="small" onClick={deleteDrillActionConfig}>
-                {t('Remove')}
-            </Button>
-            )}
             <div>
 
                 <Button
