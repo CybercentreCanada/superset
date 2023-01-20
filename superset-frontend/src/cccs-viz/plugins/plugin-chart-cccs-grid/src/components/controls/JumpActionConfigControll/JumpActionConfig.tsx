@@ -100,8 +100,6 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
     }, [fetchFilterList, selectedDashboardID])
     
     
-    const { isNew } = state
-    
     const isValidForm = () => {
         const errors = [
           validateNonEmpty(selectedDashboardID),
@@ -130,11 +128,6 @@ const DrillActionConfig: React.FC<Props> = (props : Props) => {
             setState({...state, isNew: false})
             props.close()
         }
-    }
-
-    const deleteDrillActionConfig = () => {
-        props.removeDrillActionConfig();
-        props.close();
     }
 
     const onDashboardChange = (v: any) => {
