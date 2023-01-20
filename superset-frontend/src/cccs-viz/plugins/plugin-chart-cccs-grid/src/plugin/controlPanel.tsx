@@ -104,17 +104,6 @@ const validateAggControlValues = (
     : [];
 };
 
-const validateAggColumnValues = (
-  controls: ControlStateMapping,
-  values: any[],
-  state: ControlPanelState,
-) => {
-  const result = validateAggControlValues(controls, values);
-  if (result.length === 0 && isAggMode({ controls })) {
-    return [];
-  }
-  return result;
-};
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
@@ -215,20 +204,11 @@ const config: ControlPanelConfig = {
         [
           {
             name: 'groupby',
-            config: {
-              type: 'SelectControl',
-              label: t('Group by'),
-              description: sharedControls.groupby.description,
-              multi: true,
-              freeForm: true,
-              allowAll: true,
-              default: [],
-              valueKey: 'column_name',
-              includeTime: false,
-              canSelectAll: true,
-              optionRenderer: c => <StyledColumnOption showType column={c} />,
-              valueRenderer: c => <StyledColumnOption column={c} />,
+            override: {
               visibility: isAggMode,
+              resetOnHide: false,
+              canCopy: true,
+              canSelectAll: true,
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
@@ -238,24 +218,19 @@ const config: ControlPanelConfig = {
                   sharedControls?.groupby?.mapStateToProps;
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggColumnValues(
+                newState.externalValidationErrors = validateAggControlValues(
                   controls,
                   [
                     controls.metrics?.value,
-                    controlState.value,
                     controls.percent_metrics?.value,
+                    controlState.value,
                   ],
-                  state,
                 );
+
                 return newState;
               },
-              rerender: [
-                'metrics',
-                'percent_metrics',
-                'principalEmitFilterColumn',
-              ],
-              canCopy: true,
-            } as typeof sharedControls.groupby,
+              rerender: ['metrics', 'percent_metrics', ],
+            },
           },
         ],
         [
@@ -320,15 +295,22 @@ const config: ControlPanelConfig = {
             name: 'columns',
             config: {
               type: 'SelectControl',
-              label: t('Columns'),
+              label: t('Dimensions'),
               description: t('Columns to display'),
               multi: true,
               freeForm: true,
               allowAll: true,
               default: [],
               canSelectAll: true,
-              optionRenderer: c => <StyledColumnOption showType column={c} />,
-              valueRenderer: c => <StyledColumnOption column={c} />,
+              optionRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption showType column={c} />
+              ),
+              // eslint-disable-next-line react/react-in-jsx-scope
+              valueRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption column={c} />
+              ),
               valueKey: 'column_name',
               mapStateToProps: (
                 state: ControlPanelState,
@@ -350,7 +332,7 @@ const config: ControlPanelConfig = {
               rerender: ['principalColumns'],
               visibility: isRawMode,
               canCopy: true,
-            } as typeof sharedControls.groupby,
+            } 
           },
         ],
         [
@@ -440,8 +422,9 @@ const config: ControlPanelConfig = {
                     controlState: ControlState,
                   ) => {
                     const { controls } = state;
-                    const originalMapStateToProps =
-                      sharedControls?.columns?.mapStateToProps;
+                    const originalMapStateToProps = isRawMode({ controls }) ?
+                      sharedControls?.columns?.mapStateToProps :
+                      sharedControls?.groupby?.mapStateToProps;
                     const newState =
                       originalMapStateToProps?.(state, controlState) ?? {};
                     const choices = isRawMode({ controls })
