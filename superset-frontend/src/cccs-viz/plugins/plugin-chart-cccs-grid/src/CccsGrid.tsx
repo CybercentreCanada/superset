@@ -331,6 +331,7 @@ export default function CccsGrid({
           const valueRendererName = column.colDef.cellRenderer
           let valueRendererObjt = null
           let renderedValue = null
+          
           if (valueRendererName) {
             const valueRenderer = valueRendererName ? frameworkComponents[valueRendererName] : undefined
             valueRendererObjt = new valueRenderer({value, valueFormatted: null})
@@ -340,7 +341,7 @@ export default function CccsGrid({
           if (!updatedSelectedData[col].includes(value)) {
             updatedSelectedData[col].push(value);
           }
-          if (!newSelectedbyAdvancedType[advancedDataType].includes(renderedValue)) {
+          if (!newSelectedbyAdvancedType[advancedDataType].includes(renderedValue) && renderedValue) {
             newSelectedbyAdvancedType[advancedDataType].push(renderedValue);
           }
         }
