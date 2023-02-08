@@ -41,7 +41,7 @@ import CountryValueRenderer from './CountryValueRenderer';
 import Ipv4ValueRenderer from './Ipv4ValueRenderer';
 import Ipv6ValueRenderer from './Ipv6ValueRenderer';
 import DomainValueRenderer from './DomainValueRenderer';
-import JsonValueRenderer from './JsonValueRenderer';
+import JsonValueRenderer from './TestJsonValueRenderer';
 import CustomTooltip from './CustomTooltip';
 
 /// / jcc
@@ -183,6 +183,33 @@ export default function CccsGrid({
       formData.slice_id,
     ],
   );
+
+  const getMainMenuItems = useCallback(params => {
+    if (params.column.colDef.cellRenderer === 'jsonValueRenderer') {
+      const jsonMenuItems = params.defaultItems.slice(0);
+
+      const instances = params.api.getCellRendererInstances();
+
+      jsonMenuItems.push({
+        name: 'Expand All',
+        action: () => {
+          instances.map((instance: any) =>
+            instance.componentInstance.updateState(true),
+          );
+        },
+      });
+      jsonMenuItems.push({
+        name: 'Collapse All',
+        action: () => {
+          instances.map((instance: any) =>
+            instance.componentInstance.updateState(false),
+          );
+        },
+      });
+      return jsonMenuItems;
+    }
+    return params.defaultItems;
+  }, []);
 
   const frameworkComponents = {
     countryValueRenderer: CountryValueRenderer,
@@ -376,6 +403,7 @@ export default function CccsGrid({
           gridOptions={gridOptions}
           onGridColumnsChanged={autoSizeFirst100Columns}
           getContextMenuItems={getContextMenuItems}
+          getMainMenuItems={getMainMenuItems}
           onGridReady={onGridReady}
           onRangeSelectionChanged={onRangeSelectionChanged}
           onSelectionChanged={onSelectionChanged}

@@ -228,6 +228,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const isSortable = true;
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
+      const autoHeight = true;
       return {
         field: column,
         headerName: columnHeader,
@@ -238,6 +239,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         enableRowGroup,
         getQuickFilterText: (params: any) => advancedTypeValueFormatter(params),
         headerTooltip: columnDescription,
+        autoHeight,
       };
     });
   } else {
@@ -257,6 +259,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         const isSortable = true;
         const enableRowGroup = true;
         const columnDescription = columnDescriptionMap[column];
+        const autoHeight = true;
         return {
           field: column,
           headerName: columnHeader,
@@ -266,6 +269,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           getQuickFilterText: (params: any) =>
             advancedTypeValueFormatter(params),
           headerTooltip: columnDescription,
+          autoHeight,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);
