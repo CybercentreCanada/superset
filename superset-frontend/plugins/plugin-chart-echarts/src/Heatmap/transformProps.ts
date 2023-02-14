@@ -56,6 +56,7 @@ const NORMALIZED_VALUE_INDEX = 3;
 const PERCENT_INDEX = 4;
 const X_SUM_INDEX = 5;
 const Y_SUM_INDEX = 6;
+const NORMALIZED_RANK_VALUE = 7;
 
 export function formatTooltip({
   params,
@@ -66,6 +67,7 @@ export function formatTooltip({
   metric,
   showPerc,
   numberFormatter,
+  normalized,
 }: {
   params: HeatmapSeriesCallbackDataParams;
   xCategory: string;
@@ -75,6 +77,7 @@ export function formatTooltip({
   metric: string | object;
   showPerc: boolean;
   numberFormatter: NumberFormatter;
+  normalized: boolean;
 }): string {
   const { value } = params;
 
@@ -83,7 +86,13 @@ export function formatTooltip({
     `<b>${xCategory}</b>: ${xCategories[value[X_INDEX]]}`,
     `<b>${yCategory}</b>: ${yCategories[value[Y_INDEX]]}`,
     `<b>${metric}</b>: ${numberFormatter(value[VALUE_INDEX])}`,
-    showPerc ? `<b>%</b>: ${value[PERCENT_INDEX].toFixed(2)}%` : '',
+    showPerc
+      ? `<b>%</b>: ${
+          normalized
+            ? value[NORMALIZED_RANK_VALUE]
+            : value[PERCENT_INDEX].toFixed(2)
+        }%`
+      : '',
   ];
 
   return [...stats].join('<br/>');
@@ -153,6 +162,53 @@ function getNormalizedValue(
   max_x: number,
 ): number {
   return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
+}
+
+function getPercentRanks(values: number[]): Map<number, number> {
+  // based on pandas DataFrame.rank
+  // array of values (whole heatmap or row/col)
+  // array: [1, 3, 7, 7] // MUST BE ORDERED
+  // rank:  [1, 2, 3, 4]
+  // counts:[1, 1, 2, 2]
+  // rank2: [0.25, 0.5, 0.875, 0.875]
+  // (1/array.length)*rank (if one value)
+  // (rank1 + ...rankn)/array.length/n
+
+  const orderedValues = [...values].sort((value1, value2) => value1 - value2);
+  const valueCountMap: Map<number, number> = new Map();
+  orderedValues.forEach(value => {
+    valueCountMap.set(value, (valueCountMap.get(value) || 0) + 1);
+  });
+
+  // TODO check if values list is empty?
+  // TODO MONDAY - THE OUTPUTTED VALUES ARE WROOONG
+  let currentValue = orderedValues[0];
+  let rankSum = 0;
+  const percentRanks: Map<number, number> = new Map();
+  orderedValues.forEach((value, index) => {
+    if (currentValue === value) {
+      rankSum += index + 1;
+    } else {
+      percentRanks.set(
+        currentValue,
+        (rankSum /
+          orderedValues.length /
+          (valueCountMap.get(currentValue) || 1)) *
+          100,
+      );
+      currentValue = value;
+      rankSum = index + 1;
+    }
+  });
+
+  // Get the last value (this is shady)
+  percentRanks.set(
+    currentValue,
+    (rankSum / orderedValues.length / (valueCountMap.get(currentValue) || 1)) *
+      100,
+  );
+
+  return percentRanks;
 }
 
 export default function transformProps(
@@ -236,6 +292,9 @@ export default function transformProps(
   const xMaxes = new Map<string, number>();
   const yMins = new Map<string, number>();
   const yMaxes = new Map<string, number>();
+  // For getting ranks when normalized is checked
+  const xValues = new Map<string, number[]>();
+  const yValues = new Map<string, number[]>();
 
   const xCategory = allColumnsX;
   const yCategory = allColumnsY;
@@ -246,6 +305,13 @@ export default function transformProps(
   const overallMinValue = Math.min(
     ...data.map(datum => datum[metric.toString()] as number),
   );
+
+  // const distinctValues = [
+  //   ...new Set(data.map(datum => datum[metric.toString()] as number)),
+  // ].sort((value1, value2) => value1 - value2);
+
+  // get a list of distinct values, ordered
+  // then below, for each entry, give it a rank = position in ordered list?
 
   data.forEach(datum => {
     const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
@@ -275,29 +341,113 @@ export default function transformProps(
       yCategoryValue,
       Math.max(yMaxes.get(yCategoryValue) || Number.MIN_SAFE_INTEGER, value),
     );
+
+    // TODO is there another way to do this? vv 
+    // Collect x or y or all values when needed?
+    // Probably but then reiterating over entire dataset again.
+
+    xValues.set(
+      xCategoryValue,
+      (xValues.get(xCategoryValue) || []).concat(value),
+    );
+
+    yValues.set(
+      yCategoryValue,
+      (yValues.get(yCategoryValue) || []).concat(value),
+    );
   });
 
-  const minBound =
+  let minBound =
     normalizeAcross === 'heatmap'
       ? yAxisBounds[0] || overallMinValue
       : overallMinValue;
   // TODO this and legend always spanned from 0 to 1 in old version
-  const maxBound =
+  let maxBound =
     normalizeAcross === 'heatmap'
       ? yAxisBounds[1] || overallMaxValue
       : overallMaxValue;
+
+  const xCategories = sortCategoryList(sortXAxis, 'x', xSums);
+  const yCategories = sortCategoryList(sortYAxis, 'y', ySums);
+
+  // TODO this is awful!?
+  // key = x/ycategory or heatmap, (key = cell value, value = rank as percent)
+  const percentRanks: Map<string, Map<number, number>> = new Map();
+  if (normalized) {
+    minBound = 0;
+    maxBound = 100;
+    if (normalizeAcross === 'heatmap') {
+      percentRanks.set(
+        'heatmap',
+        getPercentRanks(data.map(datum => datum[metric.toString()] as number))
+      );
+    } else if (normalizeAcross === 'x') {
+      xCategories.forEach(xCategory => {
+        // TODO the || stuff here is shady.
+        // Confirm what xCategories values (DataRecordValue) look like
+        percentRanks.set(
+          xCategory as string,
+          getPercentRanks(xValues.get(xCategory as string) || []),
+        );
+      });
+    } else if (normalizeAcross === 'y') {
+      yCategories.forEach(yCategory => {
+        percentRanks.set(
+          yCategory as string,
+          getPercentRanks(yValues.get(yCategory as string) || []),
+        );
+      });
+    }
+  }
 
   const enrichedData = data.map(datum => {
     const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
     const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
     const yCategoryValue: string = datum[yCategory] as string;
+    // const rank: number = distinctValues.findIndex(element => element === value);
+
+    let percentRank: number;
+
+    if (normalizeAcross === 'heatmap') {
+      percentRank = percentRanks.get('heatmap')?.get(value) || 0;
+    } else if (normalizeAcross === 'x') {
+      percentRank = percentRanks.get(xCategoryValue)?.get(value) || 0;
+    } else {
+      percentRank = percentRanks.get(yCategoryValue)?.get(value) || 0;
+    }
 
     let normalizedValue: number = value;
     let percent = 0;
     let maxDataValue: number;
     let minDataValue: number;
+    // let rankedNormalizedValue = 0;
 
-    if (normalizeAcross === 'x') {
+    // TODO || new Map is shady
+    if (normalized) {
+      if (normalizeAcross === 'x') {
+        minDataValue = Math.min(
+          ...(percentRanks.get(xCategoryValue) || new Map()).values(),
+        );
+        maxDataValue = Math.max(
+          ...(percentRanks.get(xCategoryValue) || new Map()).values(),
+        );
+      } else if (normalizeAcross === 'y') {
+        minDataValue = Math.min(
+          ...(percentRanks.get(yCategoryValue) || new Map()).values(),
+        );
+        maxDataValue = Math.max(
+          ...(percentRanks.get(yCategoryValue) || new Map()).values(),
+        );
+      } else {
+        // TODO 'heatmap' hard coded key is shady
+        minDataValue = Math.min(
+          ...(percentRanks.get('heatmap') || new Map()).values(),
+        );
+        maxDataValue = Math.max(
+          ...(percentRanks.get('heatmap') || new Map()).values(),
+        );
+      }
+    } else if (normalizeAcross === 'x') {
       maxDataValue = xMaxes.get(xCategoryValue) || overallMaxValue;
       minDataValue = xMins.get(xCategoryValue) || overallMinValue;
     } else if (normalizeAcross === 'y') {
@@ -317,7 +467,29 @@ export default function transformProps(
       maxDataValue,
     );
 
-    percent = (value / maxDataValue) * 100;
+    // if (distinctValues.length > 0) {
+    //   rankedNormalizedValue = getNormalizedValue(
+    //     overallMinValue,
+    //     overallMaxValue,
+    //     rank,
+    //     distinctValues[0],
+    //     distinctValues.length - 1,
+    //   );
+    // }
+
+    // if (distinctValues.length > 0) {
+    //   rankedNormalizedValue = getNormalizedValue(
+    //     0,
+    //     1,
+    //     percentRank,
+    //     0,
+    //     distinctValues.length - 1,
+    //   );
+    // }
+
+    // percent = (value / maxDataValue) * 100;
+    // Old heatmap does it this way:
+    percent = ((value - minDataValue) / (maxDataValue - minDataValue)) * 100;
 
     return {
       value,
@@ -327,11 +499,9 @@ export default function transformProps(
       ySum: ySums.get(yCategoryValue),
       normalizedValue,
       percent,
+      percentRank,
     };
   });
-
-  const xCategories = sortCategoryList(sortXAxis, 'x', xSums);
-  const yCategories = sortCategoryList(sortYAxis, 'y', ySums);
 
   const transformedData = enrichedData.map(datum => {
     const xIndex = xCategories.findIndex(
@@ -345,7 +515,7 @@ export default function transformProps(
     // TODO heatmap seems to require a number, so no formatting allowed?
     // (e.g., for 1k or 4,000%)
     const formattedData = Number(numberFormatter(datum.value));
-    // [xIndex, yIndex, value, normalized, percent, x_sum, y_sum]
+    // [xIndex, yIndex, value, normalized, percent, x_sum, y_sum, percentRank]
     return [
       xIndex,
       yIndex,
@@ -354,8 +524,15 @@ export default function transformProps(
       datum.percent,
       datum.xSum,
       datum.ySum,
+      datum.percentRank,
     ];
   });
+
+  const dimension = normalized
+    ? NORMALIZED_RANK_VALUE
+    : yAxisBounds && normalizeAcross === 'heatmap'
+    ? VALUE_INDEX
+    : NORMALIZED_VALUE_INDEX;
 
   const echartOptions: EChartsCoreOption = {
     tooltip: {
@@ -372,6 +549,7 @@ export default function transformProps(
           metric,
           showPerc,
           numberFormatter,
+          normalized,
         }),
     },
     grid: {
@@ -413,10 +591,7 @@ export default function transformProps(
       color: colors,
       // TODO vv VALUE_INDEX if yAxisBounds AND normalized across heatmap
       // or only normalized_value index if normalized on x/y
-      dimension:
-        yAxisBounds && normalizeAcross === 'heatmap'
-          ? VALUE_INDEX
-          : NORMALIZED_VALUE_INDEX,
+      dimension,
     },
     series: [
       {
