@@ -84,6 +84,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     column_state,
     enable_row_numbers,
     jump_action_configs,
+    default_group_by
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
@@ -237,6 +238,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sort: sortDirection,
         sortIndex,
         enableRowGroup,
+        rowGroup: !!(default_group_by.find((element: any) => { 
+          return element === column
+        })),
         getQuickFilterText: (params: any) => advancedTypeValueFormatter(params),
         headerTooltip: columnDescription,
       };
@@ -264,6 +268,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           cellRenderer,
           sortable: isSortable,
           enableRowGroup,
+          rowGroup: !!(default_group_by.find((element: any) => { 
+            return element === column
+          })),
           getQuickFilterText: (params: any) =>
             advancedTypeValueFormatter(params),
           headerTooltip: columnDescription,
