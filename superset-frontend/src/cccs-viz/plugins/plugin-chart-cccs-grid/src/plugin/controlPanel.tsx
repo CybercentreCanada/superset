@@ -606,6 +606,18 @@ config.controlPanelSections.push({
     ],
     [
       {
+        name: 'enable_json_expand',
+        config: {
+          type: 'CheckboxControl',
+          label: t('JSON Expand'),
+          renderTrigger: true,
+          default: false,
+          description: t('Whether to enable row level JSON expand buttons'),
+        },
+      },
+    ],
+    [
+      {
         name: 'page_length',
         config: {
           type: 'SelectControl',

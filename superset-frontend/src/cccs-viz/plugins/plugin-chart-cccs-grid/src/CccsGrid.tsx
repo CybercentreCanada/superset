@@ -41,7 +41,8 @@ import CountryValueRenderer from './CountryValueRenderer';
 import Ipv4ValueRenderer from './Ipv4ValueRenderer';
 import Ipv6ValueRenderer from './Ipv6ValueRenderer';
 import DomainValueRenderer from './DomainValueRenderer';
-import JsonValueRenderer from './TestJsonValueRenderer';
+import JsonValueRenderer from './JsonValueRenderer';
+import ExpandAllValueRenderer from './ExpandAllValueRenderer';
 import CustomTooltip from './CustomTooltip';
 
 /// / jcc
@@ -185,29 +186,50 @@ export default function CccsGrid({
   );
 
   const getMainMenuItems = useCallback(params => {
-    if (params.column.colDef.cellRenderer === 'jsonValueRenderer') {
+    // If the column currently selected has either JSON data, or the
+    // expand all button for the row, add extra options
+    if (
+      params.column.colDef.cellRenderer === 'jsonValueRenderer' ||
+      params.column.colDef.cellRenderer === 'expandAllValueRenderer'
+    ) {
+      // Get the default menu items so we can add to them
       const jsonMenuItems = params.defaultItems.slice(0);
 
+      // Get all of the cell renderer's and the current column ID
       const instances = params.api.getCellRendererInstances();
+      const columnID = params.column.colId;
 
+      // Only keep cells which belong to the current column
+      const newInstances = instances.filter(
+        (instance: any) => instance.params.column.colId === columnID,
+      );
+
+      // Add an expand all button which will send an update to each cell renderer
       jsonMenuItems.push({
         name: 'Expand All',
         action: () => {
-          instances.map((instance: any) =>
+          newInstances.map((instance: any) =>
             instance.componentInstance.updateState(true),
           );
         },
       });
+
+      // Add a collapse all button which will send an update to each cell renderer
       jsonMenuItems.push({
         name: 'Collapse All',
         action: () => {
-          instances.map((instance: any) =>
+          newInstances.map((instance: any) =>
             instance.componentInstance.updateState(false),
           );
         },
       });
+
+      // Return the default menu with added options (expand/collapse)
       return jsonMenuItems;
     }
+
+    // If the column currently selected has neither JSON data, nor the
+    // expand all button for the row, use the regular menu
     return params.defaultItems;
   }, []);
 
@@ -217,6 +239,7 @@ export default function CccsGrid({
     ipv6ValueRenderer: Ipv6ValueRenderer,
     domainValueRenderer: DomainValueRenderer,
     jsonValueRenderer: JsonValueRenderer,
+    expandAllValueRenderer: ExpandAllValueRenderer,
     customTooltip: CustomTooltip,
   };
 
@@ -231,6 +254,7 @@ export default function CccsGrid({
         applyOrder: true,
       });
     }
+    // params.columnApi.sizeColumnsToFit();
   };
 
   const onSelectionChanged = (params: any) => {

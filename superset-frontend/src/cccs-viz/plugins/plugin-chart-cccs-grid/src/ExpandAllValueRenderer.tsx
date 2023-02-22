@@ -1,0 +1,88 @@
+import React, { Component } from 'react';
+
+// Show a button to minimize all of the JSON blobs in the row
+function minimizeJSON(this: any, reverseState: any) {
+  return (
+    <button type="button" onClick={reverseState}>
+      MINIMIZE
+    </button>
+  );
+}
+
+// Show a button to expand all of the JSON blobs in the row
+function expandJSON(this: any, reverseState: any) {
+  return (
+    <>
+      <button type="button" onClick={reverseState}>
+        EXPAND
+      </button>
+    </>
+  );
+}
+
+export default class ExpandAllValueRenderer extends Component<
+  {},
+  { api: any; expanded: boolean; rowIndex: number }
+> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      api: props.api,
+      expanded: false,
+      rowIndex: props.rowIndex,
+    };
+  }
+
+  // Set the current `expanded` field to the opposite of what it currently is
+  // as well as go through each cell renderer and if it's in the same row &
+  // it's a cell with a JSON blob, update whether it is expanded or not
+  reverseState = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: !prevState.expanded,
+    }));
+    const instances = this.state.api.getCellRendererInstances();
+
+    const newInstances = instances.filter(
+      (instance: any) =>
+        instance.params.rowIndex === this.state.rowIndex &&
+        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
+    );
+
+    newInstances.map((instance: any) =>
+      instance.componentInstance.updateState(!this.state.expanded),
+    );
+  };
+
+  // Set the current `expanded` field to be equal to the boolean being passed in
+  // as well as go through each cell renderer and if it's in the same row &
+  // it's a cell with a JSON blob, update whether it is expanded or not
+  updateState = (newFlag: any) => {
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: newFlag,
+    }));
+
+    const instances = this.state.api.getCellRendererInstances();
+
+    const newInstances = instances.filter(
+      (instance: any) =>
+        instance.params.rowIndex === this.state.rowIndex &&
+        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
+    );
+
+    newInstances.map((instance: any) =>
+      instance.componentInstance.updateState(newFlag),
+    );
+  };
+
+  render() {
+    // Show either the expand or minimize button dependent
+    // on the value of the `expanded` field
+    if (this.state.expanded === false) {
+      return expandJSON(this.reverseState);
+    }
+    return minimizeJSON(this.reverseState);
+  }
+}

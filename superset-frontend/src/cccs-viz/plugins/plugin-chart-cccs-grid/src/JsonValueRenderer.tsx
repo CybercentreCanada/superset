@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import ModalTrigger from 'src/components/ModalTrigger';
 import JSONTree from 'react-json-tree';
-import Button from 'src/components/Button';
-import CopyToClipboard from 'src/components/CopyToClipboard';
 
 const JSON_TREE_THEME = {
   scheme: 'monokai',
@@ -48,34 +45,44 @@ function safeJsonObjectParse(
   }
 }
 
-function addJsonModal(
-  node: React.ReactNode,
-  jsonObject: Record<string, unknown> | unknown[],
-  jsonString: String,
-) {
+// JSX which shows the JSON tree inline, and a button to collapse it
+function minimizeJSON(this: any, reverseState: any, jsonObject: any) {
   return (
-    <ModalTrigger
-      modalBody={<JSONTree data={jsonObject} theme={JSON_TREE_THEME} />}
-      modalFooter={
-        <Button>
-          <CopyToClipboard shouldShowText={false} text={jsonString} />
-        </Button>
-      }
-      modalTitle="Cell content as JSON"
-      triggerNode={node}
-    />
+    <span>
+      <button type="button" onClick={reverseState}>
+        MINIMIZE
+      </button>
+      <JSONTree
+        data={jsonObject}
+        theme={JSON_TREE_THEME}
+        shouldExpandNode={() => true}
+      />
+    </span>
+  );
+}
+
+// JSX which shows the JSON data on one line, and a button to open the JSON tree
+function expandJSON(this: any, reverseState: any, cellData: any) {
+  return (
+    <>
+      <button type="button" onClick={reverseState}>
+        EXPAND
+      </button>
+      {cellData}
+    </>
   );
 }
 
 export default class JsonValueRenderer extends Component<
   {},
-  { cellValue: any }
+  { cellValue: any; expanded: boolean }
 > {
   constructor(props: any) {
     super(props);
 
     this.state = {
       cellValue: JsonValueRenderer.getValueToDisplay(props),
+      expanded: false,
     };
   }
 
@@ -86,12 +93,33 @@ export default class JsonValueRenderer extends Component<
     };
   }
 
+  // Set the current `expanded` field to the opposite of what it currently is
+  reverseState = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: !prevState.expanded,
+    }));
+  };
+
+  // Take the boolean value passed in and set the `expanded` field equal to it
+  updateState = (newFlag: any) => {
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: newFlag,
+    }));
+  };
+
   render() {
     const cellData = this.state.cellValue;
     const jsonObject = safeJsonObjectParse(this.state.cellValue);
-    const cellNode = <div>{cellData}</div>;
+
+    // If there is a JSON object, either show it expanded or minimized based
+    // on the value which the `expanded` field is set to
     if (jsonObject) {
-      return addJsonModal(cellNode, jsonObject, cellData);
+      if (this.state.expanded === false) {
+        return expandJSON(this.reverseState, cellData);
+      }
+      return minimizeJSON(this.reverseState, jsonObject);
     }
     return cellData ?? null;
   }

@@ -83,6 +83,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_grouping,
     column_state,
     enable_row_numbers,
+    enable_json_expand,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
@@ -317,6 +318,17 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       pinned: 'left',
       valueGetter: (params: any) =>
         params.node ? params.node.rowIndex + 1 : null,
+    } as any);
+  }
+
+  // If the flag is set to true, add a column which will contain
+  // a button to expand all JSON blobs in the row
+  if (enable_json_expand) {
+    columnDefs.splice(1, 0, {
+      headerName: 'JSON',
+      colId: 'jsonExpand',
+      pinned: 'left',
+      cellRenderer: 'expandAllValueRenderer',
     } as any);
   }
 
