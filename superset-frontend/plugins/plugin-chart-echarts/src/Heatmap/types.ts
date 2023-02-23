@@ -23,7 +23,7 @@ import {
   QueryFormColumn,
   QueryFormData,
 } from '@superset-ui/core';
-import { EChartTransformedProps } from '../types';
+import { EChartTransformedProps, LegendOrientation } from '../types';
 import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
 import { CallbackDataParams } from 'echarts/types/src/util/types';
 
@@ -65,7 +65,8 @@ export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   metric: '',
   normalized: false,
   numberFormat: 'SMART_NUMBER',
-  showLegend: true,
+  showLegend: true, // could use default here?
+  legendOrientation: LegendOrientation.Right,
   showPercentage: true,
   showValues: false,
   sortXAxis: 'Axis ascending',
