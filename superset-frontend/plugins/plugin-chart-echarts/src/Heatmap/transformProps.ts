@@ -30,7 +30,11 @@ import {
   getNumberFormatter,
   NumberFormats,
 } from '@superset-ui/core';
-import { EChartsCoreOption, HeatmapSeriesOption } from 'echarts';
+import {
+  EChartsCoreOption,
+  HeatmapSeriesOption,
+  LegendComponentOption,
+} from 'echarts';
 import { HeatmapDataItemOption } from 'echarts/types/src/chart/heatmap/HeatmapSeries';
 import { OptionDataValue } from 'echarts/types/src/util/types';
 import { DataFormatMixin } from 'echarts/types/src/model/mixin/dataFormat';
@@ -56,7 +60,7 @@ const NORMALIZED_VALUE_INDEX = 3;
 const PERCENT_INDEX = 4;
 const X_SUM_INDEX = 5;
 const Y_SUM_INDEX = 6;
-const NORMALIZED_RANK_VALUE = 7;
+const NORMALIZED_RANK_VALUE_INDEX = 7;
 
 export function formatTooltip({
   params,
@@ -89,7 +93,7 @@ export function formatTooltip({
     showPerc
       ? `<b>%</b>: ${
           normalized
-            ? value[NORMALIZED_RANK_VALUE]
+            ? value[NORMALIZED_RANK_VALUE_INDEX]
             : value[PERCENT_INDEX].toFixed(2)
         }%`
       : '',
@@ -253,38 +257,7 @@ export default function transformProps(
 
   const columnsLabelMap = new Map<string, string[]>();
 
-  // const transformedData: HeatmapDataItemOption[] = data.map(
-  //   (data_point, index) => {
-  //     const name = groupbyLabels
-  //       .map(column => `${column}: ${data_point[column]}`)
-  //       .join(', ');
-  //     columnsLabelMap.set(
-  //       name,
-  //       groupbyLabels.map(col => data_point[col] as string),
-  //     );
-  //     const item = {
-  //       value: [100], // [data_point[index]] || [0], // TODO
-  //     };
-  //     return item; // item;
-  //   },
-  // );
-
   const { setDataMask = () => {}, onContextMenu } = hooks;
-
-  // const heatmapSeriesOptions: HeatmapSeriesOption[] = [
-  //   {
-  //     type: 'heatmap',
-  //     coordinateSystem: 'cartesian2d', // TODO
-  //     pointSize: 10,
-  //     blurSize: 100, // TODO
-  //     maxOpacity: 100, // TODO
-  //     minOpacity: 0, // TODO
-  //     data: transformedData,
-  //   },
-  // ];
-
-  // const X_CATEGORY_INDEX = 5;
-  // const Y_CATEGORY_INDEX = 6;
 
   const xSums = new Map<string, number>(); // key = xValue
   const ySums = new Map<string, number>(); // key = yValue
@@ -311,7 +284,7 @@ export default function transformProps(
   // ].sort((value1, value2) => value1 - value2);
 
   // get a list of distinct values, ordered
-  // then below, for each entry, give it a rank = position in ordered list?
+  // then below, for each entry, give it a rank = average position in ordered list?
 
   data.forEach(datum => {
     const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
@@ -342,7 +315,7 @@ export default function transformProps(
       Math.max(yMaxes.get(yCategoryValue) || Number.MIN_SAFE_INTEGER, value),
     );
 
-    // TODO is there another way to do this? vv 
+    // TODO is there another way to do this? vv
     // Collect x or y or all values when needed?
     // Probably but then reiterating over entire dataset again.
 
@@ -379,7 +352,7 @@ export default function transformProps(
     if (normalizeAcross === 'heatmap') {
       percentRanks.set(
         'heatmap',
-        getPercentRanks(data.map(datum => datum[metric.toString()] as number))
+        getPercentRanks(data.map(datum => datum[metric.toString()] as number)),
       );
     } else if (normalizeAcross === 'x') {
       xCategories.forEach(xCategory => {
@@ -404,7 +377,6 @@ export default function transformProps(
     const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
     const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
     const yCategoryValue: string = datum[yCategory] as string;
-    // const rank: number = distinctValues.findIndex(element => element === value);
 
     let percentRank: number;
 
@@ -420,9 +392,9 @@ export default function transformProps(
     let percent = 0;
     let maxDataValue: number;
     let minDataValue: number;
-    // let rankedNormalizedValue = 0;
 
     // TODO || new Map is shady
+    // What happens if we hit the Math.min(new Map().values()) case?
     if (normalized) {
       if (normalizeAcross === 'x') {
         minDataValue = Math.min(
@@ -467,26 +439,6 @@ export default function transformProps(
       maxDataValue,
     );
 
-    // if (distinctValues.length > 0) {
-    //   rankedNormalizedValue = getNormalizedValue(
-    //     overallMinValue,
-    //     overallMaxValue,
-    //     rank,
-    //     distinctValues[0],
-    //     distinctValues.length - 1,
-    //   );
-    // }
-
-    // if (distinctValues.length > 0) {
-    //   rankedNormalizedValue = getNormalizedValue(
-    //     0,
-    //     1,
-    //     percentRank,
-    //     0,
-    //     distinctValues.length - 1,
-    //   );
-    // }
-
     // percent = (value / maxDataValue) * 100;
     // Old heatmap does it this way:
     percent = ((value - minDataValue) / (maxDataValue - minDataValue)) * 100;
@@ -528,8 +480,22 @@ export default function transformProps(
     ];
   });
 
+  const test = defaultGrid;
+
+  // VisualMap isn't quite a legend, so this returns attributes (e.g., scroll)
+  // that visualMap doesn't know about.
+  const legendProperties = getLegendProps(
+    legendType,
+    legendOrientation,
+    showLegend,
+  );
+  const padding = {
+    left: leftMargin as number,
+    bottom: bottomMargin as number,
+  };
+
   const dimension = normalized
-    ? NORMALIZED_RANK_VALUE
+    ? NORMALIZED_RANK_VALUE_INDEX
     : yAxisBounds && normalizeAcross === 'heatmap'
     ? VALUE_INDEX
     : NORMALIZED_VALUE_INDEX;
@@ -554,8 +520,9 @@ export default function transformProps(
     },
     grid: {
       ...defaultGrid,
-      left: leftMargin,
-      bottom: bottomMargin,
+      ...getChartPadding(showLegend, legendOrientation, legendMargin, padding),
+      // left: leftMargin,
+      // bottom: bottomMargin,
     },
     xAxis: {
       type: 'category',
@@ -582,12 +549,20 @@ export default function transformProps(
       min: minBound, // minDataValue, // TODO test 'dataMin',
       max: maxBound, // maxDataValue,
       calculable: true,
-      orient: legendOrientation, // 'vertical',
-      top: '15%',
-      left: 'right',
-      show: showLegend,
-      itemWidth: 15,
-      itemHeight: 80,
+      // TODO shady cast? getLegendProps doesn't seem to ever return a list, but a list is an option
+      orient: (legendProperties as LegendComponentOption).orient, // legendOrientation, // 'vertical',
+      top: (legendProperties as LegendComponentOption).top,
+      bottom: (legendProperties as LegendComponentOption).bottom,
+      left: (legendProperties as LegendComponentOption).left,
+      right: (legendProperties as LegendComponentOption).right,
+      show: (legendProperties as LegendComponentOption).show,
+      itemHeight: (legendProperties as LegendComponentOption).itemHeight,
+      itemWidth: (legendProperties as LegendComponentOption).itemWidth,
+      // top: '15%',
+      // left: 'right',
+      // show: showLegend,
+      // itemWidth: 15,
+      // itemHeight: 80,
       color: colors,
       // TODO vv VALUE_INDEX if yAxisBounds AND normalized across heatmap
       // or only normalized_value index if normalized on x/y
