@@ -254,7 +254,21 @@ export default function CccsGrid({
         applyOrder: true,
       });
     }
-    // params.columnApi.sizeColumnsToFit();
+  };
+
+  const onFirstDataRendered = (params: any) => {
+    // Get all of the columns in the grid
+    const instances = params.columnApi.getAllColumns();
+
+    // Filter on columns that have JSON data
+    const newInstances = instances.filter(
+      (instance: any) => instance.colDef?.cellRenderer === 'jsonValueRenderer',
+    );
+
+    // Set the columns which have JSON data to be 350 pixels wide
+    newInstances.map((instance: any) =>
+      params.columnApi.setColumnWidth(instance.colId, 350),
+    );
   };
 
   const onSelectionChanged = (params: any) => {
@@ -429,6 +443,7 @@ export default function CccsGrid({
           getContextMenuItems={getContextMenuItems}
           getMainMenuItems={getMainMenuItems}
           onGridReady={onGridReady}
+          onFirstDataRendered={onFirstDataRendered}
           onRangeSelectionChanged={onRangeSelectionChanged}
           onSelectionChanged={onSelectionChanged}
           rowData={rowData}
