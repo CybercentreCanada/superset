@@ -34,6 +34,21 @@ export default class ExpandAllValueRenderer extends Component<
     };
   }
 
+  // Get all of the cells in the AG Grid and only keep the ones that
+  // are in the same row as the current expand all button, and make
+  // sure that they have a JSON blob
+  getJSONCells = () => {
+    const instances = this.state.api.getCellRendererInstances();
+
+    const newInstances = instances.filter(
+      (instance: any) =>
+        instance.params.rowIndex === this.state.rowIndex &&
+        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
+    );
+
+    return newInstances;
+  };
+
   // Set the current `expanded` field to the opposite of what it currently is
   // as well as go through each cell renderer and if it's in the same row &
   // it's a cell with a JSON blob, update whether it is expanded or not
@@ -42,13 +57,8 @@ export default class ExpandAllValueRenderer extends Component<
       ...prevState,
       expanded: !prevState.expanded,
     }));
-    const instances = this.state.api.getCellRendererInstances();
 
-    const newInstances = instances.filter(
-      (instance: any) =>
-        instance.params.rowIndex === this.state.rowIndex &&
-        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
-    );
+    const newInstances = this.getJSONCells();
 
     newInstances.map((instance: any) =>
       instance.componentInstance.updateState(!this.state.expanded),
@@ -64,22 +74,42 @@ export default class ExpandAllValueRenderer extends Component<
       expanded: newFlag,
     }));
 
-    const instances = this.state.api.getCellRendererInstances();
-
-    const newInstances = instances.filter(
-      (instance: any) =>
-        instance.params.rowIndex === this.state.rowIndex &&
-        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
-    );
+    const newInstances = this.getJSONCells();
 
     newInstances.map((instance: any) =>
       instance.componentInstance.updateState(newFlag),
     );
   };
 
+  // Get all of the cells in the AG Grid and only keep the ones
+  // that are in the same row as the current expand all button and
+  // make sure that they have a JSON blob (and see whether they are
+  // expanded or not)
+  checkState = () => {
+    const newInstances = this.getJSONCells();
+
+    const jsonCells = newInstances.map((instance: any) =>
+      instance.componentInstance.getExpandedValue(),
+    );
+
+    // If there is at least one cell that can expand, the expand all
+    // button for the row should show 'Expand'
+    if (jsonCells.includes(false)) {
+      this.setState(prevState => ({
+        ...prevState,
+        expanded: false,
+      }));
+    } else {
+      this.setState(prevState => ({
+        ...prevState,
+        expanded: true,
+      }));
+    }
+  };
+
+  // Show either the expand or minimize button dependent
+  // on the value of the `expanded` field
   render() {
-    // Show either the expand or minimize button dependent
-    // on the value of the `expanded` field
     if (this.state.expanded === false) {
       return expandJSON(this.reverseState);
     }

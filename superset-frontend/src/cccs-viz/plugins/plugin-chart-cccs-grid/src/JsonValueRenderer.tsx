@@ -75,14 +75,16 @@ function expandJSON(this: any, reverseState: any, cellData: any) {
 
 export default class JsonValueRenderer extends Component<
   {},
-  { cellValue: any; expanded: boolean }
+  { api: any; cellValue: any; expanded: boolean; rowIndex: number }
 > {
   constructor(props: any) {
     super(props);
 
     this.state = {
+      api: props.api,
       cellValue: JsonValueRenderer.getValueToDisplay(props),
       expanded: false,
+      rowIndex: props.rowIndex,
     };
   }
 
@@ -94,11 +96,26 @@ export default class JsonValueRenderer extends Component<
   }
 
   // Set the current `expanded` field to the opposite of what it currently is
+  // and trigger the 'checkState` function in the expand all button for the row
   reverseState = () => {
-    this.setState(prevState => ({
-      ...prevState,
-      expanded: !prevState.expanded,
-    }));
+    this.setState(
+      prevState => ({
+        ...prevState,
+        expanded: !prevState.expanded,
+      }),
+      () => {
+        const instances = this.state.api.getCellRendererInstances();
+
+        instances
+          .filter(
+            (instance: any) =>
+              instance.params.rowIndex === this.state.rowIndex &&
+              instance.params.column.colDef.cellRenderer ===
+                'expandAllValueRenderer',
+          )
+          .map((instance: any) => instance.componentInstance.checkState());
+      },
+    );
   };
 
   // Take the boolean value passed in and set the `expanded` field equal to it
@@ -108,6 +125,9 @@ export default class JsonValueRenderer extends Component<
       expanded: newFlag,
     }));
   };
+
+  // Return whether 'expanded' is set to true or false
+  getExpandedValue = () => this.state.expanded;
 
   render() {
     const cellData = this.state.cellValue;
