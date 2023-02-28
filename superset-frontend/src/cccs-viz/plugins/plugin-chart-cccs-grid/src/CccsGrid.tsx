@@ -93,40 +93,8 @@ export default function CccsGrid({
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
-  const [jsonFields, setJsonFields] = useState<any[]>([]);
 
   const gridRef = useRef<AgGridReactType>(null);
-
-  const setJSONCell = (colId: string, rowIndex: number, boolVal: boolean) => {
-    // Make a copy of the current array in state
-    const jsonCellState = jsonFields;
-
-    // Update the cell based on the functions parameters
-    const newJSONCellState: any = (jsonCellState[rowIndex][colId] = boolVal);
-
-    // Set the state to be equal to the updated array
-    setJsonFields(newJSONCellState);
-  };
-
-  const getJSONCells = () => jsonFields;
-
-  // Create a new set of column definitions, where the columns with
-  // JSON data or the expand all JSON column have an extra `cellRendererParams` field
-  const newColumnDefs = columnDefs.map((instance: any) => {
-    if (
-      instance?.cellRenderer === 'jsonValueRenderer' ||
-      instance?.cellRenderer === 'expandAllValueRenderer'
-    ) {
-      return {
-        ...instance,
-        cellRendererParams: {
-          getJSONCells,
-          setJSONCell,
-        },
-      };
-    }
-    return instance;
-  });
 
   const handleChange = useCallback(
     filters => {
@@ -290,41 +258,17 @@ export default function CccsGrid({
 
   const onFirstDataRendered = (params: any) => {
     // Get all of the columns in the grid
-    const columns = params.columnApi.getAllColumns();
+    const instances = params.columnApi.getAllColumns();
 
     // Filter on columns that have JSON data
-    const jsonColumns = columns.filter(
+    const newInstances = instances.filter(
       (instance: any) => instance.colDef?.cellRenderer === 'jsonValueRenderer',
     );
 
     // Set the columns which have JSON data to be 350 pixels wide
-    jsonColumns.map((instance: any) =>
+    newInstances.map((instance: any) =>
       params.columnApi.setColumnWidth(instance.colId, 350),
     );
-
-    // Get all of the JSON cells in the grid
-    const jsonCells = params.api
-      .getCellRendererInstances()
-      .filter(
-        (instance: any) =>
-          instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
-      );
-
-    const jsonCellState: any = [];
-
-    // Get every JSON cell in the row and set the dictionary key for it to false
-    for (let i = 0; i < params.api.getDisplayedRowCount(); i += 1) {
-      const jsonDictionary = {};
-      jsonCells
-        .filter((instance: any) => instance.params.rowIndex === i)
-        .map((instance: any) => instance.params.column.colId)
-        // eslint-disable-next-line no-return-assign
-        .forEach((colId: string) => (jsonDictionary[colId] = true));
-      jsonCellState.push(jsonDictionary);
-    }
-
-    // Set the state which tracks all of the JSON cells and whether they are expanded or not
-    setJsonFields(jsonCellState);
   };
 
   const onSelectionChanged = (params: any) => {
@@ -488,7 +432,7 @@ export default function CccsGrid({
         <AgGridReact
           ref={gridRef}
           modules={AllModules}
-          columnDefs={newColumnDefs}
+          columnDefs={columnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
           frameworkComponents={frameworkComponents}
           enableBrowserTooltips={true}

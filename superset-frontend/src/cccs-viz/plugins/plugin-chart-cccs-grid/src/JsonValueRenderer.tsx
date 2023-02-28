@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import JSONTree from 'react-json-tree';
 
@@ -76,14 +75,7 @@ function expandJSON(this: any, reverseState: any, cellData: any) {
 
 export default class JsonValueRenderer extends Component<
   {},
-  {
-    cellValue: any;
-    expanded: boolean;
-    colId: string;
-    rowIndex: number;
-    getJSONCells: any;
-    setJSONCell: any;
-  }
+  { cellValue: any; expanded: boolean }
 > {
   constructor(props: any) {
     super(props);
@@ -91,10 +83,6 @@ export default class JsonValueRenderer extends Component<
     this.state = {
       cellValue: JsonValueRenderer.getValueToDisplay(props),
       expanded: false,
-      colId: props.colDef.colId,
-      rowIndex: props.rowIndex,
-      getJSONCells: props.getJSONCells,
-      setJSONCell: props.setJSONCell,
     };
   }
 
@@ -107,10 +95,6 @@ export default class JsonValueRenderer extends Component<
 
   // Set the current `expanded` field to the opposite of what it currently is
   reverseState = () => {
-    const jsonCellArray = this.state.getJSONCells();
-
-    console.log(jsonCellArray);
-
     this.setState(prevState => ({
       ...prevState,
       expanded: !prevState.expanded,
@@ -125,19 +109,6 @@ export default class JsonValueRenderer extends Component<
     }));
   };
 
-  getCellStatus = () => {
-    const jsonCellArray = this.state.getJSONCells();
-
-    // console.log(jsonCellArray);
-
-    try {
-      return jsonCellArray[this.state.rowIndex][this.state.colId];
-    } catch (e) {
-      // console.log(e);
-      return false;
-    }
-  };
-
   render() {
     const cellData = this.state.cellValue;
     const jsonObject = safeJsonObjectParse(this.state.cellValue);
@@ -145,10 +116,10 @@ export default class JsonValueRenderer extends Component<
     // If there is a JSON object, either show it expanded or minimized based
     // on the value which the `expanded` field is set to
     if (jsonObject) {
-      if (this.getCellStatus()) {
-        return minimizeJSON(this.reverseState, jsonObject);
+      if (this.state.expanded === false) {
+        return expandJSON(this.reverseState, cellData);
       }
-      return expandJSON(this.reverseState, cellData);
+      return minimizeJSON(this.reverseState, jsonObject);
     }
     return cellData ?? null;
   }
