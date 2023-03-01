@@ -229,7 +229,7 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', ],
+              rerender: ['metrics', 'percent_metrics', 'default_group_by',],
             },
           },
         ],
@@ -329,7 +329,7 @@ const config: ControlPanelConfig = {
                     : [];
                 return newState;
               },
-              rerender: ['principalColumns'],
+              rerender: ['principalColumns', 'default_group_by'],
               visibility: isRawMode,
               canCopy: true,
             } 
@@ -609,6 +609,7 @@ config.controlPanelSections.push({
           allowAll: true,
           default: [],
           canSelectAll: true,
+          renderTrigger: true,
           optionRenderer: (c: ColumnMeta) => (
             // eslint-disable-next-line react/react-in-jsx-scope
             <StyledColumnOption showType column={c} />
