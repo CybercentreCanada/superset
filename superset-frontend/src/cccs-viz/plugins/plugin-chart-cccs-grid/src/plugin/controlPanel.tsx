@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react'
+import React from 'react';
 
 import {
   t,
@@ -47,7 +47,6 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/JumpActionConfigControll';
-
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -103,7 +102,6 @@ const validateAggControlValues = (
     ? [t('Group By, Metrics, or Percent Metrics must have a value')]
     : [];
 };
-
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
@@ -229,7 +227,7 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', ],
+              rerender: ['metrics', 'percent_metrics'],
             },
           },
         ],
@@ -332,7 +330,7 @@ const config: ControlPanelConfig = {
               rerender: ['principalColumns'],
               visibility: isRawMode,
               canCopy: true,
-            } 
+            },
           },
         ],
         [
@@ -422,9 +420,9 @@ const config: ControlPanelConfig = {
                     controlState: ControlState,
                   ) => {
                     const { controls } = state;
-                    const originalMapStateToProps = isRawMode({ controls }) ?
-                      sharedControls?.columns?.mapStateToProps :
-                      sharedControls?.groupby?.mapStateToProps;
+                    const originalMapStateToProps = isRawMode({ controls })
+                      ? sharedControls?.columns?.mapStateToProps
+                      : sharedControls?.groupby?.mapStateToProps;
                     const newState =
                       originalMapStateToProps?.(state, controlState) ?? {};
                     const choices = isRawMode({ controls })
