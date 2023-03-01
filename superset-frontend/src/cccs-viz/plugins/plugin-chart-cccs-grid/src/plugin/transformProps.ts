@@ -348,10 +348,11 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   // a button to expand all JSON blobs in the row
   if (enable_json_expand) {
     columnDefs.splice(1, 0, {
-      headerName: 'JSON',
       colId: 'jsonExpand',
       pinned: 'left',
       cellRenderer: 'expandAllValueRenderer',
+      autoHeight: true,
+      minWidth: 105,
     } as any);
   }
 

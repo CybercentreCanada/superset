@@ -1,25 +1,6 @@
 import React, { Component } from 'react';
 import JSONTree from 'react-json-tree';
-
-const JSON_TREE_THEME = {
-  scheme: 'monokai',
-  base00: '#272822',
-  base01: '#383830',
-  base02: '#49483e',
-  base03: '#75715e',
-  base04: '#a59f85',
-  base05: '#f8f8f2',
-  base06: '#f5f4f1',
-  base07: '#f9f8f5',
-  base08: '#f92672',
-  base09: '#fd971f',
-  base0A: '#f4bf75',
-  base0B: '#a6e22e',
-  base0C: '#a1efe4',
-  base0D: '#66d9ef',
-  base0E: '#ae81ff',
-  base0F: '#cc6633',
-};
+import './Buttons.css';
 
 function safeJsonObjectParse(
   data: unknown,
@@ -46,18 +27,26 @@ function safeJsonObjectParse(
 }
 
 // JSX which shows the JSON tree inline, and a button to collapse it
-function minimizeJSON(this: any, reverseState: any, jsonObject: any) {
+function collapseJSON(this: any, reverseState: any, jsonObject: any) {
   return (
-    <span>
-      <button type="button" onClick={reverseState}>
-        MINIMIZE
-      </button>
-      <JSONTree
-        data={jsonObject}
-        theme={JSON_TREE_THEME}
-        shouldExpandNode={() => true}
-      />
-    </span>
+    <>
+      <div style={{ float: 'left' }}>
+        <button
+          className="Button Collapse"
+          type="button"
+          onClick={reverseState}
+        >
+          {' '}
+        </button>
+      </div>
+      <div style={{ float: 'left' }}>
+        <JSONTree
+          data={jsonObject}
+          theme="default"
+          shouldExpandNode={() => true}
+        />
+      </div>
+    </>
   );
 }
 
@@ -65,8 +54,8 @@ function minimizeJSON(this: any, reverseState: any, jsonObject: any) {
 function expandJSON(this: any, reverseState: any, cellData: any) {
   return (
     <>
-      <button type="button" onClick={reverseState}>
-        EXPAND
+      <button className="Button Expand" type="button" onClick={reverseState}>
+        {' '}
       </button>
       {cellData}
     </>
@@ -133,15 +122,16 @@ export default class JsonValueRenderer extends Component<
     const cellData = this.state.cellValue;
     const jsonObject = safeJsonObjectParse(this.state.cellValue);
 
-    // If there is a JSON object, either show it expanded or minimized based
+    // If there is a JSON object, either show it expanded or collapsed based
     // on the value which the `expanded` field is set to
     if (jsonObject) {
       if (this.state.expanded === false) {
         return expandJSON(this.reverseState, cellData);
       }
-      return minimizeJSON(this.reverseState, jsonObject);
+      return collapseJSON(this.reverseState, jsonObject);
     }
-    return cellData ?? null;
+    // If the cellData is set to 'null' or NULL, return an empty string
+    return cellData !== 'null' && cellData !== null ? cellData : '';
   }
 
   static getValueToDisplay(params: { valueFormatted: any; value: any }) {

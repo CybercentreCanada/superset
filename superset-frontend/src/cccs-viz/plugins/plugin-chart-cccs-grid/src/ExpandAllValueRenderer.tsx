@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import './Buttons.css';
 
-// Show a button to minimize all of the JSON blobs in the row
-function minimizeJSON(this: any, reverseState: any) {
+// Show a button to collapse all of the JSON blobs in the row
+function collapseJSON(this: any, reverseState: any) {
   return (
-    <button type="button" onClick={reverseState}>
-      MINIMIZE
+    <button className="Row-Expand" type="button" onClick={reverseState}>
+      Collapse Row
     </button>
   );
 }
@@ -13,8 +14,8 @@ function minimizeJSON(this: any, reverseState: any) {
 function expandJSON(this: any, reverseState: any) {
   return (
     <>
-      <button type="button" onClick={reverseState}>
-        EXPAND
+      <button className="Row-Expand" type="button" onClick={reverseState}>
+        Expand Row
       </button>
     </>
   );
@@ -107,12 +108,12 @@ export default class ExpandAllValueRenderer extends Component<
     }
   };
 
-  // Show either the expand or minimize button dependent
+  // Show either the expand or collapse button dependent
   // on the value of the `expanded` field
   render() {
     if (this.state.expanded === false) {
       return expandJSON(this.reverseState);
     }
-    return minimizeJSON(this.reverseState);
+    return collapseJSON(this.reverseState);
   }
 }

@@ -290,7 +290,10 @@ export default function CccsGrid({
 
       // Add an expand all button which will send an update to each cell renderer
       jsonMenuItems.push({
-        name: 'Expand All',
+        name:
+          params.column.colDef.cellRenderer === 'jsonValueRenderer'
+            ? 'Expand Column'
+            : 'Expand All',
         action: () => {
           newInstances.map((instance: any) =>
             instance.componentInstance.updateState(true),
@@ -300,7 +303,10 @@ export default function CccsGrid({
 
       // Add a collapse all button which will send an update to each cell renderer
       jsonMenuItems.push({
-        name: 'Collapse All',
+        name:
+          params.column.colDef.cellRenderer === 'jsonValueRenderer'
+            ? 'Collapse Column'
+            : 'Collapse All',
         action: () => {
           newInstances.map((instance: any) =>
             instance.componentInstance.updateState(false),
