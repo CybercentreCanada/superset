@@ -1,3 +1,4 @@
+import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
 import React, { Component } from 'react';
 import './Buttons.css';
 
@@ -41,13 +42,21 @@ export default class ExpandAllValueRenderer extends Component<
   getJSONCells = () => {
     const instances = this.state.api.getCellRendererInstances();
 
-    const newInstances = instances.filter(
-      (instance: any) =>
-        instance.params.rowIndex === this.state.rowIndex &&
-        instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
-    );
+    // Make sure row grouping is not enabled, but if it is, don't
+    // try to find all of the JSON blobs in the row
+    if (
+      instances.filter((instance: any) => instance instanceof GroupCellRenderer)
+        .length === 0
+    ) {
+      const newInstances = instances.filter(
+        (instance: any) =>
+          instance.params.rowIndex === this.state.rowIndex &&
+          instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
+      );
 
-    return newInstances;
+      return newInstances;
+    }
+    return [];
   };
 
   // Set the current `expanded` field to the opposite of what it currently is

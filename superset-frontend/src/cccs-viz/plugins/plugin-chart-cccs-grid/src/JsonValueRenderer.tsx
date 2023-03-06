@@ -102,15 +102,22 @@ export default class JsonValueRenderer extends Component<
       () => {
         const instances = this.state.api.getCellRendererInstances();
 
-        instances
-          .filter((instance: any) => !(instance instanceof GroupCellRenderer))
-          .filter(
-            (instance: any) =>
-              instance.params.rowIndex === this.state.rowIndex &&
-              instance.params.column.colDef.cellRenderer ===
-                'expandAllValueRenderer',
-          )
-          .map((instance: any) => instance.componentInstance.checkState());
+        // Make sure row grouping is not enabled, but if it is, don't
+        // trigger the 'checkState` function in the expand all button for the row
+        if (
+          instances.filter(
+            (instance: any) => instance instanceof GroupCellRenderer,
+          ).length === 0
+        ) {
+          instances
+            .filter(
+              (instance: any) =>
+                instance.params.rowIndex === this.state.rowIndex &&
+                instance.params.column.colDef.cellRenderer ===
+                  'expandAllValueRenderer',
+            )
+            .map((instance: any) => instance.componentInstance.checkState());
+        }
       },
     );
   };
@@ -138,7 +145,8 @@ export default class JsonValueRenderer extends Component<
       }
       return collapseJSON(this.reverseState, jsonObject);
     }
-    return cellData ?? null;
+    // If the cellData is set to 'null' or undefined, return null
+    return cellData !== 'null' && cellData !== undefined ? cellData : null;
   }
 
   static getValueToDisplay(params: { valueFormatted: any; value: any }) {
