@@ -319,6 +319,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       headerName: '#',
       colId: 'rowNum',
       pinned: 'left',
+      lockVisible: true,
       valueGetter: (params: any) =>
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
@@ -353,6 +354,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       cellRenderer: 'expandAllValueRenderer',
       autoHeight: true,
       minWidth: 105,
+      lockVisible: true,
     } as any);
   }
 

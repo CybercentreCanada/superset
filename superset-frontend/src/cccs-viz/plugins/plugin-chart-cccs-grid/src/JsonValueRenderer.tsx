@@ -1,3 +1,4 @@
+import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
 import React, { Component } from 'react';
 import JSONTree from 'react-json-tree';
 import './Buttons.css';
@@ -34,6 +35,7 @@ function collapseJSON(this: any, reverseState: any, jsonObject: any) {
         <button
           className="Button Collapse"
           type="button"
+          title="Collapse"
           onClick={reverseState}
         >
           {' '}
@@ -54,7 +56,12 @@ function collapseJSON(this: any, reverseState: any, jsonObject: any) {
 function expandJSON(this: any, reverseState: any, cellData: any) {
   return (
     <>
-      <button className="Button Expand" type="button" onClick={reverseState}>
+      <button
+        className="Button Expand"
+        type="button"
+        title="Expand"
+        onClick={reverseState}
+      >
         {' '}
       </button>
       {cellData}
@@ -96,6 +103,7 @@ export default class JsonValueRenderer extends Component<
         const instances = this.state.api.getCellRendererInstances();
 
         instances
+          .filter((instance: any) => !(instance instanceof GroupCellRenderer))
           .filter(
             (instance: any) =>
               instance.params.rowIndex === this.state.rowIndex &&
@@ -130,8 +138,7 @@ export default class JsonValueRenderer extends Component<
       }
       return collapseJSON(this.reverseState, jsonObject);
     }
-    // If the cellData is set to 'null' or NULL, return an empty string
-    return cellData !== 'null' && cellData !== null ? cellData : '';
+    return cellData ?? null;
   }
 
   static getValueToDisplay(params: { valueFormatted: any; value: any }) {
