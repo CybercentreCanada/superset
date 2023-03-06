@@ -32,7 +32,10 @@ import {
   sections,
   sharedControls,
   getStandardizedControls,
+  ControlPanelsContainerProps,
 } from '@superset-ui/chart-controls';
+import { legendSection } from '../controls';
+import { LegendOrientation } from '../types';
 
 const sortAxisChoices = [
   ['alpha_asc', t('Axis ascending')],
@@ -103,7 +106,7 @@ const config: ControlPanelConfig = {
       ],
     },
     {
-      label: t('Heatmap Options'),
+      label: t('Options'),
       expanded: true,
       tabOverride: 'customize',
       controlSetRows: [
@@ -142,25 +145,6 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'canvas_image_rendering',
-            config: {
-              type: 'SelectControl',
-              label: t('Rendering'),
-              renderTrigger: true,
-              choices: [
-                ['pixelated', 'pixelated (Sharp)'],
-                ['auto', 'auto (Smooth)'],
-              ],
-              default: 'pixelated',
-              description: t(
-                'image-rendering CSS attribute of the canvas object that ' +
-                  'defines how the browser scales up the image',
-              ),
-            },
-          },
-        ],
-        [
-          {
             name: 'normalize_across',
             config: {
               type: 'SelectControl',
@@ -189,6 +173,7 @@ const config: ControlPanelConfig = {
                   </ul>
                 </>
               ),
+              renderTrigger: true,
             },
           },
         ],
@@ -254,6 +239,8 @@ const config: ControlPanelConfig = {
                 'Hard value bounds applied for color coding. Is only relevant ' +
                   'and applied when the normalization is applied against the whole heatmap.',
               ),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.normalize_across?.value === 'heatmap'),
             },
           },
         ],
@@ -267,6 +254,7 @@ const config: ControlPanelConfig = {
               choices: sortAxisChoices,
               clearable: false,
               default: 'alpha_asc',
+              renderTrigger: true,
             },
           },
         ],
@@ -279,18 +267,56 @@ const config: ControlPanelConfig = {
               choices: sortAxisChoices,
               clearable: false,
               default: 'alpha_asc',
+              renderTrigger: true,
             },
           },
         ],
+        [<div className="section-header">{t('Legend')}</div>],
         [
           {
             name: 'show_legend',
             config: {
               type: 'CheckboxControl',
-              label: t('Legend'),
+              label: t('Show legend'),
               renderTrigger: true,
               default: true,
-              description: t('Whether to display the legend (toggles)'),
+              description: t('Whether to display a legend for the chart'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'legendOrientation',
+            config: {
+              type: 'SelectControl',
+              freeForm: false,
+              label: 'Orientation',
+              choices: [
+                ['top', 'Top'],
+                ['bottom', 'Bottom'],
+                ['left', 'Left'],
+                ['right', 'Right'],
+              ],
+              default: LegendOrientation.Top,
+              renderTrigger: true,
+              description: t('Legend Orientation'),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.show_legend?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'legendMargin',
+            config: {
+              type: 'TextControl',
+              label: t('Margin'),
+              renderTrigger: true,
+              isInt: true,
+              default: null,
+              description: t('Additional padding for legend.'),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.show_legend?.value),
             },
           },
         ],
@@ -342,6 +368,9 @@ const config: ControlPanelConfig = {
   controlOverrides: {
     y_axis_format: {
       label: t('Value Format'),
+      description: `${t(
+        'D3 format syntax: https://github.com/d3/d3-format. ',
+      )} ${t('Only applies to the metric value displayed in the tooltip.')}`,
     },
   },
   formDataOverrides: formData => ({

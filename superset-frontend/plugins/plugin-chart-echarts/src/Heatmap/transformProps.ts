@@ -24,7 +24,6 @@ import {
   QueryFormMetric,
   getMetricLabel,
   DataRecordValue,
-  CategoricalColorNamespace,
   getSequentialSchemeRegistry,
   NumberFormatter,
   getNumberFormatter,
@@ -35,10 +34,7 @@ import {
   HeatmapSeriesOption,
   LegendComponentOption,
 } from 'echarts';
-import { HeatmapDataItemOption } from 'echarts/types/src/chart/heatmap/HeatmapSeries';
-import { OptionDataValue } from 'echarts/types/src/util/types';
-import { DataFormatMixin } from 'echarts/types/src/model/mixin/dataFormat';
-import { defaultGrid, defaultTooltip } from '../defaults';
+import { defaultGrid, defaultLegendPadding, defaultTooltip } from '../defaults';
 import {
   DEFAULT_FORM_DATA,
   EchartsHeatmapFormData,
@@ -52,6 +48,7 @@ import {
   getLegendProps,
   sanitizeHtml,
 } from '../utils/series';
+import { LegendOrientation } from '../types';
 
 const X_INDEX = 0;
 const Y_INDEX = 1;
@@ -62,23 +59,30 @@ const X_SUM_INDEX = 5;
 const Y_SUM_INDEX = 6;
 const NORMALIZED_RANK_VALUE_INDEX = 7;
 
+const DEFAULT_LEGEND_PADDING = {
+  [LegendOrientation.Left]: 120,
+  [LegendOrientation.Right]: 120,
+  [LegendOrientation.Top]: 70,
+  [LegendOrientation.Bottom]: 70,
+};
+
 export function formatTooltip({
   params,
   xCategory,
   yCategory,
   xCategories,
   yCategories,
-  metric,
+  metricName,
   showPerc,
   numberFormatter,
   normalized,
 }: {
-  params: HeatmapSeriesCallbackDataParams;
+  params: HeatmapSeriesCallbackDataParams; // TODO this doesn't seem to be HeatmapCallback
   xCategory: string;
   yCategory: string;
   xCategories: DataRecordValue[];
   yCategories: DataRecordValue[];
-  metric: string | object;
+  metricName: string;
   showPerc: boolean;
   numberFormatter: NumberFormatter;
   normalized: boolean;
@@ -87,9 +91,12 @@ export function formatTooltip({
 
   // TODO could/should store x/y category in value?
   const stats = [
+    // TODO remove test field
+    `Normalized value ${value[NORMALIZED_VALUE_INDEX]}`,
+    `Value ${value[VALUE_INDEX]}`,
     `<b>${xCategory}</b>: ${xCategories[value[X_INDEX]]}`,
     `<b>${yCategory}</b>: ${yCategories[value[Y_INDEX]]}`,
-    `<b>${metric}</b>: ${numberFormatter(value[VALUE_INDEX])}`,
+    `<b>${metricName}</b>: ${numberFormatter(value[VALUE_INDEX])}`,
     showPerc
       ? `<b>%</b>: ${
           normalized
@@ -158,6 +165,8 @@ function sortCategoryList(
   return sortedCategories;
 }
 
+// Normalize x (which could be between min_x and max_x)
+// onto a range (a to b)
 function getNormalizedValue(
   a: number,
   b: number,
@@ -165,8 +174,16 @@ function getNormalizedValue(
   min_x: number,
   max_x: number,
 ): number {
+  if (x === 1) {
+    const m = a;
+  }
   return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
 }
+// ++++++++++++++++++++++++++++
+// TODO when have value bounds -40 to 40, min_x being passed in isn't 1, but 4.58 (percentRank thing)
+// Should percentRanks come into this when value bounds are set?
+
+// +++++++++++++++++++++
 
 function getPercentRanks(values: number[]): Map<number, number> {
   // based on pandas DataFrame.rank
@@ -255,6 +272,10 @@ export default function transformProps(
     ?.getColors();
   const colors = scheme_colors ? [...scheme_colors].reverse() : [];
 
+  // Boldly assume the metric will always be the last element in this array
+  const metricName =
+    queriesData[0].colnames[queriesData[0].colnames.length - 1];
+
   const columnsLabelMap = new Map<string, string[]>();
 
   const { setDataMask = () => {}, onContextMenu } = hooks;
@@ -265,7 +286,7 @@ export default function transformProps(
   const xMaxes = new Map<string, number>();
   const yMins = new Map<string, number>();
   const yMaxes = new Map<string, number>();
-  // For getting ranks when normalized is checked
+  // For getting ranks when normalized box is checked
   const xValues = new Map<string, number[]>();
   const yValues = new Map<string, number[]>();
 
@@ -273,21 +294,17 @@ export default function transformProps(
   const yCategory = allColumnsY;
 
   const overallMaxValue = Math.max(
-    ...data.map(datum => datum[metric.toString()] as number),
+    ...data.map(datum => datum[metricName] as number),
   );
   const overallMinValue = Math.min(
-    ...data.map(datum => datum[metric.toString()] as number),
+    ...data.map(datum => datum[metricName] as number),
   );
-
-  // const distinctValues = [
-  //   ...new Set(data.map(datum => datum[metric.toString()] as number)),
-  // ].sort((value1, value2) => value1 - value2);
 
   // get a list of distinct values, ordered
   // then below, for each entry, give it a rank = average position in ordered list?
 
   data.forEach(datum => {
-    const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
+    const value: number = datum[metricName] as number; // TODO sketchy casts?
     const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
     const yCategoryValue: string = datum[yCategory] as string;
 
@@ -347,12 +364,23 @@ export default function transformProps(
   // key = x/ycategory or heatmap, (key = cell value, value = rank as percent)
   const percentRanks: Map<string, Map<number, number>> = new Map();
   if (normalized) {
-    minBound = 0;
-    maxBound = 100;
+    if (normalizeAcross === 'heatmap') {
+      // && (yAxisBounds[0] != null || yAxisBounds[1] != null)
+      minBound = yAxisBounds[0] || 0;
+      maxBound = yAxisBounds[1] || 100;
+    } else {
+      minBound = 0;
+      maxBound = 100;
+    }
+
+    // minBound =
+    //   normalizeAcross === 'heatmap' && yAxisBounds ? yAxisBounds[0] : 0;
+    // maxBound =
+    //   normalizeAcross === 'heatmap' && yAxisBounds ? yAxisBounds[1] : 100;
     if (normalizeAcross === 'heatmap') {
       percentRanks.set(
         'heatmap',
-        getPercentRanks(data.map(datum => datum[metric.toString()] as number)),
+        getPercentRanks(data.map(datum => datum[metricName] as number)),
       );
     } else if (normalizeAcross === 'x') {
       xCategories.forEach(xCategory => {
@@ -374,9 +402,13 @@ export default function transformProps(
   }
 
   const enrichedData = data.map(datum => {
-    const value: number = datum[metric.toString()] as number; // TODO sketchy casts?
+    const value: number = datum[metricName] as number; // TODO sketchy casts?
     const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
     const yCategoryValue: string = datum[yCategory] as string;
+
+    if (value === 1) {
+      const test = value;
+    }
 
     let percentRank: number;
 
@@ -480,18 +512,27 @@ export default function transformProps(
     ];
   });
 
-  const test = defaultGrid;
-
-  // VisualMap isn't quite a legend, so this returns attributes (e.g., scroll)
-  // that visualMap doesn't know about.
-  const legendProperties = getLegendProps(
+  // TODO shady cast? getLegendProps doesn't seem to ever return a list, but a list is an option
+  // VisualMap isn't quite a legend, so getLegendProps returns attributes (e.g., scroll)
+  // that visualMap doesn't know about if we don't explicitly destructure.
+  const {
+    orient,
+    top: legendTop,
+    bottom: legendBottom,
+    right: legendRight,
+    left: legendLeft,
+    itemHeight: legendItemHeight,
+    itemWidth: legendItemWidth,
+    show: legendShow,
+  } = getLegendProps(
     legendType,
     legendOrientation,
     showLegend,
-  );
+  ) as LegendComponentOption;
+
   const padding = {
-    left: leftMargin as number,
-    bottom: bottomMargin as number,
+    left: (leftMargin === 'auto' ? 0 : leftMargin) as number,
+    bottom: (bottomMargin === 'auto' ? 20 : bottomMargin) as number,
   };
 
   const dimension = normalized
@@ -512,7 +553,7 @@ export default function transformProps(
           yCategory: allColumnsY,
           xCategories,
           yCategories,
-          metric,
+          metricName,
           showPerc,
           numberFormatter,
           normalized,
@@ -520,9 +561,12 @@ export default function transformProps(
     },
     grid: {
       ...defaultGrid,
-      ...getChartPadding(showLegend, legendOrientation, legendMargin, padding),
-      // left: leftMargin,
-      // bottom: bottomMargin,
+      ...getChartPadding(
+        showLegend,
+        legendOrientation,
+        legendMargin || DEFAULT_LEGEND_PADDING[legendOrientation],
+        padding,
+      ),
     },
     xAxis: {
       type: 'category',
@@ -549,23 +593,15 @@ export default function transformProps(
       min: minBound, // minDataValue, // TODO test 'dataMin',
       max: maxBound, // maxDataValue,
       calculable: true,
-      // TODO shady cast? getLegendProps doesn't seem to ever return a list, but a list is an option
-      orient: (legendProperties as LegendComponentOption).orient, // legendOrientation, // 'vertical',
-      top: (legendProperties as LegendComponentOption).top,
-      bottom: (legendProperties as LegendComponentOption).bottom,
-      left: (legendProperties as LegendComponentOption).left,
-      right: (legendProperties as LegendComponentOption).right,
-      show: (legendProperties as LegendComponentOption).show,
-      itemHeight: (legendProperties as LegendComponentOption).itemHeight,
-      itemWidth: (legendProperties as LegendComponentOption).itemWidth,
-      // top: '15%',
-      // left: 'right',
-      // show: showLegend,
-      // itemWidth: 15,
-      // itemHeight: 80,
+      orient, // legendOrientation, // 'vertical',
+      top: legendTop,
+      bottom: legendBottom,
+      left: legendLeft,
+      right: legendRight,
+      show: legendShow,
+      itemHeight: legendItemHeight,
+      itemWidth: legendItemWidth,
       color: colors,
-      // TODO vv VALUE_INDEX if yAxisBounds AND normalized across heatmap
-      // or only normalized_value index if normalized on x/y
       dimension,
     },
     series: [
