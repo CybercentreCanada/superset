@@ -17,9 +17,22 @@
  * under the License.
  */
 
-export { default as legacyValidateInteger } from './legacyValidateInteger';
-export { default as legacyValidateNumber } from './legacyValidateNumber';
-export { default as validateInteger } from './validateInteger';
-export { default as validateNumber } from './validateNumber';
-export { default as validateNonEmpty } from './validateNonEmpty';
-export { default as validateValueBounds } from './validateValueBounds';
+import { t } from '../translation';
+
+export default function validateValueBounds(v: unknown) {
+  if (!Array.isArray(v) || v.length !== 2) {
+    return t('Expected array with length 2.');
+  }
+
+  if (Array.isArray(v) && v.length === 2) {
+    // If min is greater than max (assuming that an empty value is interpreted as 0)
+    if (
+      (v[0] == null && v[1] < 0) ||
+      (v[0] > 0 && v[1] == null) ||
+      (v[0] != null && v[1] != null && v[0] > v[1])
+    ) {
+      return t('Max value must be greater than Min.');
+    }
+  }
+  return false;
+}

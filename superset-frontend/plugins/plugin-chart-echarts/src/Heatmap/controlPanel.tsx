@@ -22,6 +22,7 @@ import {
   isFeatureEnabled,
   t,
   validateNonEmpty,
+  validateValueBounds,
 } from '@superset-ui/core';
 import {
   columnChoices,
@@ -241,6 +242,7 @@ const config: ControlPanelConfig = {
               ),
               visibility: ({ controls }: ControlPanelsContainerProps) =>
                 Boolean(controls?.normalize_across?.value === 'heatmap'),
+              validators: [validateValueBounds],
             },
           },
         ],

@@ -28,6 +28,7 @@ import {
   NumberFormatter,
   getNumberFormatter,
   NumberFormats,
+  getTimeFormatter,
 } from '@superset-ui/core';
 import {
   EChartsCoreOption,
@@ -45,6 +46,7 @@ import {
 import {
   extractGroupbyLabel,
   getChartPadding,
+  getColtypesMapping,
   getLegendProps,
   sanitizeHtml,
 } from '../utils/series';
@@ -179,11 +181,6 @@ function getNormalizedValue(
   }
   return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
 }
-// ++++++++++++++++++++++++++++
-// TODO when have value bounds -40 to 40, min_x being passed in isn't 1, but 4.58 (percentRank thing)
-// Should percentRanks come into this when value bounds are set?
-
-// +++++++++++++++++++++
 
 function getPercentRanks(values: number[]): Map<number, number> {
   // based on pandas DataFrame.rank
@@ -202,7 +199,6 @@ function getPercentRanks(values: number[]): Map<number, number> {
   });
 
   // TODO check if values list is empty?
-  // TODO MONDAY - THE OUTPUTTED VALUES ARE WROOONG
   let currentValue = orderedValues[0];
   let rankSum = 0;
   const percentRanks: Map<number, number> = new Map();
@@ -241,6 +237,7 @@ export default function transformProps(
     groupby,
     bottomMargin,
     canvasImageRendering,
+    dateFormat,
     allColumnsX,
     allColumnsY,
     linearColorScheme,
@@ -300,13 +297,28 @@ export default function transformProps(
     ...data.map(datum => datum[metricName] as number),
   );
 
+  // TODO testing - is this useful?
+  const coltypeMapping = getColtypesMapping(queriesData[0]);
+
   // get a list of distinct values, ordered
   // then below, for each entry, give it a rank = average position in ordered list?
 
   data.forEach(datum => {
     const value: number = datum[metricName] as number; // TODO sketchy casts?
-    const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
-    const yCategoryValue: string = datum[yCategory] as string;
+    const xCategoryValue: string = extractGroupbyLabel({
+      datum,
+      groupby: xCategory,
+      coltypeMapping,
+      timeFormatter: getTimeFormatter(dateFormat),
+      numberFormatter,
+    });
+    const yCategoryValue: string = extractGroupbyLabel({
+      datum,
+      groupby: yCategory,
+      coltypeMapping,
+      timeFormatter: getTimeFormatter(dateFormat),
+      numberFormatter,
+    });
 
     xSums.set(xCategoryValue, (xSums.get(xCategoryValue) || 0) + value);
 
@@ -349,12 +361,16 @@ export default function transformProps(
 
   let minBound =
     normalizeAcross === 'heatmap'
-      ? yAxisBounds[0] || overallMinValue
+      ? yAxisBounds[0] == null
+        ? overallMinValue
+        : yAxisBounds[0]
       : overallMinValue;
   // TODO this and legend always spanned from 0 to 1 in old version
   let maxBound =
     normalizeAcross === 'heatmap'
-      ? yAxisBounds[1] || overallMaxValue
+      ? yAxisBounds[1] == null
+        ? overallMaxValue
+        : yAxisBounds[1]
       : overallMaxValue;
 
   const xCategories = sortCategoryList(sortXAxis, 'x', xSums);
@@ -364,19 +380,17 @@ export default function transformProps(
   // key = x/ycategory or heatmap, (key = cell value, value = rank as percent)
   const percentRanks: Map<string, Map<number, number>> = new Map();
   if (normalized) {
-    if (normalizeAcross === 'heatmap') {
-      // && (yAxisBounds[0] != null || yAxisBounds[1] != null)
-      minBound = yAxisBounds[0] || 0;
-      maxBound = yAxisBounds[1] || 100;
+    if (
+      normalizeAcross === 'heatmap' &&
+      (yAxisBounds[0] != null || yAxisBounds[1] != null)
+    ) {
+      minBound = yAxisBounds[0] == null ? 0 : yAxisBounds[0];
+      maxBound = yAxisBounds[1] == null ? 100 : yAxisBounds[1];
     } else {
       minBound = 0;
       maxBound = 100;
     }
 
-    // minBound =
-    //   normalizeAcross === 'heatmap' && yAxisBounds ? yAxisBounds[0] : 0;
-    // maxBound =
-    //   normalizeAcross === 'heatmap' && yAxisBounds ? yAxisBounds[1] : 100;
     if (normalizeAcross === 'heatmap') {
       percentRanks.set(
         'heatmap',
@@ -403,12 +417,21 @@ export default function transformProps(
 
   const enrichedData = data.map(datum => {
     const value: number = datum[metricName] as number; // TODO sketchy casts?
-    const xCategoryValue: string = datum[xCategory] as string; // TODO sketchy cast?
-    const yCategoryValue: string = datum[yCategory] as string;
-
-    if (value === 1) {
-      const test = value;
-    }
+    // TODO this code v is duplicated
+    const xCategoryValue: string = extractGroupbyLabel({
+      datum,
+      groupby: xCategory,
+      coltypeMapping,
+      timeFormatter: getTimeFormatter(dateFormat),
+      numberFormatter,
+    });
+    const yCategoryValue: string = extractGroupbyLabel({
+      datum,
+      groupby: yCategory,
+      coltypeMapping,
+      timeFormatter: getTimeFormatter(dateFormat),
+      numberFormatter,
+    });
 
     let percentRank: number;
 
@@ -425,33 +448,7 @@ export default function transformProps(
     let maxDataValue: number;
     let minDataValue: number;
 
-    // TODO || new Map is shady
-    // What happens if we hit the Math.min(new Map().values()) case?
-    if (normalized) {
-      if (normalizeAcross === 'x') {
-        minDataValue = Math.min(
-          ...(percentRanks.get(xCategoryValue) || new Map()).values(),
-        );
-        maxDataValue = Math.max(
-          ...(percentRanks.get(xCategoryValue) || new Map()).values(),
-        );
-      } else if (normalizeAcross === 'y') {
-        minDataValue = Math.min(
-          ...(percentRanks.get(yCategoryValue) || new Map()).values(),
-        );
-        maxDataValue = Math.max(
-          ...(percentRanks.get(yCategoryValue) || new Map()).values(),
-        );
-      } else {
-        // TODO 'heatmap' hard coded key is shady
-        minDataValue = Math.min(
-          ...(percentRanks.get('heatmap') || new Map()).values(),
-        );
-        maxDataValue = Math.max(
-          ...(percentRanks.get('heatmap') || new Map()).values(),
-        );
-      }
-    } else if (normalizeAcross === 'x') {
+    if (normalizeAcross === 'x') {
       maxDataValue = xMaxes.get(xCategoryValue) || overallMaxValue;
       minDataValue = xMins.get(xCategoryValue) || overallMinValue;
     } else if (normalizeAcross === 'y') {
@@ -471,8 +468,7 @@ export default function transformProps(
       maxDataValue,
     );
 
-    // percent = (value / maxDataValue) * 100;
-    // Old heatmap does it this way:
+    // Old heatmap calculates percent this way.
     percent = ((value - minDataValue) / (maxDataValue - minDataValue)) * 100;
 
     return {
@@ -549,8 +545,8 @@ export default function transformProps(
       formatter: (params: HeatmapSeriesCallbackDataParams) =>
         formatTooltip({
           params,
-          xCategory: allColumnsX,
-          yCategory: allColumnsY,
+          xCategory,
+          yCategory,
           xCategories,
           yCategories,
           metricName,
