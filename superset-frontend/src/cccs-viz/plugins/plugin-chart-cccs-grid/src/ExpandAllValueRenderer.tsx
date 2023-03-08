@@ -101,11 +101,10 @@ export default class ExpandAllValueRenderer extends Component<
 
     // If there is at least one cell that can expand, the expand all
     // button for the row should show 'Expand'
-    if (jsonCellExpandedValues.includes(false)) {
-      this.setState(prevState => ({ ...prevState, expanded: false }));
-    } else {
-      this.setState(prevState => ({ ...prevState, expanded: true }));
-    }
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: !jsonCellExpandedValues.includes(false),
+    }));
   };
 
   // Show either the expand or collapse button dependent
