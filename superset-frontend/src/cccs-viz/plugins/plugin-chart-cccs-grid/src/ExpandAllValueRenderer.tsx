@@ -79,10 +79,7 @@ export default class ExpandAllValueRenderer extends Component<
   // as well as go through each cell renderer and if it's in the same row &
   // it's a cell with a JSON blob, update whether it is expanded or not
   updateState = (newFlag: any) => {
-    this.setState(prevState => ({
-      ...prevState,
-      expanded: newFlag,
-    }));
+    this.setState(prevState => ({ ...prevState, expanded: newFlag }));
 
     const newInstances = this.getJSONCells();
 
@@ -98,22 +95,16 @@ export default class ExpandAllValueRenderer extends Component<
   checkState = () => {
     const newInstances = this.getJSONCells();
 
-    const jsonCells = newInstances.map((instance: any) =>
+    const jsonCellExpandedValues = newInstances.map((instance: any) =>
       instance.componentInstance.getExpandedValue(),
     );
 
     // If there is at least one cell that can expand, the expand all
     // button for the row should show 'Expand'
-    if (jsonCells.includes(false)) {
-      this.setState(prevState => ({
-        ...prevState,
-        expanded: false,
-      }));
+    if (jsonCellExpandedValues.includes(false)) {
+      this.setState(prevState => ({ ...prevState, expanded: false }));
     } else {
-      this.setState(prevState => ({
-        ...prevState,
-        expanded: true,
-      }));
+      this.setState(prevState => ({ ...prevState, expanded: true }));
     }
   };
 

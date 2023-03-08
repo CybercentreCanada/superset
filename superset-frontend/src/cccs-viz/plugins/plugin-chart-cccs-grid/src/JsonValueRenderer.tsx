@@ -95,10 +95,7 @@ export default class JsonValueRenderer extends Component<
   // and trigger the 'checkState` function in the expand all button for the row
   reverseState = () => {
     this.setState(
-      prevState => ({
-        ...prevState,
-        expanded: !prevState.expanded,
-      }),
+      prevState => ({ ...prevState, expanded: !prevState.expanded }),
       () => {
         const instances = this.state.api.getCellRendererInstances();
 
@@ -124,10 +121,7 @@ export default class JsonValueRenderer extends Component<
 
   // Take the boolean value passed in and set the `expanded` field equal to it
   updateState = (newFlag: any) => {
-    this.setState(prevState => ({
-      ...prevState,
-      expanded: newFlag,
-    }));
+    this.setState(prevState => ({ ...prevState, expanded: newFlag }));
   };
 
   // Return whether 'expanded' is set to true or false
