@@ -452,7 +452,6 @@ const config: ControlPanelConfig = {
                     return newState;
                   },
                   visibility: ({ controls }) =>
-                    // TODO properly ensure is Bool
                     Boolean(controls?.emitFilter?.value),
                   canCopy: true,
                 },
@@ -591,7 +590,6 @@ config.controlPanelSections.push({
             'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
           ),
           visibility: ({ controls }) =>
-            // TODO properly ensure is Bool
             Boolean(!controls?.enable_json_expand?.value),
         },
       },
@@ -620,7 +618,6 @@ config.controlPanelSections.push({
             'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
           ),
           visibility: ({ controls }) =>
-            // TODO properly ensure is Bool
             Boolean(!controls?.enable_grouping?.value),
         },
       },
