@@ -280,7 +280,7 @@ export default function CccsGrid({
       // Get the default menu items so we can add to them
       const jsonMenuItems = params.defaultItems.slice(0);
 
-      // Get all of the cell renderer's and the current column ID
+      // Get all of the cell renderers and the current column ID
       const instances = params.api.getCellRendererInstances();
       const columnID = params.column.colId;
 
