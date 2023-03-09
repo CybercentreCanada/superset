@@ -230,6 +230,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const isSortable = true;
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
+      const rowGroupIndex = default_group_by.findIndex((element: any) => { 
+        return element === column
+      });
+      
+      const rowGroup = rowGroupIndex >= 0
+      const hide = rowGroup;
       return {
         field: column,
         headerName: columnHeader,
@@ -238,9 +244,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sort: sortDirection,
         sortIndex,
         enableRowGroup,
-        rowGroup: !!(default_group_by.find((element: any) => { 
-          return element === column
-        })),
+        rowGroup,
+        hide,
+        rowGroupIndex,
         getQuickFilterText: (params: any) => advancedTypeValueFormatter(params),
         headerTooltip: columnDescription,
       };
@@ -262,15 +268,22 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         const isSortable = true;
         const enableRowGroup = true;
         const columnDescription = columnDescriptionMap[column];
+        const rowGroupIndex = default_group_by.findIndex((element: any) => { 
+          return element === column
+        });
+        const initialRowGroupIndex = rowGroupIndex;
+        const rowGroup = rowGroupIndex >= 0
+        const hide = rowGroup;
         return {
           field: column,
           headerName: columnHeader,
           cellRenderer,
           sortable: isSortable,
           enableRowGroup,
-          rowGroup: !!(default_group_by.find((element: any) => { 
-            return element === column
-          })),
+          rowGroup,
+          rowGroupIndex,
+          initialRowGroupIndex,
+          hide,
           getQuickFilterText: (params: any) =>
             advancedTypeValueFormatter(params),
           headerTooltip: columnDescription,
