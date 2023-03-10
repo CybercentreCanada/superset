@@ -236,7 +236,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const rowGroupIndex = default_group_by.findIndex((element: any) => { 
         return element === column
       });
-      
       const rowGroup = rowGroupIndex >= 0
       const hide = rowGroup;
       return {
