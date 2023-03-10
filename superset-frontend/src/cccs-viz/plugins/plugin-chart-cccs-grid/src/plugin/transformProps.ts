@@ -84,7 +84,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     column_state,
     enable_row_numbers,
     jump_action_configs,
-    default_group_by
+    default_group_by,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
