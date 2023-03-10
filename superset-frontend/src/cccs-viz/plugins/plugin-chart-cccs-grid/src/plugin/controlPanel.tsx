@@ -657,7 +657,6 @@ config.controlPanelSections.push({
             return newState;
           },
           visibility: ({ controls }) =>
-            // TODO properly emsure is Bool
             Boolean(controls?.enable_grouping?.value),
           canCopy: true,
         },
