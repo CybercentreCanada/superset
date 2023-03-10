@@ -229,7 +229,7 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', ],
+              rerender: ['metrics', 'percent_metrics', 'default_group_by',],
             },
           },
         ],
@@ -329,7 +329,7 @@ const config: ControlPanelConfig = {
                     : [];
                 return newState;
               },
-              rerender: ['principalColumns'],
+              rerender: ['principalColumns', 'default_group_by'],
               visibility: isRawMode,
               canCopy: true,
             } 
@@ -594,6 +594,73 @@ config.controlPanelSections.push({
           ),
         },
       },
+    ],
+    [
+      {
+        name: 'default_group_by',
+        config: {
+          type: 'SelectControl',
+          label: t('Default columns for row grouping'),
+          description: t(
+            'Preselect a set of columns for row grouping in the grid.',
+          ),
+          multi: true,
+          freeForm: true,
+          allowAll: true,
+          default: [],
+          canSelectAll: true,
+          renderTrigger: true,
+          optionRenderer: (c: ColumnMeta) => (
+            // eslint-disable-next-line react/react-in-jsx-scope
+            <StyledColumnOption showType column={c} />
+          ),
+          // eslint-disable-next-line react/react-in-jsx-scope
+          valueRenderer: (c: ColumnMeta) => (
+            // eslint-disable-next-line react/react-in-jsx-scope
+            <StyledColumnOption column={c} />
+          ),
+          valueKey: 'column_name',
+          mapStateToProps: (
+            state: ControlPanelState,
+            controlState: ControlState,
+          ) => {
+            const { controls } = state;
+            const originalMapStateToProps = isRawMode({ controls }) ?
+              sharedControls?.columns?.mapStateToProps :
+              sharedControls?.groupby?.mapStateToProps;
+            const newState =
+              originalMapStateToProps?.(state, controlState) ?? {};
+            const choices = isRawMode({ controls })
+              ? controls?.columns?.value
+              : controls?.groupby?.value;
+            newState.options = newState.options.filter(
+              (o: { column_name: string }) =>
+                ensureIsArray(choices).includes(o.column_name),
+            );
+            const invalidOptions = ensureIsArray(
+              controlState.value,
+            ).filter(c => !ensureIsArray(choices).includes(c));
+            newState.externalValidationErrors =
+              invalidOptions.length > 0
+                ? invalidOptions.length > 1
+                  ? [
+                      `'${invalidOptions.join(', ')}'${t(
+                        ' are not valid options',
+                      )}`,
+                    ]
+                  : [
+                      `'${invalidOptions}'${t(
+                        ' is not a valid option',
+                      )}`,
+                    ]
+                : [];
+            return newState;
+          },
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_grouping?.value),
+          canCopy: true,
+        },
+      }
     ],
     [
       {
