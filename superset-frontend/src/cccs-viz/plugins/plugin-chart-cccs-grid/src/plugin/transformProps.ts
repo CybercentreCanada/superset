@@ -275,7 +275,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           return element === column
         });
         const initialRowGroupIndex = rowGroupIndex;
-        const rowGroup = rowGroupIndex >= 0
+        const rowGroup = (rowGroupIndex >= 0)
         const hide = rowGroup;
         return {
           field: column,
