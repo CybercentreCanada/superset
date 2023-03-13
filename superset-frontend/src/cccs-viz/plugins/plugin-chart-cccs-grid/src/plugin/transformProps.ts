@@ -85,6 +85,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_row_numbers,
     enable_json_expand,
     jump_action_configs,
+    default_group_by,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
@@ -234,6 +235,11 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
       const autoHeight = true;
+      const rowGroupIndex = default_group_by.findIndex((element: any) => {
+        return element === column;
+      });
+      const rowGroup = rowGroupIndex >= 0;
+      const hide = rowGroup;
       return {
         field: column,
         headerName: columnHeader,
@@ -242,6 +248,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         sort: sortDirection,
         sortIndex,
         enableRowGroup,
+        rowGroup,
+        hide,
+        rowGroupIndex,
         getQuickFilterText: (params: any) => valueFormatter(params),
         headerTooltip: columnDescription,
         autoHeight,
@@ -265,12 +274,22 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         const enableRowGroup = true;
         const columnDescription = columnDescriptionMap[column];
         const autoHeight = true;
+        const rowGroupIndex = default_group_by.findIndex(
+          (element: any) => element === column,
+        );
+        const initialRowGroupIndex = rowGroupIndex;
+        const rowGroup = rowGroupIndex >= 0;
+        const hide = rowGroup;
         return {
           field: column,
           headerName: columnHeader,
           cellRenderer,
           sortable: isSortable,
           enableRowGroup,
+          rowGroup,
+          rowGroupIndex,
+          initialRowGroupIndex,
+          hide,
           getQuickFilterText: (params: any) => valueFormatter(params),
           headerTooltip: columnDescription,
           autoHeight,
