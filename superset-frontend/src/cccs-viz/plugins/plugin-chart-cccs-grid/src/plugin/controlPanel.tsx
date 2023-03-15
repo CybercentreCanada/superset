@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react'
+import React from 'react';
 
 import {
   t,
@@ -47,7 +47,6 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/JumpActionConfigControll';
-
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -103,7 +102,6 @@ const validateAggControlValues = (
     ? [t('Group By, Metrics, or Percent Metrics must have a value')]
     : [];
 };
-
 
 // function isIP(v: unknown) {
 //   if (typeof v === 'string' && v.trim().length > 0) {
@@ -229,7 +227,7 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', 'default_group_by',],
+              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
             },
           },
         ],
@@ -332,7 +330,7 @@ const config: ControlPanelConfig = {
               rerender: ['principalColumns', 'default_group_by'],
               visibility: isRawMode,
               canCopy: true,
-            } 
+            },
           },
         ],
         [
@@ -422,9 +420,9 @@ const config: ControlPanelConfig = {
                     controlState: ControlState,
                   ) => {
                     const { controls } = state;
-                    const originalMapStateToProps = isRawMode({ controls }) ?
-                      sharedControls?.columns?.mapStateToProps :
-                      sharedControls?.groupby?.mapStateToProps;
+                    const originalMapStateToProps = isRawMode({ controls })
+                      ? sharedControls?.columns?.mapStateToProps
+                      : sharedControls?.groupby?.mapStateToProps;
                     const newState =
                       originalMapStateToProps?.(state, controlState) ?? {};
                     const choices = isRawMode({ controls })
@@ -454,7 +452,6 @@ const config: ControlPanelConfig = {
                     return newState;
                   },
                   visibility: ({ controls }) =>
-                    // TODO properly emsure is Bool
                     Boolean(controls?.emitFilter?.value),
                   canCopy: true,
                 },
@@ -590,8 +587,10 @@ config.controlPanelSections.push({
           renderTrigger: true,
           default: false,
           description: t(
-            'Whether to enable row grouping (this will only take affect after a save)',
+            'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
           ),
+          visibility: ({ controls }) =>
+            Boolean(!controls?.enable_json_expand?.value),
         },
       },
     ],
@@ -625,9 +624,9 @@ config.controlPanelSections.push({
             controlState: ControlState,
           ) => {
             const { controls } = state;
-            const originalMapStateToProps = isRawMode({ controls }) ?
-              sharedControls?.columns?.mapStateToProps :
-              sharedControls?.groupby?.mapStateToProps;
+            const originalMapStateToProps = isRawMode({ controls })
+              ? sharedControls?.columns?.mapStateToProps
+              : sharedControls?.groupby?.mapStateToProps;
             const newState =
               originalMapStateToProps?.(state, controlState) ?? {};
             const choices = isRawMode({ controls })
@@ -637,9 +636,9 @@ config.controlPanelSections.push({
               (o: { column_name: string }) =>
                 ensureIsArray(choices).includes(o.column_name),
             );
-            const invalidOptions = ensureIsArray(
-              controlState.value,
-            ).filter(c => !ensureIsArray(choices).includes(c));
+            const invalidOptions = ensureIsArray(controlState.value).filter(
+              c => !ensureIsArray(choices).includes(c),
+            );
             newState.externalValidationErrors =
               invalidOptions.length > 0
                 ? invalidOptions.length > 1
@@ -648,11 +647,7 @@ config.controlPanelSections.push({
                         ' are not valid options',
                       )}`,
                     ]
-                  : [
-                      `'${invalidOptions}'${t(
-                        ' is not a valid option',
-                      )}`,
-                    ]
+                  : [`'${invalidOptions}'${t(' is not a valid option')}`]
                 : [];
             return newState;
           },
@@ -660,7 +655,7 @@ config.controlPanelSections.push({
             Boolean(controls?.enable_grouping?.value),
           canCopy: true,
         },
-      }
+      },
     ],
     [
       {
@@ -671,6 +666,22 @@ config.controlPanelSections.push({
           renderTrigger: true,
           default: true,
           description: t('Whether to enable row numbers'),
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_json_expand',
+        config: {
+          type: 'CheckboxControl',
+          label: t('JSON Row Expand'),
+          renderTrigger: true,
+          default: false,
+          description: t(
+            'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(!controls?.enable_grouping?.value),
         },
       },
     ],
