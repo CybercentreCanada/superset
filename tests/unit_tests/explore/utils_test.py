@@ -50,6 +50,7 @@ query_datasources_by_name = (
     "superset.connectors.sqla.models.SqlaTable.query_datasources_by_name"
 )
 
+
 def test_unsaved_chart_no_dataset_id(app_context: AppContext) -> None:
     from superset.explore.utils import check_access as check_chart_access
 
