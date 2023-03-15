@@ -83,6 +83,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     enable_grouping,
     column_state,
     enable_row_numbers,
+    enable_json_expand,
     jump_action_configs,
     default_group_by,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
@@ -233,6 +234,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const isSortable = true;
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
+      const autoHeight = true;
       const rowGroupIndex = default_group_by.findIndex((element: any) => {
         return element === column;
       });
@@ -251,6 +253,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         rowGroupIndex,
         getQuickFilterText: (params: any) => valueFormatter(params),
         headerTooltip: columnDescription,
+        autoHeight,
       };
     });
   } else {
@@ -270,9 +273,10 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         const isSortable = true;
         const enableRowGroup = true;
         const columnDescription = columnDescriptionMap[column];
-        const rowGroupIndex = default_group_by.findIndex((element: any) => {
-          return element === column;
-        });
+        const autoHeight = true;
+        const rowGroupIndex = default_group_by.findIndex(
+          (element: any) => element === column,
+        );
         const initialRowGroupIndex = rowGroupIndex;
         const rowGroup = rowGroupIndex >= 0;
         const hide = rowGroup;
@@ -288,6 +292,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           hide,
           getQuickFilterText: (params: any) => valueFormatter(params),
           headerTooltip: columnDescription,
+          autoHeight,
         };
       });
       columnDefs = columnDefs.concat(groupByColumnDefs);
@@ -333,6 +338,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       headerName: '#',
       colId: 'rowNum',
       pinned: 'left',
+      lockVisible: true,
       valueGetter: (params: any) =>
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
@@ -357,6 +363,19 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       ];
     }
   });
+
+  // If the flag is set to true, add a column which will contain
+  // a button to expand all JSON blobs in the row
+  if (enable_json_expand) {
+    columnDefs.splice(1, 0, {
+      colId: 'jsonExpand',
+      pinned: 'left',
+      cellRenderer: 'expandAllValueRenderer',
+      autoHeight: true,
+      minWidth: 105,
+      lockVisible: true,
+    } as any);
+  }
 
   return {
     formData,
