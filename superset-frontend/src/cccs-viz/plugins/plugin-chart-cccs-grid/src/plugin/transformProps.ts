@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ValueFormatterParams } from '@ag-grid-enterprise/all-modules';
+import { ValueFormatterParams } from 'ag-grid-enterprise';
 import {
   Column,
   getMetricLabel,
