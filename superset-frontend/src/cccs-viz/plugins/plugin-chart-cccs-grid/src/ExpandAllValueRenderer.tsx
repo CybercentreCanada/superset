@@ -1,6 +1,6 @@
-import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
 import React, { Component } from 'react';
 import './Buttons.css';
+import JsonValueRenderer from './JsonValueRenderer';
 
 // Show a button to collapse all of the JSON blobs in the row
 function collapseJSON(this: any, reverseState: any) {
@@ -45,13 +45,16 @@ export default class ExpandAllValueRenderer extends Component<
     // Make sure row grouping is not enabled, but if it is, don't
     // try to find all of the JSON blobs in the row
     if (
-      instances.filter((instance: any) => instance instanceof GroupCellRenderer)
-        .length === 0
+      instances.filter(
+        (instance: any) =>
+          instance instanceof JsonValueRenderer ||
+          instance instanceof ExpandAllValueRenderer,
+      ).length === instances.length
     ) {
       const newInstances = instances.filter(
         (instance: any) =>
-          instance.params.rowIndex === this.state.rowIndex &&
-          instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
+          instance.props.rowIndex === this.state.rowIndex &&
+          instance.props.column.colDef.cellRenderer === 'jsonValueRenderer',
       );
 
       return newInstances;
@@ -71,7 +74,7 @@ export default class ExpandAllValueRenderer extends Component<
     const newInstances = this.getJSONCells();
 
     newInstances.map((instance: any) =>
-      instance.componentInstance.updateState(!this.state.expanded),
+      instance.updateState(!this.state.expanded),
     );
   };
 
@@ -83,9 +86,7 @@ export default class ExpandAllValueRenderer extends Component<
 
     const newInstances = this.getJSONCells();
 
-    newInstances.map((instance: any) =>
-      instance.componentInstance.updateState(newFlag),
-    );
+    newInstances.map((instance: any) => instance.updateState(newFlag));
   };
 
   // Get all of the cells in the AG Grid and only keep the ones
@@ -96,7 +97,7 @@ export default class ExpandAllValueRenderer extends Component<
     const newInstances = this.getJSONCells();
 
     const jsonCellExpandedValues = newInstances.map((instance: any) =>
-      instance.componentInstance.getExpandedValue(),
+      instance.getExpandedValue(),
     );
 
     // If there is at least one cell that can expand, the expand all

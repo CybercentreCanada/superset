@@ -23,18 +23,17 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { AgGridReact } from '@ag-grid-community/react';
-import { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { AgGridReact } from 'ag-grid-react';
 import {
-  AllModules,
   LicenseManager,
   MenuItemDef,
   GetContextMenuItemsParams,
-} from '@ag-grid-enterprise/all-modules';
+} from 'ag-grid-enterprise';
 import { ensureIsArray } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearDataMask } from 'src/dataMask/actions';
 import { RootState } from 'src/dashboard/types';
+import rison from 'rison';
 import { CccsGridTransformedProps } from './types';
 
 import CountryValueRenderer from './CountryValueRenderer';
@@ -49,12 +48,11 @@ import CustomTooltip from './CustomTooltip';
 
 // 'use strict';
 
-import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
-import '@ag-grid-community/core/dist/styles/ag-grid.css';
-import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 
 import { PAGE_SIZE_OPTIONS } from './plugin/controlPanel';
-import rison from 'rison';
 
 const DEFAULT_COLUMN_DEF = {
   editable: false,
@@ -101,7 +99,7 @@ export default function CccsGrid({
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
 
-  const gridRef = useRef<AgGridReactType>(null);
+  const gridRef = useRef<AgGridReact>(null);
 
   const handleChange = useCallback(
     filters => {
@@ -284,36 +282,42 @@ export default function CccsGrid({
       const instances = params.api.getCellRendererInstances();
       const columnID = params.column.colId;
 
-      // Only keep cells which belong to the current column
-      const newInstances = instances.filter(
-        (instance: any) => instance.params.column.colId === columnID,
-      );
+      // If row grouping is enabled, do not allow for expanding
+      // or collapsing all of the cells in the column
+      if (
+        instances.filter(
+          (instance: any) =>
+            instance instanceof JsonValueRenderer ||
+            instance instanceof ExpandAllValueRenderer,
+        ).length === instances.length
+      ) {
+        // Only keep cells which belong to the current column
+        const newInstances = instances.filter(
+          (instance: any) => instance.props.column.colId === columnID,
+        );
 
-      // Add an expand all button which will send an update to each cell renderer
-      jsonMenuItems.push({
-        name:
-          params.column.colDef.cellRenderer === 'jsonValueRenderer'
-            ? 'Expand Column'
-            : 'Expand All',
-        action: () => {
-          newInstances.map((instance: any) =>
-            instance.componentInstance.updateState(true),
-          );
-        },
-      });
+        // Add an expand all button which will send an update to each cell renderer
+        jsonMenuItems.push({
+          name:
+            params.column.colDef.cellRenderer === 'jsonValueRenderer'
+              ? 'Expand Column'
+              : 'Expand All',
+          action: () => {
+            newInstances.map((instance: any) => instance.updateState(true));
+          },
+        });
 
-      // Add a collapse all button which will send an update to each cell renderer
-      jsonMenuItems.push({
-        name:
-          params.column.colDef.cellRenderer === 'jsonValueRenderer'
-            ? 'Collapse Column'
-            : 'Collapse All',
-        action: () => {
-          newInstances.map((instance: any) =>
-            instance.componentInstance.updateState(false),
-          );
-        },
-      });
+        // Add a collapse all button which will send an update to each cell renderer
+        jsonMenuItems.push({
+          name:
+            params.column.colDef.cellRenderer === 'jsonValueRenderer'
+              ? 'Collapse Column'
+              : 'Collapse All',
+          action: () => {
+            newInstances.map((instance: any) => instance.updateState(false));
+          },
+        });
+      }
 
       // Return the default menu with added options (expand/collapse)
       return jsonMenuItems;
@@ -349,7 +353,7 @@ export default function CccsGrid({
 
   const onFirstDataRendered = (params: any) => {
     // Get all of the columns in the grid
-    const instances = params.columnApi.getAllColumns();
+    const instances = params.columnApi.getColumns();
 
     // Filter on columns that have JSON data
     const newInstances = instances.filter(
@@ -462,7 +466,7 @@ export default function CccsGrid({
   function autoSizeFirst100Columns(params: any) {
     // Autosizes only the first 100 Columns in Ag-Grid
     const allColumnIds = params.columnApi
-      .getAllColumns()
+      .getColumns()
       .map((col: any) => col.getColId());
     params.columnApi.autoSizeColumns(allColumnIds.slice(0, 100), false);
   }
@@ -557,10 +561,9 @@ export default function CccsGrid({
       <div style={{ flex: '1 1 auto' }}>
         <AgGridReact
           ref={gridRef}
-          modules={AllModules}
           columnDefs={columnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
-          frameworkComponents={frameworkComponents}
+          components={frameworkComponents}
           enableBrowserTooltips={true}
           enableRangeSelection={true}
           allowContextMenuWithControlKey={true}

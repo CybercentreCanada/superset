@@ -1,7 +1,8 @@
-import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
+import { GroupCellRenderer } from 'ag-grid-enterprise';
 import React, { Component } from 'react';
 import JSONTree from 'react-json-tree';
 import './Buttons.css';
+import ExpandAllValueRenderer from './ExpandAllValueRenderer';
 
 function safeJsonObjectParse(
   data: unknown,
@@ -84,6 +85,32 @@ export default class JsonValueRenderer extends Component<
     };
   }
 
+  // Get all of the cells in the AG Grid and only keep the Expand
+  // all button in the current row
+  getExpandRowCell = () => {
+    const instances = this.state.api.getCellRendererInstances();
+
+    // Make sure row grouping is not enabled, but if it is, don't
+    // try to find the expand all button in the row
+    if (
+      instances.filter(
+        (instance: any) =>
+          instance instanceof JsonValueRenderer ||
+          instance instanceof ExpandAllValueRenderer,
+      ).length === instances.length
+    ) {
+      const expandAllCell = instances.filter(
+        (instance: any) =>
+          instance.props.rowIndex === this.state.rowIndex &&
+          instance.props.column.colDef.cellRenderer ===
+            'expandAllValueRenderer',
+      );
+
+      return expandAllCell;
+    }
+    return [];
+  };
+
   // update cellValue when the cell's props are updated
   static getDerivedStateFromProps(nextProps: any) {
     return {
@@ -97,31 +124,23 @@ export default class JsonValueRenderer extends Component<
     this.setState(
       prevState => ({ ...prevState, expanded: !prevState.expanded }),
       () => {
-        const instances = this.state.api.getCellRendererInstances();
+        const expandAllCell = this.getExpandRowCell();
 
-        // Make sure row grouping is not enabled, but if it is, don't
-        // trigger the 'checkState` function in the expand all button for the row
-        if (
-          instances.filter(
-            (instance: any) => instance instanceof GroupCellRenderer,
-          ).length === 0
-        ) {
-          instances
-            .filter(
-              (instance: any) =>
-                instance.params.rowIndex === this.state.rowIndex &&
-                instance.params.column.colDef.cellRenderer ===
-                  'expandAllValueRenderer',
-            )
-            .map((instance: any) => instance.componentInstance.checkState());
-        }
+        expandAllCell.map((instance: any) => instance.checkState());
       },
     );
   };
 
   // Take the boolean value passed in and set the `expanded` field equal to it
   updateState = (newFlag: any) => {
-    this.setState(prevState => ({ ...prevState, expanded: newFlag }));
+    this.setState(
+      prevState => ({ ...prevState, expanded: newFlag }),
+      () => {
+        const expandAllCell = this.getExpandRowCell();
+
+        expandAllCell.map((instance: any) => instance.checkState());
+      },
+    );
   };
 
   // Return whether 'expanded' is set to true or false
