@@ -27,15 +27,17 @@ import {
 import {
   columnChoices,
   ControlPanelConfig,
+  ControlPanelsContainerProps,
   ControlPanelState,
+  D3_FORMAT_OPTIONS,
+  emitFilterControl,
   formatSelectOptions,
   formatSelectOptionsForRange,
   sections,
   sharedControls,
   getStandardizedControls,
-  ControlPanelsContainerProps,
 } from '@superset-ui/chart-controls';
-import { legendSection } from '../controls';
+import { DEFAULT_FORM_DATA } from './types';
 import { LegendOrientation } from '../types';
 
 const sortAxisChoices = [
@@ -91,6 +93,7 @@ const config: ControlPanelConfig = {
         ],
         ['metric'],
         ['adhoc_filters'],
+        emitFilterControl,
         ['row_limit'],
         [
           {
@@ -246,7 +249,24 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['y_axis_format'],
+        [
+          {
+            name: 'number_format',
+            config: {
+              type: 'SelectControl',
+              freeForm: true,
+              label: t('Number Format'),
+              renderTrigger: true,
+              default: DEFAULT_FORM_DATA.numberFormat,
+              choices: D3_FORMAT_OPTIONS,
+              description: `${t(
+                'D3 format syntax: https://github.com/d3/d3-format. ',
+              )} ${t(
+                'Only applies to the metric value displayed in the tooltip.',
+              )}`,
+            },
+          },
+        ],
         [
           {
             name: 'sort_x_axis',
@@ -367,14 +387,6 @@ const config: ControlPanelConfig = {
       ],
     },
   ],
-  controlOverrides: {
-    y_axis_format: {
-      label: t('Value Format'),
-      description: `${t(
-        'D3 format syntax: https://github.com/d3/d3-format. ',
-      )} ${t('Only applies to the metric value displayed in the tooltip.')}`,
-    },
-  },
   formDataOverrides: formData => ({
     ...formData,
     metric: getStandardizedControls().shiftMetric(),

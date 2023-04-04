@@ -23,21 +23,19 @@ import {
   QueryFormColumn,
   QueryFormData,
 } from '@superset-ui/core';
+import { CallbackDataParams } from 'echarts/types/src/util/types';
 import { EChartTransformedProps, LegendOrientation } from '../types';
 import { DEFAULT_LEGEND_FORM_DATA } from '../constants';
-import { CallbackDataParams } from 'echarts/types/src/util/types';
 
 export type EchartsHeatmapFormData = QueryFormData & {
   groupby: QueryFormColumn[];
   width: number;
   height: number;
-  bottomMargin: number | string;
   canvasImageRendering: string; // TODO
   colorScheme?: string;
   columnX: string;
   columnY: string;
-  leftMargin: number | string;
-  metric: string | object;
+  metric: string;
   normalized: boolean;
   numberFormat: string;
   showLegend: boolean;
@@ -75,6 +73,7 @@ export const DEFAULT_FORM_DATA: Partial<EchartsHeatmapFormData> = {
   yscaleInterval: 1,
   yAxisBounds: [],
   emitFilter: false,
+  xAxisRotation: 45,
 };
 
 export interface EchartsHeatmapChartProps
@@ -91,6 +90,6 @@ export interface HeatmapSeriesCallbackDataParams extends CallbackDataParams {
   yCategory: string;
   xCategoryValue: string;
   yCategoryValue: string;
-  metric: string;
+  metricName: string;
   showPerc: boolean;
 }
