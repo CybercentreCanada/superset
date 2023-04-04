@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import { emitFilterControl } from '@superset-ui/chart-controls';
 import {
   DataRecord,
   getColumnLabel,
@@ -48,7 +47,6 @@ import {
   getChartPadding,
   getColtypesMapping,
   getLegendProps,
-  sanitizeHtml,
 } from '../utils/series';
 import { LegendOrientation } from '../types';
 
@@ -57,8 +55,8 @@ const Y_INDEX = 1;
 const VALUE_INDEX = 2;
 const NORMALIZED_VALUE_INDEX = 3;
 const PERCENT_INDEX = 4;
-const X_SUM_INDEX = 5;
-const Y_SUM_INDEX = 6;
+// const X_SUM_INDEX = 5;
+// const Y_SUM_INDEX = 6;
 const NORMALIZED_RANK_VALUE_INDEX = 7;
 
 const DEFAULT_LEGEND_PADDING = {
@@ -91,11 +89,7 @@ export function formatTooltip({
 }): string {
   const { value } = params;
 
-  // TODO could/should store x/y category in value?
   const stats = [
-    // TODO remove test field
-    `Normalized value ${value[NORMALIZED_VALUE_INDEX]}`,
-    `Value ${value[VALUE_INDEX]}`,
     `<b>${xCategory}</b>: ${xCategories[value[X_INDEX]]}`,
     `<b>${yCategory}</b>: ${yCategories[value[Y_INDEX]]}`,
     `<b>${metricName}</b>: ${numberFormatter(value[VALUE_INDEX])}`,
@@ -111,6 +105,18 @@ export function formatTooltip({
   return [...stats].join('<br/>');
 }
 
+/**
+ * Returns a sorted list of category values.
+ *
+ * @param sortOption indicates the value on
+ * which to sort and in which order (may have
+ * a value of 'alpha_asc', 'alpha_desc', 'value_asc', or 'value_desc')
+ * @param axis the axis to sort ('x' or 'y')
+ * @param sums a map where the key represents the category value
+ * (e.g., the value displayed on the heatmap axis for one row or column)
+ * and the value is the sum of the values on that row or column
+ * @returns a sorted list of category values
+ */
 function sortCategoryList(
   sortOption: string,
   axis: string,
@@ -167,8 +173,16 @@ function sortCategoryList(
   return sortedCategories;
 }
 
-// Normalize x (which could be between min_x and max_x)
-// onto a range (a to b)
+/**
+ * Returns the value of x normalized on a given range.
+ *
+ * @param a the minimum value of the range onto which x is normalized
+ * @param b the maximum value of the range onto which x is normalized
+ * @param x the value to be normalized
+ * @param min_x the minimum possible value of x
+ * @param max_x the maximum possible value of x
+ * @returns the normalized value of x
+ */
 function getNormalizedValue(
   a: number,
   b: number,
@@ -176,54 +190,58 @@ function getNormalizedValue(
   min_x: number,
   max_x: number,
 ): number {
-  if (x === 1) {
-    const m = a;
-  }
   return (b - a) * ((x - min_x) / (max_x - min_x)) + a;
 }
 
+/**
+ * Returns a map of ranked values, where the key is the value and
+ * the value is the rank
+ *
+ * @remarks This is based on Pandas DataFrame.rank() method. When given
+ * a list that contains n duplicate values, the rank of that number
+ * is equal to the sum of the ranks of the n elements divided by the
+ * length of the list divided by the n.
+ *
+ * @param values a list of the values in a row, column, or the heatmap as a whole
+ * @returns a map of ranked values
+ */
 function getPercentRanks(values: number[]): Map<number, number> {
-  // based on pandas DataFrame.rank
-  // array of values (whole heatmap or row/col)
-  // array: [1, 3, 7, 7] // MUST BE ORDERED
-  // rank:  [1, 2, 3, 4]
-  // counts:[1, 1, 2, 2]
-  // rank2: [0.25, 0.5, 0.875, 0.875]
-  // (1/array.length)*rank (if one value)
-  // (rank1 + ...rankn)/array.length/n
-
   const orderedValues = [...values].sort((value1, value2) => value1 - value2);
   const valueCountMap: Map<number, number> = new Map();
   orderedValues.forEach(value => {
     valueCountMap.set(value, (valueCountMap.get(value) || 0) + 1);
   });
 
-  // TODO check if values list is empty?
-  let currentValue = orderedValues[0];
-  let rankSum = 0;
   const percentRanks: Map<number, number> = new Map();
-  orderedValues.forEach((value, index) => {
-    if (currentValue === value) {
-      rankSum += index + 1;
-    } else {
-      percentRanks.set(
-        currentValue,
-        (rankSum /
-          orderedValues.length /
-          (valueCountMap.get(currentValue) || 1)) *
-          100,
-      );
-      currentValue = value;
-      rankSum = index + 1;
-    }
-  });
 
-  // Get the last value (this is shady)
-  percentRanks.set(
-    currentValue,
-    (rankSum / orderedValues.length / (valueCountMap.get(currentValue) || 1)) *
-      100,
-  );
+  if (orderedValues.length > 0) {
+    let currentValue = orderedValues[0];
+    let rankSum = 0;
+    orderedValues.forEach((value, index) => {
+      if (currentValue === value) {
+        rankSum += index + 1;
+      } else {
+        percentRanks.set(
+          currentValue,
+          (rankSum /
+            orderedValues.length /
+            (valueCountMap.get(currentValue) || 1)) *
+            100,
+        );
+        currentValue = value;
+        rankSum = index + 1;
+      }
+    });
+
+    // Get the last value // TODO refactor this after tests are in place
+    percentRanks.set(
+      currentValue,
+      (rankSum /
+        orderedValues.length /
+        (valueCountMap.get(currentValue) || 1)) *
+        100,
+    );
+  }
 
   return percentRanks;
 }
@@ -231,18 +249,21 @@ function getPercentRanks(values: number[]): Map<number, number> {
 export default function transformProps(
   chartProps: EchartsHeatmapChartProps,
 ): HeatmapChartTransformedProps {
-  const { width, height, formData, queriesData, hooks, filterState, theme } =
+  const { width, height, formData, queriesData, hooks, filterState } =
     chartProps;
   const {
-    groupby,
+    allColumnsX: xCategory,
+    allColumnsY: yCategory,
     bottomMargin,
-    canvasImageRendering,
     dateFormat,
-    allColumnsX,
-    allColumnsY,
-    linearColorScheme,
+    emitFilter,
+    groupby,
     leftMargin,
-    metric,
+    legendMargin,
+    legendOrientation,
+    legendType,
+    linearColorScheme,
+    metric = '',
     normalized,
     normalizeAcross,
     numberFormat,
@@ -254,41 +275,42 @@ export default function transformProps(
     xscaleInterval,
     yscaleInterval,
     yAxisBounds,
-    yAxisFormat,
-    emitFilter,
-    legendMargin,
-    legendOrientation,
-    legendType,
-    sliceId,
+    xAxisRotation,
   }: EchartsHeatmapFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = (queriesData[0]?.data || []) as DataRecord[];
   const groupbyLabels = groupby.map(getColumnLabel);
-  const numberFormatter = getNumberFormatter(yAxisFormat);
+  const numberFormatter = getNumberFormatter(numberFormat);
   const scheme_colors = getSequentialSchemeRegistry()
     ?.get(linearColorScheme)
     ?.getColors();
   const colors = scheme_colors ? [...scheme_colors].reverse() : [];
 
-  // Boldly assume the metric will always be the last element in this array
-  const metricName =
-    queriesData[0].colnames[queriesData[0].colnames.length - 1];
+  const metricName = getMetricLabel(metric);
 
   const columnsLabelMap = new Map<string, string[]>();
 
   const { setDataMask = () => {}, onContextMenu } = hooks;
 
-  const xSums = new Map<string, number>(); // key = xValue
-  const ySums = new Map<string, number>(); // key = yValue
+  // These maps hold the summations of the values found in the
+  // heatmap's rows and columns, where the key is the x or y
+  // category value as shown on the axes
+  const xSums = new Map<string, number>();
+  const ySums = new Map<string, number>();
+
+  // These maps hold the min or max values found in the heatmap's
+  // rows and columns, where the key is the x or y category value
+  // as shown on the axes.
   const xMins = new Map<string, number>();
   const xMaxes = new Map<string, number>();
   const yMins = new Map<string, number>();
   const yMaxes = new Map<string, number>();
-  // For getting ranks when normalized box is checked
+
+  // These maps hold the values found in the heatmap's rows and
+  // columns, where the key is the x or y category value as shown
+  // on the axes. This is used for getting ranks when the heatmap
+  // is normalized.
   const xValues = new Map<string, number[]>();
   const yValues = new Map<string, number[]>();
-
-  const xCategory = allColumnsX;
-  const yCategory = allColumnsY;
 
   const overallMaxValue = Math.max(
     ...data.map(datum => datum[metricName] as number),
@@ -297,81 +319,87 @@ export default function transformProps(
     ...data.map(datum => datum[metricName] as number),
   );
 
-  // TODO testing - is this useful?
   const coltypeMapping = getColtypesMapping(queriesData[0]);
 
   // get a list of distinct values, ordered
   // then below, for each entry, give it a rank = average position in ordered list?
+  if (!Number.isNaN(overallMaxValue)) {
+    data.forEach(datum => {
+      const value: number = datum[metricName] as number; // TODO sketchy casts?
+      const xCategoryValue: string = extractGroupbyLabel({
+        datum,
+        groupby: xCategory,
+        coltypeMapping,
+        timeFormatter: getTimeFormatter(dateFormat),
+        numberFormatter,
+      });
+      const yCategoryValue: string = extractGroupbyLabel({
+        datum,
+        groupby: yCategory,
+        coltypeMapping,
+        timeFormatter: getTimeFormatter(dateFormat),
+        numberFormatter,
+      });
 
-  data.forEach(datum => {
-    const value: number = datum[metricName] as number; // TODO sketchy casts?
-    const xCategoryValue: string = extractGroupbyLabel({
-      datum,
-      groupby: xCategory,
-      coltypeMapping,
-      timeFormatter: getTimeFormatter(dateFormat),
-      numberFormatter,
+      xSums.set(xCategoryValue, (xSums.get(xCategoryValue) || 0) + value);
+
+      ySums.set(yCategoryValue, (ySums.get(yCategoryValue) || 0) + value);
+
+      xMins.set(
+        xCategoryValue,
+        Math.min(xMins.get(xCategoryValue) || Number.MAX_SAFE_INTEGER, value),
+      );
+
+      xMaxes.set(
+        xCategoryValue,
+        Math.max(xMaxes.get(xCategoryValue) || Number.MIN_SAFE_INTEGER, value),
+      );
+
+      yMins.set(
+        yCategoryValue,
+        Math.min(yMins.get(yCategoryValue) || Number.MAX_SAFE_INTEGER, value),
+      );
+
+      yMaxes.set(
+        yCategoryValue,
+        Math.max(yMaxes.get(yCategoryValue) || Number.MIN_SAFE_INTEGER, value),
+      );
+
+      // TODO is there another way to do this? vv
+      // Collect x or y or all values when needed?
+      // Probably but then reiterating over entire dataset again.
+
+      xValues.set(
+        xCategoryValue,
+        (xValues.get(xCategoryValue) || []).concat(value),
+      );
+
+      yValues.set(
+        yCategoryValue,
+        (yValues.get(yCategoryValue) || []).concat(value),
+      );
     });
-    const yCategoryValue: string = extractGroupbyLabel({
-      datum,
-      groupby: yCategory,
-      coltypeMapping,
-      timeFormatter: getTimeFormatter(dateFormat),
-      numberFormatter,
-    });
+  }
 
-    xSums.set(xCategoryValue, (xSums.get(xCategoryValue) || 0) + value);
+  // minBound = overallMinValue unless one of Min/Max bound is set
+  // (in which case it's the set minV bound, or 0 by default) or
+  // if normalized is checked, in which case 0 is lower default bound
+  let minBound = Number.isNaN(overallMinValue) ? 0 : overallMinValue;
+  let maxBound = Number.isNaN(overallMaxValue) ? 0 : overallMaxValue;
 
-    ySums.set(yCategoryValue, (ySums.get(yCategoryValue) || 0) + value);
+  if (normalizeAcross === 'heatmap') {
+    if (yAxisBounds[0] != null) {
+      minBound = yAxisBounds[0];
+    } else if (normalized || yAxisBounds[1] != null) {
+      minBound = 0;
+    }
 
-    xMins.set(
-      xCategoryValue,
-      Math.min(xMins.get(xCategoryValue) || Number.MAX_SAFE_INTEGER, value),
-    );
-
-    xMaxes.set(
-      xCategoryValue,
-      Math.max(xMaxes.get(xCategoryValue) || Number.MIN_SAFE_INTEGER, value),
-    );
-
-    yMins.set(
-      yCategoryValue,
-      Math.min(yMins.get(yCategoryValue) || Number.MAX_SAFE_INTEGER, value),
-    );
-
-    yMaxes.set(
-      yCategoryValue,
-      Math.max(yMaxes.get(yCategoryValue) || Number.MIN_SAFE_INTEGER, value),
-    );
-
-    // TODO is there another way to do this? vv
-    // Collect x or y or all values when needed?
-    // Probably but then reiterating over entire dataset again.
-
-    xValues.set(
-      xCategoryValue,
-      (xValues.get(xCategoryValue) || []).concat(value),
-    );
-
-    yValues.set(
-      yCategoryValue,
-      (yValues.get(yCategoryValue) || []).concat(value),
-    );
-  });
-
-  let minBound =
-    normalizeAcross === 'heatmap'
-      ? yAxisBounds[0] == null
-        ? overallMinValue
-        : yAxisBounds[0]
-      : overallMinValue;
-  // TODO this and legend always spanned from 0 to 1 in old version
-  let maxBound =
-    normalizeAcross === 'heatmap'
-      ? yAxisBounds[1] == null
-        ? overallMaxValue
-        : yAxisBounds[1]
-      : overallMaxValue;
+    if (yAxisBounds[1] != null) {
+      maxBound = yAxisBounds[1];
+    } else if (normalized || yAxisBounds[0] != null) {
+      maxBound = 100;
+    }
+  }
 
   const xCategories = sortCategoryList(sortXAxis, 'x', xSums);
   const yCategories = sortCategoryList(sortYAxis, 'y', ySums);
@@ -380,17 +408,6 @@ export default function transformProps(
   // key = x/ycategory or heatmap, (key = cell value, value = rank as percent)
   const percentRanks: Map<string, Map<number, number>> = new Map();
   if (normalized) {
-    if (
-      normalizeAcross === 'heatmap' &&
-      (yAxisBounds[0] != null || yAxisBounds[1] != null)
-    ) {
-      minBound = yAxisBounds[0] == null ? 0 : yAxisBounds[0];
-      maxBound = yAxisBounds[1] == null ? 100 : yAxisBounds[1];
-    } else {
-      minBound = 0;
-      maxBound = 100;
-    }
-
     if (normalizeAcross === 'heatmap') {
       percentRanks.set(
         'heatmap',
@@ -434,30 +451,23 @@ export default function transformProps(
     });
 
     let percentRank: number;
-
-    if (normalizeAcross === 'heatmap') {
-      percentRank = percentRanks.get('heatmap')?.get(value) || 0;
-    } else if (normalizeAcross === 'x') {
-      percentRank = percentRanks.get(xCategoryValue)?.get(value) || 0;
-    } else {
-      percentRank = percentRanks.get(yCategoryValue)?.get(value) || 0;
-    }
-
     let normalizedValue: number = value;
-    let percent = 0;
     let maxDataValue: number;
     let minDataValue: number;
 
-    if (normalizeAcross === 'x') {
-      maxDataValue = xMaxes.get(xCategoryValue) || overallMaxValue;
-      minDataValue = xMins.get(xCategoryValue) || overallMinValue;
-    } else if (normalizeAcross === 'y') {
-      maxDataValue = yMaxes.get(yCategoryValue) || overallMaxValue;
-      minDataValue = yMins.get(yCategoryValue) || overallMinValue;
-    } else {
-      // normalizeAcross === 'heatmap'
+    if (normalizeAcross === 'heatmap') {
+      percentRank = percentRanks.get('heatmap')?.get(value) || 0;
       maxDataValue = overallMaxValue;
       minDataValue = overallMinValue;
+    } else if (normalizeAcross === 'x') {
+      percentRank = percentRanks.get(xCategoryValue)?.get(value) || 0;
+      maxDataValue = xMaxes.get(xCategoryValue) || overallMaxValue;
+      minDataValue = xMins.get(xCategoryValue) || overallMinValue;
+    } else {
+      // normalizeAcross == 'y'
+      percentRank = percentRanks.get(yCategoryValue)?.get(value) || 0;
+      maxDataValue = yMaxes.get(yCategoryValue) || overallMaxValue;
+      minDataValue = yMins.get(yCategoryValue) || overallMinValue;
     }
 
     normalizedValue = getNormalizedValue(
@@ -469,7 +479,8 @@ export default function transformProps(
     );
 
     // Old heatmap calculates percent this way.
-    percent = ((value - minDataValue) / (maxDataValue - minDataValue)) * 100;
+    const percent =
+      ((value - minDataValue) / (maxDataValue - minDataValue)) * 100;
 
     return {
       value,
@@ -492,20 +503,19 @@ export default function transformProps(
       category => category === datum.yCategoryValue,
     );
 
-    // TODO heatmap seems to require a number, so no formatting allowed?
-    // (e.g., for 1k or 4,000%)
-    const formattedData = Number(numberFormatter(datum.value));
-    // [xIndex, yIndex, value, normalized, percent, x_sum, y_sum, percentRank]
-    return [
-      xIndex,
-      yIndex,
-      datum.value,
-      datum.normalizedValue,
-      datum.percent,
-      datum.xSum,
-      datum.ySum,
-      datum.percentRank,
-    ];
+    if (!Number.isNaN(overallMaxValue)) {
+      return [
+        xIndex,
+        yIndex,
+        datum.value,
+        datum.normalizedValue,
+        datum.percent,
+        datum.xSum,
+        datum.ySum,
+        datum.percentRank,
+      ];
+    }
+    return [xIndex, yIndex, null, null, null, null, null, null];
   });
 
   // TODO shady cast? getLegendProps doesn't seem to ever return a list, but a list is an option
@@ -569,7 +579,7 @@ export default function transformProps(
       data: xCategories,
       axisLabel: {
         interval: xscaleInterval - 1,
-        rotate: 45, // TODO pull into constants or defaults?
+        rotate: xAxisRotation,
       },
       splitArea: {
         show: true,
@@ -586,10 +596,10 @@ export default function transformProps(
       },
     },
     visualMap: {
-      min: minBound, // minDataValue, // TODO test 'dataMin',
-      max: maxBound, // maxDataValue,
+      min: minBound,
+      max: maxBound,
       calculable: true,
-      orient, // legendOrientation, // 'vertical',
+      orient,
       top: legendTop,
       bottom: legendBottom,
       left: legendLeft,
@@ -628,5 +638,6 @@ export default function transformProps(
     groupby: groupbyLabels,
     selectedValues: filterState.selectedValues || [],
     setDataMask,
+    onContextMenu,
   };
 }
