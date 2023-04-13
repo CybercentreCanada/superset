@@ -31,6 +31,7 @@ from io import StringIO
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import pandas as pd
+from flask_babel import gettext as __
 
 from superset import app
 from superset.common.chart_data import ChartDataResultFormat
@@ -74,7 +75,7 @@ def pivot_df(  # pylint: disable=too-many-locals, too-many-arguments, too-many-s
     show_columns_total: bool = False,
     apply_metrics_on_rows: bool = False,
 ) -> pd.DataFrame:
-    metric_name = f"Total ({aggfunc})"
+    metric_name = __("Total (%(aggfunc)s)", aggfunc=aggfunc)
 
     if transpose_pivot:
         rows, columns = columns, rows
@@ -162,7 +163,7 @@ def pivot_df(  # pylint: disable=too-many-locals, too-many-arguments, too-many-s
                 slice_ = df.columns.get_loc(subgroup)
                 subtotal = pivot_v2_aggfunc_map[aggfunc](df.iloc[:, slice_], axis=1)
                 depth = df.columns.nlevels - len(subgroup) - 1
-                total = metric_name if level == 0 else "Subtotal"
+                total = metric_name if level == 0 else __("Subtotal")
                 subtotal_name = tuple([*subgroup, total, *([""] * depth)])
                 # insert column after subgroup
                 df.insert(int(slice_.stop), subtotal_name, subtotal)
@@ -179,7 +180,7 @@ def pivot_df(  # pylint: disable=too-many-locals, too-many-arguments, too-many-s
                     df.iloc[slice_, :].apply(pd.to_numeric), axis=0
                 )
                 depth = df.index.nlevels - len(subgroup) - 1
-                total = metric_name if level == 0 else "Subtotal"
+                total = metric_name if level == 0 else __("Subtotal")
                 subtotal.name = tuple([*subgroup, total, *([""] * depth)])
                 # insert row after subgroup
                 df = pd.concat(
@@ -375,11 +376,49 @@ def apply_post_process(
 
     post_processor = post_processors[viz_type]
 
-    if result["query_context"].result_format == ChartDataResultFormat.CSV:
-        for query in result["queries"]:
-            df = pd.read_csv(StringIO(query["data"]))
-            processed_df = post_processor(df, form_data)  # type: ignore
+    for query in result["queries"]:
+        if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
+            raise Exception(f"Result format {query['result_format']} not supported")
 
+        if not query["data"]:
+            # do not try to process empty data
+            continue
+
+        if query["result_format"] == ChartDataResultFormat.JSON:
+            df = pd.DataFrame.from_dict(query["data"])
+        elif query["result_format"] == ChartDataResultFormat.CSV:
+            df = pd.read_csv(StringIO(query["data"]))
+
+        # convert all columns to verbose (label) name
+        if datasource:
+            df.rename(columns=datasource.data["verbose_map"], inplace=True)
+
+        processed_df = post_processor(df, form_data, datasource)
+
+        query["colnames"] = list(processed_df.columns)
+        query["indexnames"] = list(processed_df.index)
+        query["coltypes"] = extract_dataframe_dtypes(processed_df, datasource)
+        query["rowcount"] = len(processed_df.index)
+
+        # Flatten hierarchical columns/index since they are represented as
+        # `Tuple[str]`. Otherwise encoding to JSON later will fail because
+        # maps cannot have tuples as their keys in JSON.
+        processed_df.columns = [
+            " ".join(str(name) for name in column).strip()
+            if isinstance(column, tuple)
+            else column
+            for column in processed_df.columns
+        ]
+        processed_df.index = [
+            " ".join(str(name) for name in index).strip()
+            if isinstance(index, tuple)
+            else index
+            for index in processed_df.index
+        ]
+
+        if query["result_format"] == ChartDataResultFormat.JSON:
+            query["data"] = processed_df.to_dict()
+        elif query["result_format"] == ChartDataResultFormat.CSV:
             buf = StringIO()
             processed_df.to_csv(buf)
             buf.seek(0)
