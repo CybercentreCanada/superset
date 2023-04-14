@@ -53,7 +53,7 @@ FROM node:16 AS superset-node
 ARG NPM_VER=7
 RUN npm install -g npm@${NPM_VER}
 
-ARG NPM_BUILD_CMD="build-instrumented"
+ARG NPM_BUILD_CMD="build"
 ENV BUILD_CMD=${NPM_BUILD_CMD}
 
 # NPM ci first, as to NOT invalidate previous steps except for when package.json changes
