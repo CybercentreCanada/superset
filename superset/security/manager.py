@@ -1773,7 +1773,6 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
         from superset.connectors.sqla.models import SqlaTable
         from superset.extensions import feature_flag_manager
         from superset.sql_parse import Table
-        from superset.views.utils import is_owner
 
         if database and table or query:
             if query:

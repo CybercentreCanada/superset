@@ -25,6 +25,7 @@ import React, {
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import rison from 'rison';
+import { datahubUrl } from 'src/preamble';
 import {
   createFetchRelated,
   createFetchDistinct,

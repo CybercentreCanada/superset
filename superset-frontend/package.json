@@ -77,6 +77,8 @@
     "last 3 edge versions"
   ],
   "dependencies": {
+    "@ag-grid-community/react": "^26.0.0",
+    "@ag-grid-enterprise/all-modules": "^26.0.0",
     "@ant-design/icons": "^4.8.0",
     "@babel/runtime-corejs3": "^7.12.5",
     "@data-ui/sparkline": "^0.0.84",
@@ -127,6 +129,7 @@
     "chrono-node": "^2.2.6",
     "classnames": "^2.2.5",
     "core-js": "^3.6.5",
+    "currencyformatter.js": "^2.2.0",
     "d3-array": "^1.2.4",
     "d3-color": "^1.2.0",
     "d3-scale": "^2.1.2",
@@ -209,6 +212,8 @@
     "yargs": "^15.4.1"
   },
   "devDependencies": {
+    "@ag-grid-community/react": "^26.0.0",
+    "@ag-grid-enterprise/all-modules": "^26.0.0",
     "@applitools/eyes-storybook": "^3.30.1",
     "@babel/cli": "^7.18.10",
     "@babel/compat-data": "^7.18.8",

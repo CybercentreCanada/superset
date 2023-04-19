@@ -228,33 +228,6 @@ export default function transformProps(
   const axisTickDistance =
     axisLineWidth + axisTickLength + OFFSETS.ticksFromLine;
 
-  const min = minVal ?? calculateMin(transformedData);
-  const max = maxVal ?? calculateMax(transformedData);
-  const axisLabels = range(min, max, (max - min) / splitNumber);
-  const axisLabelLength = Math.max(
-    ...axisLabels.map(label => numberFormatter(label).length).concat([1]),
-  );
-  const normalizer = max;
-  const intervalBoundsAndColors = setIntervalBoundsAndColors(
-    intervals,
-    intervalColorIndices,
-    colorFn,
-    normalizer,
-  );
-  const splitLineDistance =
-    axisLineWidth + splitLineLength + OFFSETS.ticksFromLine;
-  const axisLabelDistance =
-    FONT_SIZE_MULTIPLIERS.axisLabelDistance *
-      fontSize *
-      FONT_SIZE_MULTIPLIERS.axisLabelLength *
-      axisLabelLength +
-    (showSplitLine ? splitLineLength : 0) +
-    (showAxisTick ? axisTickLength : 0) +
-    OFFSETS.ticksFromLine -
-    axisLineWidth;
-  const axisTickDistance =
-    axisLineWidth + axisTickLength + OFFSETS.ticksFromLine;
-
   const progress = {
     show: showProgress,
     overlap,
