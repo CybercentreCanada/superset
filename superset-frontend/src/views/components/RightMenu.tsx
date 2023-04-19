@@ -44,7 +44,6 @@ import {
   MenuObjectChildProps,
 } from 'src/types/bootstrapTypes';
 import { RootState } from 'src/dashboard/types';
-import { Tag } from 'antd';
 import LanguagePicker from './LanguagePicker';
 import DatabaseModal from '../CRUD/data/database/DatabaseModal';
 import { uploadUserPerms } from '../CRUD/utils';

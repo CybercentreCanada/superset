@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import ModalTrigger from 'src/components/ModalTrigger';
-import JSONTree from 'react-json-tree';
 import Button from 'src/components/Button';
 import CopyToClipboard from 'src/components/CopyToClipboard';
+import { JSONTree } from 'react-json-tree';
 
 const JSON_TREE_THEME = {
   scheme: 'monokai',
