@@ -97,7 +97,6 @@ export default function CccsGrid({
   const [selectedDataByAdvancedType, setselectedDataByAdvancedType] =
     useState<{ [key: string]: string[] }>(initialFilters);
 
-  const [filters, setFilters] = useState(initialFilters);
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);

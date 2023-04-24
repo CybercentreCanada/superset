@@ -240,6 +240,7 @@ describe('DatasetList', () => {
       wrapper
         .find('[data-test="cell-text"]')
         .filterWhere(
+          // @ts-ignore
           e =>
             e.childAt(0).props().cell.column.id === 'datahub_link' &&
             e.childAt(0).props().cell.row.index === 0,
@@ -255,6 +256,7 @@ describe('DatasetList', () => {
       wrapper
         .find('[data-test="cell-text"]')
         .filterWhere(
+          // @ts-ignore
           e =>
             e.childAt(0).props().cell.column.id === 'datahub_link' &&
             e.childAt(0).props().cell.row.index === 1,
