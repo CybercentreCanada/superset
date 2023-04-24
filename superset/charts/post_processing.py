@@ -34,7 +34,6 @@ from flask_babel import gettext as __
 
 from superset import app
 from superset.common.chart_data import ChartDataResultFormat
-from superset.common.query_context import QueryContext
 from superset.utils.core import (
     DTTM_ALIAS,
     extract_dataframe_dtypes,

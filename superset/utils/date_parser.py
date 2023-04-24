@@ -25,6 +25,7 @@ import pandas as pd
 import parsedatetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+from flask import current_app as app
 from flask_babel import lazy_gettext as _
 from holidays import country_holidays
 from pyparsing import (
@@ -40,7 +41,6 @@ from pyparsing import (
     Suppress,
 )
 
-from superset import app
 from superset.charts.commands.exceptions import (
     TimeDeltaAmbiguousError,
     TimeRangeAmbiguousError,
@@ -175,7 +175,7 @@ def get_since_until(  # pylint: disable=too-many-arguments,too-many-locals,too-m
         - Next X seconds/minutes/hours/days/weeks/months/years
 
     """
-    config = app.config  # type: ignore
+    config = app.config
     default_relative_start = config["DEFAULT_RELATIVE_START_TIME"]
     default_relative_end = config["DEFAULT_RELATIVE_END_TIME"]
 
