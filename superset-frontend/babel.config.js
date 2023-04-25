@@ -90,14 +90,7 @@ module.exports = {
       ],
     },
     production: {
-      plugins: [
-        [
-          'babel-plugin-jsx-remove-data-test-id',
-          {
-            attributes: 'data-test',
-          },
-        ],
-      ],
+      plugins: [],
     },
     testableProduction: {
       plugins: [],
