@@ -189,6 +189,8 @@ export const DEFAULT_COMMON_BOOTSTRAP_DATA: CommonBootstrapData = {
     },
   },
   d3_format: DEFAULT_D3_FORMAT,
+  datahub_url: '',
+  advanced_data_types: [],
 };
 
 export const DEFAULT_BOOTSTRAP_DATA: BootstrapData = {
