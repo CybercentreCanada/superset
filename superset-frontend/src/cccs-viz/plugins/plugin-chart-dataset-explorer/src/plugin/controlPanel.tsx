@@ -46,10 +46,10 @@ import {
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
-import DrillActionConfig from '../components/controls/JumpActionConfigControll';
-import ChangeDataSourceButton from '../components/controls/changeDatasourceButton';
-
-
+import DrillActionConfig from '../../../plugin-chart-cccs-grid/src/components/controls/JumpActionConfigControll';
+import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
+import SelecttorValue from '../../../plugin-chart-cccs-grid/src/components/controls/selectorValueControl';
+import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
   10,
@@ -195,11 +195,48 @@ const { user } = JSON.parse(
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
-    sections.legacyTimeseriesTime,
+
     {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
+
+        ['granularity'],
+        ['druid_time_origin'],
+        ['granularity_sqla'],
+        [
+          {
+            name: 'timerange_selection',
+            config: {
+              type: DateTimeControl,
+              label: t('Time Range'),
+              description: t('Order results by selected columns'),
+              multi: false,
+              rerender: ['selector_selection_value'],
+              default: " : ",
+              valueKey: 'value',
+              mapStateToProps: (state: ControlPanelState,
+                controlState: ControlState,) => {
+                const options = state.datasource?.columns ? (state.datasource as Dataset)?.columns.reduce((arr: any[], curr: any) => {
+                  return curr?.advanced_data_type ? [...new Set([...arr, {"value": curr?.advanced_data_type}])] : arr;
+                }, []) : []
+                return {options}
+              },
+              resetOnHide: false,
+            },
+          },
+        ],
+        [
+          {
+            name: 'datasource_config',
+            config: {
+              type: ChangeDataSourceButton,
+              renderTrigger: true,
+              label: t('Jump Actions'),
+              description: t('Configure dashboard jump actions.'),
+            },
+          },
+        ],
         [
           {
             name: 'query_mode',
@@ -234,67 +271,52 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
+              rerender: [, 'default_group_by',],
             },
           },
         ],
         [
           {
-            name: 'metrics',
-            override: {
-              visibility: isAggMode,
-              validators: [],
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const { controls } = state;
-                const originalMapStateToProps =
-                  sharedControls?.metrics?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggControlValues(
-                  controls,
-                  [
-                    controls.groupby?.value,
-                    controlState.value,
-                    controls.percent_metrics?.value,
-                  ],
-                );
-                return newState;
-              },
-              rerender: ['groupby', 'percent_metrics'],
-            },
-          },
-        ],
-        [
-          {
-            name: 'percent_metrics',
+            name: 'selector_selection',
             config: {
-              type: 'MetricsControl',
-              label: t('Percentage metrics'),
-              description: t(
-                'Metrics for which percentage of total are to be displayed. Calculated from only data within the row limit.',
-              ),
-              multi: true,
-              visibility: isAggMode,
-              mapStateToProps: ({ datasource, controls }, controlState) => ({
-                columns: datasource?.columns || [],
-                savedMetrics: defineSavedMetrics(datasource),
-                datasourceType: datasource?.type,
-                queryMode: getQueryMode(controls),
-                externalValidationErrors: validateAggControlValues(controls, [
-                  controls.groupby?.value,
-                  controls.metrics?.value,
-                  controlState.value,
-                ]),
-              }),
-              rerender: ['groupby', 'metrics'],
+              type: 'SelectControl',
+              label: t('Selector'),
+              description: t('Order results by selected columns'),
+              multi: false,
+              rerender: ['selector_selection_value'],
               default: [],
-              validators: [],
+              valueKey: 'value',
+              mapStateToProps: (state: ControlPanelState,
+                controlState: ControlState,) => {
+                const options = state.datasource?.columns ? (state.datasource as Dataset)?.columns.reduce((arr: any[], curr: any) => {
+                  return curr?.advanced_data_type ? [...new Set([...arr, {"value": curr?.advanced_data_type}])] : arr;
+                }, []) : []
+                return {options}
+              },
+              resetOnHide: false,
             },
           },
         ],
+        [
+          {
+            name: 'selector_selection_value',
+            config: {
+              type: SelecttorValue,
+              freeForm: true,
+              label: t('Values'),
+              description: t('Order results by selected columns'),
+              multi: true,
+              default: [],
+              resetOnHide: false,
+              mapStateToProps: (state) => {
+                const datasource = state.datasource;
+                const selector = state.controls?.selector_selection?.value || ""
+                return {datasource, selector}
+              },
+              },
+            },
+        ],
+
         [
           {
             name: 'columns',
@@ -340,47 +362,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [
-          {
-            name: 'adhoc_filters',
-            override: {
-              // validators: [adhocFilterValidator],
-            },
-          },
-        ],
-        [
-          {
-            name: 'timeseries_limit_metric',
-            override: {
-              visibility: isAggMode,
-            },
-          },
-        ],
-        [
-          {
-            name: 'row_limit',
-            override: {
-              label: t('PAPAME'),
-              default: 100,
-            },
-          },
-        ],
-        [
-          {
-            name: 'datasource',
-            config: {
-              type: 'DatasourceControl',
-              label: t('Datasource'),
-              default: null,
-              description: null,
-              mapStateToProps: ({ datasource, form_data }) => ({
-                datasource,
-                form_data,
-                user,
-              }),
-            }
-          }
-        ],
+
         [
           {
             name: 'order_by_cols',
@@ -389,6 +371,7 @@ const config: ControlPanelConfig = {
               label: t('Ordering'),
               description: t('Order results by selected columns'),
               multi: true,
+              hidden: true,
               default: [],
               mapStateToProps: ({ datasource }) => ({
                 choices: datasource?.hasOwnProperty('order_by_choices')
@@ -408,6 +391,7 @@ const config: ControlPanelConfig = {
                   type: 'CheckboxControl',
                   label: t('Emit dashboard cross filters'),
                   default: false,
+                  hidden: true,
                   renderTrigger: true,
                   description: t('Emit dashboard cross filters.'),
                 },
@@ -596,6 +580,7 @@ config.controlPanelSections.push({
         config: {
           type: 'CheckboxControl',
           label: t('Search box'),
+          hidden: true,
           renderTrigger: true,
           default: false,
           description: t('Whether to include a client-side search box'),
@@ -610,6 +595,7 @@ config.controlPanelSections.push({
           label: t('Row grouping'),
           renderTrigger: true,
           default: false,
+          hidden: true,
           description: t(
             'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
           ),
@@ -632,6 +618,7 @@ config.controlPanelSections.push({
           allowAll: true,
           default: [],
           canSelectAll: true,
+          hidden: true,
           renderTrigger: true,
           optionRenderer: (c: ColumnMeta) => (
             // eslint-disable-next-line react/react-in-jsx-scope
@@ -688,6 +675,7 @@ config.controlPanelSections.push({
           type: 'CheckboxControl',
           label: t('Row numbers'),
           renderTrigger: true,
+          hidden: true,
           default: true,
           description: t('Whether to enable row numbers'),
         },
@@ -700,6 +688,7 @@ config.controlPanelSections.push({
           type: 'CheckboxControl',
           label: t('JSON Row Expand'),
           renderTrigger: true,
+          hidden: true,
           default: false,
           description: t(
             'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
@@ -718,6 +707,7 @@ config.controlPanelSections.push({
           renderTrigger: true,
           label: t('Page length'),
           default: 0,
+          hidden: true,
           choices: PAGE_SIZE_OPTIONS,
           description: t('Rows per page, 0 means no pagination'),
           validators: [legacyValidateInteger],
@@ -729,23 +719,13 @@ config.controlPanelSections.push({
         name: 'jump_action_configs',
         config: {
           type: DrillActionConfig,
-          renderTrigger: true,
+          hidden: true,
           label: t('Jump Actions'),
           description: t('Configure dashboard jump actions.'),
         },
       },
     ],
-    [
-      {
-        name: 'datasource',
-        config: {
-          type: ChangeDataSourceButton,
-          renderTrigger: true,
-          label: t('Jump Actions'),
-          description: t('Configure dashboard jump actions.'),
-        },
-      },
-    ],
+
 
     
   ],
