@@ -36,7 +36,6 @@ import {
   ControlStateMapping,
   ControlPanelConfig,
   ControlPanelsContainerProps,
-  sections,
   QueryModeLabel,
   sharedControls,
   ControlPanelState,
