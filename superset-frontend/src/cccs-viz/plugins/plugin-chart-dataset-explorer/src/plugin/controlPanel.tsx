@@ -195,12 +195,27 @@ const { user } = JSON.parse(
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
-
     {
-      label: t('Query'),
+      label: t('Data Set'),
+      expanded: true,
+      controlSetRows: [ 
+        [
+          {
+            name: 'datasource_config',
+            config: {
+              type: ChangeDataSourceButton,
+              renderTrigger: true,
+              label: t('Jump Actions'),
+              description: t('Configure dashboard jump actions.'),
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: t('Time'),
       expanded: true,
       controlSetRows: [
-
         ['granularity'],
         ['druid_time_origin'],
         ['granularity_sqla'],
@@ -210,10 +225,9 @@ const config: ControlPanelConfig = {
             config: {
               type: DateTimeControl,
               label: t('Time Range'),
-              description: t('Order results by selected columns'),
               multi: false,
               rerender: ['selector_selection_value'],
-              default: " : ",
+              default: "Today : Today",
               valueKey: 'value',
               mapStateToProps: (state: ControlPanelState,
                 controlState: ControlState,) => {
@@ -226,17 +240,12 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [
-          {
-            name: 'datasource_config',
-            config: {
-              type: ChangeDataSourceButton,
-              renderTrigger: true,
-              label: t('Jump Actions'),
-              description: t('Configure dashboard jump actions.'),
-            },
-          },
-        ],
+      ]
+    },
+    {
+      label: t('Query'),
+      expanded: true,
+      controlSetRows: [
         [
           {
             name: 'query_mode',
