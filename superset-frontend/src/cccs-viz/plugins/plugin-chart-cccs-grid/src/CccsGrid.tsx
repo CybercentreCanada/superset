@@ -76,7 +76,7 @@ export default function CccsGrid({
   selectedValues,
   tooltipShowDelay,
   rowSelection,
-  emitFilter,
+  emitCrossFilters,
   principalColumns,
   include_search,
   page_length = 0,
@@ -105,7 +105,7 @@ export default function CccsGrid({
 
   const handleChange = useCallback(
     filters => {
-      if (!emitFilter) {
+      if (!emitCrossFilters) {
         return;
       }
       const groupBy = Object.keys(filters);
@@ -134,7 +134,12 @@ export default function CccsGrid({
         },
       });
     },
-    [emitFilter, setDataMask, selectedDataByColumnName, principalColumnFilters],
+    [
+      emitCrossFilters,
+      setDataMask,
+      selectedDataByColumnName,
+      principalColumnFilters,
+    ],
   ); // only take relevant page size options
 
   const generateNativeFilterUrlString = (
@@ -217,7 +222,7 @@ export default function CccsGrid({
       let result: (string | MenuItemDef)[] = [];
       result = ['copy', 'copyWithHeaders', 'paste'];
 
-      if (emitFilter) {
+      if (emitCrossFilters) {
         result = result.concat([
           'separator',
           {
@@ -259,7 +264,7 @@ export default function CccsGrid({
       return result;
     },
     [
-      emitFilter,
+      emitCrossFilters,
       selectedDataByColumnName,
       principalColumns,
       crossFilterValue,
