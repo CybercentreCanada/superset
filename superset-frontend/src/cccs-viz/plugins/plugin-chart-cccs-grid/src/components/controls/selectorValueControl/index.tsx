@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ChangeDatasourceModal,
     DatasourceModal,
@@ -7,10 +7,8 @@ import { t, withTheme } from '@superset-ui/core';
 import { connect, useSelector, useDispatch } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import { setDatasource } from 'src/explore/actions/exploreActions';
-
-
-
-
+import { Tooltip } from 'src/components/Tooltip';
+import useAdvancedDataTypes from 'src/explore/components/controls/FilterControl/AdhocFilterEditPopoverSimpleTabContent/useAdvancedDataTypes';
 
 export interface Props {
     colorScheme: string;
@@ -22,7 +20,7 @@ export interface Props {
     name: string;
     actions: object;
     label: string;
-    value?: object[];
+    value?: any[] | any;
     datasource: any;
     multi: boolean;
     freeForm: boolean;
@@ -49,12 +47,22 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
     label,
     ...props
 }) => {
+    const [rawValues, setRawValues] = useState([]);
 
+    const {
+        advancedDataTypesState,
+        subjectAdvancedDataType,
+        fetchAdvancedDataTypeValueCallback,
+        fetchSubjectAdvancedDataType,
+      } = useAdvancedDataTypes(() => {});
 
     const onChangeWrapper = (selection: any) => {
+        setRawValues(selection)
+    }
     
-        const data =  selection.length > 0 ?  {
-            "data": selection,
+    useEffect( () => {
+        const data =  advancedDataTypesState.parsedAdvancedDataType.length > 0 && advancedDataTypesState.parsedAdvancedDataType.split(",").length > 0 ?  {
+            "data":  advancedDataTypesState.parsedAdvancedDataType.split(","),
             "columns": datasource.columns.filter((col: any) => {
                 return col.advanced_data_type === selector
             }).map((col: any) => {
@@ -62,18 +70,36 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
             }) 
         } : {"data": [], "columns": []}
         onChange(data);
-    }
+    }, [advancedDataTypesState])
+
+    useEffect(() => {
+        fetchAdvancedDataTypeValueCallback(
+            Array.isArray(rawValues) ? rawValues : [rawValues],
+            advancedDataTypesState,
+            Array.isArray(selector) ? selector[0] : selector,
+        );
+      }, [selector, rawValues, subjectAdvancedDataType]);
     
+      
     return (
-        <>
-            <SelectControl
-                onChange={onChangeWrapper}
-                multi={multi}
-                freeForm={freeForm}
-                label={label}
-                            />
-        
-        </>
+        <Tooltip
+            title={
+            advancedDataTypesState.errorMessage ||
+            advancedDataTypesState.parsedAdvancedDataType
+            }
+        >
+            <>
+                <SelectControl
+                    description={advancedDataTypesState.parsedAdvancedDataType}
+                    validationErrors={advancedDataTypesState.errorMessage ? [advancedDataTypesState.errorMessage] : []}
+                    onChange={onChangeWrapper}
+                    multi={multi}
+                    freeForm={freeForm}
+                    label={label}
+                />
+            
+            </>
+        </Tooltip>
     );
 }
 
