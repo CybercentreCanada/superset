@@ -14,8 +14,10 @@ import { FrameComponentProps } from 'src/explore/components/controls/DateFilterC
 import DateFunctionTooltip from 'src/explore/components/controls/DateFilterControl/components/DateFunctionTooltip';
 import { connect } from 'react-redux';
 import rison from 'rison';
+import ControlHeader from 'src/explore/components/ControlHeader';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import { useDebouncedEffect } from 'src/explore/exploreUtils';
+import { Descriptions } from 'antd';
 
 
 
@@ -59,7 +61,10 @@ const fetchTimeRange = async (timeRange: string) => {
 const DatetimeControl: React.FC<Props>  = (props) => {
 
     const [timeRange, setTimeRange ] = useState(props.default); 
-    
+    const [validationErrors, setValidationErrors ] = useState<string[]>([]); 
+    const [actualTimeRange, setactualTimeRange] = useState<string>();
+
+
     const [since, until] = timeRange.split(SEPARATOR);
 
     function onChange(control: 'since' | 'until', value: string) {
@@ -73,18 +78,28 @@ const DatetimeControl: React.FC<Props>  = (props) => {
         props.onChange(timeRange)
     }, [timeRange])
     useDebouncedEffect(() => {
-      fetchTimeRange(timeRange).then( value =>
-        console.log(value)
-      )
+      fetchTimeRange(timeRange).then( value => {
+        setactualTimeRange(value?.value ? `Actual Time Range ${value?.value}` : "");
+        setValidationErrors(value?.error ? [value?.error] : [])
+      }
+      ).catch(error => {
+        setValidationErrors(error);
+      })
     },SLOW_DEBOUNCE,[timeRange])
+
+    const headerProps = {
+      name: props.name,
+      label: props.label,
+      validationErrors,
+      description: actualTimeRange,
+      hovered: true
+    }
+
     return (
         <>
+        <ControlHeader {...headerProps} />
           <div className="control-label">
             {t('START (INCLUSIVE)')}{' '}
-            <InfoTooltipWithTrigger
-              tooltip={t('Start date included in time range')}
-              placement="right"
-            />
           </div>
           <Input
             key="since"
@@ -93,10 +108,6 @@ const DatetimeControl: React.FC<Props>  = (props) => {
           />
           <div className="control-label">
             {t('END (EXCLUSIVE)')}{' '}
-            <InfoTooltipWithTrigger
-              tooltip={t('End date excluded from time range')}
-              placement="right"
-            />
           </div>
           <Input
             key="until"
