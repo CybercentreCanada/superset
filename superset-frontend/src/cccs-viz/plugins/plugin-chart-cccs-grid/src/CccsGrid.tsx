@@ -149,7 +149,6 @@ export default function CccsGrid({
     ) {
       const newSortArr = ensureIsArray(columnDefs).map(c => {
         const new_c = c;
-        // if the new column defs does not contain the sortField, it is ignored
         if (c.field === sortField) {
           new_c.sort = sortOrder;
         }
@@ -157,6 +156,7 @@ export default function CccsGrid({
       });
       setSortedColumnDefs(newSortArr);
     } else {
+      // if the new column defs do not contain the sort field reset it
       setSortField('');
       setSortOrder('');
       setSortedColumnDefs(columnDefs);
