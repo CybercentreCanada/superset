@@ -137,24 +137,31 @@ export default function CccsGrid({
           value: groupByValues.length ? groupByValues : null,
         },
       });
-      if (sortField) {
-        const newSortArr = ensureIsArray(columnDefs).map(c => {
-          const new_c = c;
-          if (c.field === sortField) {
-            new_c.sort = sortOrder;
-          }
-          return new_c;
-        });
-        setSortedColumnDefs(newSortArr);
-      }
     },
-    [
-      emitCrossFilters,
-      setDataMask,
-      selectedDataByColumnName,
-      principalColumnFilters,
-    ],
+    [emitCrossFilters, setDataMask, sortField, columnDefs, sortOrder],
   ); // only take relevant page size options
+
+  useEffect(() => {
+    // if we are sorting by a field, persist that after column defs are reset
+    if (
+      sortField &&
+      ensureIsArray(columnDefs).some(c => c.field === sortField)
+    ) {
+      const newSortArr = ensureIsArray(columnDefs).map(c => {
+        const new_c = c;
+        // if the new column defs does not contain the sortField, it is ignored
+        if (c.field === sortField) {
+          new_c.sort = sortOrder;
+        }
+        return new_c;
+      });
+      setSortedColumnDefs(newSortArr);
+    } else {
+      setSortField('');
+      setSortOrder('');
+      setSortedColumnDefs(columnDefs);
+    }
+  }, [columnDefs, sortField, sortOrder]);
 
   const generateNativeFilterUrlString = (
     nativefilterID: string,
