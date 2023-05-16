@@ -23,8 +23,8 @@ SUPERSET_WEBSERVER_PORT = 8088
 # Your App secret key will be used for securely signing the session cookie
 # and encrypting sensitive information on the database
 # Make sure you are changing this key for your deployment with a strong key.
-# You can generate a strong key using `openssl rand -base64 42`
-
+# You can generate a strong key using `openssl rand -base64 42`.
+# Alternatively you can set it with `SUPERSET_SECRET_KEY` environment variable.
 SECRET_KEY = 'YOUR_OWN_RANDOM_GENERATED_SECRET_KEY'
 
 # The SQLAlchemy connection string to your database backend
@@ -149,7 +149,11 @@ Make sure the pip package [`Authlib`](https://authlib.org/) is installed on the 
 First, configure authorization in Superset `superset_config.py`.
 
 ```python
+from flask_appbuilder.security.manager import AUTH_OAUTH
+
+# Set the authentication type to OAuth
 AUTH_TYPE = AUTH_OAUTH
+
 OAUTH_PROVIDERS = [
     {   'name':'egaSSO',
         'token_key':'access_token', # Name of the token in the response of access_token_url

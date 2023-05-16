@@ -24,12 +24,15 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm.query import Query
 
 from superset import db, is_feature_enabled, security_manager
-from superset.models.core import FavStar
+from superset.connectors.sqla.models import SqlaTable
+from superset.models.core import Database, FavStar
 from superset.models.dashboard import Dashboard
 from superset.models.embedded_dashboard import EmbeddedDashboard
 from superset.models.slice import Slice
 from superset.security.guest_token import GuestTokenResourceType, GuestUser
-from superset.views.base import BaseFilter, is_user_admin
+from superset.utils.core import get_user_id
+from superset.utils.filters import get_dataset_access_filters
+from superset.views.base import BaseFilter
 from superset.views.base_api import BaseFavoriteFilter
 
 
@@ -51,15 +54,15 @@ class DashboardTitleOrSlugFilter(BaseFilter):  # pylint: disable=too-few-public-
 
 class DashboardCreatedByMeFilter(BaseFilter):  # pylint: disable=too-few-public-methods
     name = _("Created by me")
-    arg_name = "created_by_me"
+    arg_name = "dashboard_created_by_me"
 
     def apply(self, query: Query, value: Any) -> Query:
         return query.filter(
             or_(
                 Dashboard.created_by_fk  # pylint: disable=comparison-with-callable
-                == g.user.get_user_id(),
+                == get_user_id(),
                 Dashboard.changed_by_fk  # pylint: disable=comparison-with-callable
-                == g.user.get_user_id(),
+                == get_user_id(),
             )
         )
 
@@ -97,11 +100,8 @@ class DashboardAccessFilter(BaseFilter):  # pylint: disable=too-few-public-metho
     """
 
     def apply(self, query: Query, value: Any) -> Query:
-        if is_user_admin():
+        if security_manager.is_admin():
             return query
-
-        datasource_perms = security_manager.user_view_menu_names("datasource_access")
-        schema_perms = security_manager.user_view_menu_names("schema_access")
 
         is_rbac_disabled_filter = []
         dashboard_has_roles = Dashboard.roles.any()
@@ -110,14 +110,15 @@ class DashboardAccessFilter(BaseFilter):  # pylint: disable=too-few-public-metho
 
         datasource_perm_query = (
             db.session.query(Dashboard.id)
-            .join(Dashboard.slices)
+            .join(Dashboard.slices, isouter=True)
+            .join(SqlaTable, Slice.datasource_id == SqlaTable.id)
+            .join(Database, SqlaTable.database_id == Database.id)
             .filter(
                 and_(
                     Dashboard.published.is_(True),
                     *is_rbac_disabled_filter,
-                    or_(
-                        Slice.perm.in_(datasource_perms),
-                        Slice.schema_perm.in_(schema_perms),
+                    get_dataset_access_filters(
+                        Slice,
                         security_manager.can_access_all_datasources(),
                     ),
                 )
@@ -126,17 +127,14 @@ class DashboardAccessFilter(BaseFilter):  # pylint: disable=too-few-public-metho
 
         users_favorite_dash_query = db.session.query(FavStar.obj_id).filter(
             and_(
-                FavStar.user_id == security_manager.user_model.get_user_id(),
+                FavStar.user_id == get_user_id(),
                 FavStar.class_name == "Dashboard",
             )
         )
         owner_ids_query = (
             db.session.query(Dashboard.id)
             .join(Dashboard.owners)
-            .filter(
-                security_manager.user_model.id
-                == security_manager.user_model.get_user_id()
-            )
+            .filter(security_manager.user_model.id == get_user_id())
         )
 
         feature_flagged_filters = []
@@ -158,7 +156,6 @@ class DashboardAccessFilter(BaseFilter):  # pylint: disable=too-few-public-metho
         if is_feature_enabled("EMBEDDED_SUPERSET") and security_manager.is_guest_user(
             g.user
         ):
-
             guest_user: GuestUser = g.user
             embedded_dashboard_ids = [
                 r["id"]
@@ -234,4 +231,20 @@ class DashboardCertifiedFilter(BaseFilter):  # pylint: disable=too-few-public-me
                     Dashboard.certified_by == "",
                 )
             )
+        return query
+
+
+class DashboardHasCreatedByFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+    """
+    Custom filter for the GET list that filters all dashboards created by user
+    """
+
+    name = _("Has created by")
+    arg_name = "dashboard_has_created_by"
+
+    def apply(self, query: Query, value: Any) -> Query:
+        if value is True:
+            return query.filter(and_(Dashboard.created_by_fk.isnot(None)))
+        if value is False:
+            return query.filter(and_(Dashboard.created_by_fk.is_(None)))
         return query

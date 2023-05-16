@@ -80,6 +80,7 @@ from superset.utils import core as utils, csv
 from superset.utils.cache import set_and_log_cache
 from superset.utils.core import (
     apply_max_row_limit,
+    DateColumn,
     DTTM_ALIAS,
     ExtraFiltersReasonType,
     get_column_name,
@@ -153,7 +154,8 @@ class BaseViz:  # pylint: disable=too-many-public-methods
         self.status: Optional[str] = None
         self.error_msg = ""
         self.results: Optional[QueryResult] = None
-        self.applied_template_filters: List[str] = []
+        self.applied_filter_columns: List[Column] = []
+        self.rejected_filter_columns: List[Column] = []
         self.errors: List[Dict[str, Any]] = []
         self.force = force
         self._force_cached = force_cached
@@ -287,7 +289,8 @@ class BaseViz:  # pylint: disable=too-many-public-methods
 
         # The datasource here can be different backend but the interface is common
         self.results = self.datasource.query(query_obj)
-        self.applied_template_filters = self.results.applied_template_filters or []
+        self.applied_filter_columns = self.results.applied_filter_columns or []
+        self.rejected_filter_columns = self.results.rejected_filter_columns or []
         self.query = self.results.query
         self.status = self.results.status
         self.errors = self.results.errors
@@ -301,9 +304,15 @@ class BaseViz:  # pylint: disable=too-many-public-methods
         if not df.empty:
             utils.normalize_dttm_col(
                 df=df,
-                timestamp_format=timestamp_format,
-                offset=self.datasource.offset,
-                time_shift=self.time_shift,
+                dttm_cols=tuple(
+                    [
+                        DateColumn.get_legacy_time_column(
+                            timestamp_format=timestamp_format,
+                            offset=self.datasource.offset,
+                            time_shift=self.form_data.get("time_shift"),
+                        )
+                    ]
+                ),
             )
 
             if self.enforce_numerical_metrics:
@@ -397,9 +406,7 @@ class BaseViz:  # pylint: disable=too-many-public-methods
         # extras are used to query elements specific to a datasource type
         # for instance the extra where clause that applies only to Tables
         extras = {
-            "druid_time_origin": self.form_data.get("druid_time_origin", ""),
             "having": self.form_data.get("having", ""),
-            "having_druid": self.form_data.get("having_filters", []),
             "time_grain_sqla": self.form_data.get("time_grain_sqla"),
             "where": self.form_data.get("where", ""),
         }
@@ -487,25 +494,21 @@ class BaseViz:  # pylint: disable=too-many-public-methods
         if "df" in payload:
             del payload["df"]
 
-        filters = self.form_data.get("filters", [])
-        filter_columns = [flt.get("col") for flt in filters]
-        columns = set(self.datasource.column_names)
-        applied_template_filters = self.applied_template_filters or []
+        applied_filter_columns = self.applied_filter_columns or []
+        rejected_filter_columns = self.rejected_filter_columns or []
         applied_time_extras = self.form_data.get("applied_time_extras", {})
         applied_time_columns, rejected_time_columns = utils.get_time_filter_status(
             self.datasource, applied_time_extras
         )
         payload["applied_filters"] = [
-            {"column": get_column_name(col)}
-            for col in filter_columns
-            if is_adhoc_column(col) or col in columns or col in applied_template_filters
+            {"column": get_column_name(col)} for col in applied_filter_columns
         ] + applied_time_columns
         payload["rejected_filters"] = [
-            {"reason": ExtraFiltersReasonType.COL_NOT_IN_DATASOURCE, "column": col}
-            for col in filter_columns
-            if not is_adhoc_column(col)
-            and col not in columns
-            and col not in applied_template_filters
+            {
+                "reason": ExtraFiltersReasonType.COL_NOT_IN_DATASOURCE,
+                "column": get_column_name(col),
+            }
+            for col in rejected_filter_columns
         ] + rejected_time_columns
         if df is not None:
             payload["colnames"] = list(df.columns)
@@ -530,8 +533,11 @@ class BaseViz:  # pylint: disable=too-many-public-methods
                 try:
                     df = cache_value["df"]
                     self.query = cache_value["query"]
-                    self.applied_template_filters = cache_value.get(
-                        "applied_template_filters", []
+                    self.applied_filter_columns = cache_value.get(
+                        "applied_filter_columns", []
+                    )
+                    self.rejected_filter_columns = cache_value.get(
+                        "rejected_filter_columns", []
                     )
                     self.status = QueryStatus.SUCCESS
                     is_loaded = True
@@ -900,7 +906,7 @@ class PivotTableViz(BaseViz):
             groupby = []
         if not groupby:
             raise QueryObjectValidationError(
-                _("Please choose at least one 'Group by' field ")
+                _("Please choose at least one 'Group by' field")
             )
         if transpose and not columns:
             raise QueryObjectValidationError(
@@ -2174,14 +2180,14 @@ class FilterBoxViz(BaseViz):
             if df is not None and not df.empty:
                 if metric:
                     df = df.sort_values(
-                        utils.get_metric_name(metric), ascending=flt.get("asc")
+                        utils.get_metric_name(metric), ascending=flt.get("asc", False)
                     )
                     data[col] = [
                         {"id": row[0], "text": row[0], "metric": row[1]}
                         for row in df.itertuples(index=False)
                     ]
                 else:
-                    df = df.sort_values(col, ascending=flt.get("asc"))
+                    df = df.sort_values(col, ascending=flt.get("asc", False))
                     data[col] = [
                         {"id": row[0], "text": row[0]}
                         for row in df.itertuples(index=False)
@@ -3219,7 +3225,7 @@ class PartitionViz(NVD3TimeSeriesViz):
         groups = get_column_names(self.form_data.get("groupby"))
         time_op = self.form_data.get("time_series_option", "not_time")
         if not groups:
-            raise ValueError("Please choose at least one groupby")
+            raise ValueError(_("Please choose at least one groupby"))
         if time_op == "not_time":
             levels = self.levels_for("agg_sum", groups, df)
         elif time_op in ["agg_sum", "agg_mean"]:
