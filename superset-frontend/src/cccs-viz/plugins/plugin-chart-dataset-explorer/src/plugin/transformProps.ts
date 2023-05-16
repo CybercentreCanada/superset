@@ -77,21 +77,23 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     headerText,
     emitFilter,
     principalColumns,
-    page_length,
     query_mode,
-    include_search,
-    enable_grouping,
     column_state,
-    enable_row_numbers,
-    enable_json_expand,
-    jump_action_configs,
-    default_group_by,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
-  const { setDataMask = () => {}, setControlValue } = hooks;
+  const default_group_by: any[] = [];
+  const enable_row_numbers: boolean = true;
+  const jump_action_configs: string[] = []
+  const enable_json_expand: boolean = false 
 
+  const include_search: boolean = true;
+  const page_length: number = 50;
+  const enable_grouping: boolean = true;
+
+
+  const { setDataMask = () => {}, setControlValue } = hooks;
   const columns = datasource?.columns as Column[];
   const metrics = datasource?.metrics as Metric[];
 
@@ -146,35 +148,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return metricMap;
   }, metricVerboseNameMap);
 
-  // Map of sorting columns, key is column name, value is a struct of sort direction (asc/desc) and sort index
-  const sortingColumnMap = new Map<string, {}>();
-  formData.order_by_cols.reduce(function (
-    columnMap: { [x: string]: any },
-    item: string,
-    currentIndex: number,
-  ) {
-    // Logic from extractQueryFields.ts
-    if (typeof item === 'string') {
-      try {
-        const array = JSON.parse(item);
-        const name = array[0];
-        const sortDirection = array[1];
-        const sortIndex = currentIndex - 1;
-        const sortOptions = {
-          sortDirection,
-          sortIndex,
-        };
-        columnMap[name] = sortOptions;
-      } catch (error) {
-        throw new Error(t('Found invalid orderby option: %s', item));
-      }
-      return columnMap;
-    }
-
-    console.log('Found invalid orderby option: %s.', item);
-    return undefined;
-  },
-  sortingColumnMap);
 
   // Key is column advanced type, value is renderer name
   const rendererMap = {
@@ -217,14 +190,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const columnHeader = columnVerboseNameMap[column]
         ? columnVerboseNameMap[column]
         : column;
-      const sortDirection =
-        column in sortingColumnMap
-          ? sortingColumnMap[column].sortDirection
-            ? 'asc'
-            : 'desc'
-          : null;
-      const sortIndex =
-        column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
       const cellRenderer =
         columnAdvancedType in rendererMap
           ? rendererMap[columnAdvancedType]
@@ -245,8 +210,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         headerName: columnHeader,
         cellRenderer,
         sortable: isSortable,
-        sort: sortDirection,
-        sortIndex,
         enableRowGroup,
         rowGroup,
         hide,

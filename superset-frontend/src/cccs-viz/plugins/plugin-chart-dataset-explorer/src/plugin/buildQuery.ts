@@ -128,8 +128,6 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         return [...arr, `${curr} IN (${selector_selection_value[0].data.map((d: any) => `'${d}'`).toString()})`];
       }, []);
     } 
-
-    formDataCopy.adhoc_filters =  [] 
     const queryObject = {
       ...baseQueryObject,
       formData: formDataCopy,
