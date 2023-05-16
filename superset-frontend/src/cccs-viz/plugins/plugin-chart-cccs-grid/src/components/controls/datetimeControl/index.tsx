@@ -67,6 +67,10 @@ const DatetimeControl: React.FC<Props>  = (props) => {
 
     const [since, until] = timeRange.split(SEPARATOR);
 
+    useEffect(() => {
+      props.onChange(timeRange)
+    }, [timeRange, since, until])
+
     function onChange(control: 'since' | 'until', value: string) {
         if (control === 'since') {
             setTimeRange(`${value}${SEPARATOR}${until}`);
@@ -74,9 +78,8 @@ const DatetimeControl: React.FC<Props>  = (props) => {
             setTimeRange(`${since}${SEPARATOR}${value}`);
         }
     }
-    useEffect(() => {
-        props.onChange(timeRange)
-    }, [timeRange])
+
+
     useDebouncedEffect(() => {
       fetchTimeRange(timeRange).then( value => {
         setactualTimeRange(value?.value ? `Actual Time Range ${value?.value}` : "");

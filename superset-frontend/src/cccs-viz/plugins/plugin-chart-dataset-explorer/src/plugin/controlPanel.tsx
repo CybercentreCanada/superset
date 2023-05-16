@@ -46,10 +46,10 @@ import {
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
-import DrillActionConfig from '../../../plugin-chart-cccs-grid/src/components/controls/JumpActionConfigControll';
 import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
 import SelecttorValue from '../../../plugin-chart-cccs-grid/src/components/controls/selectorValueControl';
 import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
+
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
   10,
@@ -91,7 +91,7 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['columns', 'groupby', 'metrics', 'percent_metrics'],
+  rerender: ['columns', 'groupby',],
 };
 
 const validateAggControlValues = (
@@ -204,7 +204,6 @@ const config: ControlPanelConfig = {
             name: 'datasource_config',
             config: {
               type: ChangeDataSourceButton,
-              renderTrigger: true,
               label: t('Jump Actions'),
               description: t('Configure dashboard jump actions.'),
             },
@@ -213,29 +212,50 @@ const config: ControlPanelConfig = {
       ],
     },
     {
-      label: t('Time'),
+      label: t('Time Settings'),
       expanded: true,
       controlSetRows: [
-        ['granularity'],
         ['druid_time_origin'],
-        ['granularity_sqla'],
         [
           {
-            name: 'timerange_selection',
+            name: "granularity_sqla",
+            config: {
+              type: 'SelectControl',
+              label: "Time Column",
+              description: t(
+                'The time column for the visualization. Note that you ' +
+                  'can define arbitrary expression that return a DATETIME ' +
+                  'column in the table. Also note that the ' +
+                  'filter below is applied against this column or ' +
+                  'expression',
+              ),
+              clearable: false,
+              optionRenderer: (c: any) => <StyledColumnOption column={c} showType />,
+              valueKey: 'column_name',
+              mapStateToProps: state => {
+                const props: any = {};
+                if (state.datasource && "granularity_sqla" in state.datasource) {
+
+                  props.choices = state.datasource.granularity_sqla;
+                  props.default = null;
+                  if (state.datasource.main_dttm_col) {
+                    props.default = state.datasource.main_dttm_col;
+                  } else if (props.choices && props.choices.length > 0) {
+                    props.default = props.choices[0].column_name;
+                  }
+                }
+                return props;
+              },
+            }
+          }
+        ],
+        [
+          {
+            name: 'time_range',
             config: {
               type: DateTimeControl,
               label: t('Time Range'),
-              multi: false,
-              rerender: ['selector_selection_value'],
-              default: "Today : Today",
-              valueKey: 'value',
-              mapStateToProps: (state: ControlPanelState,
-                controlState: ControlState,) => {
-                const options = state.datasource?.columns ? (state.datasource as Dataset)?.columns.reduce((arr: any[], curr: any) => {
-                  return curr?.advanced_data_type ? [...new Set([...arr, {"value": curr?.advanced_data_type}])] : arr;
-                }, []) : []
-                return {options}
-              },
+              default: "Today : Tomorrow",
               resetOnHide: false,
             },
           },
@@ -280,7 +300,50 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: [, 'default_group_by',],
+            },
+          },
+        ],
+        [
+          {
+            name: 'columns',
+            config: {
+              type: 'SelectControl',
+              label: t('Dimensions'),
+              description: t('Columns to display'),
+              multi: true,
+              freeForm: true,
+              allowAll: true,
+              default: [],
+              canSelectAll: true,
+              optionRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption showType column={c} />
+              ),
+              // eslint-disable-next-line react/react-in-jsx-scope
+              valueRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption column={c} />
+              ),
+              valueKey: 'column_name',
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const { controls } = state;
+                const originalMapStateToProps =
+                  sharedControls?.columns?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =
+                  // @ts-ignore
+                  isRawMode({ controls }) &&
+                  ensureIsArray(controlState.value).length === 0
+                    ? [t('must have a value')]
+                    : [];
+                return newState;
+              },
+              visibility: isRawMode,
+              canCopy: true,
             },
           },
         ],
@@ -325,155 +388,22 @@ const config: ControlPanelConfig = {
               },
             },
         ],
-
         [
           {
-            name: 'columns',
-            config: {
-              type: 'SelectControl',
-              label: t('Dimensions'),
-              description: t('Columns to display'),
-              multi: true,
-              freeForm: true,
-              allowAll: true,
-              default: [],
-              canSelectAll: true,
-              optionRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
-                <StyledColumnOption showType column={c} />
-              ),
-              // eslint-disable-next-line react/react-in-jsx-scope
-              valueRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
-                <StyledColumnOption column={c} />
-              ),
-              valueKey: 'column_name',
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const { controls } = state;
-                const originalMapStateToProps =
-                  sharedControls?.columns?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors =
-                  // @ts-ignore
-                  isRawMode({ controls }) &&
-                  ensureIsArray(controlState.value).length === 0
-                    ? [t('must have a value')]
-                    : [];
-                return newState;
-              },
-              rerender: ['principalColumns', 'default_group_by'],
-              visibility: isRawMode,
-              canCopy: true,
-            },
-          },
-        ],
-
-        [
-          {
-            name: 'order_by_cols',
-            config: {
-              type: 'SelectControl',
-              label: t('Ordering'),
-              description: t('Order results by selected columns'),
-              multi: true,
-              hidden: true,
-              default: [],
-              mapStateToProps: ({ datasource }) => ({
-                choices: datasource?.hasOwnProperty('order_by_choices')
-                  ? (datasource as Dataset)?.order_by_choices
-                  : datasource?.columns || [],
-              }),
-              visibility: isRawMode,
-              resetOnHide: false,
+            name: 'adhoc_filters',
+            override: {
+              // validators: [adhocFilterValidator],
             },
           },
         ],
         [
-          isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
-            ? {
-                name: 'emitFilter',
-                config: {
-                  type: 'CheckboxControl',
-                  label: t('Emit dashboard cross filters'),
-                  default: false,
-                  hidden: true,
-                  renderTrigger: true,
-                  description: t('Emit dashboard cross filters.'),
-                },
-              }
-            : null,
-        ],
-        [
-          isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
-            ? {
-                name: 'principalColumns',
-                config: {
-                  type: 'SelectControl',
-                  label: t('Principal Column(s) to Emit'),
-                  description: t(
-                    'Preselect a set of principal columns that can easily be emitted from the context menu',
-                  ),
-                  multi: true,
-                  freeForm: true,
-                  allowAll: true,
-                  default: [],
-                  canSelectAll: true,
-                  optionRenderer: (c: ColumnMeta) => (
-                    // eslint-disable-next-line react/react-in-jsx-scope
-                    <StyledColumnOption showType column={c} />
-                  ),
-                  // eslint-disable-next-line react/react-in-jsx-scope
-                  valueRenderer: (c: ColumnMeta) => (
-                    // eslint-disable-next-line react/react-in-jsx-scope
-                    <StyledColumnOption column={c} />
-                  ),
-                  valueKey: 'column_name',
-                  mapStateToProps: (
-                    state: ControlPanelState,
-                    controlState: ControlState,
-                  ) => {
-                    const { controls } = state;
-                    const originalMapStateToProps = isRawMode({ controls })
-                      ? sharedControls?.columns?.mapStateToProps
-                      : sharedControls?.groupby?.mapStateToProps;
-                    const newState =
-                      originalMapStateToProps?.(state, controlState) ?? {};
-                    const choices = isRawMode({ controls })
-                      ? controls?.columns?.value
-                      : controls?.groupby?.value;
-                    newState.options = newState.options.filter(
-                      (o: { column_name: string }) =>
-                        ensureIsArray(choices).includes(o.column_name),
-                    );
-                    const invalidOptions = ensureIsArray(
-                      controlState.value,
-                    ).filter(c => !ensureIsArray(choices).includes(c));
-                    newState.externalValidationErrors =
-                      invalidOptions.length > 0
-                        ? invalidOptions.length > 1
-                          ? [
-                              `'${invalidOptions.join(', ')}'${t(
-                                ' are not valid options',
-                              )}`,
-                            ]
-                          : [
-                              `'${invalidOptions}'${t(
-                                ' is not a valid option',
-                              )}`,
-                            ]
-                        : [];
-                    return newState;
-                  },
-                  visibility: ({ controls }) =>
-                    Boolean(controls?.emitFilter?.value),
-                  canCopy: true,
-                },
-              }
-            : null,
+          {
+            name: 'row_limit',
+            override: {
+              label: t('Row Limit'),
+              default: 100,
+            },
+          },
         ],
         [
           {
@@ -579,165 +509,5 @@ const config: ControlPanelConfig = {
   },
 };
 
-config.controlPanelSections.push({
-  label: t('Options'),
-  expanded: true,
-  controlSetRows: [
-    [
-      {
-        name: 'include_search',
-        config: {
-          type: 'CheckboxControl',
-          label: t('Search box'),
-          hidden: true,
-          renderTrigger: true,
-          default: false,
-          description: t('Whether to include a client-side search box'),
-        },
-      },
-    ],
-    [
-      {
-        name: 'enable_grouping',
-        config: {
-          type: 'CheckboxControl',
-          label: t('Row grouping'),
-          renderTrigger: true,
-          default: false,
-          hidden: true,
-          description: t(
-            'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
-          ),
-          visibility: ({ controls }) =>
-            Boolean(!controls?.enable_json_expand?.value),
-        },
-      },
-    ],
-    [
-      {
-        name: 'default_group_by',
-        config: {
-          type: 'SelectControl',
-          label: t('Default columns for row grouping'),
-          description: t(
-            'Preselect a set of columns for row grouping in the grid.',
-          ),
-          multi: true,
-          freeForm: true,
-          allowAll: true,
-          default: [],
-          canSelectAll: true,
-          hidden: true,
-          renderTrigger: true,
-          optionRenderer: (c: ColumnMeta) => (
-            // eslint-disable-next-line react/react-in-jsx-scope
-            <StyledColumnOption showType column={c} />
-          ),
-          // eslint-disable-next-line react/react-in-jsx-scope
-          valueRenderer: (c: ColumnMeta) => (
-            // eslint-disable-next-line react/react-in-jsx-scope
-            <StyledColumnOption column={c} />
-          ),
-          valueKey: 'column_name',
-          mapStateToProps: (
-            state: ControlPanelState,
-            controlState: ControlState,
-          ) => {
-            const { controls } = state;
-            const originalMapStateToProps = isRawMode({ controls })
-              ? sharedControls?.columns?.mapStateToProps
-              : sharedControls?.groupby?.mapStateToProps;
-            const newState =
-              originalMapStateToProps?.(state, controlState) ?? {};
-            const choices = isRawMode({ controls })
-              ? controls?.columns?.value
-              : controls?.groupby?.value;
-            newState.options = newState.options.filter(
-              (o: { column_name: string }) =>
-                ensureIsArray(choices).includes(o.column_name),
-            );
-            const invalidOptions = ensureIsArray(controlState.value).filter(
-              c => !ensureIsArray(choices).includes(c),
-            );
-            newState.externalValidationErrors =
-              invalidOptions.length > 0
-                ? invalidOptions.length > 1
-                  ? [
-                      `'${invalidOptions.join(', ')}'${t(
-                        ' are not valid options',
-                      )}`,
-                    ]
-                  : [`'${invalidOptions}'${t(' is not a valid option')}`]
-                : [];
-            return newState;
-          },
-          visibility: ({ controls }) =>
-            Boolean(controls?.enable_grouping?.value),
-          canCopy: true,
-        },
-      },
-    ],
-    [
-      {
-        name: 'enable_row_numbers',
-        config: {
-          type: 'CheckboxControl',
-          label: t('Row numbers'),
-          renderTrigger: true,
-          hidden: true,
-          default: true,
-          description: t('Whether to enable row numbers'),
-        },
-      },
-    ],
-    [
-      {
-        name: 'enable_json_expand',
-        config: {
-          type: 'CheckboxControl',
-          label: t('JSON Row Expand'),
-          renderTrigger: true,
-          hidden: true,
-          default: false,
-          description: t(
-            'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
-          ),
-          visibility: ({ controls }) =>
-            Boolean(!controls?.enable_grouping?.value),
-        },
-      },
-    ],
-    [
-      {
-        name: 'page_length',
-        config: {
-          type: 'SelectControl',
-          freeForm: true,
-          renderTrigger: true,
-          label: t('Page length'),
-          default: 0,
-          hidden: true,
-          choices: PAGE_SIZE_OPTIONS,
-          description: t('Rows per page, 0 means no pagination'),
-          validators: [legacyValidateInteger],
-        },
-      },
-    ],
-    [
-      {
-        name: 'jump_action_configs',
-        config: {
-          type: DrillActionConfig,
-          hidden: true,
-          label: t('Jump Actions'),
-          description: t('Configure dashboard jump actions.'),
-        },
-      },
-    ],
-
-
-    
-  ],
-});
 
 export default config;
