@@ -39,15 +39,13 @@ from sqlalchemy.engine.base import Connection
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.mapper import Mapper
 
-from superset import ConnectorRegistry, db, is_feature_enabled, security_manager
+from superset import db, is_feature_enabled, security_manager
 from superset.legacy import update_time_range
 from superset.models.helpers import AuditMixinNullable, ImportExportMixin
-from superset.models.tags import ChartUpdater
 from superset.tasks.thumbnails import cache_chart_thumbnail
+from superset.tasks.utils import get_current_user
+from superset.thumbnails.digest import get_chart_digest
 from superset.utils import core as utils
-from superset.utils.hashing import md5_sha_from_str
-from superset.utils.memoized import memoized
-from superset.utils.urls import get_url_path
 from superset.viz import BaseViz, viz_types
 
 if TYPE_CHECKING:
@@ -111,6 +109,9 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     export_fields = [
         "slice_name",
+        "description",
+        "certified_by",
+        "certification_details",
         "datasource_type",
         "datasource_name",
         "viz_type",
@@ -126,7 +127,10 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     @property
     def cls_model(self) -> Type["BaseDatasource"]:
-        return ConnectorRegistry.sources[self.datasource_type]
+        # pylint: disable=import-outside-toplevel
+        from superset.datasource.dao import DatasourceDAO
+
+        return DatasourceDAO.sources[self.datasource_type]
 
     @property
     def datasource(self) -> Optional["BaseDatasource"]:
@@ -146,9 +150,12 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     # pylint: disable=using-constant-test
     @datasource.getter  # type: ignore
-    @memoized
     def get_datasource(self) -> Optional["BaseDatasource"]:
-        return db.session.query(self.cls_model).filter_by(id=self.datasource_id).first()
+        return (
+            db.session.query(self.cls_model)
+            .filter_by(id=self.datasource_id)
+            .one_or_none()
+        )
 
     @renders("datasource_name")
     def datasource_link(self) -> Optional[Markup]:
@@ -184,8 +191,7 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     # pylint: enable=using-constant-test
 
-    @property  # type: ignore
-    @memoized
+    @property
     def viz(self) -> Optional[BaseViz]:
         form_data = json.loads(self.params)
         viz_class = viz_types.get(self.viz_type)
@@ -232,10 +238,7 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     @property
     def digest(self) -> str:
-        """
-        Returns a MD5 HEX digest that makes this dashboard unique
-        """
-        return md5_sha_from_str(self.params or "")
+        return get_chart_digest(self)
 
     @property
     def thumbnail_url(self) -> str:
@@ -283,14 +286,20 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     def get_explore_url(
         self,
-        base_url: str = "/superset/explore",
+        base_url: str = "/explore",
         overrides: Optional[Dict[str, Any]] = None,
     ) -> str:
+        return self.build_explore_url(self.id, base_url, overrides)
+
+    @staticmethod
+    def build_explore_url(
+        id_: int, base_url: str = "/explore", overrides: Optional[Dict[str, Any]] = None
+    ) -> str:
         overrides = overrides or {}
-        form_data = {"slice_id": self.id}
+        form_data = {"slice_id": id_}
         form_data.update(overrides)
         params = parse.quote(json.dumps(form_data))
-        return f"{base_url}/?form_data={params}"
+        return f"{base_url}/?slice_id={id_}&form_data={params}"
 
     @property
     def slice_url(self) -> str:
@@ -332,7 +341,7 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     @property
     def url(self) -> str:
-        return f"/superset/explore/?form_data=%7B%22slice_id%22%3A%20{self.id}%7D"
+        return f"/explore/?slice_id={self.id}"
 
     def get_query_context_factory(self) -> QueryContextFactory:
         if self.query_context_factory is None:
@@ -341,6 +350,11 @@ class Slice(  # pylint: disable=too-many-public-methods
 
             self.query_context_factory = QueryContextFactory()
         return self.query_context_factory
+
+    @classmethod
+    def get(cls, id_: int) -> Slice:
+        qry = db.session.query(Slice).filter_by(id=id_)
+        return qry.one_or_none()
 
 
 def set_related_perm(_mapper: Mapper, _connection: Connection, target: Slice) -> None:
@@ -356,20 +370,16 @@ def set_related_perm(_mapper: Mapper, _connection: Connection, target: Slice) ->
 def event_after_chart_changed(
     _mapper: Mapper, _connection: Connection, target: Slice
 ) -> None:
-    url = get_url_path("Superset.slice", slice_id=target.id, standalone="true")
-    cache_chart_thumbnail.delay(url, target.digest, force=True)
+    cache_chart_thumbnail.delay(
+        current_user=get_current_user(),
+        chart_id=target.id,
+        force=True,
+    )
 
 
 sqla.event.listen(Slice, "before_insert", set_related_perm)
 sqla.event.listen(Slice, "before_update", set_related_perm)
 
-# events for updating tags
-if is_feature_enabled("TAGGING_SYSTEM"):
-    sqla.event.listen(Slice, "after_insert", ChartUpdater.after_insert)
-    sqla.event.listen(Slice, "after_update", ChartUpdater.after_update)
-    sqla.event.listen(Slice, "after_delete", ChartUpdater.after_delete)
-
-# events for updating tags
 if is_feature_enabled("THUMBNAILS_SQLA_LISTENERS"):
     sqla.event.listen(Slice, "after_insert", event_after_chart_changed)
     sqla.event.listen(Slice, "after_update", event_after_chart_changed)

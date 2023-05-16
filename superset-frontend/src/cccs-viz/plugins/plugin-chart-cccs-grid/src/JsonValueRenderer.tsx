@@ -1,6 +1,7 @@
 import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
 import React, { Component } from 'react';
-import JSONTree from 'react-json-tree';
+import { JSONTree } from 'react-json-tree';
+
 import './Buttons.css';
 
 function safeJsonObjectParse(

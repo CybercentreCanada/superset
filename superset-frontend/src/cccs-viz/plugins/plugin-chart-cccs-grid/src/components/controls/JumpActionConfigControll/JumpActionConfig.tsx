@@ -30,12 +30,11 @@ const useDashboardState = () => {
     SupersetClient.get({ endpoint })
       .then(({ json }) => {
         const dashboards = json.result
-          .filter((e: any) => {
-            return JSON.parse(e.json_metadata)?.native_filter_configuration;
-          })
-          .map((e: any) => {
-            return { value: e.id, label: e.dashboard_title };
-          });
+          .filter(
+            (e: any) =>
+              JSON.parse(e.json_metadata)?.native_filter_configuration,
+          )
+          .map((e: any) => ({ value: e.id, label: e.dashboard_title }));
         setDashboardList(dashboards);
       })
       .catch(error => {});
@@ -49,13 +48,11 @@ const useDashboardState = () => {
         const metadata = JSON.parse(json.result.json_metadata);
 
         setFilterList(
-          metadata?.native_filter_configuration.map((e: any) => {
-            return {
-              value: e.id,
-              label: e.name,
-              column: e?.targets[0].column?.name || '',
-            };
-          }),
+          metadata?.native_filter_configuration.map((e: any) => ({
+            value: e.id,
+            label: e.name,
+            column: e?.targets[0].column?.name || '',
+          })),
         );
       })
       .catch(error => {});
@@ -157,9 +154,9 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
         />
         <SelectControl
           style={{ length: '100%' }}
-          ariaLabel={'Advanced Data Type'}
+          ariaLabel="Advanced Data Type"
           name="advanced-data-type-value"
-          label={'Advanced Data Type'}
+          label="Advanced Data Type"
           showHeader
           hovered
           freeForm

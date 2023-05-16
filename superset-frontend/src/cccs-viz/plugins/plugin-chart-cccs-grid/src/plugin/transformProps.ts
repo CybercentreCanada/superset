@@ -343,7 +343,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
-  let parsed_jump_action_configs = {};
+  const parsed_jump_action_configs = {};
   jump_action_configs?.forEach((e: any) => {
     if (e.dashboardID in parsed_jump_action_configs) {
       parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[
