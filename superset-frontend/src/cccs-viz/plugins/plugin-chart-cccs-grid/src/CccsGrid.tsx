@@ -102,8 +102,8 @@ export default function CccsGrid({
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
-  const [sortField, setSortField] = useState('');
-  const [sortOrder, setSortOrder] = useState('');
+  const [sortFields, setSortFields] = useState(['']);
+  const [sortOrders, setSortOrders] = useState(['']);
   const [sortedColumnDefs, setSortedColumnDefs] = useState(columnDefs);
   const gridRef = useRef<AgGridReactType>(null);
 
@@ -138,30 +138,33 @@ export default function CccsGrid({
         },
       });
     },
-    [emitCrossFilters, setDataMask, sortField, columnDefs, sortOrder],
+    [emitCrossFilters, setDataMask],
   ); // only take relevant page size options
 
   useEffect(() => {
-    // if we are sorting by a field, persist that after column defs are reset
+    // if we are sorting by a field, persist that after column defs are reset only when emitting cross filters
     if (
-      sortField &&
-      ensureIsArray(columnDefs).some(c => c.field === sortField)
+      emitCrossFilters &&
+      sortFields &&
+      ensureIsArray(columnDefs).some(c => sortFields.includes(c.field))
     ) {
       const newSortArr = ensureIsArray(columnDefs).map(c => {
         const new_c = c;
-        if (c.field === sortField) {
-          new_c.sort = sortOrder;
+        if (sortFields.includes(c.field)) {
+          new_c.sort = sortOrders.at(sortFields.indexOf(c.field));
+        } else {
+          new_c.sort = undefined;
         }
         return new_c;
       });
       setSortedColumnDefs(newSortArr);
     } else {
       // if the new column defs do not contain the sort field reset it
-      setSortField('');
-      setSortOrder('');
+      setSortFields([]);
+      setSortOrders([]);
       setSortedColumnDefs(columnDefs);
     }
-  }, [columnDefs, sortField, sortOrder]);
+  }, [columnDefs, JSON.stringify(sortFields)]);
 
   const generateNativeFilterUrlString = (
     nativefilterID: string,
@@ -521,12 +524,11 @@ export default function CccsGrid({
   const onSortChanged = (event: SortChangedEvent) => {
     const sortModel = event.api.getSortModel();
     if (sortModel.length > 0) {
-      const { colId, sort } = sortModel[0];
-      setSortField(colId || '');
-      setSortOrder(sort || '');
+      setSortFields(sortModel.map(col => col.colId || ''));
+      setSortOrders(sortModel.map(col => col.sort || ''));
     } else {
-      setSortField('');
-      setSortOrder('');
+      setSortFields([]);
+      setSortOrders([]);
     }
   };
 
