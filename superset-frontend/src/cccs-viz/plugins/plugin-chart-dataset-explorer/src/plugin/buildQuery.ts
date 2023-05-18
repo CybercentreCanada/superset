@@ -17,7 +17,6 @@
  * under the License.
  */
 import {
-  AdhocFilter,
   buildQueryContext,
   ensureIsArray,
   getMetricLabel,
@@ -28,8 +27,6 @@ import {
 } from '@superset-ui/core';
 import { BuildQuery } from '@superset-ui/core/src/chart/registries/ChartBuildQueryRegistrySingleton';
 import { CccsGridQueryFormData, DEFAULT_FORM_DATA } from '../types';
-import { connect, useSelector, useDispatch } from 'react-redux';
-import { SQLEditor } from 'src/components/AsyncAceEditor';
 /**
  * The buildQuery function is used to create an instance of QueryContext that's
  * sent to the chart data endpoint. In addition to containing information of which

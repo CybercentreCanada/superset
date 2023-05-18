@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
     ChangeDatasourceModal,
-    DatasourceModal,
   } from 'src/components/Datasource';
-import { t, withTheme } from '@superset-ui/core';
-import { connect, useSelector, useDispatch } from 'react-redux';
+import { withTheme } from '@superset-ui/core';
+import { connect, useDispatch } from 'react-redux';
 import Button from 'src/components/Button'
-import { setDatasource } from 'src/explore/actions/exploreActions';
+import { updateFormDataByDatasource } from 'src/explore/actions/exploreActions';
 
 
 
@@ -23,6 +22,7 @@ export interface Props {
     actions: object;
     label: string;
     value?: object[];
+    datasource: any;
     onChange: (a: any) => void;
 }
 
@@ -38,18 +38,18 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
     actions,
     onChange,
     value = [],
+    datasource,
     ...props
 }) => {
 
-    const state = useSelector(state => state);
     const dispatch = useDispatch();
     const [showChangeDatasourceModal, setShowChangeDatasourceModal] = useState<Boolean>(false);
 
     const toggleChangeDatasourceModal = ()  => {
         setShowChangeDatasourceModal(!showChangeDatasourceModal);
     }
-    const onDatasourceSave = (datasource: any) => {
-        dispatch(setDatasource(datasource));
+    const onDatasourceSave = (new_datasource: any) => {
+        dispatch(updateFormDataByDatasource(datasource, new_datasource));
     }
     const onChangeWrapper = (a: any) => {
         onChange(a);

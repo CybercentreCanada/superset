@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-    ChangeDatasourceModal,
-    DatasourceModal,
-  } from 'src/components/Datasource';
-import { t, withTheme } from '@superset-ui/core';
-import { connect, useSelector, useDispatch } from 'react-redux';
+import { withTheme } from '@superset-ui/core';
+import { connect} from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
-import { setDatasource } from 'src/explore/actions/exploreActions';
 import { Tooltip } from 'src/components/Tooltip';
 import useAdvancedDataTypes from 'src/explore/components/controls/FilterControl/AdhocFilterEditPopoverSimpleTabContent/useAdvancedDataTypes';
 
@@ -53,7 +48,6 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
         advancedDataTypesState,
         subjectAdvancedDataType,
         fetchAdvancedDataTypeValueCallback,
-        fetchSubjectAdvancedDataType,
       } = useAdvancedDataTypes(() => {});
 
     const onChangeWrapper = (selection: any) => {
@@ -62,7 +56,7 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
     
     useEffect( () => {
         const data =  advancedDataTypesState.parsedAdvancedDataType.length > 0 && advancedDataTypesState.parsedAdvancedDataType.split(",").length > 0 ?  {
-            "data":  advancedDataTypesState.parsedAdvancedDataType.split(","),
+            "data":  advancedDataTypesState.values,
             "columns": datasource.columns.filter((col: any) => {
                 return col.advanced_data_type === selector
             }).map((col: any) => {
