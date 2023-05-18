@@ -21,7 +21,7 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
-import { CccsGridQueryFormData, CccsGridChartProps } from '../../../plugin-chart-cccs-grid/src/types';
+import { CccsGridQueryFormData, CccsGridChartProps } from '../types';
 import example1 from '../images/Table1.png';
 
 export default class CccsDataSetExplorerPlugin extends ChartPlugin<

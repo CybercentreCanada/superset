@@ -20,15 +20,9 @@ import React from 'react';
 
 import {
   t,
-  FeatureFlag,
-  isFeatureEnabled,
-  DEFAULT_METRICS,
   QueryMode,
-  QueryFormColumn,
-  QueryResponse,
   ensureIsArray,
   validateNonEmpty,
-  legacyValidateInteger,
 } from '@superset-ui/core';
 import {
   Dataset,
@@ -36,7 +30,6 @@ import {
   ControlStateMapping,
   ControlPanelConfig,
   ControlPanelsContainerProps,
-  sections,
   QueryModeLabel,
   sharedControls,
   ControlPanelState,
@@ -64,11 +57,7 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
   if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
     return mode as QueryMode;
   }
-  const rawColumns = controls?.all_columns?.value as
-    | QueryFormColumn[]
-    | undefined;
-  const hasRawColumns = rawColumns && rawColumns.length > 0;
-  return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
+  return QueryMode.raw;
 }
 
 /**
@@ -85,7 +74,8 @@ const isRawMode = isQueryMode(QueryMode.raw);
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
   label: t('Query mode'),
-  default: null,
+  default: QueryMode.raw,
+  value: QueryMode.raw,
   options: [
     [QueryMode.aggregate, QueryModeLabel[QueryMode.aggregate]],
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
@@ -94,111 +84,14 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
   rerender: ['columns', 'groupby',],
 };
 
-const validateAggControlValues = (
-  controls: ControlStateMapping,
-  values: any[],
-) => {
-  const areControlsEmpty = values.every(val => ensureIsArray(val).length === 0);
-  // @ts-ignore
-  return areControlsEmpty && isAggMode({ controls })
-    ? [t('Group By, Metrics, or Percent Metrics must have a value')]
-    : [];
-};
 
-// function isIP(v: unknown) {
-//   if (typeof v === 'string' && v.trim().length > 0) {
-//     //console.log(v.trim());
-//     // Test IP
-//     if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(v.trim())) {
-//       return true;
-//     }
-//     // Test CIDR
-//     return cidrRegex({ exact: true }).test(v.trim());
-//   }
-//   return false;
-// }
-
-// function validateIP(v: unknown) {
-
-//   if (Array.isArray(v)) {
-//     //console.log('is array');
-//     if (v.every(isIP)) {
-//       return false;
-//     }
-//   }
-//   else {
-//     if (isIP(v)) {
-//       return false;
-//     }
-//   }
-
-//   return (' is expected to be an IP address in dotted decimal or CIDR notation');
-// }
-
-// /**
-//  * Validates the adhoc filter control. Each filter has a subject (the column name for example SRC_PORT) and a comparator (the value being tested),
-//  * it can be a single value for operators like !=, >, <= etc
-//  * or it can be an array of values for example when the IN or NOT IN operator is used.
-//  *
-//  * @param filters an array of adhoc filter with the following attributes
-//  * @param state the current state of the adhoc filter control it includes a copy of the columns as defined in the dataset model
-//  * @returns a string explaining the reason why the control is in an invalid state or false if there is no errors
-//  */
-// function adhocFilterValidator(filters: unknown, state: ControlState) {
-//   if (Array.isArray(filters)) {
-//     for (let i = 0; i < filters.length; i++) {
-//       const filter = filters[i];
-//       // Find the corresponding column in the model
-//       const column = state.columns.find((c: any) => c.column_name == filter.subject);
-//       if (typeof column !== 'undefined' && typeof column.type !== 'undefined') {
-//         // Currently supporting 2 types of columns
-//         // IPV4
-//         // IPV4 FILTER
-//         if (column.type.includes('IPV4')) {
-//           const v = filter.comparator;
-//           // check single value
-//           if (typeof v === 'string' && v.trim().length > 0) {
-//             const error = validateIP(v.trim());
-//             if (error) {
-//               return filter.subject + error;
-//             }
-//           }
-//           // check array of values
-//           else if (Array.isArray(v)) {
-//             for (let index = 0; index < v.length; index++) {
-//               const element = v[index];
-//               const error = validateIP(element.trim());
-//               if (error) {
-//                 return filter.subject + error;
-//               }
-//             }
-//           }
-//         }
-//         // else we assume the value is okay
-//         // more type validators can be added here
-//       }
-//     }
-//   }
-//   return false;
-// }
-
-const defineSavedMetrics = (datasource: Dataset | QueryResponse | null) =>
-  datasource?.hasOwnProperty('metrics')
-    ? (datasource as Dataset)?.metrics || []
-    : DEFAULT_METRICS;
-
-
-const appContainer = document.getElementById('app');
-const { user } = JSON.parse(
-  appContainer?.getAttribute('data-bootstrap') || '{}',
-);
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
     {
-      label: t('Data Set'),
-      expanded: true,
-      controlSetRows: [ 
+      label: t('Query'),
+      expanded: false,
+      controlSetRows: [
         [
           {
             name: 'datasource_config',
@@ -206,16 +99,22 @@ const config: ControlPanelConfig = {
               type: ChangeDataSourceButton,
               label: t('Jump Actions'),
               description: t('Configure dashboard jump actions.'),
+              mapStateToProps: (
+                state: ControlPanelState,
+
+              ) => {
+                //newState.default = ['Select All']
+                return {datasource: state.datasource};
+              },
             },
           },
         ],
-      ],
-    },
-    {
-      label: t('Time Settings'),
-      expanded: true,
-      controlSetRows: [
-        ['druid_time_origin'],
+        [
+          {
+            name: 'query_mode',
+            config: queryMode,
+          },
+        ],
         [
           {
             name: "granularity_sqla",
@@ -260,52 +159,9 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-      ]
-    },
-    {
-      label: t('Query'),
-      expanded: true,
-      controlSetRows: [
-        [
-          {
-            name: 'query_mode',
-            config: queryMode,
-          },
-        ],
         [
           {
             name: 'groupby',
-            override: {
-              visibility: isAggMode,
-              resetOnHide: false,
-              canCopy: true,
-              canSelectAll: true,
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const { controls } = state;
-                const originalMapStateToProps =
-                  sharedControls?.groupby?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = validateAggControlValues(
-                  controls,
-                  [
-                    controls.metrics?.value,
-                    controls.percent_metrics?.value,
-                    controlState.value,
-                  ],
-                );
-
-                return newState;
-              },
-            },
-          },
-        ],
-        [
-          {
-            name: 'columns',
             config: {
               type: 'SelectControl',
               label: t('Dimensions'),
@@ -313,7 +169,7 @@ const config: ControlPanelConfig = {
               multi: true,
               freeForm: true,
               allowAll: true,
-              default: [],
+              default: ['Select All'],
               canSelectAll: true,
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
@@ -329,7 +185,57 @@ const config: ControlPanelConfig = {
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
-                const { controls } = state;
+                const { controls, datasource } = state;
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors =
+                  // @ts-ignore
+                  isRawMode({ controls }) &&
+                  ensureIsArray(controlState.value).length === 0
+                    ? [t('must have a value')]
+                    : [];
+                if (datasource && "columns" in datasource) {
+                  newState.default = datasource.columns.map(c => c.column_name) || [];
+                }
+               
+                //newState.default = ['Select All']
+                return newState;
+              },
+              visibility: isAggMode,
+              canCopy: true,
+            },
+ 
+          },
+        ],
+        [
+          {
+            name: 'columns',
+            config: {
+              type: 'SelectControl',
+              label: t('Dimensions'),
+              description: t('Columns to display'),
+              multi: true,
+              freeForm: true,
+              allowAll: true,
+              default: ['Select All'],
+              canSelectAll: true,
+              optionRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption showType column={c} />
+              ),
+              // eslint-disable-next-line react/react-in-jsx-scope
+              valueRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption column={c} />
+              ),
+              valueKey: 'column_name',
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const { controls, datasource } = state;
                 const originalMapStateToProps =
                   sharedControls?.columns?.mapStateToProps;
                 const newState =
@@ -340,6 +246,9 @@ const config: ControlPanelConfig = {
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
+                if (datasource && "columns" in datasource) {
+                  newState.default = datasource.columns.map(c => c.column_name) || [];
+                }
                 return newState;
               },
               visibility: isRawMode,

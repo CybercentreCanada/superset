@@ -27,7 +27,6 @@ import {
   TimeseriesDataRecord,
   Column,
 } from '@superset-ui/core';
-import { string } from 'yargs';
 
 export type CccsGridQueryFormData = QueryFormData & {
   headerText?: string;

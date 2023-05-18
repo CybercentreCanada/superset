@@ -24,14 +24,13 @@ import {
   Metric,
   NumberFormats,
   QueryMode,
-  t,
   TimeseriesDataRecord,
 } from '@superset-ui/core';
 import {
   CccsGridChartProps,
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
-} from '../../../plugin-chart-cccs-grid/src/types';
+} from '../types';
 
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
