@@ -36,7 +36,6 @@ import {
   ControlStateMapping,
   ControlPanelConfig,
   ControlPanelsContainerProps,
-  sections,
   QueryModeLabel,
   sharedControls,
   ControlPanelState,
@@ -194,7 +193,6 @@ const { user } = JSON.parse(
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
-    sections.legacyTimeseriesTime,
     {
       label: t('Query'),
       expanded: true,
@@ -402,20 +400,6 @@ const config: ControlPanelConfig = {
         [
           isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
             ? {
-                name: 'emitFilter',
-                config: {
-                  type: 'CheckboxControl',
-                  label: t('Emit dashboard cross filters'),
-                  default: false,
-                  renderTrigger: true,
-                  description: t('Emit dashboard cross filters.'),
-                },
-              }
-            : null,
-        ],
-        [
-          isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
-            ? {
                 name: 'principalColumns',
                 config: {
                   type: 'SelectControl',
@@ -474,8 +458,6 @@ const config: ControlPanelConfig = {
                         : [];
                     return newState;
                   },
-                  visibility: ({ controls }) =>
-                    Boolean(controls?.emitFilter?.value),
                   canCopy: true,
                 },
               }

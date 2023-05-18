@@ -30,6 +30,8 @@ import {
   LicenseManager,
   MenuItemDef,
   GetContextMenuItemsParams,
+  SortChangedEvent,
+  GroupCellRenderer,
 } from '@ag-grid-enterprise/all-modules';
 import { ensureIsArray } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
@@ -76,7 +78,7 @@ export default function CccsGrid({
   selectedValues,
   tooltipShowDelay,
   rowSelection,
-  emitFilter,
+  emitCrossFilters,
   principalColumns,
   include_search,
   page_length = 0,
@@ -100,12 +102,14 @@ export default function CccsGrid({
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
-
+  const [sortField, setSortField] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+  const [sortedColumnDefs, setSortedColumnDefs] = useState(columnDefs);
   const gridRef = useRef<AgGridReactType>(null);
 
   const handleChange = useCallback(
     filters => {
-      if (!emitFilter) {
+      if (!emitCrossFilters) {
         return;
       }
       const groupBy = Object.keys(filters);
@@ -134,8 +138,30 @@ export default function CccsGrid({
         },
       });
     },
-    [emitFilter, setDataMask, selectedDataByColumnName, principalColumnFilters],
+    [emitCrossFilters, setDataMask, sortField, columnDefs, sortOrder],
   ); // only take relevant page size options
+
+  useEffect(() => {
+    // if we are sorting by a field, persist that after column defs are reset
+    if (
+      sortField &&
+      ensureIsArray(columnDefs).some(c => c.field === sortField)
+    ) {
+      const newSortArr = ensureIsArray(columnDefs).map(c => {
+        const new_c = c;
+        if (c.field === sortField) {
+          new_c.sort = sortOrder;
+        }
+        return new_c;
+      });
+      setSortedColumnDefs(newSortArr);
+    } else {
+      // if the new column defs do not contain the sort field reset it
+      setSortField('');
+      setSortOrder('');
+      setSortedColumnDefs(columnDefs);
+    }
+  }, [columnDefs, sortField, sortOrder]);
 
   const generateNativeFilterUrlString = (
     nativefilterID: string,
@@ -217,7 +243,7 @@ export default function CccsGrid({
       let result: (string | MenuItemDef)[] = [];
       result = ['copy', 'copyWithHeaders', 'paste'];
 
-      if (emitFilter) {
+      if (emitCrossFilters) {
         result = result.concat([
           'separator',
           {
@@ -259,7 +285,7 @@ export default function CccsGrid({
       return result;
     },
     [
-      emitFilter,
+      emitCrossFilters,
       selectedDataByColumnName,
       principalColumns,
       crossFilterValue,
@@ -285,9 +311,9 @@ export default function CccsGrid({
       const columnID = params.column.colId;
 
       // Only keep cells which belong to the current column
-      const newInstances = instances.filter(
-        (instance: any) => instance.params.column.colId === columnID,
-      );
+      const newInstances = instances
+        .filter((instance: any) => !(instance instanceof GroupCellRenderer))
+        .filter((instance: any) => instance.params.column.colId === columnID);
 
       // Add an expand all button which will send an update to each cell renderer
       jsonMenuItems.push({
@@ -492,6 +518,18 @@ export default function CccsGrid({
     setControlValue('column_state', e.columnApi.getColumnState());
   }, []);
 
+  const onSortChanged = (event: SortChangedEvent) => {
+    const sortModel = event.api.getSortModel();
+    if (sortModel.length > 0) {
+      const { colId, sort } = sortModel[0];
+      setSortField(colId || '');
+      setSortOrder(sort || '');
+    } else {
+      setSortField('');
+      setSortOrder('');
+    }
+  };
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -558,7 +596,7 @@ export default function CccsGrid({
         <AgGridReact
           ref={gridRef}
           modules={AllModules}
-          columnDefs={columnDefs}
+          columnDefs={sortedColumnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
           frameworkComponents={frameworkComponents}
           enableBrowserTooltips={true}
@@ -572,6 +610,7 @@ export default function CccsGrid({
           onFirstDataRendered={onFirstDataRendered}
           onRangeSelectionChanged={onRangeSelectionChanged}
           onSelectionChanged={onSelectionChanged}
+          onSortChanged={onSortChanged}
           rowData={rowData}
           paginationPageSize={pageSize}
           pagination={pageSize > 0}
