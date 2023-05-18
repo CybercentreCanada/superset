@@ -30,6 +30,7 @@ import {
   LicenseManager,
   MenuItemDef,
   GetContextMenuItemsParams,
+  SortChangedEvent,
   GroupCellRenderer,
 } from '@ag-grid-enterprise/all-modules';
 import { ensureIsArray } from '@superset-ui/core';
@@ -77,7 +78,7 @@ export default function CccsGrid({
   selectedValues,
   tooltipShowDelay,
   rowSelection,
-  emitFilter,
+  emitCrossFilters,
   principalColumns,
   include_search,
   page_length = 0,
@@ -101,12 +102,14 @@ export default function CccsGrid({
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
-
+  const [sortFields, setSortFields] = useState(['']);
+  const [sortOrders, setSortOrders] = useState(['']);
+  const [sortedColumnDefs, setSortedColumnDefs] = useState(columnDefs);
   const gridRef = useRef<AgGridReactType>(null);
 
   const handleChange = useCallback(
     filters => {
-      if (!emitFilter) {
+      if (!emitCrossFilters) {
         return;
       }
       const groupBy = Object.keys(filters);
@@ -135,8 +138,33 @@ export default function CccsGrid({
         },
       });
     },
-    [emitFilter, setDataMask, selectedDataByColumnName, principalColumnFilters],
+    [emitCrossFilters, setDataMask],
   ); // only take relevant page size options
+
+  useEffect(() => {
+    // if we are sorting by a field, persist that after column defs are reset only when emitting cross filters
+    if (
+      emitCrossFilters &&
+      sortFields &&
+      ensureIsArray(columnDefs).some(c => sortFields.includes(c.field))
+    ) {
+      const newSortArr = ensureIsArray(columnDefs).map(c => {
+        const new_c = c;
+        if (sortFields.includes(c.field)) {
+          new_c.sort = sortOrders.at(sortFields.indexOf(c.field));
+        } else {
+          new_c.sort = undefined;
+        }
+        return new_c;
+      });
+      setSortedColumnDefs(newSortArr);
+    } else {
+      // if the new column defs do not contain the sort field reset it
+      setSortFields([]);
+      setSortOrders([]);
+      setSortedColumnDefs(columnDefs);
+    }
+  }, [columnDefs, JSON.stringify(sortFields)]);
 
   const generateNativeFilterUrlString = (
     nativefilterID: string,
@@ -218,7 +246,7 @@ export default function CccsGrid({
       let result: (string | MenuItemDef)[] = [];
       result = ['copy', 'copyWithHeaders', 'paste'];
 
-      if (emitFilter) {
+      if (emitCrossFilters) {
         result = result.concat([
           'separator',
           {
@@ -260,7 +288,7 @@ export default function CccsGrid({
       return result;
     },
     [
-      emitFilter,
+      emitCrossFilters,
       selectedDataByColumnName,
       principalColumns,
       crossFilterValue,
@@ -493,6 +521,17 @@ export default function CccsGrid({
     setControlValue('column_state', e.columnApi.getColumnState());
   }, []);
 
+  const onSortChanged = (event: SortChangedEvent) => {
+    const sortModel = event.api.getSortModel();
+    if (sortModel.length > 0) {
+      setSortFields(sortModel.map(col => col.colId || ''));
+      setSortOrders(sortModel.map(col => col.sort || ''));
+    } else {
+      setSortFields([]);
+      setSortOrders([]);
+    }
+  };
+
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
@@ -559,7 +598,7 @@ export default function CccsGrid({
         <AgGridReact
           ref={gridRef}
           modules={AllModules}
-          columnDefs={columnDefs}
+          columnDefs={sortedColumnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
           frameworkComponents={frameworkComponents}
           enableBrowserTooltips={true}
@@ -573,6 +612,7 @@ export default function CccsGrid({
           onFirstDataRendered={onFirstDataRendered}
           onRangeSelectionChanged={onRangeSelectionChanged}
           onSelectionChanged={onSelectionChanged}
+          onSortChanged={onSortChanged}
           rowData={rowData}
           paginationPageSize={pageSize}
           pagination={pageSize > 0}
