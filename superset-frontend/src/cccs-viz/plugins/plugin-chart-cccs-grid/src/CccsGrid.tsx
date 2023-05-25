@@ -152,6 +152,7 @@ export default function CccsGrid({
         const new_c = c;
         if (sortFields.includes(c.field)) {
           new_c.sort = sortOrders.at(sortFields.indexOf(c.field));
+          new_c.sortIndex = sortFields.indexOf(c.field);
         } else {
           new_c.sort = undefined;
         }
