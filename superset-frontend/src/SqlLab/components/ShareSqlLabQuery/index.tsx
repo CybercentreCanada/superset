@@ -17,17 +17,17 @@
  * under the License.
  */
 import React from 'react';
-import { t, useTheme, styled } from '@superset-ui/core';
+import { FeatureFlag, styled, t, useTheme } from '@superset-ui/core';
 import Button from 'src/components/Button';
 import Icons from 'src/components/Icons';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import CopyToClipboard from 'src/components/CopyToClipboard';
 import { storeQuery } from 'src/utils/common';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
-import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
+import { isFeatureEnabled } from 'src/featureFlags';
 import useQueryEditor from 'src/SqlLab/hooks/useQueryEditor';
 
-interface ShareSqlLabQueryPropTypes {
+interface ShareSqlLabQueryProps {
   queryEditorId: string;
   addDangerToast: (msg: string) => void;
 }
@@ -42,19 +42,25 @@ const StyledIcon = styled(Icons.Link)`
   }
 `;
 
-function ShareSqlLabQuery({
+const ShareSqlLabQuery = ({
   queryEditorId,
   addDangerToast,
-}: ShareSqlLabQueryPropTypes) {
+}: ShareSqlLabQueryProps) => {
   const theme = useTheme();
 
-  const { dbId, name, schema, autorun, sql, remoteId } = useQueryEditor(
-    queryEditorId,
-    ['dbId', 'name', 'schema', 'autorun', 'sql', 'remoteId'],
-  );
+  const { dbId, name, schema, autorun, sql, remoteId, templateParams } =
+    useQueryEditor(queryEditorId, [
+      'dbId',
+      'name',
+      'schema',
+      'autorun',
+      'sql',
+      'remoteId',
+      'templateParams',
+    ]);
 
   const getCopyUrlForKvStore = (callback: Function) => {
-    const sharedQuery = { dbId, name, schema, autorun, sql };
+    const sharedQuery = { dbId, name, schema, autorun, sql, templateParams };
 
     return storeQuery(sharedQuery)
       .then(shortUrl => {
@@ -120,6 +126,6 @@ function ShareSqlLabQuery({
       )}
     </>
   );
-}
+};
 
 export default withToasts(ShareSqlLabQuery);

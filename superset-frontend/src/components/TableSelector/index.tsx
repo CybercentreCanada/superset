@@ -36,8 +36,11 @@ import RefreshLabel from 'src/components/RefreshLabel';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
-import { SchemaOption } from 'src/SqlLab/types';
 import { useTables, Table } from 'src/hooks/apiResources';
+import {
+  getClientErrorMessage,
+  getClientErrorObject,
+} from 'src/utils/getClientErrorObject';
 
 const REFRESH_WIDTH = 30;
 
@@ -89,13 +92,11 @@ interface TableSelectorProps {
   database?: DatabaseObject | null;
   emptyState?: ReactNode;
   formMode?: boolean;
-  getDbList?: (arg0: any) => {};
+  getDbList?: (arg0: any) => void;
   handleError: (msg: string) => void;
   isDatabaseSelectEnabled?: boolean;
   onDbChange?: (db: DatabaseObject) => void;
   onSchemaChange?: (schema?: string) => void;
-  onSchemasLoad?: (schemaOptions: SchemaOption[]) => void;
-  onTablesLoad?: (options: Array<any>) => void;
   readOnly?: boolean;
   schema?: string;
   onEmptyResults?: (searchText?: string) => void;
@@ -156,8 +157,6 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
   isDatabaseSelectEnabled = true,
   onDbChange,
   onSchemaChange,
-  onSchemasLoad,
-  onTablesLoad,
   readOnly = false,
   onEmptyResults,
   schema,
@@ -181,13 +180,21 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
   } = useTables({
     dbId: database?.id,
     schema: currentSchema,
-    onSuccess: (data: { options: Table[] }) => {
-      onTablesLoad?.(data.options);
+    onSuccess: () => {
       if (isFetched) {
-        addSuccessToast('List updated');
+        addSuccessToast(t('List updated'));
       }
     },
-    onError: () => handleError(t('There was an error loading the tables')),
+    onError: (err: Response) => {
+      getClientErrorObject(err).then(clientError => {
+        handleError(
+          getClientErrorMessage(
+            t('There was an error loading the tables'),
+            clientError,
+          ),
+        );
+      });
+    },
   });
 
   const tableOptions = useMemo<TableOption[]>(
@@ -255,26 +262,6 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
     internalTableChange(value);
   };
 
-  function renderDatabaseSelector() {
-    return (
-      <DatabaseSelector
-        db={database}
-        emptyState={emptyState}
-        formMode={formMode}
-        getDbList={getDbList}
-        handleError={handleError}
-        onDbChange={readOnly ? undefined : internalDbChange}
-        onEmptyResults={onEmptyResults}
-        onSchemaChange={readOnly ? undefined : internalSchemaChange}
-        onSchemasLoad={onSchemasLoad}
-        schema={currentSchema}
-        sqlLabMode={sqlLabMode}
-        isDatabaseSelectEnabled={isDatabaseSelectEnabled && !readOnly}
-        readOnly={readOnly}
-      />
-    );
-  }
-
   const handleFilterOption = useMemo(
     () => (search: string, option: TableOption) => {
       const searchValue = search.trim().toLowerCase();
@@ -295,7 +282,7 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
 
     const select = (
       <Select
-        ariaLabel={t('Select table or type table name')}
+        ariaLabel={t('Select table or type to search tables')}
         disabled={disabled}
         filterOption={handleFilterOption}
         header={header}
@@ -306,7 +293,7 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
           internalTableChange(options)
         }
         options={tableOptions}
-        placeholder={t('Select table or type table name')}
+        placeholder={t('Select table or type to search tables')}
         showSearch
         mode={tableSelectMode}
         value={tableSelectValue}
@@ -314,7 +301,7 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
       />
     );
 
-    const refreshLabel = !formMode && !readOnly && (
+    const refreshLabel = !readOnly && (
       <RefreshLabel
         onClick={() => refetch()}
         tooltipContent={t('Force refresh table list')}
@@ -326,7 +313,20 @@ const TableSelector: FunctionComponent<TableSelectorProps> = ({
 
   return (
     <TableSelectorWrapper>
-      {renderDatabaseSelector()}
+      <DatabaseSelector
+        db={database}
+        emptyState={emptyState}
+        formMode={formMode}
+        getDbList={getDbList}
+        handleError={handleError}
+        onDbChange={readOnly ? undefined : internalDbChange}
+        onEmptyResults={onEmptyResults}
+        onSchemaChange={readOnly ? undefined : internalSchemaChange}
+        schema={currentSchema}
+        sqlLabMode={sqlLabMode}
+        isDatabaseSelectEnabled={isDatabaseSelectEnabled && !readOnly}
+        readOnly={readOnly}
+      />
       {sqlLabMode && !formMode && <div className="divider" />}
       {renderTableSelect()}
     </TableSelectorWrapper>

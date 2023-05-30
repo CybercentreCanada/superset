@@ -675,7 +675,7 @@ WHERE TABLE_SCHEMA like "%bi%"),0x7e)));
             """
 select (extractvalue(1,concat(0x7e,(select GROUP_CONCAT(COLUMN_NAME)
 from INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME="bi_achivement_daily"),0x7e)));
+WHERE TABLE_NAME="bi_achievement_daily"),0x7e)));
 """
         )
         == {Table("COLUMNS", "INFORMATION_SCHEMA")}
@@ -1000,6 +1000,28 @@ FROM "druid"."my_table"
 GROUP BY 1,2
 )
 SELECT
+  f.week,
+  f.name,
+  f.unique_users
+FROM foo f"""
+    )
+    assert sql.is_select()
+
+
+def test_cte_is_select_lowercase() -> None:
+    """
+    Some CTEs with lowercase select are not correctly identified as SELECTS.
+    """
+    sql = ParsedQuery(
+        """WITH foo AS(
+select
+  FLOOR(__time TO WEEK) AS "week",
+  name,
+  COUNT(DISTINCT user_id) AS "unique_users"
+FROM "druid"."my_table"
+GROUP BY 1,2
+)
+select
   f.week,
   f.name,
   f.unique_users

@@ -229,11 +229,11 @@ class TestDbEngineSpecs(TestDbEngineSpec):
 
         """ Make sure base engine spec removes schema name from table name
         ie. when try_remove_schema_from_table_name == True. """
-        base_result_expected = ["table", "table_2"]
+        base_result_expected = {"table", "table_2"}
         base_result = BaseEngineSpec.get_table_names(
             database=mock.ANY, schema="schema", inspector=inspector
         )
-        self.assertListEqual(base_result_expected, base_result)
+        assert base_result_expected == base_result
 
     @pytest.mark.usefixtures("load_energy_table_with_slice")
     def test_column_datatype_to_string(self):
@@ -332,11 +332,12 @@ def test_is_readonly():
 
 def test_time_grain_denylist():
     config = app.config.copy()
-    app.config["TIME_GRAIN_DENYLIST"] = ["PT1M"]
+    app.config["TIME_GRAIN_DENYLIST"] = ["PT1M", "SQLITE_NONEXISTENT_GRAIN"]
 
     with app.app_context():
         time_grain_functions = SqliteEngineSpec.get_time_grain_expressions()
         assert not "PT1M" in time_grain_functions
+        assert not "SQLITE_NONEXISTENT_GRAIN" in time_grain_functions
 
     app.config = config
 
@@ -395,7 +396,7 @@ def test_get_time_grain_with_config():
     app.config = config
 
 
-def test_get_time_grain_with_unkown_values():
+def test_get_time_grain_with_unknown_values():
     """Should concatenate from configs and then sort in the proper order
     putting unknown patterns at the end"""
     config = app.config.copy()
@@ -520,3 +521,26 @@ def test_validate_parameters_port_closed(is_port_open, is_hostname_valid):
             },
         )
     ]
+
+
+def test_get_indexes():
+    indexes = [
+        {
+            "name": "partition",
+            "column_names": ["a", "b"],
+            "unique": False,
+        },
+    ]
+
+    inspector = mock.Mock()
+    inspector.get_indexes = mock.Mock(return_value=indexes)
+
+    assert (
+        BaseEngineSpec.get_indexes(
+            database=mock.Mock(),
+            inspector=inspector,
+            table_name="bar",
+            schema="foo",
+        )
+        == indexes
+    )

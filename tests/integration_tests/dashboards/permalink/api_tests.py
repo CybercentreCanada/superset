@@ -87,13 +87,10 @@ def test_post(
     db.session.commit()
 
 
-@patch("superset.security.SupersetSecurityManager.raise_for_dashboard_access")
-def test_post_access_denied(
-    mock_raise_for_dashboard_access, test_client, login_as_admin, dashboard_id: int
-):
-    mock_raise_for_dashboard_access.side_effect = DashboardAccessDeniedError()
+def test_post_access_denied(test_client, login_as, dashboard_id: int):
+    login_as("gamma")
     resp = test_client.post(f"api/v1/dashboard/{dashboard_id}/permalink", json=STATE)
-    assert resp.status_code == 403
+    assert resp.status_code == 404
 
 
 def test_post_invalid_schema(test_client, login_as_admin, dashboard_id: int):
@@ -110,7 +107,8 @@ def test_get(test_client, login_as_admin, dashboard_id: int, permalink_salt: str
     resp = test_client.get(f"api/v1/dashboard/permalink/{key}")
     assert resp.status_code == 200
     result = resp.json
-    assert result["dashboardId"] == str(dashboard_id)
+    dashboard_uuid = result["dashboardId"]
+    assert Dashboard.get(dashboard_uuid).id == dashboard_id
     assert result["state"] == STATE
     id_ = decode_permalink_id(key, permalink_salt)
     db.session.query(KeyValueEntry).filter_by(id=id_).delete()

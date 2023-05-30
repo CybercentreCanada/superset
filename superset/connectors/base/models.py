@@ -19,15 +19,27 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Hashable, List, Optional, Set, Type, TYPE_CHECKING, Union
+from typing import (
+    Any,
+    Dict,
+    Hashable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TYPE_CHECKING,
+    Union,
+)
 
 from flask_appbuilder.security.sqla.models import User
+from flask_babel import gettext as __
 from sqlalchemy import and_, Boolean, Column, Integer, String, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import foreign, Query, relationship, RelationshipProperty, Session
 from sqlalchemy.sql import literal_column
 
-from superset import is_feature_enabled, security_manager
+from superset import security_manager
 from superset.constants import EMPTY_STRING, NULL_STRING
 from superset.datasets.commands.exceptions import DatasetNotFoundError
 from superset.models.helpers import AuditMixinNullable, ImportExportMixin, QueryResult
@@ -110,7 +122,7 @@ class BaseDatasource(
     description = Column(Text)
     default_endpoint = Column(Text)
     is_featured = Column(Boolean, default=False)  # TODO deprecating
-    filter_select_enabled = Column(Boolean, default=is_feature_enabled("UX_BETA"))
+    filter_select_enabled = Column(Boolean, default=True)
     offset = Column(Integer, default=0)
     cache_timeout = Column(Integer)
     params = Column(String(1000))
@@ -209,7 +221,7 @@ class BaseDatasource(
     def explore_url(self) -> str:
         if self.default_endpoint:
             return self.default_endpoint
-        return f"/explore/?dataset_type={self.type}&dataset_id={self.id}"
+        return f"/explore/?datasource_type={self.type}&datasource_id={self.id}"
 
     @property
     def column_formats(self) -> Dict[str, Optional[str]]:
@@ -241,26 +253,33 @@ class BaseDatasource(
         pass
 
     @property
-    def data(self) -> Dict[str, Any]:
-        """Data representation of the datasource sent to the frontend"""
-        order_by_choices = []
+    def order_by_choices(self) -> List[Tuple[str, str]]:
+        choices = []
         # self.column_names return sorted column_names
         for column_name in self.column_names:
             column_name = str(column_name or "")
-            order_by_choices.append(
-                (json.dumps([column_name, True]), column_name + " [asc]")
+            choices.append(
+                (json.dumps([column_name, True]), f"{column_name} " + __("[asc]"))
             )
-            order_by_choices.append(
-                (json.dumps([column_name, False]), column_name + " [desc]")
+            choices.append(
+                (json.dumps([column_name, False]), f"{column_name} " + __("[desc]"))
             )
+        return choices
 
-        verbose_map = {"__timestamp": "Time"}
-        verbose_map.update(
+    @property
+    def verbose_map(self) -> Dict[str, str]:
+        verb_map = {"__timestamp": "Time"}
+        verb_map.update(
             {o.metric_name: o.verbose_name or o.metric_name for o in self.metrics}
         )
-        verbose_map.update(
+        verb_map.update(
             {o.column_name: o.verbose_name or o.column_name for o in self.columns}
         )
+        return verb_map
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        """Data representation of the datasource sent to the frontend"""
         return {
             # simple fields
             "id": self.id,
@@ -287,9 +306,9 @@ class BaseDatasource(
             "columns": [o.data for o in self.columns],
             "metrics": [o.data for o in self.metrics],
             # TODO deprecate, move logic to JS
-            "order_by_choices": order_by_choices,
+            "order_by_choices": self.order_by_choices,
             "owners": [owner.id for owner in self.owners],
-            "verbose_map": verbose_map,
+            "verbose_map": self.verbose_map,
             "select_star": self.select_star,
         }
 
@@ -312,9 +331,9 @@ class BaseDatasource(
                 for metric in utils.get_iterable(form_data.get(metric_param) or []):
                     metric_names.add(utils.get_metric_name(metric))
                     if utils.is_adhoc_metric(metric):
-                        column_names.add(
-                            (metric.get("column") or {}).get("column_name")
-                        )
+                        column = metric.get("column") or {}
+                        if column_name := column.get("column_name"):
+                            column_names.add(column_name)
 
             # Columns used in query filters
             column_names.update(
@@ -395,6 +414,7 @@ class BaseDatasource(
     @staticmethod
     def filter_values_handler(  # pylint: disable=too-many-arguments
         values: Optional[FilterValues],
+        operator: str,
         target_generic_type: GenericDataType,
         target_native_type: Optional[str] = None,
         is_list_target: bool = False,
@@ -405,6 +425,8 @@ class BaseDatasource(
             return None
 
         def handle_single_value(value: Optional[FilterValue]) -> Optional[FilterValue]:
+            if operator == utils.FilterOperator.TEMPORAL_RANGE:
+                return value
             if (
                 isinstance(value, (float, int))
                 and target_generic_type == utils.GenericDataType.TEMPORAL
