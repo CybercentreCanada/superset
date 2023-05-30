@@ -39,6 +39,7 @@ export interface CardSortSelectOption {
 
 export interface Filter {
   Header: ReactNode;
+  key: string;
   id: string;
   urlDisplay?: string;
   operator?: FilterOperator;
@@ -117,4 +118,7 @@ export enum FilterOperator {
   datasetIsCertified = 'dataset_is_certified',
   dashboardHasCreatedBy = 'dashboard_has_created_by',
   chartHasCreatedBy = 'chart_has_created_by',
+  dashboardTags = 'dashboard_tags',
+  chartTags = 'chart_tags',
+  savedQueryTags = 'saved_query_tags',
 }

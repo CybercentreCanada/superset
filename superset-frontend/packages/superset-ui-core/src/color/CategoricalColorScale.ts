@@ -20,7 +20,7 @@
 /* eslint-disable no-dupe-class-members */
 import { scaleOrdinal, ScaleOrdinal } from 'd3-scale';
 import { ExtensibleFunction } from '../models';
-import { ColorsLookup } from './types';
+import { ColorsInitLookup, ColorsLookup } from './types';
 import stringifyAndTrim from './stringifyAndTrim';
 import getSharedLabelColor from './SharedLabelColorSingleton';
 import { getAnalogousColors } from './utils';
@@ -39,7 +39,7 @@ class CategoricalColorScale extends ExtensibleFunction {
 
   scale: ScaleOrdinal<{ toString(): string }, string>;
 
-  parentForcedColors?: ColorsLookup;
+  parentForcedColors: ColorsLookup;
 
   forcedColors: ColorsLookup;
 
@@ -51,14 +51,24 @@ class CategoricalColorScale extends ExtensibleFunction {
    * @param {*} parentForcedColors optional parameter that comes from parent
    * (usually CategoricalColorNamespace) and supersede this.forcedColors
    */
-  constructor(colors: string[], parentForcedColors?: ColorsLookup) {
+  constructor(colors: string[], parentForcedColors: ColorsInitLookup = {}) {
     super((value: string, sliceId?: number) => this.getColor(value, sliceId));
 
     this.originColors = colors;
     this.colors = colors;
     this.scale = scaleOrdinal<{ toString(): string }, string>();
     this.scale.range(colors);
-    this.parentForcedColors = parentForcedColors;
+
+    // reserve fixed colors in parent map based on their index in the scale
+    Object.entries(parentForcedColors).forEach(([key, value]) => {
+      if (typeof value === 'number') {
+        // eslint-disable-next-line no-param-reassign
+        parentForcedColors[key] = colors[value % colors.length];
+      }
+    });
+
+    // all indexes have been replaced by a fixed color
+    this.parentForcedColors = parentForcedColors as ColorsLookup;
     this.forcedColors = {};
     this.multiple = 0;
   }
@@ -67,17 +77,11 @@ class CategoricalColorScale extends ExtensibleFunction {
     const cleanedValue = stringifyAndTrim(value);
     const sharedLabelColor = getSharedLabelColor();
 
-    const parentColor = this.parentForcedColors?.[cleanedValue];
-    if (parentColor) {
-      sharedLabelColor.addSlice(cleanedValue, parentColor, sliceId);
-      return parentColor;
-    }
-
-    const forcedColor = this.forcedColors[cleanedValue];
-    if (forcedColor) {
-      sharedLabelColor.addSlice(cleanedValue, forcedColor, sliceId);
-      return forcedColor;
-    }
+    // priority: parentForcedColors > forcedColors > labelColors
+    let color =
+      this.parentForcedColors?.[cleanedValue] ||
+      this.forcedColors?.[cleanedValue] ||
+      sharedLabelColor.getColorMap().get(cleanedValue);
 
     if (isFeatureEnabled(FeatureFlag.USE_ANALAGOUS_COLORS)) {
       const multiple = Math.floor(
@@ -89,8 +93,10 @@ class CategoricalColorScale extends ExtensibleFunction {
         this.range(this.originColors.concat(newRange));
       }
     }
-
-    const color = this.scale(cleanedValue);
+    const newColor = this.scale(cleanedValue);
+    if (!color) {
+      color = newColor;
+    }
     sharedLabelColor.addSlice(cleanedValue, color, sliceId);
 
     return color;
@@ -169,7 +175,7 @@ class CategoricalColorScale extends ExtensibleFunction {
    *
    * If there are fewer elements in the range than in the domain, the scale will reuse values from the start of the range.
    *
-   * @param range Array of range values.
+   * @param newRange Array of range values.
    */
   range(newRange: string[]): this;
 

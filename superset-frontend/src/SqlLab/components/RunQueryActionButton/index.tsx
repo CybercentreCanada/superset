@@ -26,8 +26,9 @@ import { DropdownButton } from 'src/components/DropdownButton';
 import { detectOS } from 'src/utils/common';
 import { QueryButtonProps } from 'src/SqlLab/types';
 import useQueryEditor from 'src/SqlLab/hooks/useQueryEditor';
+import { cleanSqlComments } from 'src/SqlLab/actions/sqlLab';
 
-export interface Props {
+export interface RunQueryActionButtonProps {
   queryEditorId: string;
   allowAsync: boolean;
   queryState?: string;
@@ -81,14 +82,14 @@ const StyledButton = styled.span`
   }
 `;
 
-const RunQueryActionButton: React.FC<Props> = ({
+const RunQueryActionButton = ({
   allowAsync = false,
   queryEditorId,
   queryState,
   overlayCreateAsMenu,
   runQuery,
   stopQuery,
-}) => {
+}: RunQueryActionButtonProps) => {
   const theme = useTheme();
   const userOS = detectOS();
 
@@ -105,9 +106,7 @@ const RunQueryActionButton: React.FC<Props> = ({
     : Button;
 
   const sqlContent = selectedText || sql || '';
-  const isDisabled =
-    !sqlContent ||
-    !sqlContent.replace(/(\/\*[^*]*\*\/)|(\/\/[^*]*)|(--[^.].*)/gm, '').trim();
+  const isDisabled = cleanSqlComments(sqlContent).length === 0;
 
   const stopButtonTooltipText = useMemo(
     () =>

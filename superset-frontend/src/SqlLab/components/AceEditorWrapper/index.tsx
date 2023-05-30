@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { usePrevious } from 'src/hooks/usePrevious';
+import { css, styled, usePrevious } from '@superset-ui/core';
+
 import { areArraysShallowEqual } from 'src/reduxUtils';
 import sqlKeywords from 'src/SqlLab/utils/sqlKeywords';
 import {
@@ -38,6 +39,7 @@ import {
   FullSQLEditor as AceEditor,
 } from 'src/components/AsyncAceEditor';
 import useQueryEditor from 'src/SqlLab/hooks/useQueryEditor';
+import { useSchemas, useTables } from 'src/hooks/apiResources';
 
 type HotKey = {
   key: string;
@@ -57,6 +59,26 @@ type AceEditorWrapperProps = {
   hotkeys: HotKey[];
 };
 
+const StyledAceEditor = styled(AceEditor)`
+  ${({ theme }) => css`
+    && {
+      // double class is better than !important
+      border: 1px solid ${theme.colors.grayscale.light2};
+      font-feature-settings: 'liga' off, 'calt' off;
+
+      &.ace_autocomplete {
+        // Use !important because Ace Editor applies extra CSS at the last second
+        // when opening the autocomplete.
+        width: ${theme.gridUnit * 130}px !important;
+      }
+
+      .ace_scroller {
+        background-color: ${theme.colors.grayscale.light4};
+      }
+    }
+  `}
+`;
+
 const AceEditorWrapper = ({
   autocomplete,
   onBlur = () => {},
@@ -74,15 +96,36 @@ const AceEditorWrapper = ({
     'dbId',
     'sql',
     'functionNames',
-    'schemaOptions',
-    'tableOptions',
     'validationResult',
     'schema',
   ]);
+  const { data: schemaOptions } = useSchemas({
+    ...(autocomplete && { dbId: queryEditor.dbId }),
+  });
+  const { data: tableData } = useTables({
+    ...(autocomplete && {
+      dbId: queryEditor.dbId,
+      schema: queryEditor.schema,
+    }),
+  });
+
   const currentSql = queryEditor.sql ?? '';
   const functionNames = queryEditor.functionNames ?? [];
-  const schemas = queryEditor.schemaOptions ?? [];
-  const tables = queryEditor.tableOptions ?? [];
+
+  // Loading schema, table and column names as auto-completable words
+  const { schemas, schemaWords } = useMemo(
+    () => ({
+      schemas: schemaOptions ?? [],
+      schemaWords: (schemaOptions ?? []).map(s => ({
+        name: s.label,
+        value: s.value,
+        score: SCHEMA_AUTOCOMPLETE_SCORE,
+        meta: 'schema',
+      })),
+    }),
+    [schemaOptions],
+  );
+  const tables = tableData?.options ?? [];
 
   const [sql, setSql] = useState(currentSql);
   const [words, setWords] = useState<AceCompleterKeyword[]>([]);
@@ -169,14 +212,7 @@ const AceEditorWrapper = ({
     onChange(text);
   };
 
-  const setAutoCompleter = () => {
-    // Loading schema, table and column names as auto-completable words
-    const schemaWords = schemas.map(s => ({
-      name: s.label,
-      value: s.value,
-      score: SCHEMA_AUTOCOMPLETE_SCORE,
-      meta: 'schema',
-    }));
+  function setAutoCompleter() {
     const columns = {};
 
     const tableWords = tables.map(t => {
@@ -240,7 +276,7 @@ const AceEditorWrapper = ({
       }));
 
     setWords(words);
-  };
+  }
 
   const getAceAnnotations = () => {
     const { validationResult } = queryEditor;
@@ -258,7 +294,7 @@ const AceEditorWrapper = ({
   };
 
   return (
-    <AceEditor
+    <StyledAceEditor
       keywords={words}
       onLoad={onEditorLoad}
       onBlur={onBlurSql}

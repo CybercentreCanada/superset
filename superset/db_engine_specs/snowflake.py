@@ -28,15 +28,17 @@ from cryptography.hazmat.primitives import serialization
 from flask import current_app
 from flask_babel import gettext as __
 from marshmallow import fields, Schema
+from sqlalchemy import types
+from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.engine.url import URL
 from typing_extensions import TypedDict
 
+from superset.constants import USER_AGENT
 from superset.databases.utils import make_url_safe
-from superset.db_engine_specs.base import BasicPropertiesType
+from superset.db_engine_specs.base import BaseEngineSpec, BasicPropertiesType
 from superset.db_engine_specs.postgres import PostgresBaseEngineSpec
 from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
 from superset.models.sql_lab import Query
-from superset.utils import core as utils
 
 if TYPE_CHECKING:
     from superset.models.core import Database
@@ -82,6 +84,9 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
     default_driver = "snowflake"
     sqlalchemy_uri_placeholder = "snowflake://"
 
+    supports_dynamic_schema = True
+    supports_catalog = True
+
     _time_grain_expressions = {
         None: "{col}",
         "PT1S": "DATE_TRUNC('SECOND', {col})",
@@ -118,18 +123,69 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
         ),
     }
 
-    @classmethod
-    def adjust_database_uri(
-        cls, uri: URL, selected_schema: Optional[str] = None
-    ) -> URL:
-        database = uri.database
-        if "/" in uri.database:
-            database = uri.database.split("/")[0]
-        if selected_schema:
-            selected_schema = parse.quote(selected_schema, safe="")
-            uri = uri.set(database=f"{database}/{selected_schema}")
+    @staticmethod
+    def get_extra_params(database: "Database") -> Dict[str, Any]:
+        """
+        Add a user agent to be used in the requests.
+        """
+        extra: Dict[str, Any] = BaseEngineSpec.get_extra_params(database)
+        engine_params: Dict[str, Any] = extra.setdefault("engine_params", {})
+        connect_args: Dict[str, Any] = engine_params.setdefault("connect_args", {})
 
-        return uri
+        connect_args.setdefault("application", USER_AGENT)
+
+        return extra
+
+    @classmethod
+    def adjust_engine_params(
+        cls,
+        uri: URL,
+        connect_args: Dict[str, Any],
+        catalog: Optional[str] = None,
+        schema: Optional[str] = None,
+    ) -> Tuple[URL, Dict[str, Any]]:
+        database = uri.database
+        if "/" in database:
+            database = database.split("/")[0]
+        if schema:
+            schema = parse.quote(schema, safe="")
+            uri = uri.set(database=f"{database}/{schema}")
+
+        return uri, connect_args
+
+    @classmethod
+    def get_schema_from_engine_params(
+        cls,
+        sqlalchemy_uri: URL,
+        connect_args: Dict[str, Any],
+    ) -> Optional[str]:
+        """
+        Return the configured schema.
+        """
+        database = sqlalchemy_uri.database.strip("/")
+
+        if "/" not in database:
+            return None
+
+        return parse.unquote(database.split("/")[1])
+
+    @classmethod
+    def get_catalog_names(
+        cls,
+        database: "Database",
+        inspector: Inspector,
+    ) -> List[str]:
+        """
+        Return all catalogs.
+
+        In Snowflake, a catalog is called a "database".
+        """
+        return sorted(
+            catalog
+            for (catalog,) in inspector.bind.execute(
+                "SELECT DATABASE_NAME from information_schema.databases"
+            )
+        )
 
     @classmethod
     def epoch_to_dttm(cls) -> str:
@@ -143,13 +199,14 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
     def convert_dttm(
         cls, target_type: str, dttm: datetime, db_extra: Optional[Dict[str, Any]] = None
     ) -> Optional[str]:
-        tt = target_type.upper()
-        if tt == utils.TemporalType.DATE:
+        sqla_type = cls.get_sqla_column_type(target_type)
+
+        if isinstance(sqla_type, types.Date):
             return f"TO_DATE('{dttm.date().isoformat()}')"
-        if tt == utils.TemporalType.DATETIME:
-            return f"""CAST('{dttm.isoformat(timespec="microseconds")}' AS DATETIME)"""
-        if tt == utils.TemporalType.TIMESTAMP:
+        if isinstance(sqla_type, types.TIMESTAMP):
             return f"""TO_TIMESTAMP('{dttm.isoformat(timespec="microseconds")}')"""
+        if isinstance(sqla_type, types.DateTime):
+            return f"""CAST('{dttm.isoformat(timespec="microseconds")}' AS DATETIME)"""
         return None
 
     @staticmethod
@@ -207,7 +264,6 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
             Dict[str, Any]
         ] = None,
     ) -> str:
-
         return str(
             URL(
                 "snowflake",

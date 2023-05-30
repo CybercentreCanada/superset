@@ -19,14 +19,18 @@ import logging
 from datetime import datetime
 from io import BytesIO
 from typing import Any
-from zipfile import ZipFile
+from zipfile import is_zipfile, ZipFile
 
 from flask import g, request, Response, send_file
 from flask_appbuilder.api import expose, protect, rison, safe
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_babel import ngettext
 
-from superset.commands.importers.exceptions import NoValidFilesFoundError
+from superset import is_feature_enabled
+from superset.commands.importers.exceptions import (
+    IncorrectFormatError,
+    NoValidFilesFoundError,
+)
 from superset.commands.importers.v1.utils import get_contents_from_bundle
 from superset.constants import MODEL_API_RW_METHOD_PERMISSION_MAP, RouteMethod
 from superset.databases.filters import DatabaseFilter
@@ -47,6 +51,7 @@ from superset.queries.saved_queries.filters import (
     SavedQueryAllTextFilter,
     SavedQueryFavoriteFilter,
     SavedQueryFilter,
+    SavedQueryTagFilter,
 )
 from superset.queries.saved_queries.schemas import (
     get_delete_ids_schema,
@@ -93,6 +98,7 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
         "schema",
         "sql",
         "sql_tables",
+        "template_parameters",
     ]
     list_columns = [
         "changed_on_delta_humanized",
@@ -104,16 +110,26 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
         "database.id",
         "db_id",
         "description",
+        "extra",
         "id",
         "label",
+        "last_run_delta_humanized",
+        "rows",
         "schema",
         "sql",
         "sql_tables",
-        "rows",
-        "last_run_delta_humanized",
-        "extra",
     ]
-    add_columns = ["db_id", "description", "label", "schema", "sql"]
+    if is_feature_enabled("TAGGING_SYSTEM"):
+        list_columns += ["tags.id", "tags.name", "tags.type"]
+    list_select_columns = list_columns + ["changed_by_fk", "changed_on"]
+    add_columns = [
+        "db_id",
+        "description",
+        "label",
+        "schema",
+        "sql",
+        "template_parameters",
+    ]
     edit_columns = add_columns
     order_columns = [
         "schema",
@@ -129,10 +145,14 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
     ]
 
     search_columns = ["id", "database", "label", "schema", "created_by"]
+    if is_feature_enabled("TAGGING_SYSTEM"):
+        search_columns += ["tags"]
     search_filters = {
         "id": [SavedQueryFavoriteFilter],
         "label": [SavedQueryAllTextFilter],
     }
+    if is_feature_enabled("TAGGING_SYSTEM"):
+        search_filters["tags"] = [SavedQueryTagFilter]
 
     apispec_parameter_schemas = {
         "get_delete_ids_schema": get_delete_ids_schema,
@@ -144,7 +164,7 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
     related_field_filters = {
         "database": "database_name",
     }
-    filter_rel_fields = {"database": [["id", DatabaseFilter, lambda: []]]}
+    base_related_field_filters = {"database": [["id", DatabaseFilter, lambda: []]]}
     allowed_rel_fields = {"database"}
     allowed_distinct_fields = {"schema"}
 
@@ -304,6 +324,30 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
                     overwrite:
                       description: overwrite existing saved queries?
                       type: boolean
+                    ssh_tunnel_passwords:
+                      description: >-
+                        JSON map of passwords for each ssh_tunnel associated to a
+                        featured database in the ZIP file. If the ZIP includes a
+                        ssh_tunnel config in the path `databases/MyDatabase.yaml`,
+                        the password should be provided in the following format:
+                        `{"databases/MyDatabase.yaml": "my_password"}`.
+                      type: string
+                    ssh_tunnel_private_keys:
+                      description: >-
+                        JSON map of private_keys for each ssh_tunnel associated to a
+                        featured database in the ZIP file. If the ZIP includes a
+                        ssh_tunnel config in the path `databases/MyDatabase.yaml`,
+                        the private_key should be provided in the following format:
+                        `{"databases/MyDatabase.yaml": "my_private_key"}`.
+                      type: string
+                    ssh_tunnel_private_key_passwords:
+                      description: >-
+                        JSON map of private_key_passwords for each ssh_tunnel associated
+                        to a featured database in the ZIP file. If the ZIP includes a
+                        ssh_tunnel config in the path `databases/MyDatabase.yaml`,
+                        the private_key should be provided in the following format:
+                        `{"databases/MyDatabase.yaml": "my_private_key_password"}`.
+                      type: string
           responses:
             200:
               description: Saved Query import result
@@ -326,6 +370,8 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
         upload = request.files.get("formData")
         if not upload:
             return self.response_400()
+        if not is_zipfile(upload):
+            raise IncorrectFormatError("Not a ZIP file")
         with ZipFile(upload) as bundle:
             contents = get_contents_from_bundle(bundle)
 
@@ -338,9 +384,29 @@ class SavedQueryRestApi(BaseSupersetModelRestApi):
             else None
         )
         overwrite = request.form.get("overwrite") == "true"
+        ssh_tunnel_passwords = (
+            json.loads(request.form["ssh_tunnel_passwords"])
+            if "ssh_tunnel_passwords" in request.form
+            else None
+        )
+        ssh_tunnel_private_keys = (
+            json.loads(request.form["ssh_tunnel_private_keys"])
+            if "ssh_tunnel_private_keys" in request.form
+            else None
+        )
+        ssh_tunnel_priv_key_passwords = (
+            json.loads(request.form["ssh_tunnel_private_key_passwords"])
+            if "ssh_tunnel_private_key_passwords" in request.form
+            else None
+        )
 
         command = ImportSavedQueriesCommand(
-            contents, passwords=passwords, overwrite=overwrite
+            contents,
+            passwords=passwords,
+            overwrite=overwrite,
+            ssh_tunnel_passwords=ssh_tunnel_passwords,
+            ssh_tunnel_private_keys=ssh_tunnel_private_keys,
+            ssh_tunnel_priv_key_passwords=ssh_tunnel_priv_key_passwords,
         )
         command.run()
         return self.response(200, message="OK")

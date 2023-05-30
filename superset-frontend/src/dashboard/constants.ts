@@ -28,7 +28,7 @@ export const PLACEHOLDER_DATASOURCE: Datasource = {
   columns: [],
   column_types: [],
   metrics: [],
-  column_format: {},
+  column_formats: {},
   verbose_map: {},
   main_dttm_col: '',
   description: '',
@@ -41,3 +41,4 @@ export const OPEN_FILTER_BAR_MAX_WIDTH = 550;
 export const FILTER_BAR_HEADER_HEIGHT = 80;
 export const FILTER_BAR_TABS_HEIGHT = 46;
 export const BUILDER_SIDEPANEL_WIDTH = 374;
+export const OVERWRITE_INSPECT_FIELDS = ['css', 'json_metadata.filter_scopes'];

@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pprint import pformat
 from typing import Any, Dict, List, NamedTuple, Optional, TYPE_CHECKING
 
@@ -46,7 +46,6 @@ from superset.utils.core import (
     json_int_dttm_ser,
     QueryObjectFilterClause,
 )
-from superset.utils.date_parser import parse_human_timedelta
 from superset.utils.hashing import md5_sha_from_dict
 
 if TYPE_CHECKING:
@@ -106,7 +105,7 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
     series_limit: int
     series_limit_metric: Optional[Metric]
     time_offsets: List[str]
-    time_shift: Optional[timedelta]
+    time_shift: Optional[str]
     time_range: Optional[str]
     to_dttm: Optional[datetime]
 
@@ -156,7 +155,7 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
         self.series_limit = series_limit
         self.series_limit_metric = series_limit_metric
         self.time_range = time_range
-        self.time_shift = parse_human_timedelta(time_shift)
+        self.time_shift = time_shift
         self.from_dttm = kwargs.get("from_dttm")
         self.to_dttm = kwargs.get("to_dttm")
         self.result_type = kwargs.get("result_type")
@@ -336,6 +335,7 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
             "series_limit": self.series_limit,
             "series_limit_metric": self.series_limit_metric,
             "to_dttm": self.to_dttm,
+            "time_shift": self.time_shift,
         }
         return query_object_dict
 
@@ -360,7 +360,7 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
 
         # TODO: the below KVs can all be cleaned up and moved to `to_dict()` at some
         #  predetermined point in time when orgs are aware that the previously
-        #  chached results will be invalidated.
+        #  cached results will be invalidated.
         if not self.apply_fetch_values_predicate:
             del cache_dict["apply_fetch_values_predicate"]
         if self.datasource:
@@ -397,22 +397,24 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
             cache_dict["annotation_layers"] = annotation_layers
 
         # Add an impersonation key to cache if impersonation is enabled on the db
-        if (
-            feature_flag_manager.is_feature_enabled("CACHE_IMPERSONATION")
-            and self.datasource
-            and hasattr(self.datasource, "database")
-            and self.datasource.database.impersonate_user
-        ):
+        # or if the CACHE_QUERY_BY_USER flag is on
+        try:
+            database = self.datasource.database  # type: ignore
+            if (
+                feature_flag_manager.is_feature_enabled("CACHE_IMPERSONATION")
+                and database.impersonate_user
+            ) or feature_flag_manager.is_feature_enabled("CACHE_QUERY_BY_USER"):
+                if key := database.db_engine_spec.get_impersonation_key(
+                    getattr(g, "user", None)
+                ):
+                    logger.debug(
+                        "Adding impersonation key to QueryObject cache dict: %s", key
+                    )
 
-            if key := self.datasource.database.db_engine_spec.get_impersonation_key(
-                getattr(g, "user", None)
-            ):
-
-                logger.debug(
-                    "Adding impersonation key to QueryObject cache dict: %s", key
-                )
-
-                cache_dict["impersonation_key"] = key
+                    cache_dict["impersonation_key"] = key
+        except AttributeError:
+            # datasource or database do not exist
+            pass
 
         return md5_sha_from_dict(cache_dict, default=json_int_dttm_ser, ignore_nan=True)
 

@@ -19,6 +19,7 @@
 import {
   ChartProps,
   DataMaskStateWithId,
+  DatasourceType,
   ExtraFormData,
   GenericDataType,
   JsonObject,
@@ -29,7 +30,7 @@ import { chart } from 'src/components/Chart/chartReducer';
 import componentTypes from 'src/dashboard/util/componentTypes';
 import { UrlParamEntries } from 'src/utils/urlUtils';
 
-import { User } from 'src/types/bootstrapTypes';
+import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
 import { ChartState } from '../explore/types';
 
 export { Dashboard } from 'src/types/Dashboard';
@@ -52,6 +53,11 @@ export type Chart = ChartState & {
   };
 };
 
+export enum FilterBarOrientation {
+  VERTICAL = 'VERTICAL',
+  HORIZONTAL = 'HORIZONTAL',
+}
+
 export type ActiveTabs = string[];
 export type DashboardLayout = { [key: string]: LayoutItem };
 export type DashboardLayoutState = { present: DashboardLayout };
@@ -65,12 +71,24 @@ export type DashboardState = {
   isRefreshing: boolean;
   isFiltersRefreshing: boolean;
   hasUnsavedChanges: boolean;
+  dashboardIsSaving: boolean;
   colorScheme: string;
   sliceIds: number[];
   directPathLastUpdated: number;
   focusedFilterField?: {
     chartId: number;
     column: string;
+  };
+  overwriteConfirmMetadata?: {
+    updatedAt: string;
+    updatedBy: string;
+    overwriteConfirmItems: {
+      keyPath: string;
+      oldValue: string;
+      newValue: string;
+    }[];
+    dashboardId: number;
+    data: JsonObject;
   };
 };
 export type DashboardInfo = {
@@ -84,14 +102,16 @@ export type DashboardInfo = {
   json_metadata: string;
   metadata: {
     native_filter_configuration: JsonObject;
-    show_native_filters: boolean;
     chart_configuration: JsonObject;
     color_scheme: string;
     color_namespace: string;
     color_scheme_domain: string[];
     label_colors: JsonObject;
     shared_label_colors: JsonObject;
+    cross_filters_enabled: boolean;
   };
+  crossFiltersEnabled: boolean;
+  filterBarOrientation: FilterBarOrientation;
 };
 
 export type ChartsState = { [key: string]: Chart };
@@ -117,7 +137,7 @@ export type RootState = {
   dataMask: DataMaskStateWithId;
   impressionId: string;
   nativeFilters: NativeFiltersState;
-  user: User;
+  user: UserWithPermissionsAndRoles;
 };
 
 /** State of dashboardLayout in redux */
@@ -173,4 +193,24 @@ export type EmbeddedDashboard = {
   uuid: string;
   dashboard_id: string;
   allowed_domains: string[];
+};
+
+export type Slice = {
+  slice_id: number;
+  slice_name: string;
+  description: string;
+  description_markdown: string;
+  form_data: any;
+  slice_url: string;
+  viz_type: string;
+  thumbnail_url: string;
+  changed_on: number;
+  changed_on_humanized: string;
+  modified: string;
+  datasource_id: number;
+  datasource_type: DatasourceType;
+  datasource_url: string;
+  datasource_name: string;
+  owners: { id: number }[];
+  created_by: { id: number };
 };

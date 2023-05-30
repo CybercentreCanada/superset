@@ -19,30 +19,35 @@
 /* eslint-disable camelcase */
 import {
   AnnotationLayer,
+  AxisType,
   CategoricalColorNamespace,
   GenericDataType,
+  getMetricLabel,
   getNumberFormatter,
+  getXAxisLabel,
+  isDefined,
   isEventAnnotationLayer,
   isFormulaAnnotationLayer,
   isIntervalAnnotationLayer,
+  isPhysicalColumn,
   isTimeseriesAnnotationLayer,
-  TimeseriesChartDataResponseResult,
   t,
-  getXAxis,
+  TimeseriesChartDataResponseResult,
 } from '@superset-ui/core';
-import { isDerivedSeries } from '@superset-ui/chart-controls';
+import {
+  extractExtraMetrics,
+  isDerivedSeries,
+} from '@superset-ui/chart-controls';
 import { EChartsCoreOption, SeriesOption } from 'echarts';
 import { ZRLineType } from 'echarts/types/src/util/types';
 import {
   EchartsTimeseriesChartProps,
   EchartsTimeseriesFormData,
-  EchartsTimeseriesSeriesType,
   TimeseriesChartTransformedProps,
   OrientationType,
-  AxisType,
 } from './types';
 import { DEFAULT_FORM_DATA } from './constants';
-import { ForecastSeriesEnum, ForecastValue } from '../types';
+import { ForecastSeriesEnum, ForecastValue, Refs } from '../types';
 import { parseYAxisBound } from '../utils/controls';
 import {
   currentSeries,
@@ -66,8 +71,9 @@ import {
   rebaseForecastDatum,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
-import { defaultGrid, defaultTooltip, defaultYAxis } from '../defaults';
+import { defaultGrid, defaultYAxis } from '../defaults';
 import {
+  getBaselineSeriesForStream,
   getPadding,
   getTooltipTimeFormatter,
   getXAxisFormatter,
@@ -78,10 +84,11 @@ import {
   transformTimeseriesAnnotation,
 } from './transformers';
 import {
-  AreaChartExtraControlsValue,
+  StackControlsValue,
   TIMESERIES_CONSTANTS,
   TIMEGRAIN_TO_TIMESTAMP,
 } from '../constants';
+import { getDefaultTooltip } from '../utils/tooltip';
 
 export default function transformProps(
   chartProps: EchartsTimeseriesChartProps,
@@ -96,11 +103,13 @@ export default function transformProps(
     datasource,
     theme,
     inContextMenu,
+    emitCrossFilters,
   } = chartProps;
   const { verboseMap = {} } = datasource;
   const [queryData] = queriesData;
-  const { data = [], label_map: labelMap } =
+  const { data = [], label_map = {} } =
     queryData as TimeseriesChartDataResponseResult;
+
   const dataTypes = getColtypesMapping(queryData);
   const annotationData = getAnnotationData(chartProps);
 
@@ -110,61 +119,96 @@ export default function transformProps(
     colorScheme,
     contributionMode,
     forecastEnabled,
+    groupby,
     legendOrientation,
     legendType,
     legendMargin,
     logAxis,
     markerEnabled,
     markerSize,
-    opacity,
+    metrics,
     minorSplitLine,
+    onlyTotal,
+    opacity,
+    orientation,
+    percentageThreshold,
+    richTooltip,
     seriesType,
     showLegend,
+    showValue,
+    sliceId,
+    sortSeriesType,
+    sortSeriesAscending,
+    timeGrainSqla,
+    timeCompare,
     stack,
-    truncateYAxis,
-    yAxisFormat,
-    xAxisTimeFormat,
-    yAxisBounds,
     tooltipTimeFormat,
     tooltipSortByMetric,
-    zoomable,
-    richTooltip,
+    truncateYAxis,
     xAxis: xAxisOrig,
     xAxisLabelRotation,
-    emitFilter,
-    groupby,
-    showValue,
-    onlyTotal,
-    percentageThreshold,
+    xAxisSortSeries,
+    xAxisSortSeriesAscending,
+    xAxisTimeFormat,
     xAxisTitle,
-    yAxisTitle,
     xAxisTitleMargin,
+    yAxisBounds,
+    yAxisFormat,
+    yAxisTitle,
     yAxisTitleMargin,
     yAxisTitlePosition,
-    sliceId,
-    timeGrainSqla,
-    orientation,
+    zoomable,
   }: EchartsTimeseriesFormData = { ...DEFAULT_FORM_DATA, ...formData };
+  const refs: Refs = {};
+
+  const labelMap = Object.entries(label_map).reduce((acc, entry) => {
+    if (
+      entry[1].length > groupby.length &&
+      Array.isArray(timeCompare) &&
+      timeCompare.includes(entry[1][0])
+    ) {
+      entry[1].shift();
+    }
+    return { ...acc, [entry[0]]: entry[1] };
+  }, {});
 
   const colorScale = CategoricalColorNamespace.getScale(colorScheme as string);
   const rebasedData = rebaseForecastDatum(data, verboseMap);
-  const xAxisCol = getXAxis(chartProps.rawFormData) as string;
+  let xAxisLabel = getXAxisLabel(chartProps.rawFormData) as string;
+  if (
+    isPhysicalColumn(chartProps.rawFormData?.x_axis) &&
+    isDefined(verboseMap[xAxisLabel])
+  ) {
+    xAxisLabel = verboseMap[xAxisLabel];
+  }
   const isHorizontal = orientation === OrientationType.horizontal;
   const { totalStackedValues, thresholdValues } = extractDataTotalValues(
     rebasedData,
     {
       stack,
       percentageThreshold,
-      xAxisCol,
+      xAxisCol: xAxisLabel,
     },
   );
-  const rawSeries = extractSeries(rebasedData, {
+  const extraMetricLabels = extractExtraMetrics(chartProps.rawFormData).map(
+    getMetricLabel,
+  );
+
+  const isMultiSeries = groupby.length || metrics.length > 1;
+
+  const [rawSeries, sortedTotalValues] = extractSeries(rebasedData, {
     fillNeighborValue: stack && !forecastEnabled ? 0 : undefined,
-    xAxis: xAxisCol,
-    removeNulls: seriesType === EchartsTimeseriesSeriesType.Scatter,
+    xAxis: xAxisLabel,
+    extraMetricLabels,
     stack,
     totalStackedValues,
     isHorizontal,
+    sortSeriesType,
+    sortSeriesAscending,
+    xAxisSortSeries: isMultiSeries ? xAxisSortSeries : undefined,
+    xAxisSortSeriesAscending: isMultiSeries
+      ? xAxisSortSeriesAscending
+      : undefined,
   });
   const showValueIndexes = extractShowValueIndexes(rawSeries, {
     stack,
@@ -174,8 +218,8 @@ export default function transformProps(
   const seriesContexts = extractForecastSeriesContexts(
     Object.values(rawSeries).map(series => series.name as string),
   );
-  const isAreaExpand = stack === AreaChartExtraControlsValue.Expand;
-  const xAxisDataType = dataTypes?.[xAxisCol] ?? dataTypes?.[xAxisOrig];
+  const isAreaExpand = stack === StackControlsValue.Expand;
+  const xAxisDataType = dataTypes?.[xAxisLabel] ?? dataTypes?.[xAxisOrig];
 
   const xAxisType = getAxisType(xAxisDataType);
   const series: SeriesOption[] = [];
@@ -199,7 +243,7 @@ export default function transformProps(
       formatter,
       showValue,
       onlyTotal,
-      totalStackedValues,
+      totalStackedValues: sortedTotalValues,
       showValueIndexes,
       thresholdValues,
       richTooltip,
@@ -207,9 +251,29 @@ export default function transformProps(
       isHorizontal,
       lineStyle,
     });
-    if (transformedSeries) series.push(transformedSeries);
+    if (transformedSeries) {
+      if (stack === StackControlsValue.Stream) {
+        // bug in Echarts - `stackStrategy: 'all'` doesn't work with nulls, so we cast them to 0
+        series.push({
+          ...transformedSeries,
+          data: (transformedSeries.data as any).map(
+            (row: [string | number, number]) => [row[0], row[1] ?? 0],
+          ),
+        });
+      } else {
+        series.push(transformedSeries);
+      }
+    }
   });
 
+  if (stack === StackControlsValue.Stream) {
+    const baselineSeries = getBaselineSeriesForStream(
+      series.map(entry => entry.data) as [string | number, number][][],
+      seriesType,
+    );
+
+    series.unshift(baselineSeries);
+  }
   const selectedValues = (filterState.selectedValues || []).reduce(
     (acc: Record<string, number>, selectedValue: string) => {
       const index = series.findIndex(({ name }) => name === selectedValue);
@@ -229,7 +293,7 @@ export default function transformProps(
           transformFormulaAnnotation(
             layer,
             data,
-            xAxisCol,
+            xAxisLabel,
             xAxisType,
             colorScale,
             sliceId,
@@ -360,6 +424,7 @@ export default function transformProps(
   if (isHorizontal) {
     [xAxis, yAxis] = [yAxis, xAxis];
     [padding.bottom, padding.left] = [padding.left, padding.bottom];
+    yAxis.inverse = true;
   }
 
   const echartOptions: EChartsCoreOption = {
@@ -371,9 +436,8 @@ export default function transformProps(
     xAxis,
     yAxis,
     tooltip: {
+      ...getDefaultTooltip(refs),
       show: !inContextMenu,
-      ...defaultTooltip,
-      appendToBody: true,
       trigger: richTooltip ? 'axis' : 'item',
       formatter: (params: any) => {
         const [xIndex, yIndex] = isHorizontal ? [1, 0] : [0, 1];
@@ -386,12 +450,15 @@ export default function transformProps(
           forecastValue.sort((a, b) => b.data[yIndex] - a.data[yIndex]);
         }
 
-        const rows: Array<string> = [`${tooltipFormatter(xValue)}`];
+        const rows: string[] = [];
         const forecastValues: Record<string, ForecastValue> =
           extractForecastValuesFromTooltipParams(forecastValue, isHorizontal);
 
         Object.keys(forecastValues).forEach(key => {
           const value = forecastValues[key];
+          if (value.observation === 0 && stack) {
+            return;
+          }
           const content = formatForecastTooltipSeries({
             ...value,
             seriesName: key,
@@ -403,11 +470,21 @@ export default function transformProps(
             rows.push(`<span style="opacity: 0.7">${content}</span>`);
           }
         });
+        if (stack) {
+          rows.reverse();
+        }
+        rows.unshift(`${tooltipFormatter(xValue)}`);
         return rows.join('<br />');
       },
     },
     legend: {
-      ...getLegendProps(legendType, legendOrientation, showLegend, zoomable),
+      ...getLegendProps(
+        legendType,
+        legendOrientation,
+        showLegend,
+        theme,
+        zoomable,
+      ),
       data: legendData as string[],
     },
     series: dedupSeries(series),
@@ -439,7 +516,7 @@ export default function transformProps(
 
   return {
     echartOptions,
-    emitFilter,
+    emitCrossFilters,
     formData,
     groupby,
     height,
@@ -451,5 +528,11 @@ export default function transformProps(
     legendData,
     onContextMenu,
     xValueFormatter: tooltipFormatter,
+    xAxis: {
+      label: xAxisLabel,
+      type: xAxisType,
+    },
+    refs,
+    coltypeMapping: dataTypes,
   };
 }

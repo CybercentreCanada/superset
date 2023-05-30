@@ -24,7 +24,14 @@ import thunk from 'redux-thunk';
 import shortid from 'shortid';
 import * as featureFlags from 'src/featureFlags';
 import * as actions from 'src/SqlLab/actions/sqlLab';
-import { defaultQueryEditor, query, initialState } from 'src/SqlLab/fixtures';
+import { LOG_EVENT } from 'src/logger/actions';
+import {
+  defaultQueryEditor,
+  query,
+  initialState,
+  queryId,
+} from 'src/SqlLab/fixtures';
+import { QueryState } from '@superset-ui/core';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -38,7 +45,6 @@ describe('async actions', () => {
     latestQueryId: null,
     sql: 'SELECT *\nFROM\nWHERE',
     name: 'Untitled Query 1',
-    schemaOptions: [{ value: 'main', label: 'main', title: 'main' }],
   };
 
   let dispatch;
@@ -49,21 +55,21 @@ describe('async actions', () => {
 
   afterEach(fetchMock.resetHistory);
 
-  const fetchQueryEndpoint = 'glob:*/superset/results/*';
+  const fetchQueryEndpoint = 'glob:*/api/v1/sqllab/results/*';
   fetchMock.get(
     fetchQueryEndpoint,
     JSON.stringify({ data: mockBigNumber, query: { sqlEditorId: 'dfsadfs' } }),
   );
 
-  const runQueryEndpoint = 'glob:*/superset/sql_json/';
+  const runQueryEndpoint = 'glob:*/api/v1/sqllab/execute/';
   fetchMock.post(runQueryEndpoint, `{ "data": ${mockBigNumber} }`);
 
   describe('saveQuery', () => {
-    const saveQueryEndpoint = 'glob:*/savedqueryviewapi/api/create';
+    const saveQueryEndpoint = 'glob:*/api/v1/saved_query/';
     fetchMock.post(saveQueryEndpoint, { results: { json: {} } });
 
     const makeRequest = () => {
-      const request = actions.saveQuery(query);
+      const request = actions.saveQuery(query, queryId);
       return request(dispatch, () => initialState);
     };
 
@@ -71,18 +77,20 @@ describe('async actions', () => {
       expect.assertions(1);
 
       const store = mockStore(initialState);
-      return store.dispatch(actions.saveQuery(query)).then(() => {
+      return store.dispatch(actions.saveQuery(query, queryId)).then(() => {
         expect(fetchMock.calls(saveQueryEndpoint)).toHaveLength(1);
       });
     });
 
     it('posts the correct query object', () => {
       const store = mockStore(initialState);
-      return store.dispatch(actions.saveQuery(query)).then(() => {
+      return store.dispatch(actions.saveQuery(query, queryId)).then(() => {
         const call = fetchMock.calls(saveQueryEndpoint)[0];
-        const formData = call[1].body;
-        Object.keys(query).forEach(key => {
-          expect(formData.get(key)).toBeDefined();
+        const formData = JSON.parse(call[1].body);
+        const mappedQueryToServer = actions.convertQueryToServer(query);
+
+        Object.keys(mappedQueryToServer).forEach(key => {
+          expect(formData[key]).toBeDefined();
         });
       });
     });
@@ -232,22 +240,38 @@ describe('async actions', () => {
       });
     });
 
-    it('calls queryFailed on fetch error', () => {
-      expect.assertions(1);
+    it('calls queryFailed on fetch error and logs the error details', () => {
+      expect.assertions(3);
 
       fetchMock.post(
         runQueryEndpoint,
-        { throws: { message: 'error text' } },
+        {
+          throws: {
+            message: 'error text',
+            timeout: true,
+            statusText: 'timeout',
+          },
+        },
         { overwriteRoutes: true },
       );
 
       const store = mockStore({});
-      const expectedActionTypes = [actions.START_QUERY, actions.QUERY_FAILED];
+      const expectedActionTypes = [
+        actions.START_QUERY,
+        LOG_EVENT,
+        LOG_EVENT,
+        actions.QUERY_FAILED,
+      ];
       const { dispatch } = store;
       const request = actions.runQuery(query);
       return request(dispatch, () => initialState).then(() => {
-        expect(store.getActions().map(a => a.type)).toEqual(
-          expectedActionTypes,
+        const actions = store.getActions();
+        expect(actions.map(a => a.type)).toEqual(expectedActionTypes);
+        expect(actions[1].payload.eventData.error_details).toContain(
+          'Issue 1000',
+        );
+        expect(actions[2].payload.eventData.error_details).toContain(
+          'Issue 1001',
         );
       });
     });
@@ -272,13 +296,37 @@ describe('async actions', () => {
     };
 
     it('makes the fetch request', async () => {
-      const runQueryEndpointWithParams = 'glob:*/superset/sql_json/?foo=bar';
+      const runQueryEndpointWithParams =
+        'glob:*/api/v1/sqllab/execute/?foo=bar';
       fetchMock.post(
         runQueryEndpointWithParams,
         `{ "data": ${mockBigNumber} }`,
       );
       await makeRequest().then(() => {
         expect(fetchMock.calls(runQueryEndpointWithParams)).toHaveLength(1);
+      });
+    });
+  });
+
+  describe('runQuery with comments', () => {
+    const makeRequest = () => {
+      const request = actions.runQuery({
+        ...query,
+        sql: '/*\nSELECT * FROM\n */\nSELECT 213--, {{ds}}\n/*\n{{new_param1}}\n{{new_param2}}*/\n\nFROM table',
+      });
+      return request(dispatch, () => initialState);
+    };
+
+    it('makes the fetch request without comments', async () => {
+      const runQueryEndpoint = 'glob:*/api/v1/sqllab/execute/';
+      fetchMock.post(runQueryEndpoint, '{}', {
+        overwriteRoutes: true,
+      });
+      await makeRequest().then(() => {
+        expect(fetchMock.calls(runQueryEndpoint)).toHaveLength(1);
+        expect(
+          JSON.parse(fetchMock.calls(runQueryEndpoint)[0][1].body).sql,
+        ).toEqual('SELECT 213\n\n\nFROM table');
       });
     });
   });
@@ -309,11 +357,15 @@ describe('async actions', () => {
   });
 
   describe('postStopQuery', () => {
-    const stopQueryEndpoint = 'glob:*/superset/stop_query/*';
+    const stopQueryEndpoint = 'glob:*/api/v1/query/stop';
     fetchMock.post(stopQueryEndpoint, {});
+    const baseQuery = {
+      ...query,
+      id: 'test_foo',
+    };
 
     const makeRequest = () => {
-      const request = actions.postStopQuery(query);
+      const request = actions.postStopQuery(baseQuery);
       return request(dispatch);
     };
 
@@ -338,7 +390,8 @@ describe('async actions', () => {
 
       return makeRequest().then(() => {
         const call = fetchMock.calls(stopQueryEndpoint)[0];
-        expect(call[1].body.get('client_id')).toBe(query.id);
+        const body = JSON.parse(call[1].body);
+        expect(body.client_id).toBe(baseQuery.id);
       });
     });
   });
@@ -370,12 +423,13 @@ describe('async actions', () => {
           queryEditor: {
             name: 'Copy of Dummy query editor',
             dbId: 1,
-            schema: null,
+            schema: query.schema,
             autorun: true,
             sql: 'SELECT * FROM something',
             queryLimit: undefined,
             maxRow: undefined,
             id: 'abcd',
+            templateParams: undefined,
           },
         },
       ];
@@ -408,6 +462,34 @@ describe('async actions', () => {
       const request = actions.addQueryEditor(defaultQueryEditor);
       return request(store.dispatch, store.getState).then(() => {
         expect(store.getActions()).toEqual(expectedActions);
+      });
+    });
+
+    describe('addNewQueryEditor', () => {
+      it('creates new query editor with new tab name', () => {
+        const store = mockStore(initialState);
+        const expectedActions = [
+          {
+            type: actions.ADD_QUERY_EDITOR,
+            queryEditor: {
+              id: 'abcd',
+              sql: expect.stringContaining('SELECT ...'),
+              name: `Untitled Query ${
+                store.getState().sqlLab.queryEditors.length + 1
+              }`,
+              dbId: defaultQueryEditor.dbId,
+              schema: defaultQueryEditor.schema,
+              autorun: false,
+              queryLimit:
+                defaultQueryEditor.queryLimit ||
+                initialState.common.conf.DEFAULT_SQLLAB_LIMIT,
+            },
+          },
+        ];
+        const request = actions.addNewQueryEditor();
+        return request(store.dispatch, store.getState).then(() => {
+          expect(store.getActions()).toEqual(expectedActions);
+        });
       });
     });
   });
@@ -472,6 +554,7 @@ describe('async actions', () => {
         const results = {
           data: mockBigNumber,
           query: { sqlEditorId: 'abcd' },
+          status: QueryState.SUCCESS,
           query_id: 'efgh',
         };
         fetchMock.get(fetchQueryEndpoint, JSON.stringify(results), {
@@ -493,6 +576,35 @@ describe('async actions', () => {
         return store.dispatch(actions.fetchQueryResults(query)).then(() => {
           expect(store.getActions()).toEqual(expectedActions);
           expect(fetchMock.calls(updateTabStateEndpoint)).toHaveLength(1);
+        });
+      });
+
+      it("doesn't update the tab state in the backend on stoppped query", () => {
+        expect.assertions(2);
+
+        const results = {
+          status: QueryState.STOPPED,
+          query_id: 'efgh',
+        };
+        fetchMock.get(fetchQueryEndpoint, JSON.stringify(results), {
+          overwriteRoutes: true,
+        });
+        const store = mockStore({});
+        const expectedActions = [
+          {
+            type: actions.REQUEST_QUERY_RESULTS,
+            query,
+          },
+          // missing below
+          {
+            type: actions.QUERY_SUCCESS,
+            query,
+            results,
+          },
+        ];
+        return store.dispatch(actions.fetchQueryResults(query)).then(() => {
+          expect(store.getActions()).toEqual(expectedActions);
+          expect(fetchMock.calls(updateTabStateEndpoint)).toHaveLength(0);
         });
       });
     });
@@ -635,7 +747,9 @@ describe('async actions', () => {
           },
         ];
         return store
-          .dispatch(actions.queryEditorSetTitle(queryEditor, name))
+          .dispatch(
+            actions.queryEditorSetTitle(queryEditor, name, queryEditor.id),
+          )
           .then(() => {
             expect(store.getActions()).toEqual(expectedActions);
             expect(fetchMock.calls(updateTabStateEndpoint)).toHaveLength(1);
