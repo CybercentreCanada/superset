@@ -78,6 +78,12 @@ function isQueryMode(mode: QueryMode) {
 
 const isAggMode = isQueryMode(QueryMode.aggregate);
 const isRawMode = isQueryMode(QueryMode.raw);
+const areColumnsSelected = ({
+  controls,
+}: Pick<ControlPanelsContainerProps, 'controls'>) =>
+  isRawMode({ controls })
+    ? ensureIsArray(controls?.columns.value).length > 0
+    : ensureIsArray(controls?.groupby?.value).length > 0;
 
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
@@ -225,7 +231,12 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
+              rerender: [
+                'metrics',
+                'principalColumns',
+                'percent_metrics',
+                'default_group_by',
+              ],
             },
           },
         ],
@@ -435,6 +446,7 @@ const config: ControlPanelConfig = {
                         : [];
                     return newState;
                   },
+                  visibility: areColumnsSelected,
                   canCopy: true,
                 },
               }
