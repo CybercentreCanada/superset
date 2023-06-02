@@ -287,7 +287,7 @@ export default class SelectControl extends React.PureComponent {
 
     const selectProps = {
       allowNewOptions: freeForm,
-      allowSelectAll: allowSelectAll,
+      allowSelectAll,
       autoFocus,
       ariaLabel:
         ariaLabel || (typeof label === 'string' ? label : t('Select ...')),
