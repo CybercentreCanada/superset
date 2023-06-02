@@ -46,6 +46,7 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/JumpActionConfigControll';
+import { isLabeledValue } from 'src/components/Select/utils';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -425,9 +426,15 @@ const config: ControlPanelConfig = {
                           o.column_name,
                         ),
                     );
-                    const invalidOptions = ensureIsArray(
-                      controlState.value,
-                    ).filter(c => !ensureIsArray(choices).includes(c));
+                    // invalid options are options that are selected, but are not present in the available choices
+                    const invalidOptions = ensureIsArray(newState.options)
+                      .filter(
+                        o =>
+                          ensureIsArray(controlState.value).includes(
+                            o.column_name,
+                          ) && !ensureIsArray(choices).includes(o.column_name),
+                      )
+                      .map(o => o.verbose_name || o.column_name);
                     newState.externalValidationErrors =
                       invalidOptions.length > 0
                         ? invalidOptions.length > 1
