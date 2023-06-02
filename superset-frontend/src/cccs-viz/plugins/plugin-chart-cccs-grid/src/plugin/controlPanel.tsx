@@ -78,12 +78,6 @@ function isQueryMode(mode: QueryMode) {
 
 const isAggMode = isQueryMode(QueryMode.aggregate);
 const isRawMode = isQueryMode(QueryMode.raw);
-const areColumnsSelected = ({
-  controls,
-}: Pick<ControlPanelsContainerProps, 'controls'>) =>
-  isRawMode({ controls })
-    ? ensureIsArray(controls?.columns.value).length > 0
-    : ensureIsArray(controls?.groupby?.value).length > 0;
 
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
@@ -395,6 +389,7 @@ const config: ControlPanelConfig = {
                   description: t(
                     'Preselect a set of principal columns that can easily be emitted from the context menu',
                   ),
+                  allowSelectAll: false,
                   multi: true,
                   freeForm: true,
                   allowAll: true,
@@ -446,7 +441,6 @@ const config: ControlPanelConfig = {
                         : [];
                     return newState;
                   },
-                  visibility: areColumnsSelected,
                   canCopy: true,
                 },
               }
