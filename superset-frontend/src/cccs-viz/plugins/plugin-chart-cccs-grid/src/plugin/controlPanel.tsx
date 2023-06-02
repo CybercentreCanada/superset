@@ -420,7 +420,10 @@ const config: ControlPanelConfig = {
                       : controls?.groupby?.value;
                     newState.options = newState.options.filter(
                       (o: { column_name: string }) =>
-                        ensureIsArray(choices).includes(o.column_name),
+                        ensureIsArray(choices).includes(o.column_name) ||
+                        ensureIsArray(controlState.value).includes(
+                          o.column_name,
+                        ),
                     );
                     const invalidOptions = ensureIsArray(
                       controlState.value,
