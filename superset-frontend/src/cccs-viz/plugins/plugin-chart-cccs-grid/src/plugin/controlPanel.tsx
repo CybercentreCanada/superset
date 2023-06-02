@@ -46,7 +46,6 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/JumpActionConfigControll';
-import { isLabeledValue } from 'src/components/Select/utils';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
