@@ -391,7 +391,7 @@ const config: ControlPanelConfig = {
                   ),
                   allowSelectAll: false,
                   multi: true,
-                  freeForm: true,
+                  freeForm: false,
                   allowAll: true,
                   default: [],
                   canSelectAll: true,
