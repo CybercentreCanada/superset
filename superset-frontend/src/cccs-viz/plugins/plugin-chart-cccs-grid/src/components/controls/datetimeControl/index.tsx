@@ -11,24 +11,22 @@ import ControlHeader from 'src/explore/components/ControlHeader';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import { useDebouncedEffect } from 'src/explore/exploreUtils';
 
-
-
 export interface Props {
-    colorScheme: string;
-    annotationError: object;
-    annotationQuery: object;
-    vizType: string;
-    theme: any;
-    validationErrors: string[];
-    name: string;
-    actions: object;
-    label: string;
-    value?: object[];
-    onChange: (a: any) => void;
-    default: string;
-  }
+  colorScheme: string;
+  annotationError: object;
+  annotationQuery: object;
+  vizType: string;
+  theme: any;
+  validationErrors: string[];
+  name: string;
+  actions: object;
+  label: string;
+  value?: object[];
+  onChange: (value: any, errors: any[]) => void;
+  default: string;
+}
 
-const SEPARATOR = " : "
+const SEPARATOR = ' : ';
 const fetchTimeRange = async (timeRange: string) => {
   const query = rison.encode_uri(timeRange);
   const endpoint = `/api/v1/time_range/?q=${query}`;
@@ -49,82 +47,79 @@ const fetchTimeRange = async (timeRange: string) => {
   }
 };
 
+const DatetimeControl: React.FC<Props> = props => {
+  const [timeRange, setTimeRange] = useState(props.default);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [actualTimeRange, setactualTimeRange] = useState<string>();
 
-const DatetimeControl: React.FC<Props>  = (props) => {
+  const [since, until] = timeRange.split(SEPARATOR);
 
-    const [timeRange, setTimeRange ] = useState(props.default); 
-    const [validationErrors, setValidationErrors ] = useState<string[]>([]); 
-    const [actualTimeRange, setactualTimeRange] = useState<string>();
+  useEffect(() => {
+    props.onChange(timeRange, validationErrors);
+  }, [timeRange, since, until, validationErrors]);
 
-
-    const [since, until] = timeRange.split(SEPARATOR);
-
-    useEffect(() => {
-      props.onChange(timeRange)
-    }, [timeRange, since, until])
-
-    function onChange(control: 'since' | 'until', value: string) {
-        if (control === 'since') {
-            setTimeRange(`${value}${SEPARATOR}${until}`);
-        } else {
-            setTimeRange(`${since}${SEPARATOR}${value}`);
-        }
+  function onChange(control: 'since' | 'until', value: string) {
+    if (control === 'since') {
+      setTimeRange(`${value}${SEPARATOR}${until}`);
+    } else {
+      setTimeRange(`${since}${SEPARATOR}${value}`);
     }
+  }
 
+  useDebouncedEffect(
+    () => {
+      fetchTimeRange(timeRange)
+        .then(value => {
+          setactualTimeRange(
+            value?.value ? `Actual Time Range ${value?.value}` : '',
+          );
+          setValidationErrors(value?.error ? [value?.error] : []);
+        })
+        .catch(error => {
+          setValidationErrors(error);
+        });
+    },
+    SLOW_DEBOUNCE,
+    [timeRange],
+  );
 
-    useDebouncedEffect(() => {
-      fetchTimeRange(timeRange).then( value => {
-        setactualTimeRange(value?.value ? `Actual Time Range ${value?.value}` : "");
-        setValidationErrors(value?.error ? [value?.error] : [])
-      }
-      ).catch(error => {
-        setValidationErrors(error);
-      })
-    },SLOW_DEBOUNCE,[timeRange])
+  const headerProps = {
+    name: props.name,
+    label: props.label,
+    validationErrors,
+    description: actualTimeRange,
+    hovered: true,
+  };
 
-    const headerProps = {
-      name: props.name,
-      label: props.label,
-      validationErrors,
-      description: actualTimeRange,
-      hovered: true
-    }
-
-    return (
-        <>
-        <ControlHeader {...headerProps} />
-          <div className="control-label">
-            {t('START (INCLUSIVE)')}{' '}
-          </div>
-          <Input
-            key="since"
-            value={since}
-            onChange={e => onChange('since', e.target.value)}
-          />
-          <div className="control-label">
-            {t('END (EXCLUSIVE)')}{' '}
-          </div>
-          <Input
-            key="until"
-            value={until}
-            onChange={e => onChange('until', e.target.value)}
-          />
-        </>
-      );
-}
-
+  return (
+    <>
+      <ControlHeader {...headerProps} />
+      <div className="control-label">{t('START (INCLUSIVE)')} </div>
+      <Input
+        key="since"
+        value={since}
+        onChange={e => onChange('since', e.target.value)}
+      />
+      <div className="control-label">{t('END (EXCLUSIVE)')} </div>
+      <Input
+        key="until"
+        value={until}
+        onChange={e => onChange('until', e.target.value)}
+      />
+    </>
+  );
+};
 
 // Tried to hook this up through stores/control.jsx instead of using redux
 // directly, could not figure out how to get access to the color_scheme
 function mapStateToProps({ charts, explore }: any) {
-    return {
-      // eslint-disable-next-line camelcase
-      colorScheme: explore.controls?.color_scheme?.value,
-      vizType: explore.controls.viz_type.value,
-    };
-  }
-  
-  const themedDrillActionConfigControl = withTheme(DatetimeControl);
-  
-  export default connect(mapStateToProps)(themedDrillActionConfigControl);
-  
+  return {
+    // eslint-disable-next-line camelcase
+    colorScheme: explore.controls?.color_scheme?.value,
+    vizType: explore.controls.viz_type.value,
+  };
+}
+
+const themedDrillActionConfigControl = withTheme(DatetimeControl);
+
+export default connect(mapStateToProps)(themedDrillActionConfigControl);
