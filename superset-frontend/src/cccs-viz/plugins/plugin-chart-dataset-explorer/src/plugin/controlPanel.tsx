@@ -191,7 +191,7 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors =
                   // @ts-ignore
-                  isRawMode({ controls }) &&
+                  isAggMode({ controls }) &&
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
