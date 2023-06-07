@@ -42,7 +42,10 @@ const fetchTimeRange = async (timeRange: string) => {
   } catch (response) {
     const clientError = await getClientErrorObject(response);
     return {
-      error: clientError.message || clientError.error,
+      // keep labelling consistent in error messages
+      error: (clientError.message || clientError.error)
+        .replace('From date', 'Start date')
+        .replace('to date', 'end date'),
     };
   }
 };
