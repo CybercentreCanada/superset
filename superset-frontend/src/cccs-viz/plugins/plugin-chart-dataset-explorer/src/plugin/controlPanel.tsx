@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import {
   t,
@@ -269,7 +269,7 @@ const config: ControlPanelConfig = {
             config: {
               type: 'SelectControl',
               label: t('Selector'),
-              description: t('Order results by selected columns'),
+              description: t('Selector'),
               multi: false,
               rerender: ['selector_selection_value'],
               default: [],
@@ -305,7 +305,7 @@ const config: ControlPanelConfig = {
               type: SelecttorValue,
               freeForm: true,
               label: t('Values'),
-              description: t('Order results by selected columns'),
+              description: t('Values'),
               multi: true,
               default: [],
               resetOnHide: false,
@@ -313,7 +313,8 @@ const config: ControlPanelConfig = {
                 const { datasource } = state;
                 const selector =
                   state.controls?.selector_selection?.value || '';
-                return { datasource, selector };
+                const disabled = ensureIsArray(selector).length === 0;
+                return { datasource, selector, disabled };
               },
             },
           },
