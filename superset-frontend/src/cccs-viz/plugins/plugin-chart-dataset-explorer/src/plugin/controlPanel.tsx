@@ -81,9 +81,8 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['columns', 'groupby',],
+  rerender: ['columns', 'groupby'],
 };
-
 
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
@@ -99,13 +98,9 @@ const config: ControlPanelConfig = {
               type: ChangeDataSourceButton,
               label: t('Jump Actions'),
               description: t('Configure dashboard jump actions.'),
-              mapStateToProps: (
-                state: ControlPanelState,
-
-              ) => {
-                //newState.default = ['Select All']
-                return {datasource: state.datasource};
-              },
+              mapStateToProps: (state: ControlPanelState) =>
+                // newState.default = ['Select All']
+                ({ datasource: state.datasource }),
             },
           },
         ],
@@ -117,10 +112,10 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: "granularity_sqla",
+            name: 'granularity_sqla',
             config: {
               type: 'SelectControl',
-              label: "Time Column",
+              label: 'Time Column',
               description: t(
                 'The time column for the visualization. Note that you ' +
                   'can define arbitrary expression that return a DATETIME ' +
@@ -129,12 +124,16 @@ const config: ControlPanelConfig = {
                   'expression',
               ),
               clearable: false,
-              optionRenderer: (c: any) => <StyledColumnOption column={c} showType />,
+              optionRenderer: (c: any) => (
+                <StyledColumnOption column={c} showType />
+              ),
               valueKey: 'column_name',
               mapStateToProps: state => {
                 const props: any = {};
-                if (state.datasource && "granularity_sqla" in state.datasource) {
-
+                if (
+                  state.datasource &&
+                  'granularity_sqla' in state.datasource
+                ) {
                   props.choices = state.datasource.granularity_sqla;
                   props.default = null;
                   if (state.datasource.main_dttm_col) {
@@ -145,8 +144,8 @@ const config: ControlPanelConfig = {
                 }
                 return props;
               },
-            }
-          }
+            },
+          },
         ],
         [
           {
@@ -154,7 +153,7 @@ const config: ControlPanelConfig = {
             config: {
               type: DateTimeControl,
               label: t('Time Range'),
-              default: "Today : Tomorrow",
+              default: 'Today : Tomorrow',
               resetOnHide: false,
             },
           },
@@ -196,17 +195,17 @@ const config: ControlPanelConfig = {
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
-                if (datasource && "columns" in datasource) {
-                  newState.default = datasource.columns.map(c => c.column_name) || [];
+                if (datasource && 'columns' in datasource) {
+                  newState.default =
+                    datasource.columns.map(c => c.column_name) || [];
                 }
-               
-                //newState.default = ['Select All']
+
+                // newState.default = ['Select All']
                 return newState;
               },
               visibility: isAggMode,
               canCopy: true,
             },
- 
           },
         ],
         [
@@ -246,8 +245,9 @@ const config: ControlPanelConfig = {
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
-                if (datasource && "columns" in datasource) {
-                  newState.default = datasource.columns.map(c => c.column_name) || [];
+                if (datasource && 'columns' in datasource) {
+                  newState.default =
+                    datasource.columns.map(c => c.column_name) || [];
                 }
                 return newState;
               },
@@ -267,12 +267,25 @@ const config: ControlPanelConfig = {
               rerender: ['selector_selection_value'],
               default: [],
               valueKey: 'value',
-              mapStateToProps: (state: ControlPanelState,
-                controlState: ControlState,) => {
-                const options = state.datasource?.columns ? (state.datasource as Dataset)?.columns.reduce((arr: any[], curr: any) => {
-                  return curr?.advanced_data_type ? [...new Set([...arr, {"value": curr?.advanced_data_type}])] : arr;
-                }, []) : []
-                return {options}
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const options = state.datasource?.columns
+                  ? (state.datasource as Dataset)?.columns.reduce(
+                      (arr: any[], curr: any) =>
+                        curr?.advanced_data_type
+                          ? [
+                              ...new Set([
+                                ...arr,
+                                { value: curr?.advanced_data_type },
+                              ]),
+                            ]
+                          : arr,
+                      [],
+                    )
+                  : [];
+                return { options };
               },
               resetOnHide: false,
             },
@@ -289,13 +302,14 @@ const config: ControlPanelConfig = {
               multi: true,
               default: [],
               resetOnHide: false,
-              mapStateToProps: (state) => {
-                const datasource = state.datasource;
-                const selector = state.controls?.selector_selection?.value || ""
-                return {datasource, selector}
-              },
+              mapStateToProps: state => {
+                const { datasource } = state;
+                const selector =
+                  state.controls?.selector_selection?.value || '';
+                return { datasource, selector };
               },
             },
+          },
         ],
         [
           {
@@ -417,6 +431,5 @@ const config: ControlPanelConfig = {
     },
   },
 };
-
 
 export default config;
