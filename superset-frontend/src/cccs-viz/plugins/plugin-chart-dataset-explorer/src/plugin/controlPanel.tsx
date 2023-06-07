@@ -70,6 +70,12 @@ function isQueryMode(mode: QueryMode) {
 
 const isAggMode = isQueryMode(QueryMode.aggregate);
 const isRawMode = isQueryMode(QueryMode.raw);
+const isTimeColumnSelected = ({
+  controls,
+}: Pick<ControlPanelsContainerProps, 'controls'>) => {
+  const val = controls.granularity_sqla.value;
+  return !!val;
+};
 
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
@@ -155,6 +161,7 @@ const config: ControlPanelConfig = {
               label: t('Time Range'),
               default: 'Today : Tomorrow',
               resetOnHide: false,
+              visibility: isTimeColumnSelected,
             },
           },
         ],
