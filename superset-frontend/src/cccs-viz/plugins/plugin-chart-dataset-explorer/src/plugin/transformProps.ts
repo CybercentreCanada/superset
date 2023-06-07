@@ -147,7 +147,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return metricMap;
   }, metricVerboseNameMap);
 
-
   // Key is column advanced type, value is renderer name
   const rendererMap = {
     IPV4: 'ipv4ValueRenderer',
@@ -199,9 +198,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
       const autoHeight = true;
-      const rowGroupIndex = default_group_by.findIndex((element: any) => {
-        return element === column;
-      });
+      const rowGroupIndex = default_group_by.findIndex(
+        (element: any) => element === column,
+      );
       const rowGroup = rowGroupIndex >= 0;
       const hide = rowGroup;
       return {
@@ -305,7 +304,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
-  let parsed_jump_action_configs = {};
+  const parsed_jump_action_configs = {};
   jump_action_configs?.forEach((e: any) => {
     if (e.dashboardID in parsed_jump_action_configs) {
       parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[

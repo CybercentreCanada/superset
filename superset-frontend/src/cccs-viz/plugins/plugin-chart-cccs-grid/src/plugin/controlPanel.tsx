@@ -46,7 +46,6 @@ import {
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../components/controls/JumpActionConfigControll';
-import ChangeDataSourceButton from '../components/controls/changeDatasourceButton';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -716,19 +715,6 @@ config.controlPanelSections.push({
         },
       },
     ],
-    [
-      {
-        name: 'datasource',
-        config: {
-          type: ChangeDataSourceButton,
-          renderTrigger: true,
-          label: t('Jump Actions'),
-          description: t('Configure dashboard jump actions.'),
-        },
-      },
-    ],
-
-    
   ],
 });
 
