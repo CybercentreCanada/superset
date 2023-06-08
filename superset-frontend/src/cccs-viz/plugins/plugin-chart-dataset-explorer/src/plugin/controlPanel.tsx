@@ -39,6 +39,7 @@ import {
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
+import { bootstrapData } from 'src/preamble';
 import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
 import SelecttorValue from '../../../plugin-chart-cccs-grid/src/components/controls/selectorValueControl';
 import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
@@ -177,6 +178,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: ['Select All'],
               canSelectAll: true,
+              rerender: ['selector_selection'],
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
@@ -227,6 +229,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: ['Select All'],
               canSelectAll: true,
+              rerender: ['selector_selection'],
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
@@ -279,18 +282,13 @@ const config: ControlPanelConfig = {
                 controlState: ControlState,
               ) => {
                 const options = state.datasource?.columns
-                  ? (state.datasource as Dataset)?.columns.reduce(
-                      (arr: any[], curr: any) =>
-                        curr?.advanced_data_type
-                          ? [
-                              ...new Set([
-                                ...arr,
-                                { value: curr?.advanced_data_type },
-                              ]),
-                            ]
-                          : arr,
-                      [],
-                    )
+                  ? bootstrapData?.common?.advanced_data_types
+                      ?.filter(v =>
+                        (state.datasource as Dataset).columns.some(
+                          c => c.advanced_data_type === v.id,
+                        ),
+                      )
+                      .map(v => ({ value: v.id, label: v.verbose_name }))
                   : [];
                 return { options };
               },
