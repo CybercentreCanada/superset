@@ -44,7 +44,7 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
         buttonStyle="primary"
         onClick={() => setShowChangeDatasourceModal(true)}
       >
-        Change dataset
+        Swap dataset
       </Button>
       {showChangeDatasourceModal && (
         <ChangeDatasourceModal
