@@ -96,7 +96,7 @@ const config: ControlPanelConfig = {
   controlPanelSections: [
     {
       label: t('Query'),
-      expanded: false,
+      expanded: true,
       controlSetRows: [
         [
           {
@@ -105,9 +105,9 @@ const config: ControlPanelConfig = {
               type: ChangeDataSourceButton,
               label: t('Jump Actions'),
               description: t('Configure dashboard jump actions.'),
-              mapStateToProps: (state: ControlPanelState) =>
-                // newState.default = ['Select All']
-                ({ datasource: state.datasource }),
+              mapStateToProps: (state: ControlPanelState) => ({
+                datasource: state.datasource,
+              }),
             },
           },
         ],
@@ -272,7 +272,9 @@ const config: ControlPanelConfig = {
             config: {
               type: 'SelectControl',
               label: t('Selector'),
-              description: t('Selector'),
+              description: t(
+                'The advanced data type used to filter the rows to display',
+              ),
               multi: false,
               rerender: ['selector_selection_value'],
               default: [],
@@ -303,7 +305,9 @@ const config: ControlPanelConfig = {
               type: SelecttorValue,
               freeForm: true,
               label: t('Values'),
-              description: t('Values'),
+              description: t(
+                'The value to be used along with the selector to filter the rows to display',
+              ),
               multi: true,
               default: [],
               resetOnHide: false,

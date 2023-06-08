@@ -547,18 +547,6 @@ export default function CccsGrid({
     }
   };
 
-  const onSortChanged = (event: SortChangedEvent) => {
-    const sortModel = event.api.getSortModel();
-    if (sortModel.length > 0) {
-      const { colId, sort } = sortModel[0];
-      setSortField(colId || '');
-      setSortOrder(sort || '');
-    } else {
-      setSortField('');
-      setSortOrder('');
-    }
-  };
-
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
