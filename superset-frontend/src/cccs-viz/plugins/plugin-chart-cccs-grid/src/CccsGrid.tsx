@@ -102,9 +102,10 @@ export default function CccsGrid({
   const [principalColumnFilters, setPrincipalColumnFilters] = useState({});
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(page_length);
-  const [sortField, setSortField] = useState('');
-  const [sortOrder, setSortOrder] = useState('');
+  const [sortFields, setSortFields] = useState(['']);
+  const [sortOrders, setSortOrders] = useState(['']);
   const [sortedColumnDefs, setSortedColumnDefs] = useState(columnDefs);
+  const [orderedColumnDefs, setOrderedColumnDefs] = useState(sortedColumnDefs);
   const gridRef = useRef<AgGridReactType>(null);
 
   const handleChange = useCallback(
@@ -138,30 +139,37 @@ export default function CccsGrid({
         },
       });
     },
-    [emitCrossFilters, setDataMask, sortField, columnDefs, sortOrder],
+    [emitCrossFilters, setDataMask],
   ); // only take relevant page size options
 
   useEffect(() => {
-    // if we are sorting by a field, persist that after column defs are reset
+    // if we are sorting by a field, persist that after column defs are reset only when emitting cross filters
     if (
-      sortField &&
-      ensureIsArray(columnDefs).some(c => c.field === sortField)
+      emitCrossFilters &&
+      sortFields &&
+      ensureIsArray(columnDefs).some(c => sortFields.includes(c.field))
     ) {
       const newSortArr = ensureIsArray(columnDefs).map(c => {
         const new_c = c;
-        if (c.field === sortField) {
-          new_c.sort = sortOrder;
+        if (sortFields.includes(c.field)) {
+          new_c.sort = sortOrders.at(sortFields.indexOf(c.field));
+        } else {
+          new_c.sort = undefined;
         }
         return new_c;
       });
       setSortedColumnDefs(newSortArr);
     } else {
       // if the new column defs do not contain the sort field reset it
-      setSortField('');
-      setSortOrder('');
+      setSortFields([]);
+      setSortOrders([]);
       setSortedColumnDefs(columnDefs);
+      // if emit filters are not set, reset the column ordering
+      if (!emitCrossFilters) {
+        setOrderedColumnDefs(sortedColumnDefs);
+      }
     }
-  }, [columnDefs, sortField, sortOrder]);
+  }, [columnDefs, JSON.stringify(sortFields)]);
 
   const generateNativeFilterUrlString = (
     nativefilterID: string,
@@ -514,9 +522,30 @@ export default function CccsGrid({
     }
   }, [include_search]);
 
-  const onColumnMoved = useCallback(e => {
-    setControlValue('column_state', e.columnApi.getColumnState());
-  }, []);
+  const onColumnMoved = useCallback(
+    e => {
+      setControlValue('column_state', e.columnApi.getColumnState());
+      const colState = e.columnApi.getColumnState();
+      // set the column orders to preserve them
+      setOrderedColumnDefs(
+        colState.map((c: { colId: any }) =>
+          sortedColumnDefs.find((sc: { colId: any }) => c.colId === sc.colId),
+        ),
+      );
+    },
+    [setControlValue, sortedColumnDefs],
+  );
+
+  const onSortChanged = (event: SortChangedEvent) => {
+    const sortModel = event.api.getSortModel();
+    if (sortModel.length > 0) {
+      setSortFields(sortModel.map(col => col.colId || ''));
+      setSortOrders(sortModel.map(col => col.sort || ''));
+    } else {
+      setSortFields([]);
+      setSortOrders([]);
+    }
+  };
 
   const onSortChanged = (event: SortChangedEvent) => {
     const sortModel = event.api.getSortModel();
@@ -596,7 +625,7 @@ export default function CccsGrid({
         <AgGridReact
           ref={gridRef}
           modules={AllModules}
-          columnDefs={sortedColumnDefs}
+          columnDefs={orderedColumnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
           frameworkComponents={frameworkComponents}
           enableBrowserTooltips={true}
