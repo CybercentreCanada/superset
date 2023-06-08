@@ -25,23 +25,13 @@ export interface Props {
 }
 
 const SelectorValueControl: React.FC<Props> = ({
-  colorScheme,
-  annotationError,
-  annotationQuery,
-  vizType,
-  theme,
-  validationErrors,
-  name,
-  actions,
   onChange,
-  value = [],
   datasource,
   multi,
   freeForm,
   selector,
   label,
   disabled,
-  ...props
 }) => {
   const [rawValues, setRawValues] = useState([]);
 
@@ -50,6 +40,11 @@ const SelectorValueControl: React.FC<Props> = ({
     subjectAdvancedDataType,
     fetchAdvancedDataTypeValueCallback,
   } = useAdvancedDataTypes(() => {});
+
+  // clear selection on selector change
+  useEffect(() => {
+    setRawValues([]);
+  }, [selector]);
 
   const onChangeWrapper = (selection: any) => {
     setRawValues(selection);
@@ -92,6 +87,7 @@ const SelectorValueControl: React.FC<Props> = ({
               ? [advancedDataTypesState.errorMessage]
               : []
           }
+          value={rawValues}
           onChange={onChangeWrapper}
           multi={multi}
           freeForm={disabled ? false : freeForm}
