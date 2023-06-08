@@ -112,19 +112,23 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         (ownState.currentPage ?? 0) * (ownState.pageSize ?? 0);
     }
 
-    const datasource_config = formData.datasource_config
+    const { datasource_config } = formData;
     formDataCopy.datasource = datasource_config || formDataCopy.datasource;
 
-
-
-    const selector_selection_value = formData.selector_selection_value;
-    const selector_selection= formData.selector_selection;
-    let filter = []
-    if (selector_selection.length > 0 ) {
-      filter = selector_selection_value[0].columns.reduce((arr: string[], curr: string) => {
-        return [...arr, `${curr} IN (${selector_selection_value[0].data.map((d: any) => `'${d}'`).toString()})`];
-      }, []);
-    } 
+    const { selector_selection_value } = formData;
+    const { selector_selection } = formData;
+    let filter = [];
+    if (selector_selection.length > 0) {
+      filter = selector_selection_value[0].columns.reduce(
+        (arr: string[], curr: string) => [
+          ...arr,
+          `${curr} IN (${selector_selection_value[0].data.map(
+            (d: any) => `${d}`,
+          )})`,
+        ],
+        [],
+      );
+    }
     const queryObject = {
       ...baseQueryObject,
       formData: formDataCopy,
@@ -134,9 +138,8 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
       ...moreProps,
       extras: {
         ...baseQueryObject.extras,
-        where: filter.join(" OR ")
-
-      }
+        where: filter.join(' OR '),
+      },
     };
 
     // Because we use same buildQuery for all table on the page we need split them by id

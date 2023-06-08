@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { withTheme } from '@superset-ui/core';
+import { ensureIsArray, withTheme } from '@superset-ui/core';
 import { connect } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import { Tooltip } from 'src/components/Tooltip';
@@ -66,9 +66,9 @@ const SelectorValueControl: React.FC<Props> = ({
 
   useEffect(() => {
     fetchAdvancedDataTypeValueCallback(
-      Array.isArray(rawValues) ? rawValues : [rawValues],
+      rawValues,
       advancedDataTypesState,
-      Array.isArray(selector) ? selector[0] : selector,
+      ensureIsArray(selector)[0],
     );
   }, [selector, rawValues, subjectAdvancedDataType]);
 
