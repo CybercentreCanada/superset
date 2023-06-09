@@ -204,12 +204,6 @@ const config: ControlPanelConfig = {
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
-                if (datasource && 'columns' in datasource) {
-                  newState.default =
-                    datasource.columns.map(c => c.column_name) || [];
-                }
-
-                // newState.default = ['Select All']
                 return newState;
               },
               visibility: isAggMode,
@@ -255,10 +249,6 @@ const config: ControlPanelConfig = {
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [];
-                if (datasource && 'columns' in datasource) {
-                  newState.default =
-                    datasource.columns.map(c => c.column_name) || [];
-                }
                 return newState;
               },
               visibility: isRawMode,
