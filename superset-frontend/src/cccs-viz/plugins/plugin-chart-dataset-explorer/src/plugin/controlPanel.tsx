@@ -193,7 +193,7 @@ const config: ControlPanelConfig = {
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
-                const { controls, datasource } = state;
+                const { controls } = state;
                 const originalMapStateToProps =
                   sharedControls?.groupby?.mapStateToProps;
                 const newState =
@@ -238,7 +238,7 @@ const config: ControlPanelConfig = {
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
-                const { controls, datasource } = state;
+                const { controls } = state;
                 const originalMapStateToProps =
                   sharedControls?.columns?.mapStateToProps;
                 const newState =
