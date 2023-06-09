@@ -176,7 +176,7 @@ const config: ControlPanelConfig = {
               multi: true,
               freeForm: true,
               allowAll: true,
-              default: ['Select All'],
+              default: [],
               canSelectAll: true,
               rerender: ['selector_selection'],
               optionRenderer: (c: ColumnMeta) => (
@@ -221,7 +221,7 @@ const config: ControlPanelConfig = {
               multi: true,
               freeForm: true,
               allowAll: true,
-              default: ['Select All'],
+              default: [],
               canSelectAll: true,
               rerender: ['selector_selection'],
               optionRenderer: (c: ColumnMeta) => (
