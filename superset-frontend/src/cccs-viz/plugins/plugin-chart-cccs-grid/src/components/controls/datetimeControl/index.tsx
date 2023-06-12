@@ -24,6 +24,7 @@ export interface Props {
   value?: object[];
   onChange: (value: any, errors: any[]) => void;
   default: string;
+  disabled: boolean;
 }
 
 const SEPARATOR = ' : ';
@@ -102,12 +103,14 @@ const DatetimeControl: React.FC<Props> = props => {
         key="since"
         value={since}
         onChange={e => onChange('since', e.target.value)}
+        disabled={props.disabled}
       />
       <div className="control-label">{t('END (EXCLUSIVE)')} </div>
       <Input
         key="until"
         value={until}
         onChange={e => onChange('until', e.target.value)}
+        disabled={props.disabled}
       />
     </>
   );
