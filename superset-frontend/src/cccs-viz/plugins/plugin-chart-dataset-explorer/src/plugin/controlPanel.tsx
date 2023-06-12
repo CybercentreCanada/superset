@@ -135,6 +135,7 @@ const config: ControlPanelConfig = {
                 <StyledColumnOption column={c} showType />
               ),
               valueKey: 'column_name',
+              rerender: ['time_range'],
               mapStateToProps: state => {
                 const props: any = {};
                 if (
@@ -162,7 +163,10 @@ const config: ControlPanelConfig = {
               label: t('Time Range'),
               default: 'Today : Tomorrow',
               resetOnHide: false,
-              visibility: isTimeColumnSelected,
+              mapStateToProps: (state: ControlPanelState) => {
+                const disabled = !isTimeColumnSelected(state);
+                return { disabled };
+              },
             },
           },
         ],
@@ -269,10 +273,7 @@ const config: ControlPanelConfig = {
               rerender: ['selector_selection_value'],
               default: [],
               valueKey: 'value',
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
+              mapStateToProps: (state: ControlPanelState) => {
                 const options = state.datasource?.columns
                   ? bootstrapData?.common?.advanced_data_types
                       ?.filter(v =>
