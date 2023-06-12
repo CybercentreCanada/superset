@@ -12,6 +12,7 @@ export interface Props {
   vizType: string;
   theme: any;
   validationErrors: string[];
+  externalValidationErrors: string[];
   name: string;
   actions: object;
   label: string;
@@ -20,12 +21,13 @@ export interface Props {
   multi: boolean;
   freeForm: boolean;
   selector: string;
-  onChange: (a: any) => void;
+  onChange: (values: any, errors: any[]) => void;
   disabled: boolean;
 }
 
 const SelectorValueControl: React.FC<Props> = ({
   onChange,
+  externalValidationErrors,
   datasource,
   multi,
   freeForm,
@@ -34,6 +36,7 @@ const SelectorValueControl: React.FC<Props> = ({
   disabled,
 }) => {
   const [rawValues, setRawValues] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const {
     advancedDataTypesState,
@@ -61,8 +64,8 @@ const SelectorValueControl: React.FC<Props> = ({
               .map((col: any) => col.column_name),
           }
         : { data: [], columns: [] };
-    onChange(data);
-  }, [advancedDataTypesState]);
+    onChange(data, validationErrors);
+  }, [advancedDataTypesState, validationErrors]);
 
   useEffect(() => {
     fetchAdvancedDataTypeValueCallback(
@@ -71,6 +74,14 @@ const SelectorValueControl: React.FC<Props> = ({
       ensureIsArray(selector)[0],
     );
   }, [selector, rawValues, subjectAdvancedDataType]);
+
+  useEffect(() => {
+    setValidationErrors(
+      advancedDataTypesState.errorMessage
+        ? [advancedDataTypesState.errorMessage]
+        : [],
+    );
+  }, [advancedDataTypesState]);
 
   return (
     <Tooltip
@@ -82,11 +93,7 @@ const SelectorValueControl: React.FC<Props> = ({
       <>
         <SelectControl
           description={advancedDataTypesState.parsedAdvancedDataType}
-          validationErrors={
-            advancedDataTypesState.errorMessage
-              ? [advancedDataTypesState.errorMessage]
-              : []
-          }
+          validationErrors={[...validationErrors, ...externalValidationErrors]}
           value={rawValues}
           onChange={onChangeWrapper}
           multi={multi}
