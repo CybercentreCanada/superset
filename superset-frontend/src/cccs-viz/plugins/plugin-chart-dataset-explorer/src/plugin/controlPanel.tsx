@@ -301,12 +301,26 @@ const config: ControlPanelConfig = {
               multi: true,
               default: [],
               resetOnHide: false,
-              mapStateToProps: state => {
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
                 const { datasource } = state;
                 const selector =
                   state.controls?.selector_selection?.value || '';
                 const disabled = ensureIsArray(selector).length === 0;
-                return { datasource, selector, disabled };
+                const externalValidationErrors =
+                  !disabled &&
+                  controlState.value?.hasOwnProperty('columns') &&
+                  ensureIsArray(controlState.value?.columns).length === 0
+                    ? [t('must have a value')]
+                    : [];
+                return {
+                  datasource,
+                  selector,
+                  disabled,
+                  externalValidationErrors,
+                };
               },
             },
           },
