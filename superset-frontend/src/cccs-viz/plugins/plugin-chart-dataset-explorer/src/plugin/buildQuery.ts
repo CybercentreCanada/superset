@@ -115,14 +115,14 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     const { datasource_config } = formData;
     formDataCopy.datasource = datasource_config || formDataCopy.datasource;
 
-    const { selector_selection_value } = formData;
-    const { selector_selection } = formData;
+    const { advanced_data_type_selection_value } = formData;
+    const { advanced_data_type_selection } = formData;
     let filter = [];
-    if (selector_selection.length > 0) {
-      filter = selector_selection_value[0].columns.reduce(
+    if (advanced_data_type_selection.length > 0) {
+      filter = advanced_data_type_selection_value[0].columns.reduce(
         (arr: string[], curr: string) => [
           ...arr,
-          `${curr} IN (${selector_selection_value[0].data.map(
+          `${curr} IN (${advanced_data_type_selection_value[0].data.map(
             (d: any) => `${d}`,
           )})`,
         ],
