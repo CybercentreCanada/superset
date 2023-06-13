@@ -41,7 +41,7 @@ export type CccsGridQueryFormData = QueryFormData & {
   jump_action_configs?: any[];
   datasource_config?: string;
   advanced_data_type_selection: string[];
-  advanced_data_type_selection_value: {
+  advanced_data_type_value: {
     columns: string[];
     data: string[];
     rawData: string[];

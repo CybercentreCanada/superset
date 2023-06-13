@@ -50,7 +50,9 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   // clear selection on advancedDataType change
   useEffect(() => {
     setRawValues(
-      currentAdvancedDataType && currentAdvancedDataType !== advancedDataType
+      (currentAdvancedDataType &&
+        currentAdvancedDataType !== advancedDataType) ||
+        !advancedDataType
         ? []
         : value[0].rawData || [],
     );

@@ -51,6 +51,11 @@ export function getQueryMode(formData: CccsGridQueryFormData) {
   return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
 }
 
+const isRange = (data: any) => {
+  const v = data.hasOwnProperty('start');
+  return v;
+};
+
 const buildQuery: BuildQuery<CccsGridQueryFormData> = (
   formData: CccsGridQueryFormData,
   options: any,
@@ -115,19 +120,30 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     const { datasource_config } = formData;
     formDataCopy.datasource = datasource_config || formDataCopy.datasource;
 
-    const { advanced_data_type_selection_value } = formData;
+    const { advanced_data_type_value } = formData;
     const { advanced_data_type_selection } = formData;
     let filter = [];
     if (advanced_data_type_selection.length > 0) {
-      filter = advanced_data_type_selection_value[0].columns.reduce(
+      // in the case of ipv4s sometimes they can be ranges and not simple values
+      let simple: any[] = [];
+      let range: any[] = [];
+      advanced_data_type_value[0].data.map((d: any) => {
+        if (isRange(d)) {
+          range = [...range, d];
+        } else {
+          simple = [...simple, d];
+        }
+        return d;
+      });
+      filter = advanced_data_type_value[0].columns.reduce(
         (arr: string[], curr: string) => [
           ...arr,
-          `${curr} IN (${advanced_data_type_selection_value[0].data.map(
-            (d: any) => `${d}`,
-          )})`,
+          `${curr} IN (${simple.map((s: any) => `${s}`)})`,
+          ...range.map(r => `${curr} BETWEEN ${r.start} AND ${r.end}`),
         ],
         [],
       );
+      const thing = 5;
     }
     const queryObject = {
       ...baseQueryObject,
