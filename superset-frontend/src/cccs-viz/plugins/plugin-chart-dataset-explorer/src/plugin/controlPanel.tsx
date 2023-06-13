@@ -41,7 +41,7 @@ import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import { bootstrapData } from 'src/preamble';
 import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
-import SelecttorValue from '../../../plugin-chart-cccs-grid/src/components/controls/selectorValueControl';
+import AdvancedDataTypeValue from '../../../plugin-chart-cccs-grid/src/components/controls/advancedDataTypeValueControl';
 import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
@@ -182,7 +182,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: [],
               canSelectAll: true,
-              rerender: ['selector_selection'],
+              rerender: ['advanced_data_type_selection'],
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
@@ -227,7 +227,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: [],
               canSelectAll: true,
-              rerender: ['selector_selection'],
+              rerender: ['advanced_data_type_selection'],
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
@@ -262,15 +262,15 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'selector_selection',
+            name: 'advanced_data_type_selection',
             config: {
               type: 'SelectControl',
-              label: t('Selector'),
+              label: t('Advanced Data Type'),
               description: t(
                 'The advanced data type used to filter the rows to display',
               ),
               multi: false,
-              rerender: ['selector_selection_value'],
+              rerender: ['advanced_data_type_value'],
               default: [],
               valueKey: 'value',
               mapStateToProps: (state: ControlPanelState) => {
@@ -291,13 +291,13 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'selector_selection_value',
+            name: 'advanced_data_type_value',
             config: {
-              type: SelecttorValue,
+              type: AdvancedDataTypeValue,
               freeForm: true,
               label: t('Values'),
               description: t(
-                'The value to be used along with the selector to filter the rows to display',
+                'The value to be used along with the advanced data type to filter the rows to display',
               ),
               multi: true,
               default: [],
@@ -307,9 +307,9 @@ const config: ControlPanelConfig = {
                 controlState: ControlState,
               ) => {
                 const { datasource } = state;
-                const selector =
-                  state.controls?.selector_selection?.value || '';
-                const disabled = ensureIsArray(selector).length === 0;
+                const advancedDataType =
+                  state.controls?.advanced_data_type_selection?.value || '';
+                const disabled = ensureIsArray(advancedDataType).length === 0;
                 const externalValidationErrors =
                   !disabled &&
                   controlState.value?.hasOwnProperty('columns') &&
@@ -318,7 +318,7 @@ const config: ControlPanelConfig = {
                     : [];
                 return {
                   datasource,
-                  selector,
+                  advancedDataType,
                   disabled,
                   externalValidationErrors,
                 };

@@ -20,23 +20,26 @@ export interface Props {
   datasource: any;
   multi: boolean;
   freeForm: boolean;
-  selector: string;
+  advancedDataType: string;
   onChange: (values: any, errors: any[]) => void;
   disabled: boolean;
 }
 
-const SelectorValueControl: React.FC<Props> = ({
+const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   onChange,
   externalValidationErrors,
   datasource,
   multi,
   freeForm,
-  selector,
+  advancedDataType,
   label,
   disabled,
+  value = [],
 }) => {
   const [rawValues, setRawValues] = useState([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [currentAdvancedDataType, setCurrentAdvancedDataType] =
+    useState<string>();
 
   const {
     advancedDataTypesState,
@@ -44,10 +47,15 @@ const SelectorValueControl: React.FC<Props> = ({
     fetchAdvancedDataTypeValueCallback,
   } = useAdvancedDataTypes(() => {});
 
-  // clear selection on selector change
+  // clear selection on advancedDataType change
   useEffect(() => {
-    setRawValues([]);
-  }, [selector]);
+    setRawValues(
+      currentAdvancedDataType && currentAdvancedDataType !== advancedDataType
+        ? []
+        : value[0].rawData || [],
+    );
+    setCurrentAdvancedDataType(advancedDataType);
+  }, [advancedDataType]);
 
   const onChangeWrapper = (selection: any) => {
     setRawValues(selection);
@@ -60,10 +68,11 @@ const SelectorValueControl: React.FC<Props> = ({
         ? {
             data: advancedDataTypesState.values,
             columns: datasource.columns
-              .filter((col: any) => col.advanced_data_type === selector)
+              .filter((col: any) => col.advanced_data_type === advancedDataType)
               .map((col: any) => col.column_name),
+            rawData: rawValues,
           }
-        : { data: [], columns: [] };
+        : { data: [], columns: [], rawData: [] };
     onChange(data, validationErrors);
   }, [advancedDataTypesState, validationErrors]);
 
@@ -71,9 +80,9 @@ const SelectorValueControl: React.FC<Props> = ({
     fetchAdvancedDataTypeValueCallback(
       rawValues,
       advancedDataTypesState,
-      ensureIsArray(selector)[0],
+      ensureIsArray(advancedDataType)[0],
     );
-  }, [selector, rawValues, subjectAdvancedDataType]);
+  }, [advancedDataType, rawValues, subjectAdvancedDataType]);
 
   useEffect(() => {
     setValidationErrors(
@@ -93,8 +102,8 @@ const SelectorValueControl: React.FC<Props> = ({
       <>
         <SelectControl
           description={advancedDataTypesState.parsedAdvancedDataType}
-          validationErrors={[...validationErrors, ...externalValidationErrors]}
           value={rawValues}
+          validationErrors={[...validationErrors, ...externalValidationErrors]}
           onChange={onChangeWrapper}
           multi={multi}
           freeForm={disabled ? false : freeForm}
@@ -114,6 +123,10 @@ function mapStateToProps({ charts, explore }: any) {
   };
 }
 
-const themedSelectorValueControl = withTheme(SelectorValueControl);
+const themedAdvancedDataTypeValueControlValueControl = withTheme(
+  AdvancedDataTypeValueControlValueControl,
+);
 
-export default connect(mapStateToProps)(themedSelectorValueControl);
+export default connect(mapStateToProps)(
+  themedAdvancedDataTypeValueControlValueControl,
+);

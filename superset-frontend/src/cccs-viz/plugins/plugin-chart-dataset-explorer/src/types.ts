@@ -40,9 +40,12 @@ export type CccsGridQueryFormData = QueryFormData & {
   enable_row_numbers: boolean;
   jump_action_configs?: any[];
   datasource_config?: string;
-  selector_selection: string[];
-  selector_selection_value: {columns: string[], data: string[]};
-
+  advanced_data_type_selection: string[];
+  advanced_data_type_selection_value: {
+    columns: string[];
+    data: string[];
+    rawData: string[];
+  };
 };
 
 export interface CccsGridStylesProps {
