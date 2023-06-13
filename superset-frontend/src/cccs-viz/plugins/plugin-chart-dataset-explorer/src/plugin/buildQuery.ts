@@ -125,6 +125,8 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     let filter = [];
     if (advanced_data_type_selection.length > 0) {
       // in the case of ipv4s sometimes they can be ranges and not simple values
+      // this will be handled in the advanced data type definition in the future
+      // to avoid this complex logic
       let simple: any[] = [];
       let range: any[] = [];
       advanced_data_type_value[0].data.map((d: any) => {
@@ -143,7 +145,6 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         ],
         [],
       );
-      const thing = 5;
     }
     const queryObject = {
       ...baseQueryObject,
