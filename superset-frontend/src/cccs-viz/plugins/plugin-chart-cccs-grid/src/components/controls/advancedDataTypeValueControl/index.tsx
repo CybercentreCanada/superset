@@ -3,6 +3,7 @@ import { ensureIsArray, withTheme } from '@superset-ui/core';
 import { connect } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import useAdvancedDataTypes from 'src/explore/components/controls/FilterControl/AdhocFilterEditPopoverSimpleTabContent/useAdvancedDataTypes';
+import { Tooltip } from 'src/components/Tooltip';
 
 export interface Props {
   colorScheme: string;
@@ -98,16 +99,25 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   }, [advancedDataTypesState]);
 
   return (
-    <SelectControl
-      description={description}
-      value={rawValues}
-      validationErrors={[...validationErrors, ...externalValidationErrors]}
-      onChange={onChangeWrapper}
-      multi={multi}
-      freeForm={disabled ? false : freeForm}
-      label={label}
-      disabled={disabled}
-    />
+    <Tooltip
+      title={
+        advancedDataTypesState.errorMessage ||
+        advancedDataTypesState.parsedAdvancedDataType
+      }
+    >
+      <>
+        <SelectControl
+          description={description}
+          value={rawValues}
+          validationErrors={[...validationErrors, ...externalValidationErrors]}
+          onChange={onChangeWrapper}
+          multi={multi}
+          freeForm={disabled ? false : freeForm}
+          label={label}
+          disabled={disabled}
+        />
+      </>
+    </Tooltip>
   );
 };
 
