@@ -48,10 +48,15 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
     fetchAdvancedDataTypeValueCallback,
   } = useAdvancedDataTypes(() => {});
 
+  const onChangeWrapper = (selection: any) => {
+    setValidationErrors([...validationErrors, 'Validation in progress']);
+    setRawValues(selection);
+  };
+
   // clear selection on advancedDataType change
   useEffect(() => {
     const rawData = value[0] ? value[0].rawData : [];
-    setRawValues(
+    onChangeWrapper(
       (currentAdvancedDataType &&
         currentAdvancedDataType !== advancedDataType) ||
         !advancedDataType
@@ -60,11 +65,6 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
     );
     setCurrentAdvancedDataType(advancedDataType);
   }, [advancedDataType]);
-
-  const onChangeWrapper = (selection: any) => {
-    setValidationErrors([...validationErrors, 'Validation in progress']);
-    setRawValues(selection);
-  };
 
   useEffect(() => {
     const data =
