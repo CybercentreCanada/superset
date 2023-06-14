@@ -62,6 +62,7 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   }, [advancedDataType]);
 
   const onChangeWrapper = (selection: any) => {
+    setValidationErrors([...validationErrors, 'Validation in progress']);
     setRawValues(selection);
   };
 
