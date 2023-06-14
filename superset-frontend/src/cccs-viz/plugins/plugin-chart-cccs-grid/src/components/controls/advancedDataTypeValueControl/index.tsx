@@ -3,7 +3,6 @@ import { ensureIsArray, withTheme } from '@superset-ui/core';
 import { connect } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import useAdvancedDataTypes from 'src/explore/components/controls/FilterControl/AdhocFilterEditPopoverSimpleTabContent/useAdvancedDataTypes';
-import { Tooltip } from 'src/components/Tooltip';
 
 export interface Props {
   colorScheme: string;
