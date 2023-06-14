@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ensureIsArray, withTheme } from '@superset-ui/core';
 import { connect } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
-import { Tooltip } from 'src/components/Tooltip';
 import useAdvancedDataTypes from 'src/explore/components/controls/FilterControl/AdhocFilterEditPopoverSimpleTabContent/useAdvancedDataTypes';
 
 export interface Props {
@@ -23,6 +22,7 @@ export interface Props {
   advancedDataType: string;
   onChange: (values: any, errors: any[]) => void;
   disabled: boolean;
+  description: any;
 }
 
 const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
@@ -35,6 +35,7 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   label,
   disabled,
   value = [],
+  description,
 }) => {
   const [rawValues, setRawValues] = useState([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -49,12 +50,13 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
 
   // clear selection on advancedDataType change
   useEffect(() => {
+    const rawData = value[0] ? value[0].rawData : [];
     setRawValues(
       (currentAdvancedDataType &&
         currentAdvancedDataType !== advancedDataType) ||
         !advancedDataType
         ? []
-        : value[0].rawData || [],
+        : rawData,
     );
     setCurrentAdvancedDataType(advancedDataType);
   }, [advancedDataType]);
@@ -95,25 +97,16 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   }, [advancedDataTypesState]);
 
   return (
-    <Tooltip
-      title={
-        advancedDataTypesState.errorMessage ||
-        advancedDataTypesState.parsedAdvancedDataType
-      }
-    >
-      <>
-        <SelectControl
-          description={advancedDataTypesState.parsedAdvancedDataType}
-          value={rawValues}
-          validationErrors={[...validationErrors, ...externalValidationErrors]}
-          onChange={onChangeWrapper}
-          multi={multi}
-          freeForm={disabled ? false : freeForm}
-          label={label}
-          disabled={disabled}
-        />
-      </>
-    </Tooltip>
+    <SelectControl
+      description={description}
+      value={rawValues}
+      validationErrors={[...validationErrors, ...externalValidationErrors]}
+      onChange={onChangeWrapper}
+      multi={multi}
+      freeForm={disabled ? false : freeForm}
+      label={label}
+      disabled={disabled}
+    />
   );
 };
 
