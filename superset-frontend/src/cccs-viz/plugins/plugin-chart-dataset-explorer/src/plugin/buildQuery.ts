@@ -138,11 +138,15 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         return d;
       });
       filter = advanced_data_type_value[0].columns.reduce(
-        (arr: string[], curr: string) => [
-          ...arr,
-          `${curr} IN (${simple.map((s: any) => `${s}`)})`,
-          ...range.map(r => `${curr} BETWEEN ${r.start} AND ${r.end}`),
-        ],
+        (arr: string[], curr: string) => {
+          const new_arr = [
+            ...arr,
+            ...range.map(r => `${curr} BETWEEN ${r.start} AND ${r.end}`),
+          ];
+          return simple.length > 0
+            ? new_arr.concat(`${curr} IN (${simple.map((s: any) => `${s}`)})`)
+            : new_arr;
+        },
         [],
       );
     }

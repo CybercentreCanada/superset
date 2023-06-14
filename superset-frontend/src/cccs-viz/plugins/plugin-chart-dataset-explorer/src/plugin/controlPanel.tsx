@@ -73,10 +73,8 @@ const isAggMode = isQueryMode(QueryMode.aggregate);
 const isRawMode = isQueryMode(QueryMode.raw);
 const isTimeColumnSelected = ({
   controls,
-}: Pick<ControlPanelsContainerProps, 'controls'>) => {
-  const val = controls.granularity_sqla.value;
-  return !!val;
-};
+}: Pick<ControlPanelsContainerProps, 'controls'>) =>
+  controls.granularity_sqla && !!controls.granularity_sqla.value;
 
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
@@ -310,10 +308,9 @@ const config: ControlPanelConfig = {
                 const advancedDataType =
                   state.controls?.advanced_data_type_selection?.value || '';
                 const disabled = ensureIsArray(advancedDataType).length === 0;
+                const val: any = controlState.value;
                 const externalValidationErrors =
-                  !disabled &&
-                  controlState.value?.hasOwnProperty('columns') &&
-                  ensureIsArray(controlState.value?.columns).length === 0
+                  !disabled && ensureIsArray(val)[0]?.columns.length === 0
                     ? [t('must have a value')]
                     : [];
                 return {
