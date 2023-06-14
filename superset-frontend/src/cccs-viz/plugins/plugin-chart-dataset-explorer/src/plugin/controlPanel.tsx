@@ -333,6 +333,24 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'order_by_cols',
+            config: {
+              type: 'SelectControl',
+              label: t('Ordering'),
+              description: t('Order results by selected columns'),
+              multi: true,
+              default: [],
+              mapStateToProps: ({ datasource }) => ({
+                choices: datasource?.hasOwnProperty('order_by_choices')
+                  ? (datasource as Dataset)?.order_by_choices
+                  : datasource?.columns || [],
+              }),
+              resetOnHide: false,
+            },
+          },
+        ],
+        [
+          {
             name: 'row_limit',
             override: {
               label: t('Row Limit'),

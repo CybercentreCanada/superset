@@ -99,25 +99,17 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   }, [advancedDataTypesState]);
 
   return (
-    <Tooltip
-      title={
-        advancedDataTypesState.errorMessage ||
-        advancedDataTypesState.parsedAdvancedDataType
-      }
-    >
-      <>
-        <SelectControl
-          description={description}
-          value={rawValues}
-          validationErrors={[...validationErrors, ...externalValidationErrors]}
-          onChange={onChangeWrapper}
-          multi={multi}
-          freeForm={disabled ? false : freeForm}
-          label={label}
-          disabled={disabled}
-        />
-      </>
-    </Tooltip>
+    <SelectControl
+      hovered
+      description={advancedDataTypesState.parsedAdvancedDataType || description}
+      value={rawValues}
+      validationErrors={[...validationErrors, ...externalValidationErrors]}
+      onChange={onChangeWrapper}
+      multi={multi}
+      freeForm={disabled ? false : freeForm}
+      label={label}
+      disabled={disabled}
+    />
   );
 };
 
