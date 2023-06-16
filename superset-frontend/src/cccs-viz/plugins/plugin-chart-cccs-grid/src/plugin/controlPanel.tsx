@@ -184,10 +184,6 @@ const defineSavedMetrics = (datasource: Dataset | QueryResponse | null) =>
     ? (datasource as Dataset)?.metrics || []
     : DEFAULT_METRICS;
 
-const appContainer = document.getElementById('app');
-const { user } = JSON.parse(
-  appContainer?.getAttribute('data-bootstrap') || '{}',
-);
 const config: ControlPanelConfig = {
   // For control input types, see: superset-frontend/src/explore/components/controls/index.js
   controlPanelSections: [
@@ -360,24 +356,7 @@ const config: ControlPanelConfig = {
           {
             name: 'row_limit',
             override: {
-              label: t('PAPAME'),
               default: 100,
-            },
-          },
-        ],
-        [
-          {
-            name: 'datasource',
-            config: {
-              type: 'DatasourceControl',
-              label: t('Datasource'),
-              default: null,
-              description: null,
-              mapStateToProps: ({ datasource, form_data }) => ({
-                datasource,
-                form_data,
-                user,
-              }),
             },
           },
         ],
