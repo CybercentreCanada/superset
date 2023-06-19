@@ -311,7 +311,7 @@ const config: ControlPanelConfig = {
                 const val: any = controlState.value;
                 const externalValidationErrors =
                   !disabled && ensureIsArray(val)[0]?.columns.length === 0
-                    ? [t('must have a value')]
+                    ? [t('Must have a valid entry')]
                     : [];
                 return {
                   datasource,
