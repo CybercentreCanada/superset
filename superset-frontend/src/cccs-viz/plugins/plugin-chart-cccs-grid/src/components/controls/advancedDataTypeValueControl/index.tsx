@@ -102,7 +102,9 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
       hovered
       description={advancedDataTypesState.parsedAdvancedDataType || description}
       value={rawValues}
-      validationErrors={[...validationErrors, ...externalValidationErrors]}
+      validationErrors={ensureIsArray(
+        [...validationErrors, ...externalValidationErrors].at(0),
+      )}
       onChange={onChangeWrapper}
       multi={multi}
       freeForm={disabled ? false : freeForm}
