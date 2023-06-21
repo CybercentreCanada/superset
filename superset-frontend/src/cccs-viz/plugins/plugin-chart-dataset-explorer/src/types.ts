@@ -26,6 +26,7 @@ import {
   supersetTheme,
   TimeseriesDataRecord,
   Column,
+  AdhocFilter,
 } from '@superset-ui/core';
 
 export type CccsGridQueryFormData = QueryFormData & {
@@ -46,6 +47,7 @@ export type CccsGridQueryFormData = QueryFormData & {
     data: string[];
     rawData: string[];
   };
+  adhoc_filters_no_date_default: AdhocFilter[];
 };
 
 export interface CccsGridStylesProps {

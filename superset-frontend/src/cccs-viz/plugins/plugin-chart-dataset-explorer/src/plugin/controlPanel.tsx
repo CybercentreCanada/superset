@@ -43,6 +43,7 @@ import { bootstrapData } from 'src/preamble';
 import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
 import AdvancedDataTypeValue from '../../../plugin-chart-cccs-grid/src/components/controls/advancedDataTypeValueControl';
 import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
+import AdhocFilterControl from 'src/explore/components/controls/FilterControl/AdhocFilterControl';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],
@@ -325,9 +326,15 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'adhoc_filters',
-            override: {
-              // validators: [adhocFilterValidator],
+            name: 'adhoc_filters_no_date_default',
+            config: {
+              type: AdhocFilterControl,
+              label: t('Filters'),
+              mapStateToProps(state, controlState, chartState) {
+                const { datasource } = state;
+                const columns = datasource?.columns;
+                return { datasource, columns };
+              },
             },
           },
         ],
