@@ -77,6 +77,8 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     };
   }
 
+  formDataCopy.adhoc_filters = formData.adhoc_filters_no_date_default;
+
   return buildQueryContext(formDataCopy, baseQueryObject => {
     let { metrics, orderby = [] } = baseQueryObject;
     const postProcessing: PostProcessingRule[] = [];
