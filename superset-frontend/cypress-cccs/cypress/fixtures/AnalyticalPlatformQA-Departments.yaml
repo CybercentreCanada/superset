@@ -1,0 +1,28 @@
+databases:
+- database_name: hogwarts_u
+  tables: 
+  - table_name: AnalyticalPlatformQA-Departments
+    schema: noschema
+    columns:
+    - column_name: id
+      description: ID description
+      type: NUMERIC
+      verbose_name: ID
+    - column_name: department
+      description: Department description
+      type: TEXT
+      verbose_name: Department
+    - column_name: manager
+      description: Manager description
+      type: TEXT
+      verbose_name: Manager
+    metrics:
+    - expression: count(*)
+      metric_name: count
+    sql: |- 
+      SELECT * FROM ( VALUES 
+        (1, 'HR', null),
+        (2, 'Shipping', null),
+        (3, 'Research & Development', 'Scott McDonald')
+      ) AS t (id, department, manager)
+    

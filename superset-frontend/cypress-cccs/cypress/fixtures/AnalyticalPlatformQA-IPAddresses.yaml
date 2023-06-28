@@ -1,0 +1,31 @@
+databases:
+- database_name: hogwarts_u
+  tables: 
+  - table_name: AnalyticalPlatformQA-IPAddresses
+    schema: noschema
+    columns:
+    - column_name: id
+      type: INTEGER
+      verbose_name: Index
+    - column_name: ip_as_numeric
+      description: Description for Decimal
+      type: INTEGER
+      verbose_name: Decimal
+      advanced_data_type: ipv4
+    - column_name: ip_as_string
+      type: VARCHAR(13)
+      verbose_name: Human Readable
+    - column_name: description
+      type: VARCHAR(26)
+      verbose_name: What it is
+    default_endpoint: ''
+    metrics:
+    - expression: count(*)
+      metric_name: count
+    sql: |- 
+      SELECT * FROM ( VALUES
+        (1, 0, '0.0.0.0', 'Description for 0'),
+        (2, 134744072, '8.8.8.8', 'Description for 134744072'),
+        (3, 4294967295, '255.255.255.255', 'Description for 4294967295')
+      ) AS t (id, ip_as_numeric, ip_as_string, description)
+      ORDER BY id ASC

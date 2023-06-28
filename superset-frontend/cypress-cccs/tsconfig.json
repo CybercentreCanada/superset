@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
+    "strict": true,
+    "target": "es6",
+    "lib": ["es6", "DOM", "DOM.Iterable"],
+    "types": ["cypress"],
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": ["node_modules/cypress", "cypress/**/*.ts"]
+}

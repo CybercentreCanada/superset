@@ -1,0 +1,1 @@
+../../../cypress-base/cypress/support/directories.ts

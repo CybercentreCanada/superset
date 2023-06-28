@@ -1,0 +1,23 @@
+# @auth
+POST https://superset.hogwarts.u.azure.chimera.cyber.gc.ca/api/v1/security/login
+# Access token obtained by az account get-access-token --subscription Chimera-U-Dev --resource api://9857feba-e79f-4e57-b587-92fd33fd0389 --query accessToken -otsv
+Authorization: Bearer {{ACCESS_TOKEN}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "provider": "oauth",
+    "oauth_provider": "azure",
+    "refresh": true
+}
+
+
+###
+GET https://superset.hogwarts.udev.azure.chimera.cyber.gc.ca/oauth-authorized/azure
+
+# ###
+# @cookie = {{ auth.response.headers.Set-Cookie }}
+# POST https://superset.hogwarts.udev.azure.chimera.cyber.gc.ca/superset/welcome
+# # Cookie: {{cookie}}
+# Cookie: "session='.eJxFVF2PozgQ_CunPO-sMCSTYd8gYALBJnw69uk0ApxMAAOZhITAav_7wcxJ92AhZHdVdXd1_168n67H23nx65SK2_HHQrR5Ko6LX4tjs_ixaNN7N939XvzVLX79vTgOjnQ8aIVXOLsE-IW7cc6Zlc__YTzaABf2za67C9vYr3YB3DDCgUdWXlzyIq7V-mgBQWqV5sSxScUFHxz15wR65sSfQOyVZ8QKq5OChkDgUdRuFAgc5R0t4yUepBWqWYVGXDNDGz2jmgVccgXNAlq-Dfp8bB-u_HwwWdzdGlyo4jxyWa25pd4zS9xZuCozWXowy1xR2RHY0DpG0JOFkuRFleISWNMSdSjilWfkAI_-dODZVejgltoXHz1MWktTxiPtcUR7NJpT0quCFfYriqiCSw1MZ0RhX7DDubfL9onLXEbG9NYw-7loKXmbNesEQj0N35aJCXU_hjYCvoyswElJ19J69clrCFOILwHpDFIGh0A4IRdBgibNCThLPOx80lyEnzA9GM9eLnddIoHUJ-prbCYxluE-KHmTh2qDt6xMGx37B73KymDvhWqUKg4JLSRzeLkeTYZTEC_9iAURtMeIPK95o995iVbxFo68FG4iMEsEp4gwj0PWJcmFppbY-yV7TYDzyQ7QpCRX9-FsBPiaz0YoNYmWmoLHCrjRuWKW3WGDPqceF7ROhBtpAyuFQMSpsWxL3yaaYi1Y5sVX_Fz3OyVATLUsAsURTFYveR3fbPPyYKT_CL9i1G_jlbpgJTtTYspu5C9ppE18rEaDtPQiNLgEKcjggkUxwLI5eJspttEHRpjImwkbqiCXkyGrYcfCCa_64rj_z5toVBFTb-07k9Gdyuasb0i_c737CVb8BCI8MaYGHzND73iDl0yIikCHTjiDm1CQEgoQCfYcChEDNY4NoWOrG_34-XDnfJrJNTNmk4zs4JxSAvrpO2by6swt8ci-3wA616iJn2zLGCKwD-QgOQp-ZjDv3ORMU5HAbEykyVenOA4eNIIAVdJwhALE9dusXUq_5s-paCRKWscS2gBBRzj1xl958_wRVkz1e2LZX-IxVvA0p4h85Q24Vc2xCQ4ByCy4w9BJAuWs80PcZyZsUAx1u-gLXifD3D9ULHu7kX4y7f20Od04zoaWmzi6IGvs66aKPp7tBYsrNjyBN_oqdNo9vrVnWSpMhJGH_A-xS3eH_kVB51Qtls0Hf8KpuS-7z1B5XOxNFzzUYcBB_TJm0lojxv0tHTP_kZMXsuSFqdqnnFAtezTy2zaHrXFtlbBVxYEU2WYJgvEleB5UZ1kNlsGyO2oyia32p-XV99zOUF157YX7JNVWu2Hg_qvftI-Pd9AZ69tzc3p_i4YXNLLtZr1zy0hfx6ZmpPfw81Oz-3cjMNfa3myj92F_NQqnA84YQW0s5W25Pj1eSxQGexA9jxd9TTNyOI5Lqwgr7UO2HWX2PswD9TO69bK7OjYr-bTDeeO-fLphy6ttfOynpb34589_m_v9cm0fBT9ep32ejvfrcfHnXxfw_kU.Y-aXLQ.y5C6mJYyPFhomEr0HueJerPkcrE'"
+

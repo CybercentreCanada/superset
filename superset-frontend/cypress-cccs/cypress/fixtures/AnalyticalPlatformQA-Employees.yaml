@@ -1,0 +1,34 @@
+databases:
+- database_name: hogwarts_u
+  tables: 
+  - table_name: AnalyticalPlatformQA-Employees
+    schema: noschema
+    main_dttm_col: modified_date
+    columns:
+    - column_name: employee_id
+      description: 9 digits employee ID
+      type: NUMERIC
+      verbose_name: Employee ID
+    - column_name: employee_name
+      description: Name of the employee
+      type: TEXT
+      verbose_name: Employee Name
+    - column_name: hiring_date
+      description: Date the employee was hired
+      type: TIMESTAMP
+      verbose_name: Hiring Date
+      is_dttm: true
+    - column_name: modified_date
+      description: Last time the record was modified
+      type: TIMESTAMP
+      verbose_name: Modified Date
+      is_dttm: true
+    metrics:
+    - expression: count(*)
+      metric_name: count
+    sql: |- 
+      SELECT * FROM ( VALUES 
+        (456723788, 'John Smith', DATE '2018-12-01', TIMESTAMP '2022-03-19 02:34:45.034 UTC'),
+        (127745634, 'John Doe', DATE '2022-05-09', TIMESTAMP '2022-05-09 17:45:23.234 UTC'),
+        (903924501, 'Christopher Kirkland', DATE '2022-05-09', TIMESTAMP '2022-10-29 07:58:23.956 UTC')
+      ) AS t (employee_id, employee_name, hiring_date, modified_date)

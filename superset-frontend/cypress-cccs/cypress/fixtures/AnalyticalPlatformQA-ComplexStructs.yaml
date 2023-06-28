@@ -1,0 +1,25 @@
+databases:
+- database_name: hogwarts_u
+  tables:
+  - table_name: AnalyticalPlatformQA-ComplexStructs
+    schema: noschema
+    columns:
+    - column_name: id
+      type: INTEGER
+      verbose_name: ID
+    - column_name: complex_struct
+      type: ROW(ID BIGINT, COST DOUBLE, DESCRIPTION VARCHAR)
+      verbose_name: Complex Structure
+    - column_name: complex_struct_as_json
+      type: JSON
+      verbose_name: Complex Structure as JSON
+    metrics:
+    - expression: count(*)
+      extra: '{"warning_markdown":""}'
+      metric_name: count
+    sql: |- 
+      SELECT id, complex_struct, TO_JSON(complex_struct) AS complex_struct_as_json FROM (VALUES 
+        (1, CAST(ROW(1, 2e0, 'Some text') AS ROW(id BIGINT, cost DOUBLE, description VARCHAR))),
+        (2, CAST(ROW(156, 4e0, 'Some other text') AS ROW(id BIGINT, cost DOUBLE, description VARCHAR))),
+        (3, CAST(ROW(43, 8e0, 'Long long long long long long long long long text') AS ROW(id BIGINT, cost DOUBLE, description VARCHAR)))
+      ) AS t (id, complex_struct)
