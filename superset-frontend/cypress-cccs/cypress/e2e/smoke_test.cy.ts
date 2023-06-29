@@ -290,7 +290,6 @@ describe('Smoke Test', () => {
     };
 
     cy.visitChartByDatasetNameAndParams(IP_ADDRESSES_DATASET, formData)
-    cy.get(exploreView.controlPanel.runButton).click()
 
     const ipFilter = '8.8.8.8'
 
