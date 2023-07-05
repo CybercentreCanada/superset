@@ -111,6 +111,7 @@ export interface AdvancedDataTypesState {
   advancedDataTypeOperatorList: string[];
   errorMessage: string;
   useDefaultOperators: boolean;
+  values: any[];
 }
 
 export const useSimpleTabFilterProps = (props: Props) => {
