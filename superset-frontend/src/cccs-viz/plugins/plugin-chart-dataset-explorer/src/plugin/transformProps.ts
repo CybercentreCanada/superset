@@ -31,7 +31,7 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-
+import {rendererMap, formatIpV4} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes'
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -41,7 +41,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
    * The transformProps function is also quite useful to return
    * additional/modified props to your data viz component. The formData
    * can also be accessed from your CccsGrid.tsx file, but
-   * doing supplying custom props here is often handy for integrating third
+   * supplying custom props here is often handy for integrating third
    * party libraries that rely on specific props.
    *
    * A description of properties in `chartProps`:
@@ -147,21 +147,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return metricMap;
   }, metricVerboseNameMap);
 
-  // Key is column advanced type, value is renderer name
-  const rendererMap = {
-    IPV4: 'ipv4ValueRenderer',
-    IPV6: 'ipv6ValueRenderer',
-    DOMAIN: 'domainValueRenderer',
-    COUNTRY: 'countryValueRenderer',
-    JSON: 'jsonValueRenderer',
-  };
-
-  const formatIpV4 = (v: any) => {
-    const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
-      (v >> 8) & 0xff
-    }.${v & 0xff}`;
-    return converted;
-  };
 
   const valueFormatter = (params: any) => {
     if (

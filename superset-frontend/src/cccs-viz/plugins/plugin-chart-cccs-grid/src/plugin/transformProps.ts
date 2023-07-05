@@ -33,6 +33,9 @@ import {
   DEFAULT_FORM_DATA,
 } from '../types';
 
+import {rendererMap, formatIpV4} from '../utils/advancedDataTypes'
+
+
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -176,22 +179,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   },
   sortingColumnMap);
 
-  // Key is column advanced type, value is renderer name
-  const rendererMap = {
-    IPV4: 'ipv4ValueRenderer',
-    IPV6: 'ipv6ValueRenderer',
-    DOMAIN: 'domainValueRenderer',
-    COUNTRY: 'countryValueRenderer',
-    JSON: 'jsonValueRenderer',
-  };
-
-  const formatIpV4 = (v: any) => {
-    const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
-      (v >> 8) & 0xff
-    }.${v & 0xff}`;
-    return converted;
-  };
-
+ 
   const valueFormatter = (params: any) => {
     if (
       params.value != null &&
