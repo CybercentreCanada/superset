@@ -29,3 +29,4 @@ export { default as AtAGlanceUserIdChartPlugin } from './plugin-chart-at-a-glanc
 export { default as AtAGlanceUserIDSasChartPlugin } from './plugin-chart-at-a-glance-user-id-sas/src/plugin';
 export { default as ApplicationLinksChartPlugin } from './plugin-chart-application-links/src/plugin';
 export { default as IFrameVisualizationChartPlugin } from './plugin-chart-iframe/src/plugin';
+export { default as DatasetExplorerChartPlugin } from './plugin-chart-dataset-explorer/src/plugin';
