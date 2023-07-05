@@ -24,7 +24,6 @@ import {
   Metric,
   NumberFormats,
   QueryMode,
-  t,
   TimeseriesDataRecord,
 } from '@superset-ui/core';
 import {
@@ -32,10 +31,7 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-
-import {rendererMap, formatIpV4} from '../utils/advancedDataTypes'
-
-
+import {rendererMap, formatIpV4} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes'
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -45,7 +41,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
    * The transformProps function is also quite useful to return
    * additional/modified props to your data viz component. The formData
    * can also be accessed from your CccsGrid.tsx file, but
-   * doing supplying custom props here is often handy for integrating third
+   * supplying custom props here is often handy for integrating third
    * party libraries that rely on specific props.
    *
    * A description of properties in `chartProps`:
@@ -73,28 +69,30 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     height,
     rawFormData: formData,
     queriesData,
-    emitCrossFilters,
   } = chartProps;
   const {
     boldText,
     headerFontSize,
     headerText,
+    emitFilter,
     principalColumns,
-    page_length,
     query_mode,
-    include_search,
-    enable_grouping,
     column_state,
-    enable_row_numbers,
-    enable_json_expand,
-    jump_action_configs,
-    default_group_by,
   }: CccsGridQueryFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const data = queriesData[0].data as TimeseriesDataRecord[];
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
-  const { setDataMask = () => {}, setControlValue } = hooks;
+  const default_group_by: any[] = [];
+  const enable_row_numbers: boolean = true;
+  const jump_action_configs: string[] = []
+  const enable_json_expand: boolean = false 
 
+  const include_search: boolean = true;
+  const page_length: number = 50;
+  const enable_grouping: boolean = true;
+
+
+  const { setDataMask = () => {}, setControlValue } = hooks;
   const columns = datasource?.columns as Column[];
   const metrics = datasource?.metrics as Metric[];
 
@@ -149,37 +147,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return metricMap;
   }, metricVerboseNameMap);
 
-  // Map of sorting columns, key is column name, value is a struct of sort direction (asc/desc) and sort index
-  const sortingColumnMap = new Map<string, {}>();
-  formData.order_by_cols.reduce(function (
-    columnMap: { [x: string]: any },
-    item: string,
-    currentIndex: number,
-  ) {
-    // Logic from extractQueryFields.ts
-    if (typeof item === 'string') {
-      try {
-        const array = JSON.parse(item);
-        const name = array[0];
-        const sortDirection = array[1];
-        const sortIndex = currentIndex - 1;
-        const sortOptions = {
-          sortDirection,
-          sortIndex,
-        };
-        columnMap[name] = sortOptions;
-      } catch (error) {
-        throw new Error(t('Found invalid orderby option: %s', item));
-      }
-      return columnMap;
-    }
 
-    console.log('Found invalid orderby option: %s.', item);
-    return undefined;
-  },
-  sortingColumnMap);
-
- 
   const valueFormatter = (params: any) => {
     if (
       params.value != null &&
@@ -205,14 +173,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const columnHeader = columnVerboseNameMap[column]
         ? columnVerboseNameMap[column]
         : column;
-      const sortDirection =
-        column in sortingColumnMap
-          ? sortingColumnMap[column].sortDirection
-            ? 'asc'
-            : 'desc'
-          : null;
-      const sortIndex =
-        column in sortingColumnMap ? sortingColumnMap[column].sortIndex : null;
       const cellRenderer =
         columnAdvancedType in rendererMap
           ? rendererMap[columnAdvancedType]
@@ -223,9 +183,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
       const autoHeight = true;
-      const rowGroupIndex = default_group_by.findIndex((element: any) => {
-        return element === column;
-      });
+      const rowGroupIndex = default_group_by.findIndex(
+        (element: any) => element === column,
+      );
       const rowGroup = rowGroupIndex >= 0;
       const hide = rowGroup;
       return {
@@ -233,12 +193,10 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         headerName: columnHeader,
         cellRenderer,
         sortable: isSortable,
-        sort: sortDirection,
-        sortIndex,
         enableRowGroup,
         rowGroup,
         hide,
-        rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+        rowGroupIndex,
         getQuickFilterText: (params: any) => valueFormatter(params),
         headerTooltip: columnDescription,
         autoHeight,
@@ -275,9 +233,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           sortable: isSortable,
           enableRowGroup,
           rowGroup,
-          rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
-          initialRowGroupIndex:
-            initialRowGroupIndex === -1 ? null : initialRowGroupIndex,
+          rowGroupIndex,
+          initialRowGroupIndex,
           hide,
           getQuickFilterText: (params: any) => valueFormatter(params),
           headerTooltip: columnDescription,
@@ -378,7 +335,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    emitCrossFilters,
+    emitFilter,
     principalColumns,
     include_search,
     page_length,

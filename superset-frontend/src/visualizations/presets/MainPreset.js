@@ -78,6 +78,20 @@ import {
 } from 'src/filters/components';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
+import {
+  GwwkChartsChartPlugin,
+  GwwkDatasetsChartPlugin,
+  GwwkDashboardsChartPlugin,
+  CccsGridChartPlugin,
+  DatasetExplorerChartPlugin,
+  BigNumberChartPlugin,
+  AtAGlanceChartIpPlugin,
+  AtAGlanceChartDnsPlugin,
+  AtAGlanceUserIdChartPlugin,
+  AtAGlanceUserIDSasChartPlugin,
+  ApplicationLinksChartPlugin,
+  IFrameVisualizationChartPlugin,
+} from 'src/cccs-viz/plugins/';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable';
 
@@ -93,6 +107,23 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new AtAGlanceUserIdChartPlugin().configure({
+          key: 'at_a_glance_user_id',
+        }),
+        new AtAGlanceUserIDSasChartPlugin().configure({
+          key: 'at_a_glance_user_id_sas',
+        }),
+        new ApplicationLinksChartPlugin().configure({
+          key: 'application_links',
+        }),
+        new AtAGlanceChartIpPlugin().configure({ key: 'at_a_glance_ip' }),
+        new AtAGlanceChartDnsPlugin().configure({ key: 'at_a_glance_dns' }),
+        new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
+        new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
+        new GwwkChartsChartPlugin().configure({ key: 'gwwk_charts' }),
+        new GwwkDatasetsChartPlugin().configure({ key: 'gwwk_datasets' }),
+        new GwwkDashboardsChartPlugin().configure({ key: 'gwwk_dashboards' }),
+        new CccsGridChartPlugin().configure({ key: 'cccs_grid' }),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
         new BigNumberChartPlugin().configure({ key: 'big_number' }),
