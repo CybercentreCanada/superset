@@ -12,7 +12,7 @@ export default function IFrameVisualization(props: IFrameVisualizationProps) {
 
   const parserdUrlParameterName = parameter_name.includes('=')
     ? parameter_name
-    : `${parameter_name}=${parameter_prefix}`;
+    : `${parameter_name}=${encodeURIComponent(parameter_prefix)}`;
 
   return (
     <>
@@ -20,7 +20,9 @@ export default function IFrameVisualization(props: IFrameVisualizationProps) {
         <>{errorMessage}</>
       ) : (
         <iframe
-          src={`${url}?${parserdUrlParameterName}${url_parameter_value}`}
+          src={`${url}?${parserdUrlParameterName}${encodeURIComponent(
+            url_parameter_value,
+          )}`}
           style={{
             position: 'absolute',
             left: 0,
