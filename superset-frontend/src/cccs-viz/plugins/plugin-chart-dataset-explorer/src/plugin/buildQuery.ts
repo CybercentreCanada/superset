@@ -21,6 +21,7 @@ import {
   ensureIsArray,
   getMetricLabel,
   PostProcessingRule,
+  QueryFormColumn,
   QueryMode,
   QueryObject,
   removeDuplicates,
@@ -152,8 +153,19 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         [],
       );
     }
+
+    // load the time range as a filter
+    baseQueryObject.filters?.push({
+      col: baseQueryObject.granularity as QueryFormColumn,
+      op: 'TEMPORAL_RANGE',
+      val: baseQueryObject.time_range || '',
+    });
+
+    const baseQueryObjectCopy = baseQueryObject;
+    baseQueryObjectCopy.granularity = undefined;
+
     const queryObject = {
-      ...baseQueryObject,
+      ...baseQueryObjectCopy,
       formData: formDataCopy,
       orderby,
       metrics,

@@ -54,7 +54,7 @@ const fetchTimeRange = async (timeRange: string) => {
 const DatetimeControl: React.FC<Props> = props => {
   const [timeRange, setTimeRange] = useState(props.default);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [actualTimeRange, setactualTimeRange] = useState<string>();
+  const [actualTimeRange, setActualTimeRange] = useState<string>();
 
   const [since, until] = timeRange.split(SEPARATOR);
 
@@ -74,7 +74,7 @@ const DatetimeControl: React.FC<Props> = props => {
     () => {
       fetchTimeRange(timeRange)
         .then(value => {
-          setactualTimeRange(
+          setActualTimeRange(
             value?.value ? `Actual Time Range ${value?.value}` : '',
           );
           setValidationErrors(value?.error ? [value?.error] : []);
