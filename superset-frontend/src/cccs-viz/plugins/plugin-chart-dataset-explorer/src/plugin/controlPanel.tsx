@@ -139,10 +139,12 @@ const config: ControlPanelConfig = {
                   'granularity_sqla' in state.datasource
                 ) {
                   props.options = state.datasource.columns
-                    .filter(
-                      c =>
-                        (state.datasource as Dataset)?.granularity_sqla ===
-                        c.column_name,
+                    .filter(c =>
+                      ensureIsArray(
+                        (state.datasource as Dataset)?.granularity_sqla,
+                      )
+                        .map(g => g[0])
+                        .includes(c.column_name),
                     )
                     .map(c => ({
                       label: c.verbose_name ? c.verbose_name : c.column_name,
