@@ -21,7 +21,7 @@ export interface Props {
   name: string;
   actions: object;
   label: string;
-  value?: object[];
+  value?: string;
   onChange: (value: any, errors: any[]) => void;
   default: string;
   disabled: boolean;
@@ -52,7 +52,9 @@ const fetchTimeRange = async (timeRange: string) => {
 };
 
 const DatetimeControl: React.FC<Props> = props => {
-  const [timeRange, setTimeRange] = useState(props.default);
+  const [timeRange, setTimeRange] = useState(
+    props.value ? props.value : props.default,
+  );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [actualTimeRange, setActualTimeRange] = useState<string>();
 

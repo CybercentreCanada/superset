@@ -41,6 +41,19 @@ export function updateFormDataByDatasource(
   };
 }
 
+export const UPDATE_CCCS_FORM_DATA_BY_DATASOURCE =
+  'UPDATE_CCCS_FORM_DATA_BY_DATASOURCE';
+export function updateCCCSFormDataByDatasource(
+  prevDatasource: Dataset,
+  newDatasource: Dataset,
+) {
+  return {
+    type: UPDATE_CCCS_FORM_DATA_BY_DATASOURCE,
+    prevDatasource,
+    newDatasource,
+  };
+}
+
 export const POST_DATASOURCE_STARTED = 'POST_DATASOURCE_STARTED';
 export const FETCH_DATASOURCE_SUCCEEDED = 'FETCH_DATASOURCE_SUCCEEDED';
 export function fetchDatasourceSucceeded() {

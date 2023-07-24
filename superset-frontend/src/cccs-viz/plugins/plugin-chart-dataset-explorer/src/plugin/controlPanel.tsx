@@ -130,7 +130,7 @@ const config: ControlPanelConfig = {
                   'expression',
               ),
               clearable: false,
-              valueKey: 'value',
+              valueKey: 'column_name',
               rerender: ['time_range'],
               mapStateToProps: state => {
                 const props: any = {};
@@ -148,9 +148,9 @@ const config: ControlPanelConfig = {
                     )
                     .map(c => ({
                       label: c.verbose_name ? c.verbose_name : c.column_name,
-                      value: c.column_name,
+                      column_name: c.column_name,
                     }));
-                  props.default = null;
+                  props.default = undefined;
                   if (state.datasource.main_dttm_col) {
                     props.default = state.datasource.main_dttm_col;
                   } else if (props.options && props.options.length > 0) {
