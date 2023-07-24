@@ -28,7 +28,6 @@ import {
 } from 'src/explore/controlUtils';
 import * as actions from 'src/explore/actions/exploreActions';
 import { HYDRATE_EXPLORE } from '../actions/hydrateExplore';
-import advancedDataTypeValueControl from 'src/cccs-viz/plugins/plugin-chart-cccs-grid/src/components/controls/advancedDataTypeValueControl';
 
 export default function exploreReducer(state = {}, action) {
   const actionHandlers = {
@@ -141,25 +140,23 @@ export default function exploreReducer(state = {}, action) {
       };
       const newControls = getControlsState(newState, newFormData);
 
-      if (newControls['advanced_data_type_selection']) {
+      if (newControls.advanced_data_type_selection) {
         // filter out incompatible Advanced Data Types in the new Datasource
         const advancedDataTypeSelectionControl =
-          newControls['advanced_data_type_selection'];
-        newFormData['advanced_data_type_selection'] =
-          newDatasource.columns.some(
-            c =>
-              c.advanced_data_type === advancedDataTypeSelectionControl.value,
-          )
-            ? advancedDataTypeSelectionControl.value
-            : [];
-        newControls['advanced_data_type_selection'].value =
-          newFormData['advanced_data_type_selection'];
+          newControls.advanced_data_type_selection;
+        newFormData.advanced_data_type_selection = newDatasource.columns.some(
+          c => c.advanced_data_type === advancedDataTypeSelectionControl.value,
+        )
+          ? advancedDataTypeSelectionControl.value
+          : [];
+        newControls.advanced_data_type_selection.value =
+          newFormData.advanced_data_type_selection;
         // check if the new datasource has any columns with the same Advanced Data Type
         if (
-          ensureIsArray(newFormData['advanced_data_type_selection']).length > 0
+          ensureIsArray(newFormData.advanced_data_type_selection).length > 0
         ) {
           // transfer the control to use the new columns
-          newControls['advanced_data_type_value'].value[0].columns =
+          newControls.advanced_data_type_value.value[0].columns =
             newDatasource.columns
               .filter(
                 c =>
@@ -171,22 +168,22 @@ export default function exploreReducer(state = {}, action) {
           controlsTransferred.push('advanced_data_type_value');
         } else {
           // if there are no compatible columns, clear the controls and disable the value control
-          newControls['advanced_data_type_value'].value = [
+          newControls.advanced_data_type_value.value = [
             { columns: [], data: [], rawData: [] },
           ];
-          newControls['advanced_data_type_value'].disabled = true;
-          newControls['advanced_data_type_value'].advancedDataType = [];
-          newFormData['advanced_data_type_value'] =
-            newControls['advanced_data_type_value'].value;
+          newControls.advanced_data_type_value.disabled = true;
+          newControls.advanced_data_type_value.advancedDataType = [];
+          newFormData.advanced_data_type_value =
+            newControls.advanced_data_type_value.value;
         }
       }
       // check if date column is compatible with new datasource
-      if (!newDatasource.columns.includes(newFormData['granularity_sqla'])) {
+      if (!newDatasource.columns.includes(newFormData.granularity_sqla)) {
         // set the time column to the new default time column
-        newControls['granularity_sqla'].value = newDatasource.main_dttm_col;
-        newFormData['granularity_sqla'] = newDatasource.main_dttm_col;
+        newControls.granularity_sqla.value = newDatasource.main_dttm_col;
+        newFormData.granularity_sqla = newDatasource.main_dttm_col;
         // disable the time range if there is no default
-        newControls['time_range'].disabled = !newDatasource.main_dttm_col;
+        newControls.time_range.disabled = !newDatasource.main_dttm_col;
       }
       return {
         ...newState,
