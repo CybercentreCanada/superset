@@ -37,7 +37,9 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   value = [],
   description,
 }) => {
-  const [rawValues, setRawValues] = useState(value ? value[0].rawData : []);
+  const [rawValues, setRawValues] = useState(
+    value && ensureIsArray(value).length === 1 ? value[0].rawData : [],
+  );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [currentAdvancedDataType, setCurrentAdvancedDataType] =
     useState<string>(advancedDataType);
@@ -47,7 +49,7 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
     advancedDataTypeOperatorList: [],
     errorMessage: '',
     useDefaultOperators: false,
-    values: value ? value[0].data : [],
+    values: value && ensureIsArray(value).length === 1 ? value[0].data : [],
   };
 
   const {

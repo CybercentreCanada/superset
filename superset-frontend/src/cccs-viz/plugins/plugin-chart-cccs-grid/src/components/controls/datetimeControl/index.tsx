@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { SLOW_DEBOUNCE, SupersetClient, t, withTheme } from '@superset-ui/core';
+import {
+  NO_TIME_RANGE,
+  SLOW_DEBOUNCE,
+  SupersetClient,
+  t,
+  withTheme,
+} from '@superset-ui/core';
 import {
   buildTimeRangeString,
   formatTimeRange,
@@ -52,8 +58,14 @@ const fetchTimeRange = async (timeRange: string) => {
 };
 
 const DatetimeControl: React.FC<Props> = props => {
+  // if the value passed in is "no filter", leave the control empty
+  // if the value does not exist, set it to the default
   const [timeRange, setTimeRange] = useState(
-    props.value ? props.value : props.default,
+    props.value
+      ? props.value === NO_TIME_RANGE
+        ? ''
+        : props.value
+      : props.default,
   );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [actualTimeRange, setActualTimeRange] = useState<string>();
@@ -66,7 +78,9 @@ const DatetimeControl: React.FC<Props> = props => {
 
   function onChange(control: 'since' | 'until', value: string) {
     if (control === 'since') {
-      setTimeRange(`${value}${SEPARATOR}${until}`);
+      setTimeRange(
+        until ? `${value}${SEPARATOR}${until}` : `${value}${SEPARATOR}`,
+      );
     } else {
       setTimeRange(`${since}${SEPARATOR}${value}`);
     }
