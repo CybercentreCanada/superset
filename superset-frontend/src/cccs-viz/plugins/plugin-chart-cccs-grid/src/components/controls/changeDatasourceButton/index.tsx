@@ -3,7 +3,7 @@ import { ChangeDatasourceModal } from 'src/components/Datasource';
 import { withTheme } from '@superset-ui/core';
 import { connect, useDispatch } from 'react-redux';
 import Button from 'src/components/Button';
-import { updateFormDataByDatasource } from 'src/explore/actions/exploreActions';
+import { updateCCCSFormDataByDatasource } from 'src/explore/actions/exploreActions';
 
 export interface Props {
   colorScheme: string;
@@ -32,7 +32,7 @@ const ChangeDatasourceButtonControll: React.FC<Props> = ({
     setShowChangeDatasourceModal(!showChangeDatasourceModal);
   };
   const onDatasourceSave = (new_datasource: any) => {
-    dispatch(updateFormDataByDatasource(datasource, new_datasource));
+    dispatch(updateCCCSFormDataByDatasource(datasource, new_datasource));
   };
   const onChangeWrapper = (a: any) => {
     onChange(a);

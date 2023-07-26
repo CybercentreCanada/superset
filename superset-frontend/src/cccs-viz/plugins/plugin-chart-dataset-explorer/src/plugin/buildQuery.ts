@@ -21,6 +21,7 @@ import {
   ensureIsArray,
   getMetricLabel,
   PostProcessingRule,
+  QueryFormColumn,
   QueryMode,
   QueryObject,
   removeDuplicates,
@@ -125,7 +126,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     const { advanced_data_type_value } = formData;
     const { advanced_data_type_selection } = formData;
     let filter = [];
-    if (advanced_data_type_selection.length > 0) {
+    if (ensureIsArray(advanced_data_type_selection).length > 0) {
       // in the case of ipv4s sometimes they can be ranges and not simple values
       // this will be handled in the advanced data type definition in the future
       // to avoid this complex logic
@@ -152,8 +153,21 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         [],
       );
     }
+
+    // load the time range as a filter if it exists
+    if (baseQueryObject.granularity) {
+      baseQueryObject.filters?.push({
+        col: baseQueryObject.granularity as QueryFormColumn,
+        op: 'TEMPORAL_RANGE',
+        val: baseQueryObject.time_range || '',
+      });
+    }
+
+    const baseQueryObjectCopy = baseQueryObject;
+    baseQueryObjectCopy.granularity = undefined;
+
     const queryObject = {
-      ...baseQueryObject,
+      ...baseQueryObjectCopy,
       formData: formDataCopy,
       orderby,
       metrics,
