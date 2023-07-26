@@ -130,9 +130,6 @@ const config: ControlPanelConfig = {
                   'expression',
               ),
               clearable: false,
-              optionRenderer: (c: any) => (
-                <StyledColumnOption column={c} showType />
-              ),
               valueKey: 'column_name',
               rerender: ['time_range'],
               mapStateToProps: state => {
@@ -141,12 +138,23 @@ const config: ControlPanelConfig = {
                   state.datasource &&
                   'granularity_sqla' in state.datasource
                 ) {
-                  props.choices = state.datasource.granularity_sqla;
-                  props.default = null;
+                  props.options = state.datasource.columns
+                    .filter(c =>
+                      ensureIsArray(
+                        (state.datasource as Dataset)?.granularity_sqla,
+                      )
+                        .map(g => g[0])
+                        .includes(c.column_name),
+                    )
+                    .map(c => ({
+                      label: c.verbose_name ? c.verbose_name : c.column_name,
+                      column_name: c.column_name,
+                    }));
+                  props.default = undefined;
                   if (state.datasource.main_dttm_col) {
                     props.default = state.datasource.main_dttm_col;
-                  } else if (props.choices && props.choices.length > 0) {
-                    props.default = props.choices[0].column_name;
+                  } else if (props.options && props.options.length > 0) {
+                    props.default = props.options.column_name;
                   }
                 }
                 return props;
