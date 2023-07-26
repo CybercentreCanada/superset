@@ -23,16 +23,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { AgGridReact } from '@ag-grid-community/react';
-import { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact as AgGridReactType } from 'ag-grid-react';
 import {
-  AllModules,
-  LicenseManager,
   MenuItemDef,
   GetContextMenuItemsParams,
-  SortChangedEvent,
   GroupCellRenderer,
-} from '@ag-grid-enterprise/all-modules';
+} from 'ag-grid-community';
+import {  LicenseManager } from 'ag-grid-enterprise';
 import { ensureIsArray } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearDataMask } from 'src/dataMask/actions';
@@ -51,9 +49,9 @@ import CustomTooltip from './CustomTooltip';
 
 // 'use strict';
 
-import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
-import '@ag-grid-community/core/dist/styles/ag-grid.css';
-import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 
 import { PAGE_SIZE_OPTIONS } from './plugin/controlPanel';
 import rison from 'rison';
@@ -536,16 +534,6 @@ export default function CccsGrid({
     [setControlValue, sortedColumnDefs],
   );
 
-  const onSortChanged = (event: SortChangedEvent) => {
-    const sortModel = event.api.getSortModel();
-    if (sortModel.length > 0) {
-      setSortFields(sortModel.map(col => col.colId || ''));
-      setSortOrders(sortModel.map(col => col.sort || ''));
-    } else {
-      setSortFields([]);
-      setSortOrders([]);
-    }
-  };
 
   const gridOptions = {
     suppressColumnVirtualisation: true,
@@ -557,7 +545,7 @@ export default function CccsGrid({
 
   return (
     <div
-      style={{ width, height, display: 'flex', flexFlow: 'column' }}
+      style={{ width: "1108px", height: "190.217px", display: 'flex', flexFlow: 'column' }}
       className="ag-theme-balham"
     >
       <div
@@ -612,10 +600,8 @@ export default function CccsGrid({
       <div style={{ flex: '1 1 auto' }}>
         <AgGridReact
           ref={gridRef}
-          modules={AllModules}
           columnDefs={orderedColumnDefs}
           defaultColDef={DEFAULT_COLUMN_DEF}
-          frameworkComponents={frameworkComponents}
           enableBrowserTooltips={true}
           enableRangeSelection={true}
           allowContextMenuWithControlKey={true}
@@ -627,7 +613,6 @@ export default function CccsGrid({
           onFirstDataRendered={onFirstDataRendered}
           onRangeSelectionChanged={onRangeSelectionChanged}
           onSelectionChanged={onSelectionChanged}
-          onSortChanged={onSortChanged}
           rowData={rowData}
           paginationPageSize={pageSize}
           pagination={pageSize > 0}

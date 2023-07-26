@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { QueryFormData } from '@superset-ui/core';
 import Collapse from 'src/components/Collapse';
-import { AgGridReact } from '@ag-grid-community/react';
-import { LicenseManager, AllModules } from '@ag-grid-enterprise/all-modules';
+import { AgGridReact } from 'ag-grid-react';
+import { LicenseManager } from 'ag-grid-enterprise';
 import styles from './styles';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 
 type AtAGlanceUserIDProps = QueryFormData & {
   ipDashboardId: string;
@@ -17,7 +17,6 @@ type AtAGlanceUserIDProps = QueryFormData & {
 const generateClientIpLinksList = (columnDefs: any, rowData: any) => (
   <div className="ag-theme-balham">
     <AgGridReact
-      modules={AllModules}
       rowData={rowData}
       columnDefs={columnDefs}
       domLayout="autoHeight"
