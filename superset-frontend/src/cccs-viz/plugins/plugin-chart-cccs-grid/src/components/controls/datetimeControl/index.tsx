@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { SLOW_DEBOUNCE, SupersetClient, t, withTheme } from '@superset-ui/core';
+import {
+  NO_TIME_RANGE,
+  SLOW_DEBOUNCE,
+  SupersetClient,
+  t,
+  withTheme,
+} from '@superset-ui/core';
 import {
   buildTimeRangeString,
   formatTimeRange,
@@ -21,7 +27,7 @@ export interface Props {
   name: string;
   actions: object;
   label: string;
-  value?: object[];
+  value?: string;
   onChange: (value: any, errors: any[]) => void;
   default: string;
   disabled: boolean;
@@ -52,9 +58,17 @@ const fetchTimeRange = async (timeRange: string) => {
 };
 
 const DatetimeControl: React.FC<Props> = props => {
-  const [timeRange, setTimeRange] = useState(props.default);
+  // if the value passed in is "no filter", leave the control empty
+  // if the value does not exist, set it to the default
+  const [timeRange, setTimeRange] = useState(
+    props.value
+      ? props.value === NO_TIME_RANGE
+        ? ''
+        : props.value
+      : props.default,
+  );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [actualTimeRange, setactualTimeRange] = useState<string>();
+  const [actualTimeRange, setActualTimeRange] = useState<string>();
 
   const [since, until] = timeRange.split(SEPARATOR);
 
@@ -64,7 +78,9 @@ const DatetimeControl: React.FC<Props> = props => {
 
   function onChange(control: 'since' | 'until', value: string) {
     if (control === 'since') {
-      setTimeRange(`${value}${SEPARATOR}${until}`);
+      setTimeRange(
+        until ? `${value}${SEPARATOR}${until}` : `${value}${SEPARATOR}`,
+      );
     } else {
       setTimeRange(`${since}${SEPARATOR}${value}`);
     }
@@ -74,7 +90,7 @@ const DatetimeControl: React.FC<Props> = props => {
     () => {
       fetchTimeRange(timeRange)
         .then(value => {
-          setactualTimeRange(
+          setActualTimeRange(
             value?.value ? `Actual Time Range ${value?.value}` : '',
           );
           setValidationErrors(value?.error ? [value?.error] : []);

@@ -37,19 +37,33 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   value = [],
   description,
 }) => {
-  const [rawValues, setRawValues] = useState([]);
+  const [rawValues, setRawValues] = useState(
+    value && ensureIsArray(value).length === 1 ? value[0].rawData : [],
+  );
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [currentAdvancedDataType, setCurrentAdvancedDataType] =
-    useState<string>();
+    useState<string>(advancedDataType);
+
+  const default_advanced_data_type_state = {
+    parsedAdvancedDataType: '',
+    advancedDataTypeOperatorList: [],
+    errorMessage: '',
+    useDefaultOperators: false,
+    values: value && ensureIsArray(value).length === 1 ? value[0].data : [],
+  };
 
   const {
     advancedDataTypesState,
     subjectAdvancedDataType,
     fetchAdvancedDataTypeValueCallback,
-  } = useAdvancedDataTypes(() => {});
+  } = useAdvancedDataTypes(() => {}, default_advanced_data_type_state);
 
   const onChangeWrapper = (selection: any) => {
-    setValidationErrors([...validationErrors, 'Validation in progress']);
+    setValidationErrors(
+      selection.length > 0
+        ? [...validationErrors, 'Validation in progress']
+        : [...validationErrors],
+    );
     setRawValues(selection);
   };
 
@@ -68,8 +82,7 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
 
   useEffect(() => {
     const data =
-      advancedDataTypesState.parsedAdvancedDataType.length > 0 &&
-      advancedDataTypesState.parsedAdvancedDataType.split(',').length > 0
+      advancedDataTypesState.values.length > 0
         ? {
             data: advancedDataTypesState.values,
             columns: datasource.columns
@@ -82,11 +95,13 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
   }, [advancedDataTypesState, validationErrors]);
 
   useEffect(() => {
-    fetchAdvancedDataTypeValueCallback(
-      rawValues,
-      advancedDataTypesState,
-      ensureIsArray(advancedDataType)[0],
-    );
+    if (rawValues.length > 0) {
+      fetchAdvancedDataTypeValueCallback(
+        rawValues,
+        advancedDataTypesState,
+        ensureIsArray(advancedDataType)[0],
+      );
+    }
   }, [advancedDataType, rawValues, subjectAdvancedDataType]);
 
   useEffect(() => {
