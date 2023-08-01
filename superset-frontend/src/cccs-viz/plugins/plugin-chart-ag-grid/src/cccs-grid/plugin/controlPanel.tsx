@@ -8,6 +8,7 @@ import {
   isAdhocColumn,
   isFeatureEnabled,
   isPhysicalColumn,
+  legacyValidateInteger,
   QueryFormColumn,
   QueryMode,
   smartDateFormatter,
@@ -29,7 +30,9 @@ import {
   ColumnMeta,
   defineSavedMetrics,
   getStandardizedControls,
+  formatSelectOptions,
 } from '@superset-ui/chart-controls';
+import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
@@ -42,6 +45,15 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
   const hasRawColumns = rawColumns && rawColumns.length > 0;
   return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
 }
+
+export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
+  [0, t('page_size.all')],
+  10,
+  20,
+  50,
+  100,
+  200,
+]);
 
 /**
  * Visibility check
@@ -249,5 +261,146 @@ const config: ControlPanelConfig = {
     },
   ],
 };
+
+config.controlPanelSections.push({
+  label: t('Options'),
+  expanded: true,
+  controlSetRows: [
+    [
+      {
+        name: 'include_search',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Search box'),
+          renderTrigger: true,
+          default: false,
+          description: t('Whether to include a client-side search box'),
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_grouping',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Row grouping'),
+          renderTrigger: true,
+          default: false,
+          description: t(
+            'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(!controls?.enable_json_expand?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'default_group_by',
+        config: {
+          type: 'SelectControl',
+          label: t('Default columns for row grouping'),
+          description: t(
+            'Preselect a set of columns for row grouping in the grid.',
+          ),
+          multi: true,
+          freeForm: true,
+          allowAll: true,
+          default: [],
+          canSelectAll: true,
+          renderTrigger: true,
+          optionRenderer: (c: ColumnMeta) => (
+            // eslint-disable-next-line react/react-in-jsx-scope
+            <StyledColumnOption showType column={c} />
+          ),
+          // eslint-disable-next-line react/react-in-jsx-scope
+          valueRenderer: (c: ColumnMeta) => (
+            // eslint-disable-next-line react/react-in-jsx-scope
+            <StyledColumnOption column={c} />
+          ),
+          valueKey: 'column_name',
+          mapStateToProps: (
+            state: ControlPanelState,
+            controlState: ControlState,
+          ) => {
+            const { controls } = state;
+            const originalMapStateToProps = isRawMode({ controls })
+              ? sharedControls?.columns?.mapStateToProps
+              : sharedControls?.groupby?.mapStateToProps;
+            const newState =
+              originalMapStateToProps?.(state, controlState) ?? {};
+            const choices = isRawMode({ controls })
+              ? controls?.columns?.value
+              : controls?.groupby?.value;
+            newState.options = newState.options.filter(
+              (o: { column_name: string }) =>
+                ensureIsArray(choices).includes(o.column_name),
+            );
+            const invalidOptions = ensureIsArray(controlState.value).filter(
+              c => !ensureIsArray(choices).includes(c),
+            );
+            newState.externalValidationErrors =
+              invalidOptions.length > 0
+                ? invalidOptions.length > 1
+                  ? [
+                      `'${invalidOptions.join(', ')}'${t(
+                        ' are not valid options',
+                      )}`,
+                    ]
+                  : [`'${invalidOptions}'${t(' is not a valid option')}`]
+                : [];
+            return newState;
+          },
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_grouping?.value),
+          canCopy: true,
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_row_numbers',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Row numbers'),
+          renderTrigger: true,
+          default: true,
+          description: t('Whether to enable row numbers'),
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_json_expand',
+        config: {
+          type: 'CheckboxControl',
+          label: t('JSON Row Expand'),
+          renderTrigger: true,
+          default: false,
+          description: t(
+            'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(!controls?.enable_grouping?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'page_length',
+        config: {
+          type: 'SelectControl',
+          freeForm: true,
+          renderTrigger: true,
+          label: t('Page length'),
+          default: 0,
+          choices: PAGE_SIZE_OPTIONS,
+          description: t('Rows per page, 0 means no pagination'),
+          validators: [legacyValidateInteger],
+        },
+      },
+    ],
+  ],
+});
 
 export default config;
