@@ -1,4 +1,3 @@
-
 import {
   Column,
   getMetricLabel,
@@ -11,38 +10,34 @@ import {
   TimeseriesDataRecord,
 } from '@superset-ui/core';
 
-import {
-    CccsGridChartProps
-} from '../../types';
+import { CccsGridChartProps } from '../../types';
 
-const calcColumnDefs = (columns: QueryFormColumn[]) => {
-
-    return columns.map(col => {
-        return {field: col, Blah: "Yeeeea"}
-    })
-}
+const calcColumnDefs = (columns: QueryFormColumn[]) =>
+  columns.map(col => ({ field: col, Blah: 'Yeeeea' }));
 
 export default function transformProps(chartProps: CccsGridChartProps) {
-    
-    const {
-        datasource,
-        hooks,
-        width,
-        height,
-        formData: formData,
-        queriesData,
-        emitCrossFilters,
-    } = chartProps;
+  const {
+    datasource,
+    hooks,
+    width,
+    height,
+    formData,
+    queriesData,
+    emitCrossFilters,
+  } = chartProps;
 
-    const columnDefs = formData.queryMode === "raw" ?  calcColumnDefs( formData.all_columns || []) : calcColumnDefs( formData.groupby || []) 
-      
-    const data = queriesData[0].data as TimeseriesDataRecord[];
+  const columnDefs =
+    formData.queryMode === QueryMode.raw
+      ? calcColumnDefs(formData.allColumns || [])
+      : calcColumnDefs(formData.groupby || []);
 
-    return {
-        width,
-        height,
-        formdata: chartProps.formData,
-        rowData: data,
-        columnDefs: columnDefs
-    }
+  const data = queriesData[0].data as TimeseriesDataRecord[];
+
+  return {
+    width,
+    height,
+    formdata: chartProps.formData,
+    rowData: data,
+    columnDefs,
+  };
 }
