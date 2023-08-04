@@ -1,29 +1,25 @@
+import { ChartProps, QueryFormData } from '@superset-ui/core';
 
-import {
-    ChartDataResponseResult,
-    ChartProps,
-    HandlerFunction,
-    QueryFormData,
-    SetDataMaskHook,
-    supersetTheme,
-    TimeseriesDataRecord,
-    Column,
-    
-  } from '@superset-ui/core';
+export type CccsTableFormData = QueryFormData & {
+  includeSearch: boolean;
+  pageLength: number;
+  enableRowNumbers: boolean;
+  enableGrouping: boolean;
+  enableJsonExpand: boolean;
+};
 
-export type CccsGridFormData = QueryFormData & {}
- 
-export type CccsGridChartProps =
-  ChartProps & {
-    formData: CccsGridFormData;
-  };
+export type CccsTableChartProps = ChartProps & {
+  formData: CccsTableFormData;
+};
 
-
-export type AGGridVizProps = {
-  formData: CccsGridFormData;
+export type AGGridVizTransformedProps = {
+  formData: CccsTableFormData;
   width: any;
   height: any;
   rowData: any[];
   columnDefs: any[];
-}
-
+  includeSearch: boolean;
+  pageLength: number;
+  enableRowNumbers: boolean;
+  enableGrouping: boolean;
+};

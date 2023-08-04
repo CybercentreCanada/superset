@@ -109,6 +109,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   }),
   visibility: isRawMode,
   resetOnHide: false,
+  rerender: ['default_group_by'],
 };
 
 const percentMetricsControl: typeof sharedControls.metrics = {
@@ -175,7 +176,7 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics'],
+              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
             },
           },
         ],
@@ -330,7 +331,7 @@ config.controlPanelSections.push({
             const newState =
               originalMapStateToProps?.(state, controlState) ?? {};
             const choices = isRawMode({ controls })
-              ? controls?.columns?.value
+              ? controls?.all_columns?.value
               : controls?.groupby?.value;
             newState.options = newState.options.filter(
               (o: { column_name: string }) =>
