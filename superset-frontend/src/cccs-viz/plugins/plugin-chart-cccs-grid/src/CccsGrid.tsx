@@ -402,9 +402,7 @@ export default function CccsGrid({
   };
 
   const onRangeSelectionChanged = (params: any) => {
-    if (params.finished === false) {
-      return;
-    }
+    console.log("calculating")
 
     const gridApi = params.api;
     const cellRanges = gridApi.getCellRanges();
@@ -538,6 +536,7 @@ export default function CccsGrid({
   const gridOptions = {
     suppressColumnVirtualisation: true,
     animateRows: true,
+    suppressRowVirtualisation: true,
     // Disables a Key performance feature for Ag-Grid to enable autosizing of multiple columns
     // if not disabled, only the first 10-15 columns will autosize
     // This change will make initial load up of Ag-Grid slower than before
@@ -545,7 +544,7 @@ export default function CccsGrid({
 
   return (
     <div
-      style={{ width: "1108px", height: "190.217px", display: 'flex', flexFlow: 'column' }}
+      style={{ width: width, height: height, display: 'flex', flexFlow: 'column' }}
       className="ag-theme-balham"
     >
       <div

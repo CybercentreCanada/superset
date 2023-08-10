@@ -20,7 +20,9 @@ export type CccsGridChartProps =
 
 
 export type AGGridVizProps = {
+  
   formData: CccsGridFormData;
+  setDataMask: SetDataMaskHook;
   width: any;
   height: any;
   rowData: any[];
