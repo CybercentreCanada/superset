@@ -1,4 +1,3 @@
-
 import {
   Column,
   getMetricLabel,
@@ -11,9 +10,8 @@ import {
   TimeseriesDataRecord,
 } from '@superset-ui/core';
 
-import {
-    CccsGridChartProps
-} from '../../types';
+import { CccsTableChartProps, CccsTableFormData } from '../../types';
+import ExpandAllValueRenderer from '../../ExpandAllValueRenderer';
 
 const calcColumnDefs = (columns: QueryFormColumn[], enable_row_numbers=true) => {
     
@@ -21,7 +19,6 @@ const calcColumnDefs = (columns: QueryFormColumn[], enable_row_numbers=true) => 
     const columnDefs = columns.map(col => {
         return {field: col, Blah: "Yeeeea"}
     })
-
 
     if (enable_row_numbers) {
         columnDefs.splice(0, 0, {
@@ -37,29 +34,68 @@ const calcColumnDefs = (columns: QueryFormColumn[], enable_row_numbers=true) => 
     return columnDefs
 }
 
-export default function transformProps(chartProps: CccsGridChartProps) {
-    
-    const {
-        datasource,
-        hooks,
-        width,
-        height,
-        formData: formData,
-        queriesData,
-        emitCrossFilters,
-    } = chartProps;
 
-    const columnDefs = formData.queryMode === "raw" ?  calcColumnDefs( formData.all_columns || []) : calcColumnDefs( formData.groupby || []) 
-      
-    const data = queriesData[0].data as TimeseriesDataRecord[];
-    const { setDataMask = () => {}, setControlValue } = hooks;
+export default function transformProps(chartProps: CccsTableChartProps) {
+  const { width, height, formData, queriesData } = chartProps;
+  const {
+    includeSearch,
+    pageLength,
+    defaultGroupBy,
+    enableRowNumbers,
+    enableGrouping,
+    enableJsonExpand,
+  }: CccsTableFormData = {
+    ...formData,
+  };
 
-    return {
-        width,
-        height,
-        setDataMask,
-        formdata: chartProps.formData,
-        rowData: data,
-        columnDefs: columnDefs
-    }
+  const {
+    hooks
+  } = chartProps;
+
+  const data = queriesData[0].data as TimeseriesDataRecord[];
+
+  const columnDefs = formData.queryMode === "raw" ?  calcColumnDefs( formData.all_columns || []) : calcColumnDefs( formData.groupby || []) 
+  const { setDataMask = () => {}, setControlValue } = hooks;
+
+  // If the flag is set to true, add a column which will contain
+  // a button to expand all JSON blobs in the row
+  // if (enableJsonExpand) {
+  //   columnDefs.splice(1, 0, {
+  //     colId: 'jsonExpand',
+  //     pinned: 'left',
+  //     cellRenderer: ExpandAllValueRenderer,
+  //     autoHeight: true,
+  //     minWidth: 105,
+  //     lockVisible: true,
+  //   } as any);
+  // } else if (enableGrouping) {
+  //   // enable row grouping
+  //   columnDefs = columnDefs.map(c => {
+  //     const enableRowGroup = true;
+  //     const rowGroupIndex = defaultGroupBy.findIndex(
+  //       (element: any) => element === c.field,
+  //     );
+  //     const rowGroup = rowGroupIndex >= 0;
+  //     const hide = rowGroup;
+  //     return {
+  //       ...c,
+  //       enableRowGroup,
+  //       rowGroup,
+  //       rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+  //       hide,
+  //     };
+  //   });
+  // }
+
+  return {
+    width,
+    height,
+    formdata: chartProps.formData,
+    rowData: data,
+    columnDefs,
+    includeSearch,
+    pageLength,
+    enableGrouping,
+    setDataMask,
+  };
 }

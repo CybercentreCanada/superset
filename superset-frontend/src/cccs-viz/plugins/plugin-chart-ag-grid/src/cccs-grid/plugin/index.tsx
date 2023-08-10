@@ -23,8 +23,7 @@ import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
 import { CccsGridFormData, CccsGridChartProps } from '../../types';
 
-
-export default class CccsGridChartPlugin extends ChartPlugin<
+export default class CccsTableChartPlugin extends ChartPlugin<
   CccsGridFormData,
   CccsGridChartProps
 > {
