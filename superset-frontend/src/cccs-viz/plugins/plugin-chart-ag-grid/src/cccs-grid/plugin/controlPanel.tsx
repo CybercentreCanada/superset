@@ -252,6 +252,69 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'principalColumns',
+            config: {
+              type: 'SelectControl',
+              label: t('Principal Column(s) to Emit'),
+              description: t(
+                'Preselect a set of principal columns that can easily be emitted from the context menu',
+              ),
+              multi: true,
+              freeForm: true,
+              allowAll: true,
+              default: [],
+              canSelectAll: true,
+              renderTrigger: true,
+              optionRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption showType column={c} />
+              ),
+              // eslint-disable-next-line react/react-in-jsx-scope
+              valueRenderer: (c: ColumnMeta) => (
+                // eslint-disable-next-line react/react-in-jsx-scope
+                <StyledColumnOption column={c} />
+              ),
+              valueKey: 'column_name',
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const { controls } = state;
+                const originalMapStateToProps = isRawMode({ controls })
+                  ? sharedControls?.columns?.mapStateToProps
+                  : sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                const choices = isRawMode({ controls })
+                  ? controls?.all_columns?.value
+                  : controls?.groupby?.value;
+                newState.options = newState.options.filter(
+                  (o: { column_name: string }) =>
+                    ensureIsArray(choices).includes(o.column_name),
+                );
+                const invalidOptions = ensureIsArray(controlState.value).filter(
+                  c => !ensureIsArray(choices).includes(c),
+                );
+                newState.externalValidationErrors =
+                  invalidOptions.length > 0
+                    ? invalidOptions.length > 1
+                      ? [
+                          `'${invalidOptions.join(', ')}'${t(
+                            ' are not valid options',
+                          )}`,
+                        ]
+                      : [`'${invalidOptions}'${t(' is not a valid option')}`]
+                    : [];
+                return newState;
+              },
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_grouping?.value),
+              canCopy: true,
+            },
+          },
+        ],
+        [
+          {
             name: 'timeseries_limit_metric',
             override: {
               visibility: isAggMode,

@@ -13,11 +13,19 @@ import {
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import ExpandAllValueRenderer from '../../ExpandAllValueRenderer';
 
-const calcColumnDefs = (columns: QueryFormColumn[], enable_row_numbers=true) => {
+const calcColumnDefs = (columns: QueryFormColumn[], defaultGroupBy: string[], enable_row_numbers=true ) => {
     
 
     const columnDefs = columns.map(col => {
-        return {field: col, Blah: "Yeeeea"}
+      const rowGroupIndex = defaultGroupBy.findIndex(
+        (element: any) => element === col,
+      );
+      const rowGroup = rowGroupIndex >= 0;
+        return {
+          field: col, 
+          rowGroup,
+          rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+        }
     })
 
     if (enable_row_numbers) {
@@ -25,7 +33,9 @@ const calcColumnDefs = (columns: QueryFormColumn[], enable_row_numbers=true) => 
           headerName: '#',
           colId: 'rowNum',
           pinned: 'left',
+          width: 50,
           lockVisible: true,
+          enableRowGroup: false,
           valueGetter: (params: any) =>
             params.node ? params.node.rowIndex + 1 : null,
         } as any);
@@ -44,6 +54,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableRowNumbers,
     enableGrouping,
     enableJsonExpand,
+    principalColumns,
   }: CccsTableFormData = {
     ...formData,
   };
@@ -54,7 +65,10 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   const data = queriesData[0].data as TimeseriesDataRecord[];
 
-  const columnDefs = formData.queryMode === "raw" ?  calcColumnDefs( formData.all_columns || []) : calcColumnDefs( formData.groupby || []) 
+  const columns =  formData.queryMode === "raw" ? formData.allColumns || [] : formData.groupby || [];
+  const columnDefs = calcColumnDefs(columns, defaultGroupBy ,enableRowNumbers) 
+  
+  
   const { setDataMask = () => {}, setControlValue } = hooks;
 
   // If the flag is set to true, add a column which will contain
@@ -96,6 +110,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     includeSearch,
     pageLength,
     enableGrouping,
+    principalColumns,
     setDataMask,
   };
 }

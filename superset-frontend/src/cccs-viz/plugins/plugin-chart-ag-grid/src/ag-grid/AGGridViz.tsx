@@ -24,6 +24,7 @@ import { ModuleRegistry } from '@ag-grid-community/core';
 import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
 
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem'
+import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem'
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
@@ -36,6 +37,7 @@ ModuleRegistry.registerModules([
   RowGroupingModule,
   RichSelectModule,
 ]);
+
 
 export default function AGGridViz({
   columnDefs,
@@ -113,7 +115,6 @@ export default function AGGridViz({
               );
               var api = gridRef.current!.api!;
               
-
               range.columns.forEach(function (column: any) {
                 const col = column.colDef?.field;
 
@@ -139,7 +140,9 @@ export default function AGGridViz({
     const handleOnContextMenu = (offsetX: number, offsetY: number, filters: any) => {
     
         contextMenuRef.current?.open(offsetX, offsetY, filters, [
-            <EmitFilterMenuItem selectedData={selectedData} setDataMask={setDataMask}/>
+            <EmitFilterMenuItem selectedData={selectedData} setDataMask={setDataMask}/>,
+            <CopyMenuItem selectedData={selectedData}/>
+            
         ]);
         setInContextMenu(true);
     }
@@ -186,7 +189,7 @@ export default function AGGridViz({
                             <select
                             className="form-control input-sm"
                             value={pageSize}
-                            onBlur={() => {}}
+                            onBlur={() => {}} 
                             onChange={e => {
                                 updatePageSize(
                                 Number((e.target as HTMLSelectElement).value),
