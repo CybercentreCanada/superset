@@ -6,6 +6,7 @@ export type CccsTableFormData = QueryFormData & {
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   enableJsonExpand: boolean;
+  principalColumns: string[];
 };
 
 export type CccsTableChartProps = ChartProps & {
@@ -23,5 +24,6 @@ export type AGGridVizProps = {
   pageLength: number;
   enableRowNumbers: boolean;
   enableGrouping: boolean;
+  principalColumns: string[];
   setDataMask: SetDataMaskHook;
 };
