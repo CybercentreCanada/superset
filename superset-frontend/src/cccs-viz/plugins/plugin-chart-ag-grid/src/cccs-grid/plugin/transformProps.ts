@@ -104,7 +104,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   return {
     width,
     height,
-    formdata: chartProps.formData,
+    formData: chartProps.formData,
     rowData: data,
     columnDefs,
     includeSearch,

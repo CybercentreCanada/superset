@@ -19,7 +19,6 @@ import ChartContextMenu, { Ref as ContextRef} from './ContextMenu/AGGridContextM
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
 
@@ -29,6 +28,10 @@ import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem'
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
 import {AGGridVizProps} from '../types'
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'src/dashboard/types';
+import { clearDataMask } from 'src/dataMask/actions';
+import { ensureIsArray } from '@superset-ui/core';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -38,6 +41,12 @@ ModuleRegistry.registerModules([
   RichSelectModule,
 ]);
 
+type DataMap = { [key: string]: string[] }
+
+type gridData = {
+  highlightedData: DataMap,
+  princibleData: DataMap,
+} 
 
 export default function AGGridViz({
   columnDefs,
@@ -49,12 +58,18 @@ export default function AGGridViz({
   pageLength = 0,
   enableGrouping,
   setDataMask,
+  principalColumns,
 }: AGGridVizProps) {
 
+  const crossFilterValue = useSelector<RootState, any>(
+    state => state.dataMask[formData.slice_id]?.filterState?.value,
+  );
+  const dispatch = useDispatch();
+  
   const contextMenuRef = useRef<ContextRef>(null);
 
   const [inContextMenu, setInContextMenu] = useState<boolean>(false)
-  const [selectedData, setSelectedData] = useState<{ [key: string]: string[] }>({})
+  const [selectedData, setSelectedData] = useState<gridData>({highlightedData: {}, princibleData: {}})
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(pageLength);
@@ -102,6 +117,8 @@ export default function AGGridViz({
         (event: RangeSelectionChangedEvent) => {
           var cellRanges = gridRef.current!.api.getCellRanges();
           const newSelectedData: { [key: string]: string[] } = {}
+          const principleData: { [key: string]: string[] } = {}
+
           if (cellRanges) {
             cellRanges.forEach(function (range: CellRange) {
               // get starting and ending row, remember rowEnd could be before rowStart
@@ -114,35 +131,92 @@ export default function AGGridViz({
                 range.endRow!.rowIndex
               );
               var api = gridRef.current!.api!;
+              for (var rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
               
-              range.columns.forEach(function (column: any) {
-                const col = column.colDef?.field;
-
-                newSelectedData[col] = newSelectedData[col] || []
-
-                for (var rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-                    const rowModel = api.getModel();
-                    const rowNode = rowModel.getRow(rowIndex)!;
-                    const value = api.getValue(column, rowNode); 
+                range.columns.forEach(function (column: any) {
+                  const col = column.colDef?.field;
+                  newSelectedData[col] = newSelectedData[col] || []
+                  const rowModel = api.getModel();
+                  const rowNode = rowModel.getRow(rowIndex)!;
+                  const value = api.getValue(column, rowNode); 
                     
-                    if (!newSelectedData[col].includes(value)) {
-                        newSelectedData[col].push(value);
-                    }
-                }
-              });
+                  if (!newSelectedData[col].includes(value)) {
+                      newSelectedData[col].push(value);
+                  }                
+                });
+                principalColumns.forEach((column: any) => {
+                  const col = column.colDef?.field;
+                  principleData[col] = principleData[col] || [];
+                  const rowModel = api.getModel();
+                  const rowNode = rowModel.getRow(rowIndex)!;
+                  const value = api.getValue(column, rowNode); 
+
+                  if (!principleData[col].includes(value)) {
+                    principleData[col].push(value);
+                  }     
+                });
+            }
             });
           }
-          setSelectedData(newSelectedData)
+          setSelectedData({highlightedData: newSelectedData, princibleData: principleData})
         },
         []
       );
+      const onClick = (data: DataMap) => {
+        emitFilter(data)
+      } 
+      const emitFilter = useCallback(
+        Data => {
+          const groupBy = Object.keys(Data);
+          const groupByValues = Object.values(Data);
+          setDataMask({
+            extraFormData: {
+              filters:
+                groupBy.length === 0
+                  ? []
+                  : groupBy.map(col => {
+                      const val = ensureIsArray(Data?.[col]);
+                      if (val === null || val === undefined)
+                        return {
+                          col,
+                          op: 'IS NULL',
+                        };
+                      return {
+                        col,
+                        op: 'IN',
+                        val,
+                      };
+                    }),
+            },
+            filterState: {
+              value: groupByValues.length ? groupByValues : null,
+            },
+          });
+        },
+        [setDataMask],
+      ); // only take relevant page size options
     
+
     const handleOnContextMenu = (offsetX: number, offsetY: number, filters: any) => {
     
         contextMenuRef.current?.open(offsetX, offsetY, filters, [
-            <EmitFilterMenuItem selectedData={selectedData} setDataMask={setDataMask}/>,
-            <CopyMenuItem selectedData={selectedData}/>
-            
+          <CopyMenuItem selectedData={selectedData.highlightedData}/>,
+          <EmitFilterMenuItem 
+              onClick={() => {onClick(selectedData.highlightedData)}}
+              label={"Emit Filter(s)"}
+              disabled={ Object.keys(selectedData.highlightedData).length === 0 }
+            />,
+          <EmitFilterMenuItem 
+            onClick={() => {onClick(selectedData.princibleData)}}
+            label={"Emit Filter(s)"}
+            disabled={ Object.keys(selectedData.princibleData).length === 0 }
+          />,
+          <EmitFilterMenuItem 
+            onClick={() => dispatch(clearDataMask(formData.slice_id))}
+            label={"Clear Emited Filter(s)"}
+            disabled={ crossFilterValue === undefined }
+         />,
+         
         ]);
         setInContextMenu(true);
     }

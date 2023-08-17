@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ValueFormatterParams } from '@ag-grid-enterprise/all-modules';
+import { ValueFormatterParams } from 'ag-grid-enterprise';
 import {
   Column,
   getMetricLabel,
@@ -335,7 +335,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    emitFilter,
+    emitFilter: true,
+    emitCrossFilters: true,
     principalColumns,
     include_search,
     page_length,
