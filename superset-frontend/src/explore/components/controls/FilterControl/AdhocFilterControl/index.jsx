@@ -355,17 +355,16 @@ class AdhocFilterControl extends React.Component {
       <div className="metrics-select" data-test="adhoc-filter-control">
         <HeaderContainer>
           <ControlHeader {...this.props} />
-          {this.props.ghostButton 
+          {this.props.ghostButton
             ? null
             : this.addNewFilterPopoverTrigger(
-              <AddIconButton data-test="add-filter-button">
-                <Icons.PlusLarge
-                  iconSize="s"
-                  iconColor={theme.colors.grayscale.light5}
-                />
-              </AddIconButton>,
-            )
-          }
+                <AddIconButton data-test="add-filter-button">
+                  <Icons.PlusLarge
+                    iconSize="s"
+                    iconColor={theme.colors.grayscale.light5}
+                  />
+                </AddIconButton>,
+              )}
         </HeaderContainer>
         <LabelsContainer>
           {this.state.values.length > 0
@@ -373,15 +372,14 @@ class AdhocFilterControl extends React.Component {
                 this.valueRenderer(value, index),
               )
             : null}
-          {this.state.values.length === 0 || this.props.ghostButton 
+          {this.state.values.length === 0 || this.props.ghostButton
             ? this.addNewFilterPopoverTrigger(
                 <AddControlLabel>
                   <Icons.PlusSmall iconColor={theme.colors.grayscale.light1} />
                   {t('Add filter')}
                 </AddControlLabel>,
               )
-              : null
-          }
+            : null}
         </LabelsContainer>
       </div>
     );
