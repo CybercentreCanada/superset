@@ -1,14 +1,4 @@
-import {
-  Column,
-  getMetricLabel,
-  getNumberFormatter,
-  Metric,
-  NumberFormats,
-  QueryFormColumn,
-  QueryMode,
-  t,
-  TimeseriesDataRecord,
-} from '@superset-ui/core';
+import { Column, TimeseriesDataRecord } from '@superset-ui/core';
 
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import ExpandAllValueRenderer from '../../types/ExpandAllValueRenderer';
@@ -85,7 +75,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   );
   let columnDefs = calcColumnDefs(columns, defaultGroupBy, enableRowNumbers);
 
-  const { setDataMask = () => {}, setControlValue } = hooks;
+  const { setDataMask = () => {} } = hooks;
 
   // If the flag is set to true, add a column which will contain
   // a button to expand all JSON blobs in the row

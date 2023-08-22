@@ -1,118 +1,75 @@
-import { GroupCellRenderer } from 'ag-grid-enterprise';
-import React, { Component } from 'react';
-import { StyledButton } from '../styles';
+import {
+  ICellRendererComp,
+  ICellRendererParams,
+  IRowNode,
+} from 'ag-grid-enterprise';
+import '../Button.css';
 
-// Show a button to collapse all of the JSON blobs in the row
-function collapseJSON(this: any, reverseState: any) {
-  return (
-    <StyledButton className="Row-Expand" onClick={reverseState}>
-      Collapse Row
-    </StyledButton>
-  );
-}
+const EXPAND_BUTTON_CLASS_NAME = 'ag-grid-btn-row-expander';
 
-// Show a button to expand all of the JSON blobs in the row
-function expandJSON(this: any, reverseState: any) {
-  return (
-    <>
-      <StyledButton className="Row-Expand" onClick={reverseState}>
-        Expand Row
-      </StyledButton>
-    </>
-  );
-}
+export default class ExpandAllValueRenderer implements ICellRendererComp {
+  eGui!: HTMLDivElement;
 
-export default class ExpandAllValueRenderer extends Component<
-  {},
-  { api: any; expanded: boolean; rowIndex: number }
-> {
-  constructor(props: any) {
-    super(props);
+  expandButton: any;
 
-    this.state = {
-      api: props.api,
-      expanded: false,
-      rowIndex: props.rowIndex,
-    };
+  expanded: boolean;
+
+  rowNode: IRowNode;
+
+  // Optional - Params for rendering. The same params that are passed to the cellRenderer function.
+  init(params: ICellRendererParams) {
+    this.rowNode = params.node;
+    this.expanded = this.rowNode.expanded || false;
+    // create cell
+    this.eGui = document.createElement('div');
+    this.eGui.innerHTML = this.renderButton();
+
+    this.expandButton = this.eGui.querySelector(`.ag-grid-btn-row-expander`)!;
+    this.expandButton.addEventListener('click', this.toggleExpand);
   }
 
-  // Get all of the cells in the AG Grid and only keep the ones that
-  // are in the same row as the current expand all button, and make
-  // sure that they have a JSON blob
-  getJSONCells = () => {
-    const instances = this.state.api.getCellRendererInstances();
+  // Mandatory - Return the DOM element of the component, this is what the grid puts into the cell
+  getGui() {
+    return this.eGui;
+  }
 
-    // Make sure row grouping is not enabled, but if it is, don't
-    // try to find all of the JSON blobs in the row
-    if (
-      instances.filter((instance: any) => instance instanceof GroupCellRenderer)
-        .length === 0
-    ) {
-      const newInstances = instances.filter(
-        (instance: any) =>
-          instance.params.rowIndex === this.state.rowIndex &&
-          instance.params.column.colDef.cellRenderer === 'jsonValueRenderer',
-      );
-
-      return newInstances;
+  // Optional - Gets called once by grid after rendering is finished - if your renderer needs to do any cleanup,
+  // do it here
+  destroy(): void {
+    if (this.expandButton) {
+      this.expandButton.removeEventListener('click', this.toggleExpand);
     }
-    return [];
-  };
+  }
+
+  // Mandatory - Get the cell to refresh. Return true if the refresh succeeded, otherwise return false.
+  // If you return false, the grid will remove the component from the DOM and create
+  // a new component in its place with the new values.
+  refresh(params: ICellRendererParams): boolean {
+    this.rowNode = params.node;
+    if (this.expanded !== this.rowNode.expanded) {
+      this.toggleExpand();
+    }
+    return true;
+  }
+
+  renderButton(): string {
+    return `
+      <span>
+        <button type="button" class=${EXPAND_BUTTON_CLASS_NAME}>
+          Expand Row
+        </button>
+      </span>
+    `;
+  }
 
   // Set the current `expanded` field to the opposite of what it currently is
-  // as well as go through each cell renderer and if it's in the same row &
-  // it's a cell with a JSON blob, update whether it is expanded or not
-  reverseState = () => {
-    this.setState(prevState => ({
-      ...prevState,
-      expanded: !prevState.expanded,
-    }));
-
-    const newInstances = this.getJSONCells();
-
-    newInstances.map((instance: any) =>
-      instance.componentInstance.updateState(!this.state.expanded),
-    );
+  // as well as set the row node to the new expanded value to update all cells in the row
+  toggleExpand = () => {
+    this.expanded = !this.expanded;
+    this.rowNode.setExpanded(this.expanded);
+    // update button text
+    this.expandButton.innerHTML = !this.expanded
+      ? 'Expand Row'
+      : 'Collapse Row';
   };
-
-  // Set the current `expanded` field to be equal to the boolean being passed in
-  // as well as go through each cell renderer and if it's in the same row &
-  // it's a cell with a JSON blob, update whether it is expanded or not
-  updateState = (newFlag: any) => {
-    this.setState(prevState => ({ ...prevState, expanded: newFlag }));
-
-    const newInstances = this.getJSONCells();
-
-    newInstances.map((instance: any) =>
-      instance.componentInstance.updateState(newFlag),
-    );
-  };
-
-  // Get all of the cells in the AG Grid and only keep the ones
-  // that are in the same row as the current expand all button and
-  // make sure that they have a JSON blob (and see whether they are
-  // expanded or not)
-  checkState = () => {
-    const newInstances = this.getJSONCells();
-
-    const jsonCellExpandedValues = newInstances.map((instance: any) =>
-      instance.componentInstance.getExpandedValue(),
-    );
-
-    // If there is at least one cell that can expand, the expand all
-    // button for the row should show 'Expand'
-    this.setState(prevState => ({
-      ...prevState,
-      expanded: !jsonCellExpandedValues.includes(false),
-    }));
-  };
-
-  // Show either the expand or collapse button dependent
-  // on the value of the `expanded` field
-  render() {
-    if (this.state.expanded === false) {
-      return expandJSON(this.reverseState);
-    }
-    return collapseJSON(this.reverseState);
-  }
 }

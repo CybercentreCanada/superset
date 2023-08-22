@@ -1,13 +1,13 @@
 import { GroupCellRenderer } from 'ag-grid-enterprise';
+import { Button } from 'antd';
 import React, { Component } from 'react';
-import { StyledButton } from './styles';
 
 // Show a button to collapse all of the JSON blobs in the row
 function collapseJSON(this: any, reverseState: any) {
   return (
-    <StyledButton className="Row-Expand" onClick={reverseState}>
+    <Button className="Row-Expand" onClick={reverseState}>
       Collapse Row
-    </StyledButton>
+    </Button>
   );
 }
 
@@ -15,9 +15,9 @@ function collapseJSON(this: any, reverseState: any) {
 function expandJSON(this: any, reverseState: any) {
   return (
     <>
-      <StyledButton className="Row-Expand" onClick={reverseState}>
+      <Button className="Row-Expand" onClick={reverseState}>
         Expand Row
-      </StyledButton>
+      </Button>
     </>
   );
 }
