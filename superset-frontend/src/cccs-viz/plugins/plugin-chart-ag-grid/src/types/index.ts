@@ -13,7 +13,6 @@ export type CccsTableChartProps = ChartProps & {
   formData: CccsTableFormData;
 };
 
-
 export type AGGridVizProps = {
   formData: CccsTableFormData;
   width: any;

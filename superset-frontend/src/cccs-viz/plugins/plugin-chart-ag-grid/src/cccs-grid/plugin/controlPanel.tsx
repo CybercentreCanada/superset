@@ -1,17 +1,9 @@
 import React from 'react';
 import {
-  ChartDataResponseResult,
   ensureIsArray,
-  FeatureFlag,
-  GenericDataType,
-  hasGenericChartAxes,
-  isAdhocColumn,
-  isFeatureEnabled,
-  isPhysicalColumn,
   legacyValidateInteger,
   QueryFormColumn,
   QueryMode,
-  smartDateFormatter,
   t,
 } from '@superset-ui/core';
 import {
@@ -20,7 +12,6 @@ import {
   ControlPanelConfig,
   ControlPanelsContainerProps,
   ControlStateMapping,
-  D3_TIME_FORMAT_OPTIONS,
   QueryModeLabel,
   sections,
   sharedControls,
@@ -29,7 +20,6 @@ import {
   Dataset,
   ColumnMeta,
   defineSavedMetrics,
-  getStandardizedControls,
   formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';

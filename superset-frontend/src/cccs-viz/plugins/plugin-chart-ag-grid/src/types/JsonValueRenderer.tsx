@@ -1,11 +1,13 @@
-import { ICellRendererParams } from 'ag-grid-community';
+import {
+  ICellRendererComp,
+  ICellRendererParams,
+  RowEvent,
+} from 'ag-grid-community';
 import React from 'react';
-import { renderToStaticMarkup, renderToString } from "react-dom/server"
+import { renderToString } from "react-dom/server"
 import { JSONTree } from 'react-json-tree';
 
-import { ICellRendererComp } from '@ag-grid-community';
-import { StyledButton } from '../styles';
-import { utcThursday } from 'd3-time';
+import '../Button.css';
 
 interface JsonCellParams extends ICellRendererParams {
   expanded: boolean;
@@ -24,8 +26,11 @@ export default class JsonValueRenderer implements ICellRendererComp {
 
   expandListener!: () => void;
 
+  rowNode: any;
+
   init(params: JsonCellParams) {
-    this.expanded = params.expanded || false;
+    this.rowNode = params.node;
+    this.expanded = params.node.expanded || false;
 
     // create cell
     this.eGui = document.createElement('div');
@@ -40,7 +45,8 @@ export default class JsonValueRenderer implements ICellRendererComp {
     this.eValueContainer.innerHTML = this.cellValue;
 
     // add event listener to button
-    this.expandButton.addEventListener('click', this.reverseState);
+    this.expandButton.addEventListener('click', this.toggleExpand);
+    this.rowNode.addEventListener('expandedChanged', this.onExpandChanged);
   }
 
   getGui() {
@@ -48,8 +54,10 @@ export default class JsonValueRenderer implements ICellRendererComp {
   }
 
   refresh(params: JsonCellParams) {
-    // set value into cell again
-    this.expanded = params.expanded || false;
+    this.rowNode = params.node;
+    if (this.expanded !== this.rowNode.expanded) {
+      this.toggleExpand();
+    }
     this.cellValue = this.getValueToDisplay(params);
     this.eValueContainer.innerHTML = this.renderCell();
     // return true to tell the grid we refreshed successfully
@@ -58,7 +66,10 @@ export default class JsonValueRenderer implements ICellRendererComp {
 
   destroy() {
     if (this.expandButton) {
-      this.expandButton.removeEventListener('click', this.reverseState);
+      this.expandButton.removeEventListener('click', this.toggleExpand);
+    }
+    if (this.rowNode) {
+      this.rowNode.removeEventListener('expandedChanged', this.onExpandChanged);
     }
   }
 
@@ -67,15 +78,31 @@ export default class JsonValueRenderer implements ICellRendererComp {
   }
 
   // Set the current `expanded` field to the opposite of what it currently is
-  reverseState = () => {
+  toggleExpand = () => {
     this.expanded = !this.expanded;
+    this.expandButton.className = this.expanded
+      ? 'ag-grid-btn ag-grid-btn-collapse'
+      : 'ag-grid-btn ag-grid-btn-expand';
     this.eValueContainer.innerHTML = this.renderCell();
   };
+
+  onExpandChanged = (params: RowEvent) => {
+    this.rowNode = params.node;
+    if (this.expanded !== this.rowNode.expanded) {
+      this.toggleExpand();
+    }
+  };
+
+  setExpand(expand: boolean) {
+    if (this.expanded !== expand) {
+      this.toggleExpand();
+    }
+  }
 
   renderExpandButton() {
     return `
       <span>
-        <button class="ag-grid-btn-expand"></button>
+        <button class="ag-grid-btn ag-grid-btn-expand"></button>
         <span class="ag-grid-cell-value"></span>
       </span>
     `;
