@@ -12,23 +12,118 @@ import {
 
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import ExpandAllValueRenderer from '../../ExpandAllValueRenderer';
+import { ValueFormatterParams } from 'ag-grid-community';
 
-const calcColumnDefs = (columns: QueryFormColumn[], defaultGroupBy: string[], enable_row_numbers=true ) => {
-    
+const calcMetricColumnDefs = (metrics: any[], percent_metrics: any[], datasource_metrics: Metric[]) => {
+  
+  const percentMetricValueFormatter = function (params: ValueFormatterParams) {
+    return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
+      params.value,
+    );
+  };
+  // Map of verbose names, key is metric name, value is verbose name
+  const metricVerboseNameMap = new Map<string, string>();
+  datasource_metrics.reduce(function (metricMap, metric: Metric) {
+    // @ts-ignore
+    const name = metric.metric_name;
+    // @ts-ignore
+    metricMap[name] = metric.verbose_name;
+    return metricMap;
+  }, metricVerboseNameMap);
 
-    const columnDefs = columns.map(col => {
-      const rowGroupIndex = defaultGroupBy.findIndex(
-        (element: any) => element === col,
-      );
-      const rowGroup = rowGroupIndex >= 0;
+
+  let columnDefs: any[] = [];
+
+  if (metrics) {
+    const metricsColumnDefs = metrics
+      .map((metric: any) => {
+        const metricHeader = metricVerboseNameMap[metric]
+          ? metricVerboseNameMap[metric]
+          : metric;
         return {
-          field: col, 
-          rowGroup,
-          rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
-        }
-    })
+          field: metric,
+          headerName: metricHeader,
+          sortable: true,
+          enableRowGroup: true,
+        };
+      });
+    columnDefs = columnDefs.concat(metricsColumnDefs);
+  }
 
-    if (enable_row_numbers) {
+  if (percent_metrics) {
+    const percentMetricsColumnDefs = percent_metrics
+      .map((metric: any) => {
+        const metricHeader = metricVerboseNameMap[metric]
+          ? metricVerboseNameMap[metric]
+          : metric;
+        return {
+          field: `%${metric}`,
+          headerName: `%${metricHeader}`,
+          sortable: true,
+          valueFormatter: percentMetricValueFormatter,
+        };
+      });
+    columnDefs = columnDefs.concat(percentMetricsColumnDefs);
+  }
+
+  return columnDefs;
+}
+
+
+const calcColumnColumnDefs = (columns: QueryFormColumn[], defaultGroupBy: string[], dataset_columns: Column[], enable_row_numbers=true ) => {
+
+  const columnDataMap = new Map<string, string>();
+  dataset_columns.reduce(function (columnMap, column: Column) {
+    // @ts-ignore
+    const name = column.column_name;
+    // @ts-ignore
+    columnMap[name] = {
+      type: column.type,
+      advanced_data_type: ( (column.advanced_data_type as string) ?? ''),
+      verbose_name: column.verbose_name,
+      description: column.description
+    } 
+    return columnMap;
+  }, columnDataMap);
+
+
+const columnDefs = columns.map((column: any) => { 
+    const columnType = columnDataMap[column].type;
+    const advancedType = columnDataMap[column].advanced_data_type;
+    const columnHeader = columnDataMap[column].verbose_name
+      ? columnDataMap[column].verbose_name
+      : column;
+    // const cellRenderer =
+    //   columnAdvancedType in rendererMap
+    //     ? rendererMap[columnAdvancedType]
+    //     : columnType in rendererMap
+    //     ? rendererMap[columnType]
+    //     : undefined;
+    const isSortable = true;
+    const enableRowGroup = true;
+    const columnDescription = columnDataMap[column].description;
+    const autoHeight = true;
+    const rowGroupIndex = defaultGroupBy.findIndex(
+      (element: any) => element === column,
+    );
+    const rowGroup = rowGroupIndex >= 0;
+    const hide = rowGroup;
+    return {
+      field: column,
+      headerName: columnHeader,
+      sortable: isSortable,
+      enableRowGroup,
+      advancedType,
+      rowGroup,
+      hide,
+      rowGroupIndex,
+      // getQuickFilterText: (params: any) => valueFormatter(params),
+      headerTooltip: columnDescription,
+      autoHeight,
+    }
+  });
+
+  if (enable_row_numbers) {
         columnDefs.splice(0, 0, {
           headerName: '#',
           colId: 'rowNum',
@@ -46,7 +141,7 @@ const calcColumnDefs = (columns: QueryFormColumn[], defaultGroupBy: string[], en
 
 
 export default function transformProps(chartProps: CccsTableChartProps) {
-  const { width, height, formData, queriesData } = chartProps;
+  const { datasource, width, height, formData, queriesData } = chartProps;
   const {
     includeSearch,
     pageLength,
@@ -62,44 +157,18 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   const {
     hooks
   } = chartProps;
-
-  const data = queriesData[0].data as TimeseriesDataRecord[];
-
-  const columns =  formData.queryMode === "raw" ? formData.allColumns || [] : formData.groupby || [];
-  const columnDefs = calcColumnDefs(columns, defaultGroupBy ,enableRowNumbers) 
   
+  const datasource_metrics = datasource?.metrics as Metric[];
+  const data = queriesData[0].data as TimeseriesDataRecord[];
+  
+  const columns =  formData.queryMode === "raw" ? formData.allColumns || [] : formData.groupby || [];
+  const metrics = formData.metrics;
+  const percent_metrics = formData.percentMetrics;
+
+  let columnDefs = calcColumnColumnDefs(columns, defaultGroupBy, datasource?.columns as Column[], enableRowNumbers) 
+  columnDefs = columnDefs.concat(calcMetricColumnDefs(metrics || [], percent_metrics || [], datasource_metrics));
   
   const { setDataMask = () => {}, setControlValue } = hooks;
-
-  // If the flag is set to true, add a column which will contain
-  // a button to expand all JSON blobs in the row
-  // if (enableJsonExpand) {
-  //   columnDefs.splice(1, 0, {
-  //     colId: 'jsonExpand',
-  //     pinned: 'left',
-  //     cellRenderer: ExpandAllValueRenderer,
-  //     autoHeight: true,
-  //     minWidth: 105,
-  //     lockVisible: true,
-  //   } as any);
-  // } else if (enableGrouping) {
-  //   // enable row grouping
-  //   columnDefs = columnDefs.map(c => {
-  //     const enableRowGroup = true;
-  //     const rowGroupIndex = defaultGroupBy.findIndex(
-  //       (element: any) => element === c.field,
-  //     );
-  //     const rowGroup = rowGroupIndex >= 0;
-  //     const hide = rowGroup;
-  //     return {
-  //       ...c,
-  //       enableRowGroup,
-  //       rowGroup,
-  //       rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
-  //       hide,
-  //     };
-  //   });
-  // }
 
   return {
     width,
