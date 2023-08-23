@@ -7,6 +7,8 @@ export type CccsTableFormData = QueryFormData & {
   enableGrouping: boolean;
   enableJsonExpand: boolean;
   principalColumns: string[];
+  percent_metrics: string[];
+  
 };
 
 export type CccsTableChartProps = ChartProps & {

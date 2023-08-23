@@ -62,7 +62,7 @@ export default function AGGridViz({
 }: AGGridVizProps) {
 
   const crossFilterValue = useSelector<RootState, any>(
-    state => state.dataMask[formData.slice_id]?.filterState?.value,
+    state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
   const dispatch = useDispatch();
   
@@ -145,7 +145,7 @@ export default function AGGridViz({
                   }                
                 });
                 principalColumns.forEach((column: any) => {
-                  const col = column.colDef?.field;
+                  const col = column;
                   principleData[col] = principleData[col] || [];
                   const rowModel = api.getModel();
                   const rowNode = rowModel.getRow(rowIndex)!;
@@ -208,11 +208,11 @@ export default function AGGridViz({
             />,
           <EmitFilterMenuItem 
             onClick={() => {onClick(selectedData.princibleData)}}
-            label={"Emit Filter(s)"}
+            label={"Emit Principle Column Filter(s)"}
             disabled={ Object.keys(selectedData.princibleData).length === 0 }
           />,
           <EmitFilterMenuItem 
-            onClick={() => dispatch(clearDataMask(formData.slice_id))}
+            onClick={() => dispatch(clearDataMask(formData.sliceId))}
             label={"Clear Emited Filter(s)"}
             disabled={ crossFilterValue === undefined }
          />,
