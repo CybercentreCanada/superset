@@ -21,11 +21,11 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from '../images/thumbnail.png';
-import { CccsGridFormData, CccsGridChartProps } from '../../types';
+import { CccsTableFormData, CccsTableChartProps } from '../../types';
 
 export default class CccsTableChartPlugin extends ChartPlugin<
-  CccsGridFormData,
-  CccsGridChartProps
+  CccsTableFormData,
+  CccsTableChartProps
 > {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
