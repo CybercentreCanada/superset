@@ -7,23 +7,23 @@ import React, {
   useState,
 } from 'react';
 
-import { AgGridReact } from 'ag-grid-react';
-import { AgGridReact as AgGridReactType } from 'ag-grid-react';
+import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 
-import ChartContextMenu, { Ref as ContextRef} from './ContextMenu/AGGridContextMenue';
-
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
+import ChartContextMenu, {
+  Ref as ContextRef,
+} from './ContextMenu/AGGridContextMenue';
 
-import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem'
-import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem'
+import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
+import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
@@ -32,6 +32,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 import { ensureIsArray } from '@superset-ui/core';
+
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -83,11 +84,15 @@ export default function AGGridViz({
     setrowDataStateful(rowData);
   }, [rowData]);
 
-    const defaultColDef = useMemo(() => ({
-        resizable: true,
-        sortable: true,
-        enableRowGroup: true,
-    }), []);
+  const defaultColDef = useMemo(
+    () => ({
+      resizable: true,
+      autoHeight: true,
+      sortable: true,
+      enableRowGroup: true,
+    }),
+    [],
+  );
 
   const gridRef = useRef<AgGridReactType>(null);
 
@@ -228,97 +233,110 @@ export default function AGGridViz({
     const handleContextMenuClosed = () => {
         setInContextMenu(false );
     }
-    
-    const onContextMenu = (event: any) => {
-        event.preventDefault();
-        handleOnContextMenu( event.pageX,  event.pageY, [])
-    } 
-    
-    return (
-        <>
-            
-            {(
-            <ChartContextMenu
-                ref={contextMenuRef}
-                id={1}
-                formData={formData}
-                onSelection={handleContextMenuSelected}
-                onClose={handleContextMenuClosed}
-            />
-            )}
-                <div
-                style={{ width: width, height: height, display: 'flex', flexFlow: 'column' }}
-                className="contextContainer"
-                onContextMenu={onContextMenu}
-                >
-                <div
-                    className="form-inline"
-                    style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
-                >
-                    <div className="row">
-                    <div className="col-sm-6">
-                        {pageLength > 0 && (
-                        <span className="dt-select-page-size form-inline">
-                            Show{' '}
-                            <select
-                            className="form-control input-sm"
-                            value={pageSize}
-                            onBlur={() => {}} 
-                            onChange={e => {
-                                updatePageSize(
-                                Number((e.target as HTMLSelectElement).value),
-                                );
-                            }}
-                            >
-                            {PAGE_SIZE_OPTIONS.map(option => {
-                                const [size, text] = Array.isArray(option)
-                                ? option
-                                : [option, option];
-                                return (
-                                <option key={size} value={size}>
-                                    {text}
-                                </option>
-                                );
-                            })}
-                            </select>{' '}
-                            entries
-                        </span>
-                        )}
-                    </div>
-                    <div className="col-sm-6">
-                        {includeSearch ? (
-                        <span className="float-right">
-                            Search{' '}
-                            <input
-                            className="form-control input-sm"
-                            placeholder={`${rowData.length} records...`}
-                            value={searchValue}
-                            onChange={setSearch}
-                            />
-                        </span>
-                        ) : null}
-                    </div>
-                    </div>
-                </div>
-                <AgGridReact
-                    ref={gridRef}
-                    className="ag-theme-alpine" 
-                    columnDefs={columnDefsStateful}
-                    defaultColDef={defaultColDef}
-                    enableRangeSelection={true}
-                    rowData={rowDataStateful}
-                    enableBrowserTooltips={true}
-                    onRangeSelectionChanged={onRangeSelectionChanged}
-                    cacheQuickFilter={true}
-                    suppressRowClickSelection={true}
-                    suppressContextMenu={true}
-                    modules={[ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]}
-                    paginationPageSize={pageSize}
-                    pagination={pageSize > 0}
-                    quickFilterText={searchValue}
-                    rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
-                />
+  useEffect(() => {
+    if (!includeSearch) {
+      setSearchValue('');
+    }
+  }, [includeSearch]);
+
+  const onContextMenu = (event: any) => {
+    event.preventDefault();
+    handleOnContextMenu(event.pageX, event.pageY, []);
+  };
+
+  return (
+    <>
+      <ChartContextMenu
+        ref={contextMenuRef}
+        id={1}
+        formData={formData}
+        onSelection={handleContextMenuSelected}
+        onClose={handleContextMenuClosed}
+      />
+      <div
+        style={{
+          width,
+          height,
+          display: 'flex',
+          flexFlow: 'column',
+        }}
+        className="contextContainer"
+        onContextMenu={onContextMenu}
+      >
+        <div
+          className="form-inline"
+          style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
+        >
+          <div className="row">
+            <div className="col-sm-6">
+              {pageLength > 0 && (
+                <span className="dt-select-page-size form-inline">
+                  Show{' '}
+                  <select
+                    className="form-control input-sm"
+                    value={pageSize}
+                    onBlur={() => {}}
+                    onChange={e => {
+                      updatePageSize(
+                        Number((e.target as HTMLSelectElement).value),
+                      );
+                    }}
+                  >
+                    {PAGE_SIZE_OPTIONS.map(option => {
+                      const [size, text] = Array.isArray(option)
+                        ? option
+                        : [option, option];
+                      return (
+                        <option key={size} value={size}>
+                          {text}
+                        </option>
+                      );
+                    })}
+                  </select>{' '}
+                  entries
+                </span>
+              )}
             </div>
-        </>
-    );
+            <div className="col-sm-6">
+              {includeSearch ? (
+                <span className="float-right">
+                  Search{' '}
+                  <input
+                    className="form-control input-sm"
+                    placeholder={`${rowData.length} records...`}
+                    value={searchValue}
+                    onChange={setSearch}
+                  />
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <AgGridReact
+          ref={gridRef}
+          animateRows
+          className="ag-theme-alpine"
+          columnDefs={columnDefsStateful}
+          defaultColDef={defaultColDef}
+          enableRangeSelection
+          rowData={rowDataStateful}
+          enableBrowserTooltips
+          onRangeSelectionChanged={onRangeSelectionChanged}
+          cacheQuickFilter
+          suppressRowClickSelection
+          suppressContextMenu
+          modules={[
+            ClientSideRowModelModule,
+            RangeSelectionModule,
+            RowGroupingModule,
+            RichSelectModule,
+          ]}
+          paginationPageSize={pageSize}
+          pagination={pageSize > 0}
+          quickFilterText={searchValue}
+          rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
+        />
+      </div>
+    </>
+  );
 }
