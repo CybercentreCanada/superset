@@ -74,7 +74,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    emitFilter,
     principalColumns,
     query_mode,
     column_state,

@@ -69,7 +69,7 @@ export default function AGGridViz({
   
   const contextMenuRef = useRef<ContextRef>(null);
 
-  const [inContextMenu, setInContextMenu] = useState<boolean>(false)
+  const [, setInContextMenu] = useState<boolean>(false)
   const [selectedData, setSelectedData] = useState<gridData>({highlightedData: {}, princibleData: {}})
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');

@@ -107,6 +107,7 @@ const columnDefs = columns.map((column: any) => {
       advancedType,
       rowGroup,
       hide,
+      cellRenderer,
       rowGroupIndex,
       // getQuickFilterText: (params: any) => valueFormatter(params),
       headerTooltip: columnDescription,
@@ -158,7 +159,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   let columnDefs = calcColumnColumnDefs(columns, defaultGroupBy, datasource?.columns as Column[], enableRowNumbers) 
   columnDefs = columnDefs.concat(calcMetricColumnDefs(metrics || [], percent_metrics || [], datasource_metrics));
   
-  const { setDataMask = () => {}, setControlValue } = hooks;
+  const { setDataMask = () => {}, } = hooks;
 
   // If the flag is set to true, add a column which will contain
   // a button to expand all JSON blobs in the row

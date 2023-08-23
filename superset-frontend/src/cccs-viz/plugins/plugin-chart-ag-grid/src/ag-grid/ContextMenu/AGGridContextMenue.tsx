@@ -44,7 +44,7 @@ import React, {
       findPermission('can_explore', 'Superset', state.user?.roles),
     );
   
-    const [{ filters, clientX, clientY, extraContextMenuItems }, setState] = useState<{
+    const [{ clientX, clientY, extraContextMenuItems }, setState] = useState<{
       clientX: number;
       clientY: number;
       filters?: BinaryQueryObjectFilterClause[];
