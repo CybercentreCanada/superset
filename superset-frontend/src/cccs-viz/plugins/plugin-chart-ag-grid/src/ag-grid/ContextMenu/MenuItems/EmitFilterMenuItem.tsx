@@ -2,12 +2,8 @@
 
 import { Menu } from 'src/components/Menu';
 
-import {
-    SetDataMaskHook, ensureIsArray,
-  } from '@superset-ui/core';
-import { useCallback, useEffect, useState } from 'react';
 import { ExpandAltOutlined } from '@ant-design/icons';
-import { clearDataMask } from 'src/dataMask/actions';
+
 
 interface EmiteFilterMenuItemProps {
     label: string;

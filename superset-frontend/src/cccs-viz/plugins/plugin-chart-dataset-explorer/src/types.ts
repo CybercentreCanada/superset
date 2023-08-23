@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ColumnState } from '@ag-grid-enterprise/all-modules';
+import { ColumnState } from 'ag-grid-enterprise';
 import {
   ChartDataResponseResult,
   ChartProps,
