@@ -226,7 +226,7 @@ describe('Smoke Test', () => {
     const expiryDateKey = 'ExpiryDate'
     const supportServicesEndKey = 'SupportServicesEnd'
 
-    cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:ct,value:${DEPARTMENTS_DATASET})))`).then(findResponse => {
+    cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:eq,value:${DEPARTMENTS_DATASET})))`).then(findResponse => {
       expect(findResponse.body.ids).to.have.lengthOf(1)
       const datasetId = findResponse.body.ids[0]
       cy.request(DATASET_URL + datasetId).then(datasetResponse => {

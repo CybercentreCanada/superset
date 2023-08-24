@@ -67,12 +67,13 @@ Cypress.Commands.add('saveSqlAsDataset', (datasetName: string) => {
 });
 
 Cypress.Commands.add('visitDatasetByName', name => {
-  cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:ct,value:${name})))`).then(response => {
+  cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:eq,value:${name})))`).then(response => {
     expect(response.body.ids).to.have.lengthOf(1)
     cy.visit(`${BASE_EXPLORE_URL}${response.body.ids[0]}`);
   });
 });
 
+// Copied as is from cypress_base/cypress/support/index.ts
 Cypress.Commands.add('visitChartByParams',
   (formData: {
     datasource?: string;
@@ -113,7 +114,7 @@ Cypress.Commands.add('visitChartByParams',
 );
 
 Cypress.Commands.add('visitChartByDatasetNameAndParams', (name, params) => {
-  cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:ct,value:${name})))`).then(response => {
+  cy.request(`/api/v1/dataset/?q=(filters:!((col:table_name,opr:eq,value:${name})))`).then(response => {
     expect(response.body.ids).to.have.lengthOf(1)
     const datasetId = response.body.ids[0]
     const formData = {

@@ -86,6 +86,142 @@ export const cccsExploreView = {
     }
 }
 
+export const graphql_queries = {
+  get_search_results_for_multiple: 'query getSearchResultsForMultiple($input: ScrollAcrossEntitiesInput!) { \
+    scrollAcrossEntities(input: $input) { \
+        ...scrollResults \
+      } \
+    } \
+    fragment scrollResults on ScrollResults { \
+      searchResults { \
+        entity { \
+          ...searchResultFields \
+        } \
+      } \
+    } \
+    fragment searchResultFields on Entity { \
+      urn \
+      type \
+    }',
+  get_dataset: 'query getDataset($urn: String!) { \
+    dataset(urn: $urn) {  \
+      name \
+      type \
+      urn \
+      schemaMetadata(version: 0) { \
+        ...schemaMetadataFields \
+      } \
+      editableSchemaMetadata { \
+        editableSchemaFieldInfo { \
+          fieldPath \
+          description \
+          glossaryTerms { \
+            ...glossaryTerms \
+          } \
+        } \
+      } \
+      glossaryTerms { \
+        ...glossaryTerms \
+        __typename \
+      } \
+      ownership { \
+        ...ownershipFields \
+        __typename \
+      } \
+      domain { \
+      ...entityDomain \
+      } \
+      properties { \
+        customProperties { \
+          key \
+          value \
+        } \
+      } \
+      siblings { \
+        siblings { \
+          ...siblingDatasetFields \
+        } \
+      } \
+    } \
+  } \
+  fragment glossaryTerms on GlossaryTerms { \
+    terms { \
+      term { \
+        urn \
+        name \
+        properties { \
+          name \
+        } \
+      } \
+    } \
+  } \
+  fragment schemaMetadataFields on SchemaMetadata { \
+    fields { \
+      fieldPath \
+      jsonPath \
+      type \
+      nativeDataType \
+      glossaryTerms { \
+        ...glossaryTerms \
+      } \
+    } \
+  } \
+  fragment ownershipFields on Ownership { \
+    owners { \
+      owner { \
+        ... on CorpUser { \
+          type \
+          username \
+          info { \
+            displayName \
+          } \
+        } \
+        ... on CorpGroup { \
+          type \
+          name \
+          info { \
+            displayName \
+          } \
+        } \
+      } \
+      type \
+    } \
+  } \
+  fragment entityDomain on DomainAssociation { \
+    domain { \
+      urn \
+    } \
+  } \
+  fragment siblingDatasetFields on Dataset { \
+    name \
+    type \
+    urn \
+    schemaMetadata(version: 0) { \
+      ...schemaMetadataFields \
+    } \
+    editableSchemaMetadata { \
+      editableSchemaFieldInfo { \
+        fieldPath \
+        description \
+        glossaryTerms { \
+          ...glossaryTerms \
+        } \
+      } \
+    } \
+    glossaryTerms { \
+      ...glossaryTerms \
+      __typename \
+    } \
+    ownership { \
+      ...ownershipFields \
+      __typename \
+    } \
+    domain { \
+    ...entityDomain \
+    } \
+  }'
+}
+
 export function ipv4ToIntAsString(ipv4: string): string {
   return ipv4.split('.').reduce((int: any, v) => String(int * 256 + +v))
 }
