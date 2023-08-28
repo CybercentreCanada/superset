@@ -293,7 +293,7 @@ const AdhocFilterEditPopoverSimpleTabContent: React.FC<Props> = props => {
     subjectAdvancedDataType,
     fetchAdvancedDataTypeValueCallback,
     fetchSubjectAdvancedDataType,
-  } = useAdvancedDataTypes(props.validHandler);
+  } = useAdvancedDataTypes(props.validHandler, props.adhocFilter.operatorId);
   // TODO: This does not need to exist, just use the advancedTypeOperatorList list
   const isOperatorRelevantWrapper = (operator: Operators, subject: string) =>
     subjectAdvancedDataType && !advancedDataTypesState.useDefaultOperators

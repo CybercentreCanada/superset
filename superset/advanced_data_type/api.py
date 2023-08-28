@@ -93,6 +93,7 @@ class AdvancedDataTypeRestApi(BaseSupersetApi):
         item = kwargs["rison"]
         advanced_data_type: str = item["type"]
         values = item["values"]
+        operator = item["operator"]
         addon = ADVANCED_DATA_TYPES.get(advanced_data_type.lower())
         if not addon:
             return self.response(
@@ -105,6 +106,7 @@ class AdvancedDataTypeRestApi(BaseSupersetApi):
         bus_resp: AdvancedDataTypeResponse = addon.translate_type(
             {
                 "values": values,
+                "operator": operator,
             }
         )
         return self.response(200, result=bus_resp)
