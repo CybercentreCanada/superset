@@ -56,7 +56,7 @@ const AdvancedDataTypeValueControlValueControl: React.FC<Props> = ({
     advancedDataTypesState,
     subjectAdvancedDataType,
     fetchAdvancedDataTypeValueCallback,
-  } = useAdvancedDataTypes(() => {}, default_advanced_data_type_state);
+  } = useAdvancedDataTypes(() => {}, '', default_advanced_data_type_state);
 
   const onChangeWrapper = (selection: any) => {
     setValidationErrors(
