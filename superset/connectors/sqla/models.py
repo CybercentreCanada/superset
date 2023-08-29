@@ -1528,6 +1528,7 @@ class SqlaTable(Model, BaseDatasource):  # pylint: disable=too-many-public-metho
                         {
                             "type": col_advanced_data_type,
                             "values": values,
+                            "operator": op,
                         }
                     )
                     if bus_resp["error_message"]:
