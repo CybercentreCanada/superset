@@ -101,6 +101,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
     inverseSelection,
     defaultToFirstItem,
     searchAllOptions,
+    disableFetchOptions,
   } = formData;
   const groupby = useMemo(
     () => ensureIsArray(formData.groupby).map(getColumnLabel),
@@ -258,10 +259,11 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
     setDataMask(dataMask);
   }, [JSON.stringify(dataMask)]);
 
-  const placeholderText =
-    data.length === 0
-      ? t('No data')
-      : tn('%s option', '%s options', data.length, data.length);
+  const placeholderText = disableFetchOptions
+    ? null
+    : data.length === 0
+    ? t('No data')
+    : tn('%s option', '%s options', data.length, data.length);
 
   const formItemExtra = useMemo(() => {
     if (filterState.validateMessage) {
@@ -276,6 +278,9 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
 
   const options = useMemo(() => {
     const options: { label: string; value: DataRecordValue }[] = [];
+    if (disableFetchOptions) {
+      return options;
+    }
     data.forEach(row => {
       const [value] = groupby.map(col => row[col]);
       options.push({
