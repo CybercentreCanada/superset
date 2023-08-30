@@ -35,20 +35,12 @@ export const baseFormData = {
       result_format: "json",
       result_type: "post_processed",
       row_limit: 10,
-      time_grain_sqla: "P1D",
-      time_range: "Last day",
       timeseries_limit_metric: null,
       viz_type: "cccs_grid"
     },
     queries: [
       {
-        extras: {
-          time_grain_sqla: "P1D",
-        },
-        order_desc: true,
-        row_limit: 10,
-        time_range: "Last day",
-        timeseries_limit: 0,
+        row_limit: 10
       }
     ],
     result_format: "json",
@@ -87,12 +79,13 @@ export const cccsExploreView = {
 }
 
 export const graphql_queries = {
-  get_search_results_for_multiple: 'query getSearchResultsForMultiple($input: ScrollAcrossEntitiesInput!) { \
+  query_scrollAcrossEntities: 'query scrollAcrossEntities($input: ScrollAcrossEntitiesInput!) { \
     scrollAcrossEntities(input: $input) { \
         ...scrollResults \
       } \
     } \
     fragment scrollResults on ScrollResults { \
+      nextScrollId \
       searchResults { \
         entity { \
           ...searchResultFields \
