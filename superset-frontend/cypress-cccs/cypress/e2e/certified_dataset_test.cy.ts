@@ -56,8 +56,7 @@ describe('Test Dataset Generation script', () => {
   /**
    * Get the partion column of a dataset.
    * 
-   * @param entity 
-   * 
+   * @param dataset The dataset object
    * @returns The partition column or undefined if not found
    */
   function getPartitionColumn(dataset: any) {
@@ -162,11 +161,12 @@ describe('Test Dataset Generation script', () => {
 
   /**
    * Run a dummy query in Superset against a dataset with all the columns.
+   * 
    * @param id The dataset id
    * @param defaultDateTimeColumn the default date column / partition column
    * @param columns an array of columns
    */
-  function runDummySupersetDatasetQuery(id: string, defaultDateTimeColumn: undefined, columns: string[], messagePrefix: string) {
+  function runSimpleSupersetDatasetQuery(id: string, defaultDateTimeColumn: undefined, columns: string[], messagePrefix: string) {
     let formData = { ...baseFormData.form_data, datasource: id + '__table', columns: columns }
     let datasource = { ...baseFormData.datasource, id: id }
     let query
@@ -207,7 +207,6 @@ describe('Test Dataset Generation script', () => {
 
   it('Collect discrepancies between Datahub and Superset datasets for specific glossary terms or domains', () => {
 
-    let method = 'POST'
     let headers = { 'Authorization': `Bearer ${DATAHUB_PAT}` }
     let input = {
       'count': 10000,
@@ -219,9 +218,9 @@ describe('Test Dataset Generation script', () => {
       'query': '*',
       'types': ['DATASET'],
     }
-    let datasets_data = {'query': graphql_queries.query_scrollAcrossEntities, 'variables': {'input': input}}
+    let postData = {'query': graphql_queries.query_scrollAcrossEntities, 'variables': {'input': input}}
 
-    cy.request({method: method, url: GRAPHQL_URL, headers: headers, body: datasets_data}).then((response) => {
+    cy.request({method: 'POST', url: GRAPHQL_URL, headers: headers, body: postData}).then((response) => {
       let entities = response.body['data']['scrollAcrossEntities']['searchResults']
       // TODO Deal with nextScrollId until null
       cy.log(`Found ${entities.length} datasets matching the criteria`)
@@ -234,9 +233,10 @@ describe('Test Dataset Generation script', () => {
         }
         // Call DataHub to get the metadata of the dataset
         let datasetData = {'query': graphql_queries.get_dataset, 'variables': {'urn': datasetUrn}}
-        cy.request({method: method, url: GRAPHQL_URL, headers: headers, body: datasetData}).then((response) => {
+        cy.request({method: 'POST', url: GRAPHQL_URL, headers: headers, body: datasetData}).then((response) => {
           let dataset = response.body['data']['dataset']
           let datasetFullQualifiedName = dataset['name']
+          cy.log('Processing ' + datasetFullQualifiedName + '...')
           // If the entity is a dbt dataset, use the Iceberg table sibling as
           // the dbt version does not have partition column information nor
           // displays the correct data type for complex fields (arrays, structs, etc.)
@@ -266,7 +266,7 @@ describe('Test Dataset Generation script', () => {
                   datasetPartitionColumn = getPartitionColumn(dataset['siblings']['siblings'][0])
             }
             let editableSchemaMetadata = dataset['editableSchemaMetadata']
-            // Collecting DataHub dataset advanced data types and description for all fields
+            // Collecting DataHub dataset advanced data types and descriptions for all fields
             let descriptions: Map<string, string> = new Map<string, string>();
             let advancedDatatypes: Map<string, string> = new Map<string, string>();
             if (editableSchemaMetadata && editableSchemaMetadata['editableSchemaFieldInfo']) {
@@ -425,9 +425,8 @@ describe('Test Dataset Generation script', () => {
                     datasetResponse.body.result.columns.forEach((column: any) => {
                       columns.push(column.column_name)
                     })
-
                     // Check a simple query with all the columns
-                    runDummySupersetDatasetQuery(supersetDatasetId, datasetPartitionColumn, columns, errorDatasetPrefix)
+                    runSimpleSupersetDatasetQuery(supersetDatasetId, datasetPartitionColumn, columns, errorDatasetPrefix)
                   })
                 }
                 else {
