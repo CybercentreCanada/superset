@@ -195,7 +195,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   } else if (enableGrouping) {
     // enable row grouping
     columnDefs = columnDefs.map(c => {
-      const enableRowGroup = true;
       const rowGroupIndex = defaultGroupBy.findIndex(
         (element: any) => element === c.field,
       );
@@ -203,7 +202,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
       const hide = rowGroup;
       return {
         ...c,
-        enableRowGroup,
         rowGroup,
         rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
         hide,
