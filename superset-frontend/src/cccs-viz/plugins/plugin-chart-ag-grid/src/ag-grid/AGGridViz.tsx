@@ -24,15 +24,15 @@ import ChartContextMenu, {
 
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
+import DownloadEMLFilterMenuItem from './ContextMenu/MenuItems/DownloadEMLMenuItem';
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
-import {AGGridVizProps} from '../types'
+import { AGGridVizProps } from '../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 import { ensureIsArray } from '@superset-ui/core';
-
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -42,12 +42,12 @@ ModuleRegistry.registerModules([
   RichSelectModule,
 ]);
 
-type DataMap = { [key: string]: string[] }
+type DataMap = { [key: string]: string[] };
 
 type gridData = {
-  highlightedData: DataMap,
-  princibleData: DataMap,
-} 
+  highlightedData: DataMap;
+  princibleData: DataMap;
+};
 
 export default function AGGridViz({
   columnDefs,
@@ -61,16 +61,18 @@ export default function AGGridViz({
   setDataMask,
   principalColumns,
 }: AGGridVizProps) {
-
   const crossFilterValue = useSelector<RootState, any>(
     state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
   const dispatch = useDispatch();
-  
+
   const contextMenuRef = useRef<ContextRef>(null);
 
-  const [, setInContextMenu] = useState<boolean>(false)
-  const [selectedData, setSelectedData] = useState<gridData>({highlightedData: {}, princibleData: {}})
+  const [, setInContextMenu] = useState<boolean>(false);
+  const [selectedData, setSelectedData] = useState<gridData>({
+    highlightedData: {},
+    princibleData: {},
+  });
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(pageLength);
@@ -111,128 +113,140 @@ export default function AGGridViz({
     setSearchValue(target.value);
   };
 
+  useEffect(() => {
+    if (!includeSearch) {
+      setSearchValue('');
+    }
+  }, [includeSearch]);
 
-    useEffect(() => {
-        if (!includeSearch) {
-        setSearchValue('');
-        }
-    }, [includeSearch]);
+  const onRangeSelectionChanged = useCallback(
+    (event: RangeSelectionChangedEvent) => {
+      var cellRanges = gridRef.current!.api.getCellRanges();
+      const newSelectedData: { [key: string]: string[] } = {};
+      const principleData: { [key: string]: string[] } = {};
 
-    const onRangeSelectionChanged = useCallback(
-        (event: RangeSelectionChangedEvent) => {
-          var cellRanges = gridRef.current!.api.getCellRanges();
-          const newSelectedData: { [key: string]: string[] } = {}
-          const principleData: { [key: string]: string[] } = {}
+      if (cellRanges) {
+        cellRanges.forEach(function (range: CellRange) {
+          // get starting and ending row, remember rowEnd could be before rowStart
+          var startRow = Math.min(
+            range.startRow!.rowIndex,
+            range.endRow!.rowIndex,
+          );
+          var endRow = Math.max(
+            range.startRow!.rowIndex,
+            range.endRow!.rowIndex,
+          );
+          var api = gridRef.current!.api!;
+          for (var rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+            range.columns.forEach(function (column: any) {
+              const col = column.colDef?.field;
+              newSelectedData[col] = newSelectedData[col] || [];
+              const rowModel = api.getModel();
+              const rowNode = rowModel.getRow(rowIndex)!;
+              const value = api.getValue(column, rowNode);
 
-          if (cellRanges) {
-            cellRanges.forEach(function (range: CellRange) {
-              // get starting and ending row, remember rowEnd could be before rowStart
-              var startRow = Math.min(
-                range.startRow!.rowIndex,
-                range.endRow!.rowIndex
-              );
-              var endRow = Math.max(
-                range.startRow!.rowIndex,
-                range.endRow!.rowIndex
-              );
-              var api = gridRef.current!.api!;
-              for (var rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-              
-                range.columns.forEach(function (column: any) {
-                  const col = column.colDef?.field;
-                  newSelectedData[col] = newSelectedData[col] || []
-                  const rowModel = api.getModel();
-                  const rowNode = rowModel.getRow(rowIndex)!;
-                  const value = api.getValue(column, rowNode); 
-                    
-                  if (!newSelectedData[col].includes(value)) {
-                      newSelectedData[col].push(value);
-                  }                
-                });
-                principalColumns.forEach((column: any) => {
-                  const col = column;
-                  principleData[col] = principleData[col] || [];
-                  const rowModel = api.getModel();
-                  const rowNode = rowModel.getRow(rowIndex)!;
-                  const value = api.getValue(column, rowNode); 
+              if (!newSelectedData[col].includes(value)) {
+                newSelectedData[col].push(value);
+              }
+            });
+            principalColumns.forEach((column: any) => {
+              const col = column;
+              principleData[col] = principleData[col] || [];
+              const rowModel = api.getModel();
+              const rowNode = rowModel.getRow(rowIndex)!;
+              const value = api.getValue(column, rowNode);
 
-                  if (!principleData[col].includes(value)) {
-                    principleData[col].push(value);
-                  }     
-                });
-            }
+              if (!principleData[col].includes(value)) {
+                principleData[col].push(value);
+              }
             });
           }
-          setSelectedData({highlightedData: newSelectedData, princibleData: principleData})
+        });
+      }
+      setSelectedData({
+        highlightedData: newSelectedData,
+        princibleData: principleData,
+      });
+    },
+    [],
+  );
+  const onClick = (data: DataMap) => {
+    emitFilter(data);
+  };
+  const emitFilter = useCallback(
+    Data => {
+      const groupBy = Object.keys(Data);
+      const groupByValues = Object.values(Data);
+      setDataMask({
+        extraFormData: {
+          filters:
+            groupBy.length === 0
+              ? []
+              : groupBy.map(col => {
+                  const val = ensureIsArray(Data?.[col]);
+                  if (val === null || val === undefined)
+                    return {
+                      col,
+                      op: 'IS NULL',
+                    };
+                  return {
+                    col,
+                    op: 'IN',
+                    val,
+                  };
+                }),
         },
-        []
-      );
-      const onClick = (data: DataMap) => {
-        emitFilter(data)
-      } 
-      const emitFilter = useCallback(
-        Data => {
-          const groupBy = Object.keys(Data);
-          const groupByValues = Object.values(Data);
-          setDataMask({
-            extraFormData: {
-              filters:
-                groupBy.length === 0
-                  ? []
-                  : groupBy.map(col => {
-                      const val = ensureIsArray(Data?.[col]);
-                      if (val === null || val === undefined)
-                        return {
-                          col,
-                          op: 'IS NULL',
-                        };
-                      return {
-                        col,
-                        op: 'IN',
-                        val,
-                      };
-                    }),
-            },
-            filterState: {
-              value: groupByValues.length ? groupByValues : null,
-            },
-          });
+        filterState: {
+          value: groupByValues.length ? groupByValues : null,
         },
-        [setDataMask],
-      ); // only take relevant page size options
-    
+      });
+    },
+    [setDataMask],
+  ); // only take relevant page size options
 
-    const handleOnContextMenu = (offsetX: number, offsetY: number, filters: any) => {
-    
-        contextMenuRef.current?.open(offsetX, offsetY, filters, [
-          <CopyMenuItem selectedData={selectedData.highlightedData}/>,
-          <EmitFilterMenuItem 
-              onClick={() => {onClick(selectedData.highlightedData)}}
-              label={"Emit Filter(s)"}
-              disabled={ Object.keys(selectedData.highlightedData).length === 0 }
-            />,
-          <EmitFilterMenuItem 
-            onClick={() => {onClick(selectedData.princibleData)}}
-            label={"Emit Principle Column Filter(s)"}
-            disabled={ Object.keys(selectedData.princibleData).length === 0 }
-          />,
-          <EmitFilterMenuItem 
-            onClick={() => dispatch(clearDataMask(formData.sliceId))}
-            label={"Clear Emited Filter(s)"}
-            disabled={ crossFilterValue === undefined }
-         />,
-         
-        ]);
-        setInContextMenu(true);
-    }
-    
-    const handleContextMenuSelected = () => {
-        setInContextMenu(false);
-    }
-    
-    const handleContextMenuClosed = () => {
-        setInContextMenu(false );
-    }
+  const handleOnContextMenu = (
+    offsetX: number,
+    offsetY: number,
+    filters: any,
+  ) => {
+    contextMenuRef.current?.open(offsetX, offsetY, filters, [
+      <CopyMenuItem selectedData={selectedData.highlightedData} />,
+      <EmitFilterMenuItem
+        onClick={() => {
+          onClick(selectedData.highlightedData);
+        }}
+        label="Emit Filter(s)"
+        disabled={Object.keys(selectedData.highlightedData).length === 0}
+      />,
+      <EmitFilterMenuItem
+        onClick={() => {
+          onClick(selectedData.princibleData);
+        }}
+        label="Emit Principle Column Filter(s)"
+        disabled={Object.keys(selectedData.princibleData).length === 0}
+      />,
+      <EmitFilterMenuItem
+        onClick={() => dispatch(clearDataMask(formData.sliceId))}
+        label="Clear Emited Filter(s)"
+        disabled={crossFilterValue === undefined}
+      />,
+      <DownloadEMLFilterMenuItem
+        label="Download EML"
+        disabled={false}
+        selectedData={selectedData.highlightedData}
+      />,
+    ]);
+    setInContextMenu(true);
+  };
+
+  const handleContextMenuSelected = () => {
+    setInContextMenu(false);
+  };
+
+  const handleContextMenuClosed = () => {
+    setInContextMenu(false);
+  };
+
   useEffect(() => {
     if (!includeSearch) {
       setSearchValue('');
