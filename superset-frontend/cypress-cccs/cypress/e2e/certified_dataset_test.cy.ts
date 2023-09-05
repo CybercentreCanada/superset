@@ -166,11 +166,11 @@ describe('Test Dataset Generation script', () => {
    * @param defaultDateTimeColumn the default date column / partition column
    * @param columns an array of columns
    */
-  function runSimpleSupersetDatasetQuery(id: string, defaultDateTimeColumn: undefined, columns: string[], messagePrefix: string) {
+  function runSimpleSupersetDatasetQuery(id: string, dateTimeColumn: undefined, columns: string[], messagePrefix: string) {
     let formData = { ...baseFormData.form_data, datasource: id + '__table', columns: columns }
     let datasource = { ...baseFormData.datasource, id: id }
     let query
-    if (defaultDateTimeColumn) {
+    if (dateTimeColumn) {
       query = { ...baseFormData.queries[0], columns: columns, filters: [{ col: defaultDateTimeColumn, op: 'TEMPORAL_RANGE', val: 'Last week'}] }
     }
     else {
@@ -190,8 +190,8 @@ describe('Test Dataset Generation script', () => {
         // Query is fine
         if (dummyQueryResponse.body.result[0].data.length == 0) {
           // Query is fine but we anticipated some results
-          if (defaultDateTimeColumn) {
-            warnings.push(`${messagePrefix}, 'has no data for the last week'`)
+          if (dateTimeColumn) {
+            warnings.push(`${messagePrefix}, ' has no data for the last week'`)
           }
           else {
             warnings.push(`${messagePrefix}, ' no data could be found'`)
@@ -359,8 +359,9 @@ describe('Test Dataset Generation script', () => {
                         errors.push(`${errorDatasetPrefix}, the warning message to indicate there is no default temporal column is missing from the extra settings`)
                       }
                     }
-                    if (datasetPartitionColumn != datasetResponse.body.result.main_dttm_col) {
-                      errors.push(`${errorDatasetPrefix}, partition field does not match: partition field '${datasetPartitionColumn}' vs main temporal field '${datasetResponse.body.result.main_dttm_col}' `)
+                    let mainDateTimeColumn = datasetResponse.body.result.main_dttm_col
+                    if (datasetPartitionColumn != mainDateTimeColumn) {
+                      errors.push(`${errorDatasetPrefix}, partition field does not match: partition field '${datasetPartitionColumn}' vs main temporal field '${mainDateTimeColumn}' `)
                     }
                     // Check fields
                     let supersetDatasetFieldCount = datasetResponse.body.result.columns.length
@@ -426,7 +427,7 @@ describe('Test Dataset Generation script', () => {
                       columns.push(column.column_name)
                     })
                     // Check a simple query with all the columns
-                    runSimpleSupersetDatasetQuery(supersetDatasetId, datasetPartitionColumn, columns, errorDatasetPrefix)
+                    runSimpleSupersetDatasetQuery(supersetDatasetId, mainDateTimeColumn, columns, errorDatasetPrefix)
                   })
                 }
                 else {
@@ -442,6 +443,7 @@ describe('Test Dataset Generation script', () => {
             // Error parsing the schema, catalog and table names
             errors.push(`Error parsing the full qualified name for Datahub dataset ${datasetFullQualifiedName}`)
           }
+          cy.log('Processing ' + datasetFullQualifiedName + ' done')
         })
       })
 
