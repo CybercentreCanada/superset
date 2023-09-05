@@ -249,7 +249,6 @@ describe('Test Dataset Generation script', () => {
             }
             else {
               warnings.push(`Dataset ${datasetFullQualifiedName} does not have a sibling Iceberg dataset, will be skipped`)
-              return false
             }
           }
           let nameStructure = parseDatasetName(datasetFullQualifiedName)
@@ -457,6 +456,6 @@ describe('Test Dataset Generation script', () => {
         cy.log(warning)
       })
     }
-    expect(errors, 'Ensure error list is empty: \n' + errors.join('\n') + '\n').to.be.empty
+    expect(errors, 'Ensure error list is not empty: \n' + errors.join('\n') + '\n').to.be.empty
   })
 })
