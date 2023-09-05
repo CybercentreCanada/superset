@@ -31,7 +31,6 @@ const {
   defaultToFirstItem,
   searchAllOptions,
   sortAscending,
-  disableFetchOptions,
 } = DEFAULT_FORM_DATA;
 
 const config: ControlPanelConfig = {
@@ -59,16 +58,6 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         [
-          {
-            name: 'disableFetchOptions',
-            config: {
-              type: 'CheckboxControl',
-              renderTrigger: true,
-              label: t('Disable fetch options'),
-              default: disableFetchOptions,
-              description: t('Check for disabling fetching options'),
-            },
-          },
           {
             name: 'sortAscending',
             config: {
