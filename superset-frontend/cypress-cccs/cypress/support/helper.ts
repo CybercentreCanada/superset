@@ -212,6 +212,15 @@ export const graphql_queries = {
     domain { \
     ...entityDomain \
     } \
+    properties { \
+      customProperties { \
+        key \
+        value \
+      } \
+    } \
+    status { \
+      removed \
+    } \
   }'
 }
 

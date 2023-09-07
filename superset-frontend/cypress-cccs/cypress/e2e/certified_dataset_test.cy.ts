@@ -6,6 +6,7 @@ import { COMPLEX_STRUCTURES_DATASET,
   SQLLAB_URL } from '../support/helper'
 import { exploreView } from '../support/directories'
 import { graphql_queries } from  '../support/helper';
+import { log } from 'cypress/lib/logger';
 
 const DATAHUB_BASE_URL = Cypress.env('datahubBaseUrl')
 const GLOSSARY_TERMS_URNS: string[] = Cypress.env('glossaryTermsUrns')
@@ -42,6 +43,7 @@ describe('Test Dataset Generation script', () => {
   const DEFAULT_COMPLEX_DATA_TYPE = "JSON"
   const DBT_URN = 'urn:li:dataset:(urn:li:dataPlatform:dbt'
   const ICEBERG_URN = 'urn:li:dataset:(urn:li:dataPlatform:iceberg'
+  const RAW_JSON_COLUMN_NAME = 'rawJSON'
 
   let warnings: Array<string> = []
   let errors: Array<string> = []
@@ -59,17 +61,18 @@ describe('Test Dataset Generation script', () => {
    * @param dataset The dataset object
    * @returns The partition column or undefined if not found
    */
-  function getPartitionColumn(dataset: any) {
+  function getPartitionColumn(entity: any) {
     let partitionSpec = undefined
-    if (dataset['properties'] && dataset['properties']['customProperties']) {
-      dataset["properties"]["customProperties"].forEach((properties: any) => {
-        if (properties['key'] == "partition-spec") {
-          let aJson = JSON.parse(properties["value"]);
-          aJson.forEach((item: any) => {
+    if (entity['properties'] && entity['properties']['customProperties']) {
+      entity['properties']['customProperties'].forEach((properties: any) => {
+        if (properties['key'] == 'partition-spec') {
+          for (let item of JSON.parse(properties['value'])) {
             if (ACCEPTED_PARTITION_DATATYPES.includes(item['source-type'])) {
+              // First item that qualifies determines the partition column
               partitionSpec = item['source']
+              break
             }
-          })
+          }
         }
       })
     }
@@ -86,11 +89,11 @@ describe('Test Dataset Generation script', () => {
     let owners = new Array()
     if (entity['ownership'] && entity['ownership']['owners']) {
       entity['ownership']['owners'].forEach((owner: any) => {
-        if (owner["owner"] && owner["owner"]["info"] && owner["owner"]["info"]["displayName"]) {
-          owners.push(owner["owner"]["info"]["displayName"])
+        if (owner['owner'] && owner['owner']['info'] && owner['owner']['info']['displayName']) {
+          owners.push(owner['owner']['info']['displayName'])
         }
-        else if (owner["owner"]["type"]) {
-          let ownerNameType = owner["owner"]["type"]
+        else if (owner['owner']['type']) {
+          let ownerNameType = owner['owner']['type']
           if (ownerNameType == 'CORP_USER') {
             owners.push(owner['owner']['username'])
           }
@@ -125,10 +128,13 @@ describe('Test Dataset Generation script', () => {
    * @param datatype The datatype we want to translate.
    * @returns The Superset datatype, never null.
    */
-  function getSupersetDatatype(datatype: string) {
+  function getSupersetDatatype(datatype: string, columnName: string) {
     datatype = datatype.toUpperCase()
     let returnDatatype = datatype
-    if (datatype == 'STRING' || datatype.startsWith('VARCHAR')) {
+    if (COMPLEX_DATATYPES.includes(datatype) || columnName == RAW_JSON_COLUMN_NAME) {
+      returnDatatype = DEFAULT_COMPLEX_DATA_TYPE
+    }
+    else if (datatype == 'STRING' || datatype.startsWith('VARCHAR')) {
       returnDatatype = DEFAULT_SUPERSET_DATA_TYPE
     }
     else if (datatype == 'NUMBER') {
@@ -136,9 +142,6 @@ describe('Test Dataset Generation script', () => {
     }
     else if (TEMPORAL_DATATYPES.includes(datatype)) {
       returnDatatype = 'TIMESTAMP WITH TIME ZONE'
-    }
-    else if (COMPLEX_DATATYPES.includes(datatype)) {
-      returnDatatype = DEFAULT_COMPLEX_DATA_TYPE
     }
     return returnDatatype
   }
@@ -163,7 +166,7 @@ describe('Test Dataset Generation script', () => {
    * Run a dummy query in Superset against a dataset with all the columns.
    * 
    * @param id The dataset id
-   * @param defaultDateTimeColumn the default date column / partition column
+   * @param dateTimeColumn the default date column / partition column
    * @param columns an array of columns
    */
   function runSimpleSupersetDatasetQuery(id: string, dateTimeColumn: undefined, columns: string[], messagePrefix: string) {
@@ -171,7 +174,7 @@ describe('Test Dataset Generation script', () => {
     let datasource = { ...baseFormData.datasource, id: id }
     let query
     if (dateTimeColumn) {
-      query = { ...baseFormData.queries[0], columns: columns, filters: [{ col: defaultDateTimeColumn, op: 'TEMPORAL_RANGE', val: 'Last week'}] }
+      query = { ...baseFormData.queries[0], columns: columns, filters: [{ col: dateTimeColumn, op: 'TEMPORAL_RANGE', val: 'Last week'}] }
     }
     else {
       query = { ...baseFormData.queries[0], columns: columns }
@@ -223,32 +226,35 @@ describe('Test Dataset Generation script', () => {
     cy.request({method: 'POST', url: GRAPHQL_URL, headers: headers, body: postData}).then((response) => {
       let entities = response.body['data']['scrollAcrossEntities']['searchResults']
       // TODO Deal with nextScrollId until null
-      cy.log(`Found ${entities.length} datasets matching the criteria`)
+      cy.log(`Found ${entities.length} dataset(s) matching the criteria`)
       entities.forEach((entity: any) => {
         let datasetUrn :string = entity['entity']['urn']
         // Skip soft deleted datasets
         if (entity['status'] && entity['status']['removed']) {
           warnings.push(`Dataset ${datasetUrn} is soft deleted, will be skipped`)
-          return false
+          return
         }
         // Call DataHub to get the metadata of the dataset
         let datasetData = {'query': graphql_queries.get_dataset, 'variables': {'urn': datasetUrn}}
         cy.request({method: 'POST', url: GRAPHQL_URL, headers: headers, body: datasetData}).then((response) => {
           let dataset = response.body['data']['dataset']
           let datasetFullQualifiedName = dataset['name']
-          cy.log('Processing ' + datasetFullQualifiedName + '...')
-          // If the entity is a dbt dataset, use the Iceberg table sibling as
+          cy.log(`Processing '${datasetFullQualifiedName}'...`)
+          // If the entity is a Dbt dataset, use the Iceberg table sibling as
           // the dbt version does not have partition column information nor
           // displays the correct data type for complex fields (arrays, structs, etc.)
           if (datasetUrn.startsWith(DBT_URN)) {
-            if (entity['siblings'] &&
-                entity['siblings']['siblings'] && 
-                entity['siblings']['siblings'][0]['urn'] && 
-                String(entity['siblings']['siblings'][0]['urn']).startsWith(ICEBERG_URN)) {
-              dataset = entity["siblings"]["siblings"][0]
+            if (dataset['siblings'] &&
+                dataset['siblings']['siblings'] && 
+                dataset['siblings']['siblings'][0]['urn'] && 
+                String(dataset['siblings']['siblings'][0]['urn']).startsWith(ICEBERG_URN)) {
+              dataset = dataset["siblings"]["siblings"][0]
+              datasetUrn = dataset['urn']
+              cy.log(`Will be using Iceberg dataset '${dataset['name']}' with urn '${datasetUrn}'`)
             }
             else {
-              warnings.push(`Dataset ${datasetFullQualifiedName} does not have a sibling Iceberg dataset, will be skipped`)
+              warnings.push(`Dataset '${datasetFullQualifiedName}' does not have a sibling Iceberg dataset, will be skipped`)
+              return
             }
           }
           let nameStructure = parseDatasetName(datasetFullQualifiedName)
@@ -262,7 +268,7 @@ describe('Test Dataset Generation script', () => {
             if (datasetPartitionColumn == undefined &&
                 dataset['siblings'] &&
                 dataset['siblings']['siblings']) {
-                  datasetPartitionColumn = getPartitionColumn(dataset['siblings']['siblings'][0])
+                datasetPartitionColumn = getPartitionColumn(dataset['siblings']['siblings'][0])
             }
             let editableSchemaMetadata = dataset['editableSchemaMetadata']
             // Collecting DataHub dataset advanced data types and descriptions for all fields
@@ -301,7 +307,7 @@ describe('Test Dataset Generation script', () => {
             })
             if (datahubDatasetFieldMap.size == 0) {
               warnings.push(`Dataset ${datasetFullQualifiedName} does not have any fields, will be skipped`)
-              return false
+              return
             }
             // Call Superset to find the unique identifier of the dataset
             if (databaseMap.has(catalog)) {
@@ -379,12 +385,12 @@ describe('Test Dataset Generation script', () => {
                               errors.push(`${errorFieldPrefix}, label is missing`)
                             }
                             // Check datatype
-                            let translatedDatatype = getSupersetDatatype(datahubDatasetField!.datatype)
+                            let translatedDatatype = getSupersetDatatype(datahubDatasetField!.datatype, column.column_name)
                             if (translatedDatatype != column.type) {
                               errors.push(`${errorFieldPrefix}, data types don't match: '${translatedDatatype}' vs '${column.type}'`)
                             }
                             // Check filterable flag
-                            if (COMPLEX_DATATYPES.includes(datahubDatasetField!.datatype)) {
+                            if (COMPLEX_DATATYPES.includes(datahubDatasetField!.datatype) || column.column_name == RAW_JSON_COLUMN_NAME) {
                               if (column.filterable) {
                                 errors.push(`${errorFieldPrefix}, flag 'filterable' is enabled but it should not be`)
                               }
@@ -442,7 +448,7 @@ describe('Test Dataset Generation script', () => {
             // Error parsing the schema, catalog and table names
             errors.push(`Error parsing the full qualified name for Datahub dataset ${datasetFullQualifiedName}`)
           }
-          cy.log('Processing ' + datasetFullQualifiedName + ' done')
+          cy.log(`Processing '${datasetFullQualifiedName}' completed`)
         })
       })
 
