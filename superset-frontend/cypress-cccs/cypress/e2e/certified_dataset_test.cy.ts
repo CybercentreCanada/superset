@@ -194,10 +194,10 @@ describe('Test Dataset Generation script', () => {
         if (dummyQueryResponse.body.result[0].data.length == 0) {
           // Query is fine but we anticipated some results
           if (dateTimeColumn) {
-            warnings.push(`${messagePrefix}, ' has no data for the last week'`)
+            warnings.push(`${messagePrefix}, has no data for the last week`)
           }
           else {
-            warnings.push(`${messagePrefix}, ' no data could be found'`)
+            warnings.push(`${messagePrefix}, no data could be found`)
           }
         }
       }
@@ -366,12 +366,12 @@ describe('Test Dataset Generation script', () => {
                     }
                     let mainDateTimeColumn = datasetResponse.body.result.main_dttm_col
                     if (datasetPartitionColumn != mainDateTimeColumn) {
-                      errors.push(`${errorDatasetPrefix}, partition field does not match: partition field '${datasetPartitionColumn}' vs main temporal field '${mainDateTimeColumn}' `)
+                      errors.push(`${errorDatasetPrefix}, main date column does not match: partition field '${datasetPartitionColumn}' vs main temporal field '${mainDateTimeColumn}' `)
                     }
                     // Check fields
                     let supersetDatasetFieldCount = datasetResponse.body.result.columns.length
                     if (supersetDatasetFieldCount === datahubDatasetFieldMap.size) {
-                        // TODO Check the order for fields, this is kind of broken with subsequent imports
+                        // TODO Check the order for fields, this is kind of broken with subsequent imports: see CLDN-2262
                         datasetResponse.body.result.columns.forEach((column: any) => {
                           let errorFieldPrefix = `${errorDatasetPrefix}, for field '${column.column_name}'`
                           if (datahubDatasetFieldMap.has(column.column_name)) {
