@@ -15,7 +15,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 
 import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
 import ChartContextMenu, {
@@ -76,6 +76,7 @@ export default function AGGridViz({
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(pageLength);
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
+  const [isDestroyed, setIsDestroyed] = useState(false);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
@@ -254,7 +255,20 @@ export default function AGGridViz({
     handleOnContextMenu(event.pageX, event.pageY, []);
   };
 
-  return (
+  const recreateGrid = () => {
+    setIsDestroyed(false);
+  };
+
+  const destroyGrid = () => {
+    setIsDestroyed(true);
+    setTimeout(() => recreateGrid(), 0);
+  };
+
+  useEffect(() => {
+    destroyGrid();
+  }, [enableGrouping]);
+
+  return !isDestroyed ? (
     <>
       <ChartContextMenu
         ref={contextMenuRef}
@@ -325,7 +339,7 @@ export default function AGGridViz({
         <AgGridReact
           ref={gridRef}
           animateRows
-          className="ag-theme-alpine"
+          className="ag-theme-balham"
           columnDefs={columnDefsStateful}
           defaultColDef={defaultColDef}
           enableRangeSelection
@@ -348,5 +362,7 @@ export default function AGGridViz({
         />
       </div>
     </>
+  ) : (
+    <div />
   );
 }
