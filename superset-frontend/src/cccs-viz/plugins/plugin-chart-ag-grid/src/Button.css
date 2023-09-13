@@ -12,6 +12,10 @@
   margin-left: 5px;
 }
 
+.ag-grid-btn:focus {
+  box-shadow: none !important;
+}
+
 .ag-grid-btn-expand {
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
