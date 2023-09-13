@@ -88,10 +88,10 @@ const calcColumnColumnDefs = (
   }, columnDataMap);
 
   const columnDefs = columns.map((column: any) => {
-    const columnType = columnDataMap[column].type;
-    const advancedType = columnDataMap[column].advanced_data_type;
-    const columnHeader = columnDataMap[column].verbose_name
-      ? columnDataMap[column].verbose_name
+    const columnType = columnDataMap[column]?.type || "";
+    const advancedType = columnDataMap[column]?.advanced_data_type|| "";
+    const columnHeader = columnDataMap[column]?.verbose_name
+      ? columnDataMap[column]?.verbose_name
       : column;
     const cellRenderer =
       advancedType.toUpperCase() in rendererMap
@@ -101,7 +101,7 @@ const calcColumnColumnDefs = (
         : undefined;
     const isSortable = true;
     const enableRowGroup = true;
-    const columnDescription = columnDataMap[column].description;
+    const columnDescription = columnDataMap[column]?.description || "";
     const autoHeight = true;
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
@@ -208,7 +208,8 @@ export default function transformProps(chartProps: CccsTableChartProps) {
       };
     });
   }
-
+  const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
+  
   return {
     width,
     height,
@@ -219,6 +220,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     pageLength,
     enableGrouping,
     principalColumns,
+    agGridLicenseKey,
     setDataMask,
   };
 }

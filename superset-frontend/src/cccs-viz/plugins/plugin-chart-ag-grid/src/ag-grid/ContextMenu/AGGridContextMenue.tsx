@@ -34,6 +34,7 @@ import React, {
       filters?: BinaryQueryObjectFilterClause[],
       extraContextMenuItems?: any[],
     ) => void;
+    close: () => void;
   }
   
   const ChartContextMenu = (
@@ -43,7 +44,8 @@ import React, {
     const canExplore = useSelector((state: RootState) =>
       findPermission('can_explore', 'Superset', state.user?.roles),
     );
-  
+    const [visible, setVisible] = useState(false);
+
     const [{ clientX, clientY, extraContextMenuItems }, setState] = useState<{
       clientX: number;
       clientY: number;
@@ -81,18 +83,30 @@ import React, {
         // use a hidden span that gets clicked on when receiving click events
         // from the charts.
         document.getElementById(`hidden-span-${id}`)?.click();
+        setVisible(true);
       },
       [id, showDrillToDetail],
     );
-  
+      
+    const close = useCallback(
+      () => {
+        
+        setVisible(false);
+      },
+      [],
+    );
+
     useImperativeHandle(
       ref,
       () => ({
         open,
+        close,
       }),
       [open],
     );
-  
+    
+
+
     return ReactDOM.createPortal(
       <Dropdown
         overlay={
@@ -106,6 +120,7 @@ import React, {
         }
         trigger={['click']}
         onVisibleChange={value => !value && onClose()}
+        visible={visible}
       >
         <span
           id={`hidden-span-${id}`}
