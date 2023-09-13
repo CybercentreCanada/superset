@@ -297,8 +297,6 @@ const config: ControlPanelConfig = {
                     : [];
                 return newState;
               },
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_grouping?.value),
               canCopy: true,
             },
           },
