@@ -1,4 +1,4 @@
-import { ChartProps, QueryFormData, SetDataMaskHook } from '@superset-ui/core';
+import { ChartDataResponseResult, ChartProps, QueryFormData, SetDataMaskHook } from '@superset-ui/core';
 
 export type CccsTableFormData = QueryFormData & {
   includeSearch: boolean;
@@ -13,6 +13,7 @@ export type CccsTableFormData = QueryFormData & {
 
 export type CccsTableChartProps = ChartProps & {
   formData: CccsTableFormData;
+  queriesData: AgGridChartDataResponseResult[];
 };
 
 export type AGGridVizProps = {
@@ -26,5 +27,11 @@ export type AGGridVizProps = {
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   principalColumns: string[];
+  agGridLicenseKey: string;
   setDataMask: SetDataMaskHook;
 };
+
+export interface AgGridChartDataResponseResult
+  extends ChartDataResponseResult {
+  agGridLicenseKey: string;
+}

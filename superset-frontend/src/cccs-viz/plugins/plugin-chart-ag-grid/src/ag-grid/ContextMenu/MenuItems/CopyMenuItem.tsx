@@ -3,20 +3,27 @@
 import { Menu } from 'src/components/Menu';
 
 import { useCallback} from 'react';
-import { ExpandAltOutlined } from '@ant-design/icons';
+import { CopyFilled } from '@ant-design/icons';
 
 interface CopyMenuItemProps {
     selectedData: { [key: string]: string[] };
+    onSelection: () => void;
     isContextMenu?: boolean;
     contextMenuY?: number;
-    onSelection?: () => void;
+  
 }
 
 export default function CopyMenuItem (props: CopyMenuItemProps) {
 
     const copyText = useCallback(
         () => {
-            navigator.clipboard.writeText(JSON.stringify(props.selectedData));
+            let copiedItem = "" 
+            for (const [key, value] of Object.entries(props.selectedData)) {
+                console.log(key, value);
+                copiedItem = copiedItem ? `${copiedItem},${value.toString()}`: `${value.toString()}` 
+            }
+            navigator.clipboard.writeText(copiedItem);
+            props.onSelection()
         }, [props.selectedData]   
     )
     return (
@@ -26,7 +33,7 @@ export default function CopyMenuItem (props: CopyMenuItemProps) {
             onClick={() => copyText()}
             key="drill-detail-no-filters"
             className='ant-menu-item'
-            icon={<ExpandAltOutlined />}
+            icon={<CopyFilled />}
         >Copy</Menu.Item>
 
     )

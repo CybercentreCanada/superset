@@ -24,6 +24,7 @@ import ChartContextMenu, {
 
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
+import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
@@ -32,6 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 import { ensureIsArray } from '@superset-ui/core';
+import { LicenseManager } from 'ag-grid-enterprise';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -59,7 +61,11 @@ export default function AGGridViz({
   enableGrouping,
   setDataMask,
   principalColumns,
+  agGridLicenseKey,
 }: AGGridVizProps) {
+
+  LicenseManager.setLicenseKey(agGridLicenseKey);
+  
   const crossFilterValue = useSelector<RootState, any>(
     state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
@@ -67,7 +73,7 @@ export default function AGGridViz({
 
   const contextMenuRef = useRef<ContextRef>(null);
 
-  const [, setInContextMenu] = useState<boolean>(false);
+  const [inContextMenu, setInContextMenu] = useState<boolean>(true);
   const [selectedData, setSelectedData] = useState<gridData>({
     highlightedData: {},
     princibleData: {},
@@ -77,6 +83,9 @@ export default function AGGridViz({
   const [pageSize, setPageSize] = useState<number>(pageLength);
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
+  const [contextDivID, setContextDivID] = useState(Math.random());
+
+  //document.getElementById("div")?.addEventListener("touchend", touchHandler, false);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
@@ -212,22 +221,27 @@ export default function AGGridViz({
     filters: any,
   ) => {
     contextMenuRef.current?.open(offsetX, offsetY, filters, [
-      <CopyMenuItem selectedData={selectedData.highlightedData} />,
+      <CopyMenuItem selectedData={selectedData.highlightedData} onSelection={handleContextMenuSelected} />,
+      <CopyWithHeaderMenuItem selectedData={selectedData.highlightedData} onSelection={handleContextMenuSelected} />,
       <EmitFilterMenuItem
         onClick={() => {
           onClick(selectedData.highlightedData);
         }}
+        onSelection={handleContextMenuSelected}
         label="Emit Filter(s)"
         disabled={Object.keys(selectedData.highlightedData).length === 0}
+        key={contextDivID.toString()}
       />,
       <EmitFilterMenuItem
         onClick={() => {
           onClick(selectedData.princibleData);
         }}
+        onSelection={handleContextMenuSelected}
         label="Emit Principle Column Filter(s)"
         disabled={Object.keys(selectedData.princibleData).length === 0}
       />,
       <EmitFilterMenuItem
+        onSelection={handleContextMenuSelected}
         onClick={() => dispatch(clearDataMask(formData.sliceId))}
         label="Clear Emited Filter(s)"
         disabled={crossFilterValue === undefined}
@@ -237,11 +251,11 @@ export default function AGGridViz({
   };
 
   const handleContextMenuSelected = () => {
-    setInContextMenu(false);
+    contextMenuRef.current?.close()
   };
 
   const handleContextMenuClosed = () => {
-    setInContextMenu(false);
+    contextMenuRef.current?.close()
   };
 
   useEffect(() => {
@@ -252,7 +266,8 @@ export default function AGGridViz({
 
   const onContextMenu = (event: any) => {
     event.preventDefault();
-    handleOnContextMenu(event.pageX, event.pageY, []);
+    handleOnContextMenu(event.clientX, event.clientY, []);
+    //setInContextMenu(true);
   };
 
   const recreateGrid = () => {
@@ -272,7 +287,7 @@ export default function AGGridViz({
     <>
       <ChartContextMenu
         ref={contextMenuRef}
-        id={1}
+        id={contextDivID}
         formData={formData}
         onSelection={handleContextMenuSelected}
         onClose={handleContextMenuClosed}
@@ -284,7 +299,6 @@ export default function AGGridViz({
           display: 'flex',
           flexFlow: 'column',
         }}
-        className="contextContainer"
         onContextMenu={onContextMenu}
       >
         <div
@@ -338,7 +352,7 @@ export default function AGGridViz({
         </div>
         <AgGridReact
           ref={gridRef}
-          animateRows
+          // animateRows
           className="ag-theme-balham"
           columnDefs={columnDefsStateful}
           defaultColDef={defaultColDef}
