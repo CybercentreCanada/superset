@@ -141,8 +141,15 @@ const calcColumnColumnDefs = (
 };
 
 export default function transformProps(chartProps: CccsTableChartProps) {
-  const { hooks, datasource, width, height, formData, queriesData } =
-    chartProps;
+  const {
+    hooks,
+    datasource,
+    width,
+    height,
+    formData,
+    queriesData,
+    emitCrossFilters,
+  } = chartProps;
   const {
     includeSearch,
     pageLength,
@@ -209,7 +216,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     });
   }
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
-  
+
   return {
     width,
     height,
@@ -222,5 +229,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     principalColumns,
     agGridLicenseKey,
     setDataMask,
+    emitCrossFilters,
   };
 }

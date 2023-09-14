@@ -31,7 +31,7 @@ function safeJsonObjectParse(
 // JSX which shows the JSON tree inline, and a button to collapse it
 function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
   return (
-    <>
+    <span style={{ display: 'flex' }}>
       <div style={{ float: 'left' }}>
         <button
           className="ag-grid-btn ag-grid-btn-collapse"
@@ -49,7 +49,7 @@ function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
           shouldExpandNode={() => true}
         />
       </div>
-    </>
+    </span>
   );
 }
 
