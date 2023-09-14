@@ -1,4 +1,9 @@
-import { ChartDataResponseResult, ChartProps, QueryFormData, SetDataMaskHook } from '@superset-ui/core';
+import {
+  ChartDataResponseResult,
+  ChartProps,
+  QueryFormData,
+  SetDataMaskHook,
+} from '@superset-ui/core';
 
 export type CccsTableFormData = QueryFormData & {
   includeSearch: boolean;
@@ -6,9 +11,9 @@ export type CccsTableFormData = QueryFormData & {
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   enableJsonExpand: boolean;
+  emitCrossFilters: boolean;
   principalColumns: string[];
   percent_metrics: string[];
-  
 };
 
 export type CccsTableChartProps = ChartProps & {
@@ -28,6 +33,7 @@ export type AGGridVizProps = {
   enableGrouping: boolean;
   principalColumns: string[];
   agGridLicenseKey: string;
+  emitCrossFilters: boolean;
   setDataMask: SetDataMaskHook;
 };
 
