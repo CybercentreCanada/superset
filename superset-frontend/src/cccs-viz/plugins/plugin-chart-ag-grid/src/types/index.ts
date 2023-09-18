@@ -25,7 +25,7 @@ export type AGGridVizProps = {
   formData: CccsTableFormData;
   width: any;
   height: any;
-  rowData: any[];
+  rowData: { [index: string]: any }[];
   columnDefs: any[];
   includeSearch: boolean;
   pageLength: number;
@@ -37,7 +37,6 @@ export type AGGridVizProps = {
   setDataMask: SetDataMaskHook;
 };
 
-export interface AgGridChartDataResponseResult
-  extends ChartDataResponseResult {
+export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
 }
