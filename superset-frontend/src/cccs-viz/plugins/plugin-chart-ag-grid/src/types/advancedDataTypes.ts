@@ -3,6 +3,7 @@ import DomainValueRenderer from './DomainValueRenderer';
 import Ipv4ValueRenderer from './Ipv4ValueRenderer';
 import Ipv6ValueRenderer from './Ipv6ValueRenderer';
 import JsonValueRenderer from './JsonValueRenderer';
+import TimestampWithoutTimezoneValueRenderer from './TimestampWithoutTimezoneValueRenderer';
 
 // Key is column advanced type, value is renderer
 export const rendererMap = {
@@ -11,6 +12,7 @@ export const rendererMap = {
   DOMAIN: DomainValueRenderer,
   COUNTRY: CountryValueRenderer,
   JSON: JsonValueRenderer,
+  'TIMESTAMP WITHOUT TIME ZONE': TimestampWithoutTimezoneValueRenderer,
 };
 
 export const formatIpV4 = (v: any) => {
