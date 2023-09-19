@@ -9,7 +9,7 @@ export type PrettyPrintVisualizationProps = QueryFormData & {
   width: number;
 };
 
-const PrettyPrintVisualization: React.FC<PrettyPrintVisualizationProps> =
+const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
   props => {
     const { values, errorMessage, height, width } = props;
 
@@ -39,4 +39,4 @@ const PrettyPrintVisualization: React.FC<PrettyPrintVisualizationProps> =
     );
   };
 
-export default memo(PrettyPrintVisualization);
+export default memo(JSONViewVisualization);
