@@ -48,33 +48,25 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const { formData, queriesData } = chartProps;
+  const data = chartProps.queriesData.flatMap(
+    q => q.data,
+  ) as TimeseriesDataRecord[];
 
-  const { url, parameterName, parameterPrefix, groupby } = formData;
-
-  const data = queriesData[0]?.data as TimeseriesDataRecord[];
-
-  let value: string | number | true | Date = '';
   let errorMessage = '';
 
-  if (Array.isArray(data) && data.length > 1) {
-    errorMessage =
-      'The query returned too many rows when only one was expected.';
-  }
+  // if (Array.isArray(data) && data.length > 1) {
+  //   errorMessage =
+  //     'The query returned too many rows when only one was expected.';
+  // }
 
   if (Array.isArray(data) && data.length === 0) {
     errorMessage = 'The query returned no rows.';
   }
 
-  if (Array.isArray(data) && data.length === 1) {
-    value = data[0][groupby] || '';
-  }
-
   return {
-    url_parameter_value: value,
-    parameter_name: parameterName,
-    url,
-    parameter_prefix: parameterPrefix,
+    values: data,
     errorMessage,
+    height: chartProps.height,
+    width: chartProps.width,
   };
 }

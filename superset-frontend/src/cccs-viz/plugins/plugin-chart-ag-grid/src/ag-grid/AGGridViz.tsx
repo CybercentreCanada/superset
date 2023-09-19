@@ -24,7 +24,7 @@ import { LicenseManager } from 'ag-grid-enterprise';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-import { ExplorePageState } from 'src/explore/types';
+// import { ExplorePageState } from 'src/explore/types';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -86,7 +86,7 @@ export default function AGGridViz({
   const [rowDataStateful, setRowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  const exploreState = useSelector((state: ExplorePageState) => state.explore);
+  // const exploreState = useSelector((state: ExplorePageState) => state.explore);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);

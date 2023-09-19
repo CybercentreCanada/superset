@@ -1,6 +1,7 @@
+import React, { useCallback } from 'react';
+
 import { Menu } from 'src/components/Menu';
 
-import React, { useCallback } from 'react';
 import { CopyFilled } from '@ant-design/icons';
 
 interface CopyMenuItemProps {
@@ -13,14 +14,16 @@ interface CopyMenuItemProps {
 export default function CopyMenuItem(props: CopyMenuItemProps) {
   const copyText = useCallback(() => {
     let copiedItem = '';
-    for (const [key, value] of Object.entries(props.selectedData)) {
+    Object.entries(props.selectedData).forEach(([key, value]) => {
       copiedItem = copiedItem
         ? `${copiedItem},${value.toString()}`
         : `${value.toString()}`;
-    }
-    navigator.clipboard.writeText(copiedItem);
-    props.onSelection();
+
+      navigator.clipboard.writeText(copiedItem);
+      props.onSelection();
+    });
   }, [props.selectedData]);
+
   return (
     <Menu.Item
       onItemHover={() => {}}
