@@ -26,7 +26,7 @@ export type AGGridVizProps = {
   formData: CccsTableFormData;
   width: any;
   height: any;
-  rowData: any[];
+  rowData: { [index: string]: any }[];
   columnDefs: any[];
   includeSearch: boolean;
   pageLength: number;

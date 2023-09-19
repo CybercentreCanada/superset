@@ -7,8 +7,8 @@ import {
   getNumberFormatter,
 } from '@superset-ui/core';
 
-import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import { ValueFormatterParams } from 'ag-grid-community';
+import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import ExpandAllValueRenderer from '../../types/ExpandAllValueRenderer';
 import { rendererMap } from '../../types/advancedDataTypes';
 
@@ -22,15 +22,15 @@ const calcMetricColumnDefs = (
       params.value,
     );
   };
+
   // Map of verbose names, key is metric name, value is verbose name
-  const metricVerboseNameMap = new Map<string, string>();
-  datasource_metrics.reduce(function (metricMap, metric: Metric) {
-    // @ts-ignore
-    const name = metric.metric_name;
-    // @ts-ignore
-    metricMap[name] = metric.verbose_name;
-    return metricMap;
-  }, metricVerboseNameMap);
+  const metricVerboseNameMap = datasource_metrics.reduce(
+    (metricMap, metric: Metric) => ({
+      ...metricMap,
+      [metric.metric_name]: metric.verbose_name,
+    }),
+    {} as { [index: string]: string },
+  );
 
   let columnDefs: any[] = [];
 
@@ -73,41 +73,39 @@ const calcColumnColumnDefs = (
   dataset_columns: Column[],
   enable_row_numbers = true,
 ) => {
-  const columnDataMap = new Map<string, string>();
-  dataset_columns.reduce(function (columnMap, column: Column) {
-    // @ts-ignore
-    const name = column.column_name;
-    // @ts-ignore
-    columnMap[name] = {
-      type: column.type,
-      advanced_data_type: (column.advanced_data_type as string) ?? '',
-      verbose_name: column.verbose_name,
-      description: column.description,
-    };
-    return columnMap;
-  }, columnDataMap);
+  const columnDataMap = dataset_columns.reduce(
+    (columnMap, column: Column) => ({
+      ...columnMap,
+      [column.column_name]: {
+        type: column.type,
+        advanced_data_type: (column.advanced_data_type as string) ?? '',
+        verbose_name: column.verbose_name,
+        description: column.description,
+      },
+    }),
+    {} as { [index: string]: { [index: string]: any } },
+  );
 
   const columnDefs = columns.map((column: any) => {
-    const columnType = columnDataMap[column]?.type || "";
-    const advancedType = columnDataMap[column]?.advanced_data_type|| "";
+    const columnType = columnDataMap[column]?.type || '';
+    const advancedType = columnDataMap[column]?.advanced_data_type || '';
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
     const cellRenderer =
-      advancedType.toUpperCase() in rendererMap
-        ? rendererMap[advancedType.toUpperCase()]
-        : columnType in rendererMap
-        ? rendererMap[columnType]
-        : undefined;
+      rendererMap[advancedType.toUpperCase()] ??
+      rendererMap[columnType] ??
+      undefined;
     const isSortable = true;
     const enableRowGroup = true;
-    const columnDescription = columnDataMap[column]?.description || "";
+    const columnDescription = columnDataMap[column]?.description || '';
     const autoHeight = true;
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
     const rowGroup = rowGroupIndex >= 0;
     const hide = rowGroup;
+
     return {
       field: column,
       headerName: columnHeader,
@@ -170,8 +168,8 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     formData.queryMode === 'raw'
       ? formData.allColumns || []
       : formData.groupby || [];
-  const { metrics } = formData;
-  const percent_metrics = formData.percentMetrics;
+
+  const { metrics, percentMetrics } = formData;
 
   let columnDefs = calcColumnColumnDefs(
     columns,
@@ -182,7 +180,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   columnDefs = columnDefs.concat(
     calcMetricColumnDefs(
       metrics || [],
-      percent_metrics || [],
+      percentMetrics || [],
       datasource_metrics,
     ),
   );

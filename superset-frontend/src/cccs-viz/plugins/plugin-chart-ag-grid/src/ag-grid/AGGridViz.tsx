@@ -24,6 +24,7 @@ import { LicenseManager } from 'ag-grid-enterprise';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
+// import { ExplorePageState } from 'src/explore/types';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -86,7 +87,7 @@ export default function AGGridViz({
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(pageLength);
-  const [rowDataStateful, setrowDataStateful] = useState(rowData);
+  const [rowDataStateful, setRowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
   const [emitCrossFiltersStateful, setEmitCrossFiltersStateful] =
@@ -101,7 +102,7 @@ export default function AGGridViz({
   }, [columnDefs]);
 
   useEffect(() => {
-    setrowDataStateful(rowData);
+    setRowDataStateful(rowData);
   }, [rowData]);
 
   const defaultColDef = useMemo(

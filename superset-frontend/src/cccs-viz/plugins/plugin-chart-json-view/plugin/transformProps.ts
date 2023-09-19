@@ -64,7 +64,7 @@ export default function transformProps(chartProps: ChartProps) {
   }
 
   return {
-    values: data,
+    values: Array.isArray(data) && data.length < 2 ? data[0] : data,
     errorMessage,
     height: chartProps.height,
     width: chartProps.width,
