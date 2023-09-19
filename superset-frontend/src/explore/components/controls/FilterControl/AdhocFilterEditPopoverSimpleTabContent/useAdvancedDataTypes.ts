@@ -30,9 +30,12 @@ const INITIAL_ADVANCED_DATA_TYPES_STATE: AdvancedDataTypesState = {
   values: [],
 };
 
-const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
+const useAdvancedDataTypes = (
+  validHandler: (isValid: boolean) => void,
+  default_state: AdvancedDataTypesState = INITIAL_ADVANCED_DATA_TYPES_STATE,
+) => {
   const [advancedDataTypesState, setAdvancedDataTypesState] =
-    useState<AdvancedDataTypesState>(INITIAL_ADVANCED_DATA_TYPES_STATE);
+    useState<AdvancedDataTypesState>(default_state);
   const [subjectAdvancedDataType, setSubjectAdvancedDataType] = useState<
     string | undefined
   >();
