@@ -156,6 +156,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableGrouping,
     enableJsonExpand,
     principalColumns,
+    onClickBehaviour,
   }: CccsTableFormData = {
     ...formData,
   };
@@ -167,6 +168,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     formData.queryMode === 'raw'
       ? formData.allColumns || []
       : formData.groupby || [];
+
   const { metrics, percentMetrics } = formData;
 
   let columnDefs = calcColumnColumnDefs(
@@ -224,6 +226,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     pageLength,
     enableGrouping,
     principalColumns,
+    onClickBehaviour,
     agGridLicenseKey,
     setDataMask,
     emitCrossFilters,
