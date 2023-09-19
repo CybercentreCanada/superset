@@ -17,6 +17,7 @@
  * under the License.
  */
 import { ChartProps, TimeseriesDataRecord } from '@superset-ui/core';
+import { safeJsonObjectParse } from '../../utils';
 
 export default function transformProps(chartProps: ChartProps) {
   /**
@@ -54,17 +55,29 @@ export default function transformProps(chartProps: ChartProps) {
 
   let errorMessage = '';
 
-  // if (Array.isArray(data) && data.length > 1) {
-  //   errorMessage =
-  //     'The query returned too many rows when only one was expected.';
-  // }
+  let values: TimeseriesDataRecord | TimeseriesDataRecord[] | null = null;
+  if (Array.isArray(data)) {
+    if (data.length < 1) {
+      errorMessage = 'The query returned no rows.';
+    } else {
+      values = (data ?? []).map(row => {
+        const newRow: any = {};
 
-  if (Array.isArray(data) && data.length === 0) {
-    errorMessage = 'The query returned no rows.';
+        Object.entries(row).forEach(([key, val]) => {
+          newRow[key] = safeJsonObjectParse(val) ?? val;
+        });
+
+        return newRow;
+      });
+
+      if (Array.isArray(values) && values.length < 2) {
+        values = values[0];
+      }
+    }
   }
 
   return {
-    values: Array.isArray(data) && data.length < 2 ? data[0] : data,
+    values,
     errorMessage,
     height: chartProps.height,
     width: chartProps.width,
