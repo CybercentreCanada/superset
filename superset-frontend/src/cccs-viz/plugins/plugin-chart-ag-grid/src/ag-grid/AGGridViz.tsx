@@ -33,7 +33,10 @@ import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 
-import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
+import {
+  PAGE_SIZE_OPTIONS,
+  DEFAULT_CLICK_ACTIONS,
+} from '../cccs-grid/plugin/controlPanel';
 
 import { AGGridVizProps } from '../types';
 
@@ -63,6 +66,7 @@ export default function AGGridViz({
   enableGrouping,
   setDataMask,
   principalColumns,
+  onClickBehaviour,
   agGridLicenseKey,
   emitCrossFilters,
 }: AGGridVizProps) {
@@ -86,7 +90,12 @@ export default function AGGridViz({
   const [rowDataStateful, setRowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  // const exploreState = useSelector((state: ExplorePageState) => state.explore);
+  const [emitCrossFiltersStateful, setEmitCrossFiltersStateful] =
+    useState<boolean>(emitCrossFilters);
+
+  useEffect(() => {
+    setEmitCrossFiltersStateful(emitCrossFilters);
+  }, [emitCrossFilters]);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
@@ -128,6 +137,57 @@ export default function AGGridViz({
       setSearchValue('');
     }
   }, [includeSearch]);
+
+  const emitFilter = useCallback(
+    Data => {
+      const groupBy = Object.keys(Data);
+      const groupByValues = Object.values(Data);
+      setDataMask({
+        extraFormData: {
+          filters:
+            groupBy.length === 0
+              ? []
+              : groupBy.map(col => {
+                  const val = ensureIsArray(Data?.[col]);
+                  if (val === null || val === undefined)
+                    return {
+                      col,
+                      op: 'IS NULL',
+                    };
+                  return {
+                    col,
+                    op: 'IN',
+                    val,
+                  };
+                }),
+        },
+        filterState: {
+          value: groupByValues.length ? groupByValues : null,
+        },
+      });
+    },
+    [setDataMask],
+  ); // only take relevant page size options
+
+  const handleOnClickBehavior = (
+    highlightedData: DataMap,
+    principalData: DataMap,
+  ) => {
+    const to_emit = emitCrossFiltersStateful;
+    // handle default click behaviour
+    if (onClickBehaviour !== 'None') {
+      // get action
+      const action = DEFAULT_CLICK_ACTIONS.find(
+        a => a.verbose_name === onClickBehaviour,
+      )?.action_name;
+      // handle action
+      if (action === 'emit_filters' && to_emit) {
+        emitFilter(highlightedData);
+      } else if (action === 'emit_principal_filters' && to_emit) {
+        emitFilter(principalData);
+      }
+    }
+  };
 
   const onRangeSelectionChanged = useCallback(
     (event: RangeSelectionChangedEvent) => {
@@ -177,40 +237,10 @@ export default function AGGridViz({
         highlightedData: newSelectedData,
         principalData,
       });
+      handleOnClickBehavior(newSelectedData, principalData);
     },
-    [],
+    [emitCrossFiltersStateful],
   );
-
-  const emitFilter = useCallback(
-    Data => {
-      const groupBy = Object.keys(Data);
-      const groupByValues = Object.values(Data);
-      setDataMask({
-        extraFormData: {
-          filters:
-            groupBy.length === 0
-              ? []
-              : groupBy.map(col => {
-                  const val = ensureIsArray(Data?.[col]);
-                  if (val === null || val === undefined)
-                    return {
-                      col,
-                      op: 'IS NULL',
-                    };
-                  return {
-                    col,
-                    op: 'IN',
-                    val,
-                  };
-                }),
-        },
-        filterState: {
-          value: groupByValues.length ? groupByValues : null,
-        },
-      });
-    },
-    [setDataMask],
-  ); // only take relevant page size options
 
   const onClick = (data: DataMap) => {
     emitFilter(data);
@@ -261,7 +291,7 @@ export default function AGGridViz({
         onSelection={handleContextMenuSelected}
       />,
     ];
-    if (emitCrossFilters) {
+    if (emitCrossFiltersStateful) {
       menuItems = [
         ...menuItems,
         <EmitFilterMenuItem

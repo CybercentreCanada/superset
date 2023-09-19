@@ -45,6 +45,19 @@ export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   200,
 ]);
 
+export const DEFAULT_CLICK_ACTIONS = [
+  { verbose_name: 'None', action_name: 'none' },
+  { verbose_name: 'Emit Filters', action_name: 'emit_filters' },
+  {
+    verbose_name: 'Emit Principal Filters',
+    action_name: 'emit_principal_filters',
+  },
+];
+
+const DEFAULT_CLICK_ACTIONS_OPTIONS = formatSelectOptions(
+  DEFAULT_CLICK_ACTIONS.map(o => o.verbose_name),
+);
+
 /**
  * Visibility check
  */
@@ -306,6 +319,22 @@ const config: ControlPanelConfig = {
             name: 'timeseries_limit_metric',
             override: {
               visibility: isAggMode,
+            },
+          },
+        ],
+        [
+          {
+            name: 'on_click_behaviour',
+            config: {
+              type: 'SelectControl',
+              freeForm: false,
+              renderTrigger: false,
+              label: t('Default click behaviour'),
+              default: 'None',
+              choices: DEFAULT_CLICK_ACTIONS_OPTIONS,
+              description: t(
+                'Select an action to occur by default when a cell/row is clicked. Actions are from the right-click context menu. Default is to do nothing.',
+              ),
             },
           },
         ],
