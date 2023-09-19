@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelState,
   ControlState,
   sharedControls,
 } from '@superset-ui/chart-controls';
+import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
 
 const config: ControlPanelConfig = {
   /**
@@ -110,8 +110,8 @@ const config: ControlPanelConfig = {
           {
             name: 'columns',
             override: {
-              label: t('Columns to Render'),
-              description: 'The columns to render.',
+              label: t('Keys to Render'),
+              description: 'The keys to render.',
               multi: true,
               allowAll: true,
               default: [],
@@ -130,6 +130,45 @@ const config: ControlPanelConfig = {
                     : ['Please add at least one column to render.'];
                 return newState;
               },
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: t('Options'),
+      expanded: true,
+      controlSetRows: [
+        [
+          {
+            name: 'key_order',
+            config: {
+              type: 'TextControl',
+              label: t('Key Order'),
+              description: t(
+                'A list of keys, separated by commas, setting the order of keys in the resulting JSON.',
+              ),
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const keys = (controlState.value as string)?.split(',');
+                const missingKey = keys.find(
+                  key => (state.form_data.columns?.indexOf(key) ?? -1) < 0,
+                );
+
+                console.log(keys, missingKey);
+                if (missingKey) {
+                  return {
+                    danger: `Key order should only contain keys matching selected columns. ${missingKey} is not a selected column. It will be ignored.`,
+                  };
+                }
+
+                return {
+                  danger: '',
+                };
+              },
+              validators: [validateNonEmpty],
             },
           },
         ],

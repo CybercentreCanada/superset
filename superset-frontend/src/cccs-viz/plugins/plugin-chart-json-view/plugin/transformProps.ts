@@ -49,9 +49,11 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const { queriesData, height, width } = chartProps;
+
+  const { queriesData, height, width, formData } = chartProps;
 
   const data = queriesData.flatMap(q => q.data) as TimeseriesDataRecord[];
+  const keyOrder = formData.keyOrder.split(',').reverse() as string[];
 
   let errorMessage = '';
 
@@ -63,9 +65,17 @@ export default function transformProps(chartProps: ChartProps) {
       values = (data ?? []).map(row => {
         const newRow: any = {};
 
-        Object.entries(row).forEach(([key, val]) => {
-          newRow[key] = safeJsonObjectParse(val) ?? val;
-        });
+        Object.entries(row)
+          // oh boy
+          .sort(
+            (tuple1, tuple2) =>
+              keyOrder.indexOf(tuple2[0]) - keyOrder.indexOf(tuple1[0]),
+          )
+          // We then iterate through each key in the row, attempting to parse each one as a JSON object.
+          // This is to convert a string like "['test', 'one', 'two']" into an array.
+          .forEach(([key, val]) => {
+            newRow[key] = safeJsonObjectParse(val) ?? val;
+          });
 
         return newRow;
       });
