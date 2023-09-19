@@ -33,9 +33,7 @@ import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
-
 import { AGGridVizProps } from '../types';
-import { ExplorePageState } from 'src/explore/types';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -86,7 +84,6 @@ export default function AGGridViz({
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  const exploreState = useSelector((state: ExplorePageState) => state.explore);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
