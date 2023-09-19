@@ -71,7 +71,7 @@ function expandJSON(this: any, toggleExpand: any, cellData: any) {
 }
 
 export default class JsonValueRenderer extends Component<
-  {},
+  { valueFormatted?: string; value: string },
   { cellValue: any; expanded: boolean; rowNode: any }
 > {
   constructor(props: any) {
