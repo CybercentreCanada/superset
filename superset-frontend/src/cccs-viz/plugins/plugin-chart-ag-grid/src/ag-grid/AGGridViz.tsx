@@ -11,31 +11,30 @@ import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 
+import { ModuleRegistry } from '@ag-grid-community/core';
+import { CloseOutlined } from '@ant-design/icons';
+import { ensureIsArray } from '@superset-ui/core';
+import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { ModuleRegistry } from '@ag-grid-community/core';
-import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
+import { LicenseManager } from 'ag-grid-enterprise';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-import { ensureIsArray } from '@superset-ui/core';
-import { LicenseManager } from 'ag-grid-enterprise';
-import { CloseOutlined } from '@ant-design/icons';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
 
-import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
+import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
 import { AGGridVizProps } from '../types';
-import { ExplorePageState } from 'src/explore/types';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -86,7 +85,7 @@ export default function AGGridViz({
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  const exploreState = useSelector((state: ExplorePageState) => state.explore);
+  // const exploreState = useSelector((state: ExplorePageState) => state.explore);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
