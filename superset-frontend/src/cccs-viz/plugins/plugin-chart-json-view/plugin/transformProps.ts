@@ -49,9 +49,9 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const data = chartProps.queriesData.flatMap(
-    q => q.data,
-  ) as TimeseriesDataRecord[];
+  const { queriesData, height, width } = chartProps;
+
+  const data = queriesData.flatMap(q => q.data) as TimeseriesDataRecord[];
 
   let errorMessage = '';
 
@@ -79,7 +79,7 @@ export default function transformProps(chartProps: ChartProps) {
   return {
     values,
     errorMessage,
-    height: chartProps.height,
-    width: chartProps.width,
+    height,
+    width,
   };
 }
