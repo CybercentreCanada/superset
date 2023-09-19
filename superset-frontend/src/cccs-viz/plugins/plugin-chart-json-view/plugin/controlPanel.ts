@@ -157,7 +157,6 @@ const config: ControlPanelConfig = {
                   key => (state.form_data.columns?.indexOf(key) ?? -1) < 0,
                 );
 
-                console.log(keys, missingKey);
                 if (missingKey) {
                   return {
                     danger: `Key order should only contain keys matching selected columns. ${missingKey} is not a selected column. It will be ignored.`,
