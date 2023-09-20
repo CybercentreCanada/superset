@@ -159,6 +159,7 @@ export default function AGGridViz({
     (data, globally = false) => {
       const groupBy: [string, any][] = Object.entries(data);
 
+      // If not global, use the same setup as usual
       if (!globally) {
         setDataMask({
           extraFormData: {
@@ -184,11 +185,20 @@ export default function AGGridViz({
           },
         });
       } else {
+        // Iterate through all the ad hoc filters, and add another ad hoc entry.
+        // Note that this may have unintended consequences. User feedback may make
+        // it so we want to allow them to choose which adhoc filter to emit to, instead
+        // of just applying it to all of them.
         adhocFilters.forEach(filter => {
+          // TODO: Add validation to check if the adhoc filter uses a datasource that has that column.
+          // there's a solid chance things could get wonky if the datasource doesn't have it.
+
           const newFilters = groupBy.map(([col, _val]) => {
             const val = Array.isArray(_val) && _val.length < 2 ? _val[0] : _val;
             const op = Array.isArray(val) ? Operators.IN : Operators.ILIKE;
 
+            // I reverse-engineered this from the redux store. There's probably a better way to do this,
+            // but this is what works for now.
             return {
               expressionType: EXPRESSION_TYPES.SIMPLE,
               subject: col,
@@ -208,8 +218,10 @@ export default function AGGridViz({
             };
           });
 
+          // This adds the new filter to the data mask. No idea if all these fields are necessary?
+          // TODO: Test removing these fields to see if things break
           const newMask = {
-            id: 'NATIVE_FILTER-7UlWv6fB8',
+            id: filter.id,
             extraFormData: {
               adhoc_filters: [
                 ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
