@@ -36,6 +36,7 @@ import {
   DISABLE_INPUT_OPERATORS,
   AGGREGATES,
   OPERATOR_ENUM_TO_OPERATOR_TYPE,
+  OPERATOR_TOOLTIP_MAP,
 } from 'src/explore/constants';
 import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
 import AdhocFilter, {
@@ -487,18 +488,20 @@ const AdhocFilterEditPopoverSimpleTabContent: React.FC<Props> = props => {
 
   const operatorsAndOperandComponent = (
     <>
-      <Select
-        css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
-        options={(props.operators ?? OPERATORS_OPTIONS)
-          .filter(op => isOperatorRelevantWrapper(op, subject))
-          .map((option, index) => ({
-            value: option,
-            label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
-            key: option,
-            order: index,
-          }))}
-        {...operatorSelectProps}
-      />
+      <Tooltip title={OPERATOR_TOOLTIP_MAP[operatorId]} css={iconStyles}>
+        <Select
+          css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
+          options={(props.operators ?? OPERATORS_OPTIONS)
+            .filter(op => isOperatorRelevantWrapper(op, subject))
+            .map((option, index) => ({
+              value: option,
+              label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
+              key: option,
+              order: index,
+            }))}
+          {...operatorSelectProps}
+        />
+      </Tooltip>
       {MULTI_OPERATORS.has(operatorId) || suggestions.length > 0 ? (
         <Tooltip
           title={
