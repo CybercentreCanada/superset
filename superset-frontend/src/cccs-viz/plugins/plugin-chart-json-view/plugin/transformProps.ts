@@ -53,7 +53,7 @@ export default function transformProps(chartProps: ChartProps) {
   const { queriesData, height, width, formData } = chartProps;
 
   const data = queriesData.flatMap(q => q.data) as TimeseriesDataRecord[];
-  const keyOrder = formData.keyOrder.split(',').reverse() as string[];
+  const keyOrder = (formData.keyOrder?.split(',') ?? []).reverse() as string[];
 
   let errorMessage = '';
 
