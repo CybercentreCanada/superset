@@ -16,15 +16,27 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CloseOutlined } from '@ant-design/icons';
-import { ensureIsArray } from '@superset-ui/core';
+import {
+  DataMaskWithId,
+  ensureIsArray,
+  isNativeFilter,
+} from '@superset-ui/core';
 import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { LicenseManager } from 'ag-grid-enterprise';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
-import { clearDataMask } from 'src/dataMask/actions';
+import { clearDataMask, updateDataMask } from 'src/dataMask/actions';
 // import { ExplorePageState } from 'src/explore/types';
+import {
+  CLAUSES,
+  EXPRESSION_TYPES,
+} from 'src/explore/components/controls/FilterControl/AdhocFilter';
+import {
+  OPERATOR_ENUM_TO_OPERATOR_TYPE,
+  Operators,
+} from 'src/explore/constants';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -74,6 +86,11 @@ export default function AGGridViz({
 
   const crossFilterValue = useSelector<RootState, any>(
     state => state.dataMask[formData.sliceId]?.filterState?.value,
+  );
+  const adhocFilters = useSelector<RootState, DataMaskWithId[]>(state =>
+    Object.values(state.nativeFilters.filters)
+      .filter(f => isNativeFilter(f) && f.filterType === 'filter_adhoc')
+      .map(f => state.dataMask[f.id]),
   );
   const dispatch = useDispatch();
 
@@ -139,34 +156,94 @@ export default function AGGridViz({
   }, [includeSearch]);
 
   const emitFilter = useCallback(
-    Data => {
-      const groupBy = Object.keys(Data);
-      const groupByValues = Object.values(Data);
-      setDataMask({
-        extraFormData: {
-          filters:
-            groupBy.length === 0
-              ? []
-              : groupBy.map(col => {
-                  const val = ensureIsArray(Data?.[col]);
-                  if (val === null || val === undefined)
+    (data, globally = false) => {
+      const groupBy: [string, any][] = Object.entries(data);
+
+      if (!globally) {
+        setDataMask({
+          extraFormData: {
+            filters:
+              groupBy.length === 0
+                ? []
+                : groupBy.map(([col, _val]) => {
+                    const val = ensureIsArray(_val);
+                    if (val === null || val === undefined)
+                      return {
+                        col,
+                        op: 'IS NULL',
+                      };
                     return {
                       col,
-                      op: 'IS NULL',
+                      op: 'IN',
+                      val,
                     };
-                  return {
-                    col,
-                    op: 'IN',
-                    val,
-                  };
-                }),
-        },
-        filterState: {
-          value: groupByValues.length ? groupByValues : null,
-        },
-      });
+                  }),
+          },
+          filterState: {
+            value: groupBy.length ? groupBy.map(col => col[1]) : null,
+          },
+        });
+      } else {
+        adhocFilters.forEach(filter => {
+          const newFilters = groupBy.map(([col, _val]) => {
+            const val = Array.isArray(_val) && _val.length < 2 ? _val[0] : _val;
+            const op = Array.isArray(val) ? Operators.IN : Operators.ILIKE;
+
+            return {
+              expressionType: EXPRESSION_TYPES.SIMPLE,
+              subject: col,
+              operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
+              operatorId: op,
+              comparator: Array.isArray(val) ? val : `%${val}%`,
+              clause: CLAUSES.WHERE,
+              sqlExpression: null,
+              isExtra: false,
+              isNew: true,
+              datasourceWarning: false,
+              filterOptionName: `filter_${Math.random()
+                .toString(36)
+                .substring(2, 15)}_${Math.random()
+                .toString(36)
+                .substring(2, 15)}`,
+            };
+          });
+
+          const newMask = {
+            id: 'NATIVE_FILTER-7UlWv6fB8',
+            extraFormData: {
+              adhoc_filters: [
+                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+                ...newFilters,
+              ],
+            },
+            filterState: {
+              value: [
+                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+                ...newFilters,
+              ],
+              filters: [
+                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+                ...newFilters,
+              ],
+            },
+            ownState: {},
+            __cache: {
+              value: [
+                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+                ...newFilters,
+              ],
+              filters: [
+                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+                ...newFilters,
+              ],
+            },
+          };
+
+          dispatch(updateDataMask(filter.id, newMask));
+        });
+      }
     },
-    [setDataMask],
+    [adhocFilters, dispatch, setDataMask],
   ); // only take relevant page size options
 
   const handleOnClickBehavior = (
@@ -242,8 +319,8 @@ export default function AGGridViz({
     [emitCrossFiltersStateful],
   );
 
-  const onClick = (data: DataMap) => {
-    emitFilter(data);
+  const onClick = (data: DataMap, globally = false) => {
+    emitFilter(data, globally);
   };
 
   const handleContextMenuSelected = () => {
@@ -300,6 +377,18 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s)"
+          disabled={Object.keys(selectedData.highlightedData).length === 0}
+          key={contextDivID.toString()}
+          icon={emitIcon(
+            Object.keys(selectedData.highlightedData).length === 0,
+          )}
+        />,
+        <EmitFilterMenuItem
+          onClick={() => {
+            onClick(selectedData.highlightedData, true);
+          }}
+          onSelection={handleContextMenuSelected}
+          label="Emit Filter(s) Globally"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
           key={contextDivID.toString()}
           icon={emitIcon(
