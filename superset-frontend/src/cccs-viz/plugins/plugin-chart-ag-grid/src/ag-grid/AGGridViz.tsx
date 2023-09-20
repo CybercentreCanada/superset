@@ -34,8 +34,8 @@ import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuIt
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 
 import {
-  PAGE_SIZE_OPTIONS,
   DEFAULT_CLICK_ACTIONS,
+  PAGE_SIZE_OPTIONS,
 } from '../cccs-grid/plugin/controlPanel';
 
 import { AGGridVizProps } from '../types';
@@ -318,7 +318,7 @@ export default function AGGridViz({
         <EmitFilterMenuItem
           onSelection={handleContextMenuSelected}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emited Filter(s)"
+          label="Clear Emitted Filter(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,

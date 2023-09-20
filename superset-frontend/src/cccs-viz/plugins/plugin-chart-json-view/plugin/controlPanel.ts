@@ -152,10 +152,11 @@ const config: ControlPanelConfig = {
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
-                const keys = (controlState.value as string)?.split(',');
-                const missingKey = keys.find(
-                  key => (state.form_data.columns?.indexOf(key) ?? -1) < 0,
-                );
+                const missingKey = (controlState.value as string)
+                  ?.split(',')
+                  ?.find(
+                    key => (state.form_data.columns?.indexOf(key) ?? -1) < 0,
+                  );
 
                 if (missingKey) {
                   return {
@@ -167,7 +168,6 @@ const config: ControlPanelConfig = {
                   danger: '',
                 };
               },
-              validators: [validateNonEmpty],
             },
           },
         ],
