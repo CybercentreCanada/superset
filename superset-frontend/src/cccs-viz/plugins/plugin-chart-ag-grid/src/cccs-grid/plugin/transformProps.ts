@@ -8,9 +8,9 @@ import {
 } from '@superset-ui/core';
 
 import { ValueFormatterParams } from 'ag-grid-community';
+import { rendererMap } from '../../advancedDataTypes';
+import ExpandAllValueRenderer from '../../renderers/ExpandAllValueRenderer';
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
-import ExpandAllValueRenderer from '../../types/ExpandAllValueRenderer';
-import { rendererMap } from '../../types/advancedDataTypes';
 
 const calcMetricColumnDefs = (
   metrics: any[],
