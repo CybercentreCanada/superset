@@ -16,14 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { DataMaskStateWithId, Filters } from '@superset-ui/core';
+import cx from 'classnames';
+import { uniqWith } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { uniqWith } from 'lodash';
-import cx from 'classnames';
-import { DataMaskStateWithId, Filters } from '@superset-ui/core';
 import Icons from 'src/components/Icons';
+import {
+  setFocusedChart,
+  unsetFocusedChart,
+} from 'src/dashboard/actions/dashboardState';
+import {
+  setFocusedNativeFilter,
+  unsetFocusedNativeFilter,
+} from 'src/dashboard/actions/nativeFilters';
 import { usePrevious } from 'src/hooks/usePrevious';
-import { setFocusedNativeFilter } from 'src/dashboard/actions/nativeFilters';
+import {
+  ChartsState,
+  DashboardInfo,
+  DashboardLayout,
+  RootState,
+} from '../../types';
 import DetailsPanelPopover from './DetailsPanel';
 import { Pill } from './Styles';
 import {
@@ -32,12 +45,6 @@ import {
   selectIndicatorsForChart,
   selectNativeIndicatorsForChart,
 } from './selectors';
-import {
-  ChartsState,
-  DashboardInfo,
-  DashboardLayout,
-  RootState,
-} from '../../types';
 
 export interface FiltersBadgeProps {
   chartId: number;
@@ -86,10 +93,27 @@ export const FiltersBadge = ({ chartId }: FiltersBadgeProps) => {
   );
 
   const onHighlightFilterSource = useCallback(
-    (path: string[]) => {
-      dispatch(setFocusedNativeFilter(path[0]));
+    (path?: string[]) => {
+      if (!path) {
+        dispatch(unsetFocusedNativeFilter());
+        dispatch(unsetFocusedChart());
+        return;
+      }
+
+      if (path[0] === 'ROOT_ID') {
+        const chartLayoutId = path[path.length - 2];
+        const chartId = (dashboardInfo as any).position_data?.[chartLayoutId]
+          ?.meta?.chartId;
+        if (chartId) {
+          dispatch(setFocusedChart(chartId));
+          dispatch(unsetFocusedNativeFilter());
+        }
+      } else {
+        dispatch(unsetFocusedChart());
+        dispatch(setFocusedNativeFilter(path[0]));
+      }
     },
-    [dispatch],
+    [dashboardInfo, dispatch],
   );
 
   const chart = charts[chartId];
