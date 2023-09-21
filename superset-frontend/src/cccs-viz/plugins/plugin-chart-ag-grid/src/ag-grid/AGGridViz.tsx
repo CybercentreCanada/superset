@@ -21,7 +21,7 @@ import {
   ensureIsArray,
   isNativeFilter,
 } from '@superset-ui/core';
-import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
+import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { LicenseManager } from 'ag-grid-enterprise';
@@ -190,12 +190,14 @@ export default function AGGridViz({
         // it so we want to allow them to choose which adhoc filter to emit to, instead
         // of just applying it to all of them.
         adhocFilters.forEach(filter => {
-          // TODO: Add validation to check if the adhoc filter uses a datasource that has that column.
-          // there's a solid chance things could get wonky if the datasource doesn't have it.
-
           const newFilters = groupBy.map(([col, _val]) => {
             const val = Array.isArray(_val) && _val.length < 2 ? _val[0] : _val;
-            const op = Array.isArray(val) ? Operators.IN : Operators.ILIKE;
+            const op = Array.isArray(val)
+              ? Operators.IN
+              : // Check to see if the value is a number or not
+              /^\d+(\.\d+)?$/.test(val.toString())
+              ? Operators.EQUALS
+              : Operators.ILIKE;
 
             // I reverse-engineered this from the redux store. There's probably a better way to do this,
             // but this is what works for now.
@@ -204,7 +206,7 @@ export default function AGGridViz({
               subject: col,
               operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
               operatorId: op,
-              comparator: Array.isArray(val) ? val : `%${val}%`,
+              comparator: op !== Operators.ILIKE ? val : `%${val}%`,
               clause: CLAUSES.WHERE,
               sqlExpression: null,
               isExtra: false,
@@ -278,58 +280,57 @@ export default function AGGridViz({
     }
   };
 
-  const onRangeSelectionChanged = useCallback(
-    (event: RangeSelectionChangedEvent) => {
-      const cellRanges = gridRef.current!.api.getCellRanges();
-      const newSelectedData: { [key: string]: string[] } = {};
-      const principalData: { [key: string]: string[] } = {};
+  const onRangeSelectionChanged = useCallback(() => {
+    const cellRanges = gridRef.current!.api.getCellRanges();
+    const newSelectedData: { [key: string]: string[] } = {};
+    const principalData: { [key: string]: string[] } = {};
 
-      if (cellRanges) {
-        cellRanges.forEach(function (range: CellRange) {
-          // get starting and ending row, remember rowEnd could be before rowStart
-          const startRow = Math.min(
-            range.startRow!.rowIndex,
-            range.endRow!.rowIndex,
-          );
-          const endRow = Math.max(
-            range.startRow!.rowIndex,
-            range.endRow!.rowIndex,
-          );
-          const api = gridRef.current!.api!;
-          for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-            range.columns.forEach((column: any) => {
-              const col = column.colDef?.field;
-              newSelectedData[col] = newSelectedData[col] || [];
-              const rowModel = api.getModel();
-              const rowNode = rowModel.getRow(rowIndex)!;
-              const value = api.getValue(column, rowNode);
+    if (cellRanges) {
+      cellRanges.forEach((range: CellRange) => {
+        // get starting and ending row, remember rowEnd could be before rowStart
+        const startRow = Math.min(
+          range.startRow!.rowIndex,
+          range.endRow!.rowIndex,
+        );
+        const endRow = Math.max(
+          range.startRow!.rowIndex,
+          range.endRow!.rowIndex,
+        );
+        const api = gridRef.current!.api!;
+        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+          range.columns.forEach((column: any) => {
+            const col = column.colDef?.field;
+            newSelectedData[col] = newSelectedData[col] || [];
+            const rowModel = api.getModel();
+            const rowNode = rowModel.getRow(rowIndex)!;
+            const value = api.getValue(column, rowNode);
 
-              if (!newSelectedData[col].includes(value)) {
-                newSelectedData[col].push(value);
-              }
-            });
-            principalColumns.forEach((column: any) => {
-              const col = column;
-              principalData[col] = principalData[col] || [];
-              const rowModel = api.getModel();
-              const rowNode = rowModel.getRow(rowIndex)!;
-              const value = api.getValue(column, rowNode);
+            if (!newSelectedData[col].includes(value)) {
+              newSelectedData[col].push(value);
+            }
+          });
+          principalColumns.forEach((column: any) => {
+            const col = column;
+            principalData[col] = principalData[col] || [];
+            const rowModel = api.getModel();
+            const rowNode = rowModel.getRow(rowIndex)!;
+            const value = api.getValue(column, rowNode);
 
-              if (!principalData[col].includes(value)) {
-                principalData[col].push(value);
-              }
-            });
-          }
-        });
-      }
-      setSelectedData({
-        highlightedData: newSelectedData,
-        principalData,
+            if (!principalData[col].includes(value)) {
+              principalData[col].push(value);
+            }
+          });
+        }
       });
-      handleOnClickBehavior(newSelectedData, principalData);
-    },
-    [emitCrossFiltersStateful],
-  );
+    }
+
+    setSelectedData({
+      highlightedData: newSelectedData,
+      principalData,
+    });
+
+    handleOnClickBehavior(newSelectedData, principalData);
+  }, [emitCrossFiltersStateful]);
 
   const onClick = (data: DataMap, globally = false) => {
     emitFilter(data, globally);
