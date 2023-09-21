@@ -1,17 +1,18 @@
-import { Menu } from 'src/components/Menu';
 import React, { ReactNode } from 'react';
+import { Menu } from 'src/components/Menu';
 
-interface EmiteFilterMenuItemProps {
+interface EmitFilterMenuItemProps {
   label: string;
   onClick: () => void;
   onSelection: () => void;
   icon: ReactNode;
+  key?: string;
   disabled?: boolean;
   isContextMenu?: boolean;
   contextMenuY?: number;
 }
 
-export default function EmiteFilterMenuItem(props: EmiteFilterMenuItemProps) {
+export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
   const onClick = () => {
     props.onClick();
     props.onSelection();
@@ -21,7 +22,7 @@ export default function EmiteFilterMenuItem(props: EmiteFilterMenuItemProps) {
     <Menu.Item
       onItemHover={() => {}}
       onClick={() => onClick()}
-      key="drill-detail-no-filters"
+      // key={props.key ?? 'emit-filter-menu-item'}
       className={
         props.disabled
           ? 'ant-menu-item ant-dropdown-menu-item-disabled'

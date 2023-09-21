@@ -12,23 +12,24 @@ interface CopyMenuItemProps {
 }
 
 export default function CopyMenuItem(props: CopyMenuItemProps) {
+  const { onSelection, selectedData } = props;
+
   const copyText = useCallback(() => {
     let copiedItem = '';
-    Object.entries(props.selectedData).forEach(([key, value]) => {
+    Object.values(selectedData).forEach(value => {
       copiedItem = copiedItem
         ? `${copiedItem},${value.toString()}`
         : `${value.toString()}`;
 
       navigator.clipboard.writeText(copiedItem);
-      props.onSelection();
+      onSelection();
     });
-  }, [props.selectedData]);
+  }, [onSelection, selectedData]);
 
   return (
     <Menu.Item
       onItemHover={() => {}}
       onClick={() => copyText()}
-      key="drill-detail-no-filters"
       className="ant-menu-item"
       icon={<CopyFilled />}
     >

@@ -1,7 +1,7 @@
 import { Menu } from 'src/components/Menu';
 
-import React, { useCallback } from 'react';
 import { CopyFilled } from '@ant-design/icons';
+import React, { useCallback } from 'react';
 
 interface CopyMenuItemProps {
   selectedData: { [key: string]: string[] };
@@ -16,11 +16,11 @@ export default function CopyMenuItem(props: CopyMenuItemProps) {
 
     props.onSelection();
   }, [props.selectedData]);
+
   return (
     <Menu.Item
       onItemHover={() => {}}
       onClick={() => copyText()}
-      key="drill-detail-no-filters"
       className="ant-menu-item"
       icon={<CopyFilled />}
     >

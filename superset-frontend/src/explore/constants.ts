@@ -189,11 +189,14 @@ export const OPERATOR_TOOLTIP_MAP = {
   NOT_IN:
     "The NOT operator is used in combination with other operators to give the opposite result, also called the negative result. The IN operator allows you to specify multiple values in a WHERE clause. The IN operator is a shorthand for multiple OR conditions. Example: SELECT * FROM table_name WHERE column_name NOT IN ('value1', 'value2', 'value3');",
   LIKE: "The LIKE operator is used in a WHERE clause to search for a specified pattern in a column. There are two wildcards often used in conjunction with the LIKE operator: The percent sign % represents zero, one, or multiple characters. The underscore sign _ represents one, single character. Example: SELECT * FROM table_name WHERE column_name LIKE '%pattern%';",
-  ILIKE: "The ILIKE operator is used in a WHERE clause to search for a specified pattern in a column, similar to the LIKE operator, but insensitive of letter case in the given pattern. There are two wildcards often used in conjunction with the LIKE operator: The percent sign % represents zero, one, or multiple characters. The underscore sign _ represents one, single character. Example: SELECT * FROM table_name WHERE column_name LIKE '%CaSeInSeNsItIvEpAtTeRn%';",,
+  ILIKE:
+    "The ILIKE operator is used in a WHERE clause to search for a specified pattern in a column, similar to the LIKE operator, but insensitive of letter case in the given pattern. There are two wildcards often used in conjunction with the LIKE operator: The percent sign % represents zero, one, or multiple characters. The underscore sign _ represents one, single character. Example: SELECT * FROM table_name WHERE column_name LIKE '%CaSeInSeNsItIvEpAtTeRn%';",
   REGEX:
     "Uses the REGEXP_LIKE() function to filter rows where the value of a column matches a regular expression pattern. For example, SELECT * FROM table_name WHERE REGEXP_LIKE(column_name, 'pattern');",
-  IS_NOT_NULL: "The NOT operator is used in combination with other operators to give the opposite result, also called the negative result. It is not possible to test for NULL values with comparison operators, such as =, <, or <>. IS NULL and IS NOT NULL operators must be used in this case instead. Example: SELECT column_names FROM table_name WHERE column_name IS NOT NULL;",
-  IS_NULL: "It is not possible to test for NULL values with comparison operators, such as =, <, or <>. IS NULL and IS NOT NULL operators must be used in this case instead. Example: SELECT column_names FROM table_name WHERE column_name IS NULL;",
+  IS_NOT_NULL:
+    'The NOT operator is used in combination with other operators to give the opposite result, also called the negative result. It is not possible to test for NULL values with comparison operators, such as =, <, or <>. IS NULL and IS NOT NULL operators must be used in this case instead. Example: SELECT column_names FROM table_name WHERE column_name IS NOT NULL;',
+  IS_NULL:
+    'It is not possible to test for NULL values with comparison operators, such as =, <, or <>. IS NULL and IS NOT NULL operators must be used in this case instead. Example: SELECT column_names FROM table_name WHERE column_name IS NULL;',
   LATEST_PARTITION: undefined,
   IS_TRUE: undefined,
   IS_FALSE: undefined,
