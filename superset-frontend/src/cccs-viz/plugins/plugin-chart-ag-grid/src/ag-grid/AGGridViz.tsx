@@ -225,6 +225,17 @@ export default function AGGridViz({
             ...newFilters,
           ];
 
+          const newLabel = newFilterList
+            .map(
+              f =>
+                `${f.subject} ${f.operator} ${
+                  Array.isArray(f.comparator)
+                    ? f.comparator.join(', ')
+                    : f.comparator
+                }`,
+            )
+            .join(', ');
+
           // This adds the new filter to the data mask. No idea if all these fields are necessary?
           // TODO: Test removing these fields to see if things break
           const newMask = {
@@ -233,7 +244,7 @@ export default function AGGridViz({
               adhoc_filters: newFilterList,
             },
             filterState: {
-              label: 'I am a banana!',
+              label: newLabel,
               value: newFilterList,
               filters: newFilterList,
             },
@@ -394,7 +405,6 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s) Globally"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
-          key={contextDivID.toString()}
           icon={emitIcon(
             Object.keys(selectedData.highlightedData).length === 0,
           )}
@@ -432,16 +442,18 @@ export default function AGGridViz({
     handleOnContextMenu(event.clientX, event.clientY, []);
   };
 
-  useEffect(() => {
+  const recreateGrid = () => {
+    setIsDestroyed(false);
+  };
+
+  const destroyGrid = () => {
     setIsDestroyed(true);
+    setTimeout(() => recreateGrid(), 0);
+  };
 
-    const timeout = setTimeout(() => {
-      setIsDestroyed(false);
-    }, 0);
-
-    return () => {
-      clearTimeout(timeout);
-    };
+  useEffect(() => {
+    destroyGrid();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableGrouping]);
 
   return !isDestroyed ? (
