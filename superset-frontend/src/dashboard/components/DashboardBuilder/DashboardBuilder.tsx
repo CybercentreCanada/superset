@@ -442,6 +442,9 @@ const DashboardBuilder: FC<DashboardBuilderProps> = () => {
   const dashboardIsSaving = useSelector<RootState, boolean>(
     ({ dashboardState }) => dashboardState.dashboardIsSaving,
   );
+  const focusedChart = useSelector<RootState, number | undefined>(
+    ({ dashboardState }) => dashboardState.focusedChart,
+  );
   const nativeFilters = useSelector((state: RootState) => state.nativeFilters);
   const focusedFilterId = nativeFilters?.focusedFilterId;
   const fullSizeChartId = useSelector<RootState, number | null>(
@@ -611,6 +614,7 @@ const DashboardBuilder: FC<DashboardBuilderProps> = () => {
     ),
     [
       focusedFilterId,
+      focusedChart,
       nativeFiltersEnabled,
       filterBarOrientation,
       editMode,
