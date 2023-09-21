@@ -260,25 +260,25 @@ export default function AGGridViz({
     [adhocFilters, dispatch, setDataMask],
   ); // only take relevant page size options
 
-  const handleOnClickBehavior = (
-    highlightedData: DataMap,
-    principalData: DataMap,
-  ) => {
-    const to_emit = emitCrossFiltersStateful;
-    // handle default click behaviour
-    if (onClickBehaviour !== 'None') {
-      // get action
-      const action = DEFAULT_CLICK_ACTIONS.find(
-        a => a.verbose_name === onClickBehaviour,
-      )?.action_name;
-      // handle action
-      if (action === 'emit_filters' && to_emit) {
-        emitFilter(highlightedData);
-      } else if (action === 'emit_principal_filters' && to_emit) {
-        emitFilter(principalData);
+  const handleOnClickBehavior = useCallback(
+    (highlightedData: DataMap, principalData: DataMap) => {
+      const to_emit = emitCrossFiltersStateful;
+      // handle default click behaviour
+      if (onClickBehaviour !== 'None') {
+        // get action
+        const action = DEFAULT_CLICK_ACTIONS.find(
+          a => a.verbose_name === onClickBehaviour,
+        )?.action_name;
+        // handle action
+        if (action === 'emit_filters' && to_emit) {
+          emitFilter(highlightedData);
+        } else if (action === 'emit_principal_filters' && to_emit) {
+          emitFilter(principalData);
+        }
       }
-    }
-  };
+    },
+    [emitCrossFiltersStateful, emitFilter, onClickBehaviour],
+  );
 
   const onRangeSelectionChanged = useCallback(() => {
     const cellRanges = gridRef.current!.api.getCellRanges();
@@ -330,7 +330,7 @@ export default function AGGridViz({
     });
 
     handleOnClickBehavior(newSelectedData, principalData);
-  }, [emitCrossFiltersStateful]);
+  }, [handleOnClickBehavior, principalColumns]);
 
   const onClick = (data: DataMap, globally = false) => {
     emitFilter(data, globally);
@@ -441,17 +441,11 @@ export default function AGGridViz({
     handleOnContextMenu(event.clientX, event.clientY, []);
   };
 
-  const recreateGrid = () => {
-    setIsDestroyed(false);
-  };
-
-  const destroyGrid = () => {
-    setIsDestroyed(true);
-    setTimeout(() => recreateGrid(), 0);
-  };
-
   useEffect(() => {
-    destroyGrid();
+    setIsDestroyed(true);
+    setTimeout(() => {
+      setIsDestroyed(false);
+    }, 0);
   }, [enableGrouping]);
 
   return !isDestroyed ? (
