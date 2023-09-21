@@ -220,36 +220,27 @@ export default function AGGridViz({
             };
           });
 
+          const newFilterList = [
+            ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
+            ...newFilters,
+          ];
+
           // This adds the new filter to the data mask. No idea if all these fields are necessary?
           // TODO: Test removing these fields to see if things break
           const newMask = {
             id: filter.id,
             extraFormData: {
-              adhoc_filters: [
-                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-                ...newFilters,
-              ],
+              adhoc_filters: newFilterList,
             },
             filterState: {
-              value: [
-                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-                ...newFilters,
-              ],
-              filters: [
-                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-                ...newFilters,
-              ],
+              label: 'I am a banana!',
+              value: newFilterList,
+              filters: newFilterList,
             },
             ownState: {},
             __cache: {
-              value: [
-                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-                ...newFilters,
-              ],
-              filters: [
-                ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-                ...newFilters,
-              ],
+              value: newFilterList,
+              filters: newFilterList,
             },
           };
 
@@ -443,9 +434,14 @@ export default function AGGridViz({
 
   useEffect(() => {
     setIsDestroyed(true);
-    setTimeout(() => {
+
+    const timeout = setTimeout(() => {
       setIsDestroyed(false);
     }, 0);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [enableGrouping]);
 
   return !isDestroyed ? (
