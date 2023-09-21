@@ -44,7 +44,7 @@ export interface DetailsPanelProps {
   appliedIndicators: Indicator[];
   incompatibleIndicators: Indicator[];
   unsetIndicators: Indicator[];
-  onHighlightFilterSource: (path: string[]) => void;
+  onHighlightFilterSource: (path?: string[]) => void;
   children: JSX.Element;
 }
 
@@ -102,6 +102,8 @@ const DetailsPanelPopover = ({
     // every time the popover opens, make sure the most relevant panel is active
     if (isOpen) {
       setActivePanels(getDefaultActivePanel());
+    } else {
+      onHighlightFilterSource();
     }
   }
 

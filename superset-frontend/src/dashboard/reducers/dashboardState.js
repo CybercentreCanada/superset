@@ -20,31 +20,33 @@
 import {
   ADD_SLICE,
   ON_CHANGE,
+  ON_FILTERS_REFRESH,
+  ON_FILTERS_REFRESH_SUCCESS,
+  ON_REFRESH,
+  ON_REFRESH_SUCCESS,
   ON_SAVE,
   REMOVE_SLICE,
+  SAVE_DASHBOARD_FINISHED,
+  SAVE_DASHBOARD_STARTED,
+  SET_ACTIVE_TABS,
   SET_COLOR_SCHEME,
+  SET_DATASETS_STATUS,
+  SET_DIRECT_PATH,
   SET_EDIT_MODE,
+  SET_FOCUSED_CHART,
+  SET_FOCUSED_FILTER_FIELD,
+  SET_FULL_SIZE_CHART_ID,
   SET_MAX_UNDO_HISTORY_EXCEEDED,
+  SET_OVERRIDE_CONFIRM,
+  SET_REFRESH_FREQUENCY,
   SET_UNSAVED_CHANGES,
   SHOW_BUILDER_PANE,
   TOGGLE_EXPAND_SLICE,
   TOGGLE_FAVE_STAR,
   TOGGLE_PUBLISHED,
-  UPDATE_CSS,
-  SET_REFRESH_FREQUENCY,
-  ON_REFRESH,
-  ON_REFRESH_SUCCESS,
-  SET_DIRECT_PATH,
-  SET_FOCUSED_FILTER_FIELD,
+  UNSET_FOCUSED_CHART,
   UNSET_FOCUSED_FILTER_FIELD,
-  SET_ACTIVE_TABS,
-  SET_FULL_SIZE_CHART_ID,
-  ON_FILTERS_REFRESH,
-  ON_FILTERS_REFRESH_SUCCESS,
-  SET_DATASETS_STATUS,
-  SET_OVERRIDE_CONFIRM,
-  SAVE_DASHBOARD_STARTED,
-  SAVE_DASHBOARD_FINISHED,
+  UPDATE_CSS,
 } from '../actions/dashboardState';
 import { HYDRATE_DASHBOARD } from '../actions/hydrate';
 
@@ -217,6 +219,18 @@ export default function dashboardStateReducer(state = {}, action) {
       return {
         ...state,
         focusedFilterField: null,
+      };
+    },
+    [SET_FOCUSED_CHART]() {
+      return {
+        ...state,
+        focusedChart: action.chartId,
+      };
+    },
+    [UNSET_FOCUSED_CHART]() {
+      return {
+        ...state,
+        focusedChart: null,
       };
     },
     [SET_FULL_SIZE_CHART_ID]() {
