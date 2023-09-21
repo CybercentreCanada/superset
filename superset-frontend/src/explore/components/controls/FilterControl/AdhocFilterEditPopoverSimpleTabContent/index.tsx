@@ -16,45 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, useState } from 'react';
-import FormItem from 'src/components/Form/FormItem';
-import { Select } from 'src/components';
-import {
-  t,
-  SupersetClient,
-  SupersetTheme,
-  styled,
-  hasGenericChartAxes,
-  isDefined,
-} from '@superset-ui/core';
-import {
-  Operators,
-  OPERATORS_OPTIONS,
-  HAVING_OPERATORS,
-  MULTI_OPERATORS,
-  CUSTOM_OPERATORS,
-  DISABLE_INPUT_OPERATORS,
-  AGGREGATES,
-  OPERATOR_ENUM_TO_OPERATOR_TYPE,
-  OPERATOR_TOOLTIP_MAP,
-} from 'src/explore/constants';
-import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
-import AdhocFilter, {
-  EXPRESSION_TYPES,
-  CLAUSES,
-} from 'src/explore/components/controls/FilterControl/AdhocFilter';
-import { Tooltip } from 'src/components/Tooltip';
-import { Input } from 'src/components/Input';
-import { optionLabel } from 'src/utils/common';
-import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
 import {
   ColumnMeta,
   Dataset,
   isTemporalColumn,
 } from '@superset-ui/chart-controls';
-import useAdvancedDataTypes from './useAdvancedDataTypes';
-import { useDatePickerInAdhocFilter } from '../utils';
+import {
+  SupersetClient,
+  SupersetTheme,
+  css,
+  hasGenericChartAxes,
+  isDefined,
+  styled,
+  t,
+} from '@superset-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Select } from 'src/components';
+import FormItem from 'src/components/Form/FormItem';
+import { Input } from 'src/components/Input';
+import { Tooltip } from 'src/components/Tooltip';
+import AdhocFilter, {
+  CLAUSES,
+  EXPRESSION_TYPES,
+} from 'src/explore/components/controls/FilterControl/AdhocFilter';
+import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
+import {
+  AGGREGATES,
+  CUSTOM_OPERATORS,
+  DISABLE_INPUT_OPERATORS,
+  HAVING_OPERATORS,
+  MULTI_OPERATORS,
+  OPERATORS_OPTIONS,
+  OPERATOR_ENUM_TO_OPERATOR_TYPE,
+  OPERATOR_TOOLTIP_MAP,
+  Operators,
+} from 'src/explore/constants';
+import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
+import { optionLabel } from 'src/utils/common';
 import { useDefaultTimeFilter } from '../../DateFilterControl/utils';
+import { useDatePickerInAdhocFilter } from '../utils';
+import useAdvancedDataTypes from './useAdvancedDataTypes';
 
 const StyledInput = styled(Input)`
   margin-bottom: ${({ theme }) => theme.gridUnit * 4}px;
@@ -73,6 +74,16 @@ const SelectWithLabel = styled(Select)<{ labelText: string }>`
     white-space: nowrap;
     color: ${({ theme }) => theme.colors.grayscale.light1};
     width: max-content;
+  }
+`;
+
+const iconStyles = css`
+  &.anticon {
+    font-size: unset;
+    .anticon {
+      line-height: unset;
+      vertical-align: unset;
+    }
   }
 `;
 
