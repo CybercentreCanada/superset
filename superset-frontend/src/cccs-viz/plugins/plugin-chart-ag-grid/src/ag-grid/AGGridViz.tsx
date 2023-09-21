@@ -405,6 +405,7 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s) Globally"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
+          key={`${contextDivID.toString()}-global`}
           icon={emitIcon(
             Object.keys(selectedData.highlightedData).length === 0,
           )}
