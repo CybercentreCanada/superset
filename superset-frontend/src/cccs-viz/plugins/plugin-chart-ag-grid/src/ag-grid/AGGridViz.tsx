@@ -375,10 +375,12 @@ export default function AGGridViz({
   ) => {
     let menuItems = [
       <CopyMenuItem
+        key="copy-menu-item"
         selectedData={selectedData.highlightedData}
         onSelection={handleContextMenuSelected}
       />,
       <CopyWithHeaderMenuItem
+        key="copy-with-header-menu-item"
         selectedData={selectedData.highlightedData}
         onSelection={handleContextMenuSelected}
       />,
@@ -393,7 +395,7 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s)"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
-          key={contextDivID.toString()}
+          key="emit-filters"
           icon={emitIcon(
             Object.keys(selectedData.highlightedData).length === 0,
           )}
@@ -405,7 +407,7 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s) Globally"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
-          key={`${contextDivID.toString()}-global`}
+          key="emit-filters-globally"
           icon={emitIcon(
             Object.keys(selectedData.highlightedData).length === 0,
           )}
@@ -416,6 +418,7 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenuSelected}
           label="Emit Principle Column Filter(s)"
+          key="emit-principle-column-filters"
           disabled={Object.keys(selectedData.principalData).length === 0}
           icon={emitIcon(Object.keys(selectedData.principalData).length === 0)}
         />,
@@ -423,6 +426,7 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
           label="Clear Emitted Filter(s)"
+          key="clear-emitted-filters"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
