@@ -6,7 +6,7 @@ import JsonValueRenderer from './renderers/JsonValueRenderer';
 import TimestampWithoutTimezoneValueRenderer from './renderers/TimestampWithoutTimezoneValueRenderer';
 
 // Key is column advanced type, value is renderer
-export const rendererMap = {
+const rendererMap = {
   IPV4: Ipv4ValueRenderer,
   IPV6: Ipv6ValueRenderer,
   DOMAIN: DomainValueRenderer,
@@ -14,3 +14,5 @@ export const rendererMap = {
   JSON: JsonValueRenderer,
   'TIMESTAMP WITHOUT TIME ZONE': TimestampWithoutTimezoneValueRenderer,
 };
+
+export default rendererMap;

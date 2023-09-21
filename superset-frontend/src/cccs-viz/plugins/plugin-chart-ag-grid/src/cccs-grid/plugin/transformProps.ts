@@ -8,7 +8,7 @@ import {
 } from '@superset-ui/core';
 
 import { ValueFormatterParams } from 'ag-grid-community';
-import { rendererMap } from '../../advancedDataTypes';
+import rendererMap from '../../rendererMap';
 import ExpandAllValueRenderer from '../../renderers/ExpandAllValueRenderer';
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 
