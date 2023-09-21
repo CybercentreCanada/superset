@@ -36,6 +36,10 @@ export default function IFrameVisualization(props: IFrameVisualizationProps) {
     }
   }, [encodedUrl, url]);
 
+  useEffect(() => {
+    setErrorMessage(props.errorMessage);
+  }, [props.errorMessage]);
+
   return (
     <>
       {errorMessage ? (
