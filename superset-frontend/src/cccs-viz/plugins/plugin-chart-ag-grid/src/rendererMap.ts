@@ -13,6 +13,7 @@ const rendererMap = {
   COUNTRY: CountryValueRenderer,
   JSON: JsonValueRenderer,
   'TIMESTAMP WITHOUT TIME ZONE': TimestampWithoutTimezoneValueRenderer,
+  DATETIME: TimestampWithoutTimezoneValueRenderer,
 };
 
 export default rendererMap;
