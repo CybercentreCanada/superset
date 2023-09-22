@@ -38,13 +38,5 @@ export default function buildQuery(formData: QueryFormData) {
     result_type: 'post_processed',
   };
 
-  return buildQueryContext(formDataCopy, baseQueryObject =>
-    // RAW mode (not aggregated)
-    [
-      {
-        ...baseQueryObject,
-        row_limit: 10,
-      },
-    ],
-  );
+  return buildQueryContext(formDataCopy, baseQueryObject => [baseQueryObject]);
 }

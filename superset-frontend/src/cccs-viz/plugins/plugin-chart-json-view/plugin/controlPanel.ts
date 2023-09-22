@@ -133,6 +133,15 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'row_limit',
+            override: {
+              label: t('Row Limit'),
+              default: 1,
+            },
+          },
+        ],
       ],
     },
     {
