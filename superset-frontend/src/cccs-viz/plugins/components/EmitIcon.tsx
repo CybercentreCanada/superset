@@ -1,6 +1,9 @@
 import React from 'react';
 
-const emitIcon = (disabled = false, disablePadding = false) => (
+const EmitIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({
+  disabled = false,
+  disablePadding = false,
+}) => (
   <div style={{ paddingRight: 8 * +!disablePadding, display: 'inline' }}>
     <svg
       width="16"
@@ -22,4 +25,4 @@ const emitIcon = (disabled = false, disablePadding = false) => (
   </div>
 );
 
-export default emitIcon;
+export default EmitIcon;

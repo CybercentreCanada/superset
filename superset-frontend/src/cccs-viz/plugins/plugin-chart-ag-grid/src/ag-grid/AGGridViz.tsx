@@ -16,27 +16,16 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CloseOutlined } from '@ant-design/icons';
-import {
-  DataMaskWithId,
-  ensureIsArray,
-  isNativeFilter,
-} from '@superset-ui/core';
+import { ensureIsArray } from '@superset-ui/core';
 import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { LicenseManager } from 'ag-grid-enterprise';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
-import { clearDataMask, updateDataMask } from 'src/dataMask/actions';
+import { clearDataMask } from 'src/dataMask/actions';
 // import { ExplorePageState } from 'src/explore/types';
-import {
-  CLAUSES,
-  EXPRESSION_TYPES,
-} from 'src/explore/components/controls/FilterControl/AdhocFilter';
-import {
-  OPERATOR_ENUM_TO_OPERATOR_TYPE,
-  Operators,
-} from 'src/explore/constants';
+import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -50,7 +39,7 @@ import {
   PAGE_SIZE_OPTIONS,
 } from '../cccs-grid/plugin/controlPanel';
 
-import emitIcon from '../../../components/EmitIcon';
+import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps } from '../types';
 
 // Register the required feature modules with the Grid
@@ -88,12 +77,8 @@ export default function AGGridViz({
   const crossFilterValue = useSelector<RootState, any>(
     state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
-  const adhocFilters = useSelector<RootState, DataMaskWithId[]>(state =>
-    Object.values(state.nativeFilters.filters)
-      .filter(f => isNativeFilter(f) && f.filterType === 'filter_adhoc')
-      .map(f => state.dataMask[f.id]),
-  );
   const dispatch = useDispatch();
+  const emitGlobalFilter = useEmitGlobalFilter();
 
   const contextMenuRef = useRef<ContextRef>(null);
 
@@ -186,81 +171,10 @@ export default function AGGridViz({
           },
         });
       } else {
-        // Iterate through all the ad hoc filters, and add another ad hoc entry.
-        // Note that this may have unintended consequences. User feedback may make
-        // it so we want to allow them to choose which adhoc filter to emit to, instead
-        // of just applying it to all of them.
-        adhocFilters.forEach(filter => {
-          const newFilters = groupBy.map(([col, _val]) => {
-            const val = Array.isArray(_val) && _val.length < 2 ? _val[0] : _val;
-            const op = Array.isArray(val)
-              ? Operators.IN
-              : // Check to see if the value is a number or not
-              /^\d+(\.\d+)?$/.test(val.toString())
-              ? Operators.EQUALS
-              : Operators.ILIKE;
-
-            // I reverse-engineered this from the redux store. There's probably a better way to do this,
-            // but this is what works for now.
-            return {
-              expressionType: EXPRESSION_TYPES.SIMPLE,
-              subject: col,
-              operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
-              operatorId: op,
-              comparator: op !== Operators.ILIKE ? val : `%${val}%`,
-              clause: CLAUSES.WHERE,
-              sqlExpression: null,
-              isExtra: false,
-              isNew: true,
-              datasourceWarning: false,
-              filterOptionName: `filter_${Math.random()
-                .toString(36)
-                .substring(2, 15)}_${Math.random()
-                .toString(36)
-                .substring(2, 15)}`,
-            };
-          });
-
-          const newFilterList = [
-            ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),
-            ...newFilters,
-          ];
-
-          const newLabel = newFilterList
-            .map(
-              f =>
-                `${f.subject} ${f.operator} ${
-                  Array.isArray(f.comparator)
-                    ? f.comparator.join(', ')
-                    : f.comparator
-                }`,
-            )
-            .join(', ');
-
-          // This adds the new filter to the data mask. No idea if all these fields are necessary?
-          // TODO: Test removing these fields to see if things break
-          const newMask = {
-            id: filter.id,
-            extraFormData: {
-              adhoc_filters: newFilterList,
-            },
-            filterState: {
-              label: newLabel,
-              value: newFilterList,
-              filters: newFilterList,
-            },
-            ownState: {},
-            __cache: {
-              value: newFilterList,
-              filters: newFilterList,
-            },
-          };
-
-          dispatch(updateDataMask(filter.id, newMask));
-        });
+        emitGlobalFilter(groupBy);
       }
     },
-    [adhocFilters, dispatch, setDataMask],
+    [emitGlobalFilter, setDataMask],
   ); // only take relevant page size options
 
   const handleOnClickBehavior = useCallback(
@@ -373,11 +287,13 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenuSelected}
           label="Emit Filter(s)"
-          disabled={Object.keys(selectedData.highlightedData).length === 0}
+          disabled={!Object.keys(selectedData.highlightedData).length}
           key="emit-filters"
-          icon={emitIcon(
-            Object.keys(selectedData.highlightedData).length === 0,
-          )}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
         />,
         <EmitFilterMenuItem
           onClick={() => {
@@ -385,11 +301,13 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenuSelected}
           label="Filter on Selection"
-          disabled={Object.keys(selectedData.highlightedData).length === 0}
+          disabled={!Object.keys(selectedData.highlightedData).length}
           key="filter-on-selection"
-          icon={emitIcon(
-            Object.keys(selectedData.highlightedData).length === 0,
-          )}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
         />,
         <EmitFilterMenuItem
           onClick={() => {
@@ -398,8 +316,12 @@ export default function AGGridViz({
           onSelection={handleContextMenuSelected}
           label="Emit Principle Column Filter(s)"
           key="emit-principle-column-filters"
-          disabled={Object.keys(selectedData.principalData).length === 0}
-          icon={emitIcon(Object.keys(selectedData.principalData).length === 0)}
+          disabled={!Object.keys(selectedData.principalData).length}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.principalData).length}
+            />
+          }
         />,
         <EmitFilterMenuItem
           onSelection={handleContextMenuSelected}
