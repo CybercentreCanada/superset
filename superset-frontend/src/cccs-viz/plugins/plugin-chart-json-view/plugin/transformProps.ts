@@ -91,5 +91,6 @@ export default function transformProps(chartProps: ChartProps) {
     errorMessage,
     height,
     width,
+    enableSearch: formData.enableSearch,
   };
 }

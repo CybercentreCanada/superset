@@ -1,9 +1,41 @@
-import { QueryFormData, css } from '@superset-ui/core';
+import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
 import _ from 'lodash';
-import React, { memo } from 'react';
+import React, { ChangeEvent, memo, useCallback, useState } from 'react';
 import { JSONTree } from 'react-json-tree';
 import EmitIcon from '../components/EmitIcon';
 import useEmitGlobalFilter from '../hooks/useEmitGlobalFilter';
+
+const wrapperStyles = (height: number, width: number) => css`
+  max-height: ${height}px;
+  max-width: ${width}px;
+  overflow: auto;
+
+  ul li {
+    padding-top: 0px !important;
+  }
+
+  ul li > label {
+    padding-top: 0.25rem;
+  }
+
+  label:empty {
+    display: none !important;
+  }
+`;
+
+const searchStyles = (theme: SupersetTheme) => css`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  span {
+    margin-right: 1rem;
+  }
+
+  input {
+    border-radius: ${theme.borderRadius}px;
+  }
+`;
 
 const labelStyles = (buttonActive = true) => css`
   display: grid;
@@ -30,13 +62,22 @@ export type PrettyPrintVisualizationProps = QueryFormData & {
   errorMessage: string;
   height: number;
   width: number;
+  enableSearch: boolean;
 };
 
 const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
   props => {
-    const { values, errorMessage, height, width } = props;
+    const { values, errorMessage, height, width, enableSearch } = props;
 
     const emitGlobalFilter = useEmitGlobalFilter();
+
+    const [searchValue, setSearchValue] = useState('');
+
+    const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+
+      setSearchValue(e.target.value);
+    }, []);
 
     return (
       <>
@@ -46,13 +87,18 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
             {errorMessage}
           </span>
         ) : (
-          <div
-            style={{
-              maxHeight: `${height}px`,
-              maxWidth: `${width}px`,
-              overflow: 'auto',
-            }}
-          >
+          <div css={wrapperStyles(height, width)}>
+            {enableSearch && (
+              <div css={searchStyles}>
+                <span>Search</span>
+                <input
+                  className="form-control input-sm"
+                  placeholder="Search values"
+                  value={searchValue}
+                  onChange={setSearch}
+                />
+              </div>
+            )}
             <JSONTree
               data={values}
               theme="default"
@@ -63,9 +109,25 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
                   .filter((_, index) => index > 0)
                   .map(key => key.toString());
 
+                const isComplex = ['Array', 'Object'].includes(nodeType);
                 const value = _.get(values, path);
 
-                const showButton = !['Array', 'Object'].includes(nodeType);
+                if (
+                  searchValue &&
+                  !isComplex &&
+                  !path
+                    .join('.')
+                    .toLowerCase()
+                    .includes(searchValue.toLowerCase()) &&
+                  !value
+                    ?.toString()
+                    .toLowerCase()
+                    .includes(searchValue.toLowerCase())
+                ) {
+                  return null;
+                }
+
+                const showButton = !isComplex;
                 const buttonDisabled = nodeType === 'Null';
 
                 return (
@@ -84,6 +146,25 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
                     <span>{keyPath[0]}:</span>
                   </div>
                 );
+              }}
+              valueRenderer={(value, _, ...keyPath) => {
+                const path = [...keyPath]
+                  .reverse()
+                  .filter((_, index) => index > 0)
+                  .map(key => key.toString())
+                  .join('.')
+                  .toLowerCase();
+
+                const valueAsString = value.toString().toLowerCase();
+
+                if (
+                  !path.includes(searchValue.toLowerCase()) &&
+                  !valueAsString.includes(searchValue.toLowerCase())
+                ) {
+                  return null;
+                }
+
+                return value;
               }}
             />
           </div>
