@@ -1,5 +1,11 @@
+import { css, SupersetTheme } from '@superset-ui/core';
 import React, { useMemo } from 'react';
 import { IFrameVisualizationProps } from './types';
+
+const errorStyles = (theme: SupersetTheme) => css`
+  color: ${theme.colors.error.base};
+  font-weight: bold;
+`;
 
 export default function IFrameVisualization(props: IFrameVisualizationProps) {
   const {
@@ -24,13 +30,9 @@ export default function IFrameVisualization(props: IFrameVisualizationProps) {
     <>
       {errorMessage ? (
         errorMessage !== 'fission-incompat' ? (
-          // eslint-disable-next-line theme-colors/no-literal-colors
-          <span style={{ color: 'red', fontWeight: 'bold' }}>
-            {errorMessage}
-          </span>
+          <span css={errorStyles}>{errorMessage}</span>
         ) : (
-          // eslint-disable-next-line theme-colors/no-literal-colors
-          <span style={{ color: 'red', fontWeight: 'bold' }}>
+          <span css={errorStyles}>
             Fission endpoints are not supported in{' '}
             {navigator.userAgent.includes('Edg/')
               ? 'Microsoft Edge'
