@@ -105,6 +105,7 @@ const calcColumnColumnDefs = (
     );
     const rowGroup = rowGroupIndex >= 0;
     const hide = rowGroup;
+    const maxWidth = 800;
 
     return {
       field: column,
@@ -119,6 +120,7 @@ const calcColumnColumnDefs = (
       // getQuickFilterText: (params: any) => valueFormatter(params),
       headerTooltip: columnDescription,
       autoHeight,
+      maxWidth,
     };
   });
 
