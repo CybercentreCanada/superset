@@ -120,20 +120,19 @@ export default function AGGridViz({
 
   const gridRef = useRef<AgGridReactType>(null);
 
-  const updatePageSize = (newSize: number) => {
+  const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
-  };
+  }, []);
+
+  const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSearchValue(e.target.value);
+  }, []);
 
   useEffect(() => {
     updatePageSize(pageLength);
   }, [pageLength]);
-
-  const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    e.preventDefault();
-    setSearchValue(target.value);
-  };
 
   useEffect(() => {
     if (!includeSearch) {

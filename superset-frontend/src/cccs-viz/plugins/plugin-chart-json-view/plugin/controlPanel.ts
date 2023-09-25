@@ -150,6 +150,20 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         [
           {
+            name: 'enable_search',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Enable Search Bar'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Whether to enable searching through the JSON tree.',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'key_order',
             config: {
               type: 'TextControl',
