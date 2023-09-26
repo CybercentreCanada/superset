@@ -149,7 +149,14 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
                       type="button"
                       disabled={buttonDisabled}
                       onClick={() =>
-                        emitGlobalFilter([[keyPath[0].toString(), value]])
+                        emitGlobalFilter([
+                          [
+                            keyPath.find(
+                              key => !!key && typeof key === 'string',
+                            ) as string,
+                            value,
+                          ],
+                        ])
                       }
                     >
                       <EmitIcon disabled={buttonDisabled} disablePadding />
