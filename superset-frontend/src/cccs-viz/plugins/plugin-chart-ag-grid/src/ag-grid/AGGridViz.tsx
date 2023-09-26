@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 // import { ExplorePageState } from 'src/explore/types';
+import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import ChartContextMenu, {
   Ref as ContextRef,
@@ -208,35 +209,39 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
+
         const endRow = Math.max(
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
+
         const api = gridRef.current!.api!;
-        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+
+        _.range(startRow, endRow + 1).forEach(rowIndex => {
           range.columns.forEach((column: any) => {
             const col = column.colDef?.field;
-            newSelectedData[col] = newSelectedData[col] || [];
-            const rowModel = api.getModel();
-            const rowNode = rowModel.getRow(rowIndex)!;
-            const value = api.getValue(column, rowNode);
 
-            if (!newSelectedData[col].includes(value)) {
-              newSelectedData[col].push(value);
+            if (col) {
+              newSelectedData[col] = newSelectedData[col] || [];
+              const rowNode = api.getModel().getRow(rowIndex)!;
+              const value = api.getValue(column, rowNode);
+
+              if (!newSelectedData[col].includes(value)) {
+                newSelectedData[col].push(value);
+              }
             }
           });
-          principalColumns.forEach((column: any) => {
-            const col = column;
-            principalData[col] = principalData[col] || [];
-            const rowModel = api.getModel();
-            const rowNode = rowModel.getRow(rowIndex)!;
+
+          principalColumns.forEach((column: string) => {
+            principalData[column] = principalData[column] || [];
+            const rowNode = api.getModel().getRow(rowIndex)!;
             const value = api.getValue(column, rowNode);
 
-            if (!principalData[col].includes(value)) {
-              principalData[col].push(value);
+            if (!principalData[column].includes(value)) {
+              principalData[column].push(value);
             }
           });
-        }
+        });
       });
     }
 
@@ -245,7 +250,9 @@ export default function AGGridViz({
       principalData,
     });
 
-    handleOnClickBehavior(newSelectedData, principalData);
+    if (!_.isEmpty(newSelectedData)) {
+      handleOnClickBehavior(newSelectedData, principalData);
+    }
   }, [handleOnClickBehavior, principalColumns]);
 
   const onClick = (data: DataMap, globally = false) => {
