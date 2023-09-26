@@ -133,7 +133,7 @@ export default function AGGridViz({
 
   useEffect(() => {
     updatePageSize(pageLength);
-  }, [pageLength]);
+  }, [pageLength, updatePageSize]);
 
   useEffect(() => {
     if (!includeSearch) {
