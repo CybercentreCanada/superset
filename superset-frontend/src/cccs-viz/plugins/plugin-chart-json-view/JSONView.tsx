@@ -1,7 +1,14 @@
 import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
 import _ from 'lodash';
-import React, { ChangeEvent, memo, useCallback, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactNode,
+  memo,
+  useCallback,
+  useState,
+} from 'react';
 import { JSONTree } from 'react-json-tree';
+import { Tooltip } from 'src/components/Tooltip';
 import EmitIcon from '../components/EmitIcon';
 import useEmitGlobalFilter from '../hooks/useEmitGlobalFilter';
 
@@ -132,19 +139,30 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
                 const showButton = !isComplex;
                 const buttonDisabled = nodeType === 'Null';
 
+                let button: ReactNode = null;
+                if (showButton) {
+                  button = (
+                    <button
+                      type="button"
+                      disabled={buttonDisabled}
+                      onClick={() =>
+                        emitGlobalFilter([[keyPath[0].toString(), value]])
+                      }
+                    >
+                      <EmitIcon disabled={buttonDisabled} disablePadding />
+                    </button>
+                  );
+                }
+
+                if (button && !buttonDisabled) {
+                  button = (
+                    <Tooltip title="Filter on Key/Value">{button}</Tooltip>
+                  );
+                }
+
                 return (
                   <div css={labelStyles(showButton)}>
-                    {showButton && (
-                      <button
-                        type="button"
-                        disabled={buttonDisabled}
-                        onClick={() =>
-                          emitGlobalFilter([[keyPath[0].toString(), value]])
-                        }
-                      >
-                        <EmitIcon disabled={buttonDisabled} disablePadding />
-                      </button>
-                    )}
+                    {button}
                     <span>{keyPath[0]}:</span>
                   </div>
                 );
