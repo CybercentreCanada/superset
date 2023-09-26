@@ -17,6 +17,10 @@ const TimestampValueRenderer: React.FC<{
 }> = memo(data => {
   const date = moment(data.value);
 
+  if (!date.isValid()) {
+    return <>{data.value}</>;
+  }
+
   const timezone = date.format('zz');
 
   return (
