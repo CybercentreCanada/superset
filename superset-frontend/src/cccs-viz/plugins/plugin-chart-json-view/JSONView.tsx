@@ -5,6 +5,11 @@ import { JSONTree } from 'react-json-tree';
 import EmitIcon from '../components/EmitIcon';
 import useEmitGlobalFilter from '../hooks/useEmitGlobalFilter';
 
+const errorStyles = (theme: SupersetTheme) => css`
+  color: ${theme.colors.error.base};
+  font-weight: bold;
+`;
+
 const wrapperStyles = (height: number, width: number) => css`
   max-height: ${height}px;
   max-width: ${width}px;
@@ -82,10 +87,7 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
     return (
       <>
         {errorMessage ? (
-          // eslint-disable-next-line theme-colors/no-literal-colors
-          <span style={{ color: 'red', fontWeight: 'bold' }}>
-            {errorMessage}
-          </span>
+          <span css={errorStyles}>{errorMessage}</span>
         ) : (
           <div css={wrapperStyles(height, width)}>
             {enableSearch && (
