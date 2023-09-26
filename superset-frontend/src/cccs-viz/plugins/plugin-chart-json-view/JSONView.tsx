@@ -119,8 +119,8 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
                     .join('.')
                     .toLowerCase()
                     .includes(searchValue.toLowerCase()) &&
-                  !value
-                    ?.toString()
+                  !(value ?? 'null')
+                    .toString()
                     .toLowerCase()
                     .includes(searchValue.toLowerCase())
                 ) {
