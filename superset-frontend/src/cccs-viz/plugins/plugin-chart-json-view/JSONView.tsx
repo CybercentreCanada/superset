@@ -40,12 +40,15 @@ const searchStyles = (theme: SupersetTheme) => css`
   flex-direction: row;
   align-items: center;
 
+  margin-top: 0.5rem;
+
   span {
     margin-right: 1rem;
   }
 
   input {
     border-radius: ${theme.borderRadius}px;
+    margin-right: 0.5rem;
   }
 `;
 
