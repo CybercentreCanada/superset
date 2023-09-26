@@ -1,5 +1,6 @@
 import {
   Column,
+  GenericDataType,
   Metric,
   NumberFormats,
   QueryFormColumn,
@@ -78,24 +79,30 @@ const calcColumnColumnDefs = (
       ...columnMap,
       [column.column_name]: {
         type: column.type,
+        is_dttm: column.is_dttm,
+        type_generic: column.type_generic,
         advanced_data_type: (column.advanced_data_type as string) ?? '',
         verbose_name: column.verbose_name,
         description: column.description,
       },
     }),
-    {} as { [index: string]: { [index: string]: any } },
+    {} as { [index: string]: Partial<Column> },
   );
 
   const columnDefs = columns.map((column: any) => {
     const columnType = columnDataMap[column]?.type || '';
+    const isDate = !!columnDataMap[column]?.is_dttm;
+    const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
     const advancedType = columnDataMap[column]?.advanced_data_type || '';
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
     const cellRenderer =
-      rendererMap[advancedType.toUpperCase()] ??
-      rendererMap[columnType] ??
-      undefined;
+      isDate || columnTypeGeneric === GenericDataType.TEMPORAL
+        ? rendererMap.DATE
+        : rendererMap[advancedType.toUpperCase()] ??
+          rendererMap[columnType] ??
+          undefined;
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
