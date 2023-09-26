@@ -2,7 +2,7 @@ import React from 'react';
 
 import moment from 'moment-timezone';
 
-const TimestampWithoutTimezoneValueRenderer: React.FC<{
+const TimestampValueRenderer: React.FC<{
   [index: string]: any;
 }> = React.memo(data => {
   const timezone = moment(data.value).format('zz');
@@ -15,4 +15,4 @@ const TimestampWithoutTimezoneValueRenderer: React.FC<{
   );
 });
 
-export default TimestampWithoutTimezoneValueRenderer;
+export default TimestampValueRenderer;
