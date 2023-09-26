@@ -14,7 +14,6 @@ const EmitIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({
       aria-hidden="true"
       focusable="false"
     >
-      '
       <path
         fillRule="evenodd"
         clipRule="evenodd"

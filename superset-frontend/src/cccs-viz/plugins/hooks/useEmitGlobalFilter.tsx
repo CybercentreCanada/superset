@@ -33,7 +33,7 @@ const useEmitGlobalFilter = () => {
           const op = Array.isArray(val)
             ? Operators.IN
             : // Check to see if the value is a number or not
-            /^\d+(\.\d+)?$/.test(val.toString())
+            /^\d+(\.\d+)?$/.test(val?.toString())
             ? Operators.EQUALS
             : Operators.ILIKE;
 
