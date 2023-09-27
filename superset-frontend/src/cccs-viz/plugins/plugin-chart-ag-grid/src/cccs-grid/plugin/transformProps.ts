@@ -88,8 +88,8 @@ const calcColumnColumnDefs = (
   }, columnDataMap);
 
   const columnDefs = columns.map((column: any) => {
-    const columnType = columnDataMap[column]?.type || "";
-    const advancedType = columnDataMap[column]?.advanced_data_type|| "";
+    const columnType = columnDataMap[column]?.type || '';
+    const advancedType = columnDataMap[column]?.advanced_data_type || '';
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
@@ -99,9 +99,18 @@ const calcColumnColumnDefs = (
         : columnType in rendererMap
         ? rendererMap[columnType]
         : undefined;
+    // const valueFormatter =
+    //   advancedType.toUpperCase() === 'IPV4'
+    //     ? (v: any) => {
+    //         const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
+    //           (v >> 8) & 0xff
+    //         }.${v & 0xff}`;
+    //         return converted;
+    //       }
+    //     : undefined;
     const isSortable = true;
     const enableRowGroup = true;
-    const columnDescription = columnDataMap[column]?.description || "";
+    const columnDescription = columnDataMap[column]?.description || '';
     const autoHeight = true;
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
@@ -121,6 +130,7 @@ const calcColumnColumnDefs = (
       // getQuickFilterText: (params: any) => valueFormatter(params),
       headerTooltip: columnDescription,
       autoHeight,
+      // valueFormatter,
     };
   });
 

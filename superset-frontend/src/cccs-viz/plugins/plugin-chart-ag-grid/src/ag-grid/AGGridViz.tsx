@@ -17,7 +17,12 @@ import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
-import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
+import {
+  CellRange,
+  ProcessCellForExportParams,
+  RangeSelectionChangedEvent,
+  SendToClipboardParams,
+} from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
@@ -84,6 +89,7 @@ export default function AGGridViz({
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
+  const [copyWithHeaders, setCopyWithHeaders] = useState(false);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);
@@ -243,20 +249,58 @@ export default function AGGridViz({
     </div>
   );
 
+  function processCellForClipboard(params: ProcessCellForExportParams) {
+    const v = params.formatValue(params.value);
+    return v;
+  }
+
+  // const sendToClipboard = (params: SendToClipboardParams) => {
+  //   let copiedText = '';
+  //   const rowModel = params.api.getModel();
+  //   const cellRanges = params.api.getCellRanges();
+  //   cellRanges?.forEach(cellRange => {
+  //     if (copyWithHeaders) {
+  //       cellRange.columns.forEach(column => {
+  //         copiedText = copiedText
+  //           ? `${copiedText},${column.getColDef().field}`
+  //           : `${column.getColDef().field}`;
+  //       });
+  //       copiedText = `${copiedText}\n`;
+  //     }
+  //     if (cellRange.startRow && cellRange.endRow) {
+  //       const startRow = cellRange.startRow.rowIndex;
+  //       const endRow = cellRange.endRow.rowIndex;
+  //       [...Array(endRow - startRow).keys()]
+  //         .map(i => i + startRow)
+  //         .forEach(rowIndex => {
+  //           cellRange.columns.forEach(column => {
+  //             const rowNode = rowModel.getRow(rowIndex)!;
+  //             const value = params.api.getValue(column, rowNode);
+  //             copiedText = copiedText
+  //               ? `${copiedText},${value.toString()}`
+  //               : `${value.toString()}`;
+  //           });
+  //           copiedText = `${copiedText}\n`;
+  //         });
+  //     }
+  //   });
+  //   navigator.clipboard.writeText(copiedText);
+  // };
+
+  const copyText = (withHeaders?: boolean) => {
+    setCopyWithHeaders(withHeaders || false);
+    gridRef.current?.api?.copySelectedRangeToClipboard();
+    handleContextMenuSelected();
+  };
+
   const handleOnContextMenu = (
     offsetX: number,
     offsetY: number,
     filters: any,
   ) => {
     let menuItems = [
-      <CopyMenuItem
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
-      <CopyWithHeaderMenuItem
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
+      <CopyMenuItem onClick={copyText} />,
+      <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
     ];
     if (emitCrossFilters) {
       menuItems = [
@@ -409,6 +453,8 @@ export default function AGGridViz({
           pagination={pageSize > 0}
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
+          processCellForClipboard={processCellForClipboard}
+          // sendToClipboard={sendToClipboard}
         />
       </div>
     </>
