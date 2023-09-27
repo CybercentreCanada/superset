@@ -21,7 +21,6 @@ import {
   CellRange,
   ProcessCellForExportParams,
   RangeSelectionChangedEvent,
-  SendToClipboardParams,
 } from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
@@ -89,7 +88,6 @@ export default function AGGridViz({
   const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  const [copyWithHeaders, setCopyWithHeaders] = useState(false);
 
   useEffect(() => {
     setColumnDefsStateful(columnDefs);

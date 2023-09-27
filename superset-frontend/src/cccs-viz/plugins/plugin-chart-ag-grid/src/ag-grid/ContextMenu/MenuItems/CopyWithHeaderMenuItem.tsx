@@ -1,6 +1,6 @@
 import { Menu } from 'src/components/Menu';
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import { CopyFilled } from '@ant-design/icons';
 
 interface CopyMenuItemProps {
