@@ -252,42 +252,10 @@ export default function AGGridViz({
     return v;
   }
 
-  // const sendToClipboard = (params: SendToClipboardParams) => {
-  //   let copiedText = '';
-  //   const rowModel = params.api.getModel();
-  //   const cellRanges = params.api.getCellRanges();
-  //   cellRanges?.forEach(cellRange => {
-  //     if (copyWithHeaders) {
-  //       cellRange.columns.forEach(column => {
-  //         copiedText = copiedText
-  //           ? `${copiedText},${column.getColDef().field}`
-  //           : `${column.getColDef().field}`;
-  //       });
-  //       copiedText = `${copiedText}\n`;
-  //     }
-  //     if (cellRange.startRow && cellRange.endRow) {
-  //       const startRow = cellRange.startRow.rowIndex;
-  //       const endRow = cellRange.endRow.rowIndex;
-  //       [...Array(endRow - startRow).keys()]
-  //         .map(i => i + startRow)
-  //         .forEach(rowIndex => {
-  //           cellRange.columns.forEach(column => {
-  //             const rowNode = rowModel.getRow(rowIndex)!;
-  //             const value = params.api.getValue(column, rowNode);
-  //             copiedText = copiedText
-  //               ? `${copiedText},${value.toString()}`
-  //               : `${value.toString()}`;
-  //           });
-  //           copiedText = `${copiedText}\n`;
-  //         });
-  //     }
-  //   });
-  //   navigator.clipboard.writeText(copiedText);
-  // };
-
   const copyText = (withHeaders?: boolean) => {
-    setCopyWithHeaders(withHeaders || false);
-    gridRef.current?.api?.copySelectedRangeToClipboard();
+    gridRef.current?.api?.copySelectedRangeToClipboard({
+      includeHeaders: withHeaders || false,
+    });
     handleContextMenuSelected();
   };
 
@@ -452,7 +420,7 @@ export default function AGGridViz({
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
           processCellForClipboard={processCellForClipboard}
-          // sendToClipboard={sendToClipboard}
+          clipboardDelimiter=","
         />
       </div>
     </>
