@@ -15,6 +15,11 @@ export type CccsTableFormData = QueryFormData & {
   principalColumns: string[];
   percent_metrics: string[];
   onClickBehaviour: string;
+  enableActionButton: boolean;
+  url: string;
+  parameterName: string;
+  columnForValue: string;
+  parameterPrefix: string;
 };
 
 export type CccsTableChartProps = ChartProps & {

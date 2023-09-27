@@ -16,7 +16,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CloseOutlined } from '@ant-design/icons';
-import { ensureIsArray } from '@superset-ui/core';
+import { SupersetTheme, css, ensureIsArray, t } from '@superset-ui/core';
 import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
@@ -27,6 +27,7 @@ import { clearDataMask } from 'src/dataMask/actions';
 // import { ExplorePageState } from 'src/explore/types';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
+import Button from 'src/components/Button';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -57,6 +58,15 @@ type gridData = {
   highlightedData: DataMap;
   principalData: DataMap;
 };
+
+const headerStyles = css`
+  display: flex;
+  flex-direction: row;
+`;
+
+const actionStyles = (theme: SupersetTheme) => css`
+  margin-left: 0.5rem;
+`;
 
 export default function AGGridViz({
   columnDefs,
@@ -390,49 +400,57 @@ export default function AGGridViz({
           className="form-inline"
           style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
         >
-          <div className="row">
-            <div className="col-sm-6">
-              {pageLength > 0 && (
-                <span className="dt-select-page-size form-inline">
-                  Show{' '}
-                  <select
-                    className="form-control input-sm"
-                    value={pageSize}
-                    onBlur={() => {}}
-                    onChange={e => {
-                      updatePageSize(
-                        Number((e.target as HTMLSelectElement).value),
-                      );
-                    }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map(option => {
-                      const [size, text] = Array.isArray(option)
-                        ? option
-                        : [option, option];
-                      return (
-                        <option key={size} value={size}>
-                          {text}
-                        </option>
-                      );
-                    })}
-                  </select>{' '}
-                  entries
-                </span>
-              )}
-            </div>
-            <div className="col-sm-6">
-              {includeSearch ? (
-                <span className="float-right" style={{ fontSize: '90%' }}>
-                  Search{' '}
-                  <input
-                    className="form-control input-sm"
-                    placeholder={`${rowData.length} records...`}
-                    value={searchValue}
-                    onChange={setSearch}
-                  />
-                </span>
-              ) : null}
-            </div>
+          <div css={headerStyles}>
+            {pageLength > 0 && (
+              <span className="dt-select-page-size form-inline">
+                Show{' '}
+                <select
+                  className="form-control input-sm"
+                  value={pageSize}
+                  onBlur={() => {}}
+                  onChange={e => {
+                    updatePageSize(
+                      Number((e.target as HTMLSelectElement).value),
+                    );
+                  }}
+                >
+                  {PAGE_SIZE_OPTIONS.map(option => {
+                    const [size, text] = Array.isArray(option)
+                      ? option
+                      : [option, option];
+                    return (
+                      <option key={size} value={size}>
+                        {text}
+                      </option>
+                    );
+                  })}
+                </select>{' '}
+                entries
+              </span>
+            )}
+            {formData.enableActionButton && (
+              <Button
+                buttonStyle="secondary"
+                css={actionStyles}
+                href={formData.url}
+                target="_blank"
+                referrerPolicy="noreferrer"
+              >
+                {t('Action Button')}
+              </Button>
+            )}
+            <div style={{ flex: 1 }} />
+            {includeSearch && (
+              <span>
+                Search{' '}
+                <input
+                  className="form-control input-sm"
+                  placeholder={`${rowData.length} records...`}
+                  value={searchValue}
+                  onChange={setSearch}
+                />
+              </span>
+            )}
           </div>
         </div>
         <AgGridReact

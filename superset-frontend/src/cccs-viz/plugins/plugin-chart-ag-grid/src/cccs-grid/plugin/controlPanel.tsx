@@ -1,4 +1,19 @@
-import React from 'react';
+import {
+  ColumnMeta,
+  ColumnOption,
+  ControlConfig,
+  ControlPanelConfig,
+  ControlPanelsContainerProps,
+  ControlPanelState,
+  ControlState,
+  ControlStateMapping,
+  Dataset,
+  defineSavedMetrics,
+  formatSelectOptions,
+  QueryModeLabel,
+  sections,
+  sharedControls,
+} from '@superset-ui/chart-controls';
 import {
   ensureIsArray,
   legacyValidateInteger,
@@ -6,22 +21,7 @@ import {
   QueryMode,
   t,
 } from '@superset-ui/core';
-import {
-  ColumnOption,
-  ControlConfig,
-  ControlPanelConfig,
-  ControlPanelsContainerProps,
-  ControlStateMapping,
-  QueryModeLabel,
-  sections,
-  sharedControls,
-  ControlPanelState,
-  ControlState,
-  Dataset,
-  ColumnMeta,
-  defineSavedMetrics,
-  formatSelectOptions,
-} from '@superset-ui/chart-controls';
+import React from 'react';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
@@ -335,6 +335,167 @@ const config: ControlPanelConfig = {
               description: t(
                 'Select an action to occur by default when a cell/row is clicked. Actions are from the right-click context menu. Default is to do nothing.',
               ),
+            },
+          },
+        ],
+      ],
+    },
+    {
+      label: t('Action Button'),
+      expanded: false,
+      controlSetRows: [
+        [
+          {
+            name: 'enable_action_button',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Enable Action Button'),
+              renderTrigger: true,
+              default: false,
+              description: t('Whether to enable the action button'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'url',
+            config: {
+              type: 'TextControl',
+              label: t('URL'),
+              renderTrigger: true,
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+
+                if (state.controls?.enable_action_button?.value) {
+                  newState.externalValidationErrors = controlState.value
+                    ? []
+                    : ['Please add a value for URL.'];
+                } else {
+                  newState.externalValidationErrors = [];
+                }
+
+                return newState;
+              },
+              default: '',
+              description: t('The Base URL for the action button.'),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'parameter_name',
+            config: {
+              type: 'TextControl',
+              label: t('Parameter Name'),
+              renderTrigger: true,
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+
+                if (state.controls?.enable_action_button?.value) {
+                  newState.externalValidationErrors = controlState.value
+                    ? []
+                    : ['Please add a value for Parameter Name.'];
+                } else {
+                  newState.externalValidationErrors = [];
+                }
+
+                return newState;
+              },
+              default: '',
+              description: t('The name for the URL parameter.'),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'column_for_value',
+            config: {
+              type: 'SelectControl',
+              label: t('Column To Use'),
+              description: t(
+                'Select a column used as input for the action button',
+              ),
+              default: [],
+              renderTrigger: true,
+              optionRenderer: (c: ColumnMeta) => (
+                <StyledColumnOption showType column={c} />
+              ),
+              valueRenderer: (c: ColumnMeta) => (
+                <StyledColumnOption column={c} />
+              ),
+              valueKey: 'column_name',
+              mapStateToProps: (state, controlState) => {
+                const { controls } = state;
+                const originalMapStateToProps = isRawMode({ controls })
+                  ? sharedControls?.columns?.mapStateToProps
+                  : sharedControls?.groupby?.mapStateToProps;
+
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+
+                const choices = isRawMode({ controls })
+                  ? controls?.all_columns?.value
+                  : controls?.groupby?.value;
+
+                newState.options = newState.options.filter(
+                  (o: { column_name: string }) =>
+                    ensureIsArray(choices).includes(o.column_name),
+                );
+
+                if (state.controls?.enable_action_button?.value) {
+                  const invalidOptions = ensureIsArray(
+                    controlState.value,
+                  ).filter(c => !ensureIsArray(choices).includes(c));
+
+                  newState.externalValidationErrors =
+                    invalidOptions.length > 0
+                      ? invalidOptions.length > 1
+                        ? [
+                            `'${invalidOptions.join(', ')}'${t(
+                              ' are not valid options',
+                            )}`,
+                          ]
+                        : [`'${invalidOptions}'${t(' is not a valid option')}`]
+                      : [];
+                } else {
+                  newState.externalValidationErrors = [];
+                }
+
+                return newState;
+              },
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'parameter_prefix',
+            config: {
+              type: 'TextControl',
+              label: t('Parameter Prefix'),
+              default: '',
+              description: t(
+                'A value that will be prefix the parameter value.',
+              ),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
             },
           },
         ],
