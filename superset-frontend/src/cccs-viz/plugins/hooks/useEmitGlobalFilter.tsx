@@ -125,7 +125,7 @@ const useEmitGlobalFilter = () => {
           dispatch(updateDataMask(filter.id, newMask));
         });
     },
-    [adhocFilters, dispatch],
+    [adhocFilters, dataMasks, dispatch],
   );
 };
 
