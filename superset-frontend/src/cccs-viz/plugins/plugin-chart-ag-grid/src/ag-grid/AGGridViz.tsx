@@ -420,7 +420,6 @@ export default function AGGridViz({
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
           processCellForClipboard={processCellForClipboard}
-          clipboardDelimiter=","
         />
       </div>
     </>

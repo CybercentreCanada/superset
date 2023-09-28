@@ -15,7 +15,7 @@ export default function CopyMenuItem(props: CopyMenuItemProps) {
       onItemHover={() => {}}
       onClick={props.onClick}
       key="drill-detail-no-filters"
-      className="ant-menu-item"
+      className="ant-dropdown-menu-item"
       icon={<CopyFilled />}
     >
       Copy With Headers

@@ -24,8 +24,8 @@ export default function EmiteFilterMenuItem(props: EmiteFilterMenuItemProps) {
       key="drill-detail-no-filters"
       className={
         props.disabled
-          ? 'ant-menu-item ant-dropdown-menu-item-disabled'
-          : 'ant-menu-item'
+          ? 'ant-dropdown-menu-item ant-dropdown-menu-item-disabled'
+          : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
       icon={[props.icon]}
