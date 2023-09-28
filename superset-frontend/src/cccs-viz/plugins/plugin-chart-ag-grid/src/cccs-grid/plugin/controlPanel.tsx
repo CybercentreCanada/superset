@@ -29,9 +29,7 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
   if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
     return mode as QueryMode;
   }
-  const rawColumns = controls?.all_columns?.value as
-    | QueryFormColumn[]
-    | undefined;
+  const rawColumns = controls?.columns?.value as QueryFormColumn[] | undefined;
   const hasRawColumns = rawColumns && rawColumns.length > 0;
   return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
 }
@@ -75,7 +73,7 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['all_columns', 'groupby', 'metrics', 'percent_metrics'],
+  rerender: ['columns', 'groupby', 'metrics', 'percent_metrics'],
 };
 
 const allColumnsControl: typeof sharedControls.groupby = {
@@ -202,7 +200,7 @@ const config: ControlPanelConfig = {
             },
           },
           {
-            name: 'all_columns',
+            name: 'columns',
             config: allColumnsControl,
           },
         ],
@@ -276,7 +274,7 @@ const config: ControlPanelConfig = {
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
                 const choices = isRawMode({ controls })
-                  ? controls?.all_columns?.value
+                  ? controls?.columns?.value
                   : controls?.groupby?.value;
                 newState.options = newState.options.filter(
                   (o: { column_name: string }) =>
@@ -382,7 +380,7 @@ config.controlPanelSections.push({
             const newState =
               originalMapStateToProps?.(state, controlState) ?? {};
             const choices = isRawMode({ controls })
-              ? controls?.all_columns?.value
+              ? controls?.columns?.value
               : controls?.groupby?.value;
             newState.options = newState.options.filter(
               (o: { column_name: string }) =>

@@ -171,9 +171,9 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   const columns =
     formData.queryMode === 'raw'
-      ? formData.allColumns || []
+      ? formData.columns || []
       : formData.groupby || [];
-  const metrics = formData.metrics;
+  const { metrics } = formData;
   const percent_metrics = formData.percentMetrics;
 
   let columnDefs = calcColumnColumnDefs(
