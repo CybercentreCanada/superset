@@ -7,10 +7,10 @@ import {
   getNumberFormatter,
 } from '@superset-ui/core';
 
-import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import { ValueFormatterParams } from 'ag-grid-community';
+import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import ExpandAllValueRenderer from '../../types/ExpandAllValueRenderer';
-import { rendererMap } from '../../types/advancedDataTypes';
+import { formatterMap, rendererMap } from '../../types/advancedDataTypes';
 
 const calcMetricColumnDefs = (
   metrics: any[],
@@ -88,8 +88,8 @@ const calcColumnColumnDefs = (
   }, columnDataMap);
 
   const columnDefs = columns.map((column: any) => {
-    const columnType = columnDataMap[column]?.type || "";
-    const advancedType = columnDataMap[column]?.advanced_data_type|| "";
+    const columnType = columnDataMap[column]?.type || '';
+    const advancedType = columnDataMap[column]?.advanced_data_type || '';
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
@@ -99,9 +99,13 @@ const calcColumnColumnDefs = (
         : columnType in rendererMap
         ? rendererMap[columnType]
         : undefined;
+    const valueFormatter =
+      advancedType.toUpperCase() in formatterMap
+        ? formatterMap[advancedType.toUpperCase()]
+        : undefined;
     const isSortable = true;
     const enableRowGroup = true;
-    const columnDescription = columnDataMap[column]?.description || "";
+    const columnDescription = columnDataMap[column]?.description || '';
     const autoHeight = true;
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
@@ -118,9 +122,9 @@ const calcColumnColumnDefs = (
       hide,
       cellRenderer,
       rowGroupIndex,
-      // getQuickFilterText: (params: any) => valueFormatter(params),
       headerTooltip: columnDescription,
       autoHeight,
+      valueFormatter,
     };
   });
 

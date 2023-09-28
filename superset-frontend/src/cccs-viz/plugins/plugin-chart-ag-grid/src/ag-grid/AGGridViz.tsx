@@ -17,7 +17,11 @@ import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
-import { CellRange, RangeSelectionChangedEvent } from 'ag-grid-community';
+import {
+  CellRange,
+  ProcessCellForExportParams,
+  RangeSelectionChangedEvent,
+} from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
@@ -243,20 +247,26 @@ export default function AGGridViz({
     </div>
   );
 
+  function processCellForClipboard(params: ProcessCellForExportParams) {
+    const v = params.formatValue(params.value);
+    return v;
+  }
+
+  const copyText = (withHeaders?: boolean) => {
+    gridRef.current?.api?.copySelectedRangeToClipboard({
+      includeHeaders: withHeaders || false,
+    });
+    handleContextMenuSelected();
+  };
+
   const handleOnContextMenu = (
     offsetX: number,
     offsetY: number,
     filters: any,
   ) => {
     let menuItems = [
-      <CopyMenuItem
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
-      <CopyWithHeaderMenuItem
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
+      <CopyMenuItem onClick={copyText} />,
+      <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
     ];
     if (emitCrossFilters) {
       menuItems = [
@@ -409,6 +419,8 @@ export default function AGGridViz({
           pagination={pageSize > 0}
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
+          processCellForClipboard={processCellForClipboard}
+          clipboardDelimiter=","
         />
       </div>
     </>
