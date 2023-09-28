@@ -1,4 +1,9 @@
-import { DataMaskStateWithId, Filter, isNativeFilter } from '@superset-ui/core';
+import {
+  DataMaskStateWithId,
+  Filter,
+  ensureIsArray,
+  isNativeFilter,
+} from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateDataMask } from 'src/dataMask/actions';
 import {
@@ -12,6 +17,7 @@ import {
   CLAUSES,
   EXPRESSION_TYPES,
 } from 'src/explore/components/controls/FilterControl/AdhocFilter';
+import { safeJsonObjectParse } from '../utils';
 
 const useEmitGlobalFilter = () => {
   const dispatch = useDispatch();
@@ -36,11 +42,26 @@ const useEmitGlobalFilter = () => {
         .map(f => dataMasks[f.id])
         .forEach(filter => {
           const newFilters = groupBy.map(([col, _val]) => {
-            const val = Array.isArray(_val) && _val.length < 2 ? _val[0] : _val;
-            const op = Array.isArray(val)
+            const rawValue =
+              Array.isArray(_val) && _val.length < 2
+                ? // If the value is an array of a single entry, strip it to just the underlying value.
+                  _val[0]
+                : // Otherwise, preserve (note this applies to non-array values too)
+                  _val;
+
+            // Since some values are nested JSON (i.e. the string "['test', 'test2']"), we need to try and parse this out.
+            const processedValue = Array.isArray(rawValue)
+              ? // If it's an array, we flatMap and try to parse every entry
+                rawValue.flatMap(entry =>
+                  ensureIsArray(safeJsonObjectParse(entry) ?? entry),
+                )
+              : // If it's not an array, we just parse the single raw value
+                safeJsonObjectParse(rawValue) ?? rawValue;
+
+            const op = Array.isArray(processedValue)
               ? Operators.IN
               : // Check to see if the value is a number or not
-              /^\d+(\.\d+)?$/.test(val?.toString())
+              /^\d+(\.\d+)?$/.test(processedValue?.toString())
               ? Operators.EQUALS
               : Operators.ILIKE;
 
@@ -51,7 +72,8 @@ const useEmitGlobalFilter = () => {
               subject: col,
               operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
               operatorId: op,
-              comparator: op !== Operators.ILIKE ? val : `%${val}%`,
+              comparator:
+                op !== Operators.ILIKE ? processedValue : `%${processedValue}%`,
               clause: CLAUSES.WHERE,
               sqlExpression: null,
               isExtra: false,
