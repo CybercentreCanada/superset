@@ -179,10 +179,10 @@ export default function AGGridViz({
           },
         });
       } else {
-        emitGlobalFilter(groupBy);
+        emitGlobalFilter(formData.sliceId, groupBy);
       }
     },
-    [emitGlobalFilter, setDataMask],
+    [emitGlobalFilter, formData.sliceId, setDataMask],
   ); // only take relevant page size options
 
   const handleOnClickBehavior = useCallback(

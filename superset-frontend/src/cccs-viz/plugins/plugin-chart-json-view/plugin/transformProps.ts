@@ -92,5 +92,6 @@ export default function transformProps(chartProps: ChartProps) {
     height,
     width,
     enableSearch: formData.enableSearch,
+    sliceId: formData.sliceId,
   };
 }

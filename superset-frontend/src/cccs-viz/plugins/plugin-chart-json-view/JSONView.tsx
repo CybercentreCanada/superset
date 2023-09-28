@@ -78,129 +78,134 @@ export type PrettyPrintVisualizationProps = QueryFormData & {
   height: number;
   width: number;
   enableSearch: boolean;
+  sliceId: number;
 };
 
-const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> =
-  props => {
-    const { values, errorMessage, height, width, enableSearch } = props;
+const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
+  values,
+  errorMessage,
+  height,
+  width,
+  enableSearch,
+  sliceId,
+}) => {
+  const emitGlobalFilter = useEmitGlobalFilter();
 
-    const emitGlobalFilter = useEmitGlobalFilter();
+  const [searchValue, setSearchValue] = useState('');
 
-    const [searchValue, setSearchValue] = useState('');
+  const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
 
-    const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
+    setSearchValue(e.target.value);
+  }, []);
 
-      setSearchValue(e.target.value);
-    }, []);
+  return (
+    <>
+      {errorMessage ? (
+        <span css={errorStyles}>{errorMessage}</span>
+      ) : (
+        <div css={wrapperStyles(height, width)}>
+          {enableSearch && (
+            <div css={searchStyles}>
+              <span>Search</span>
+              <input
+                className="form-control input-sm"
+                placeholder="Search values"
+                value={searchValue}
+                onChange={setSearch}
+              />
+            </div>
+          )}
+          <JSONTree
+            data={values}
+            theme="default"
+            shouldExpandNode={() => true}
+            labelRenderer={(keyPath, nodeType) => {
+              const path = [...keyPath]
+                .reverse()
+                .filter((_, index) => index > 0)
+                .map(key => key.toString());
 
-    return (
-      <>
-        {errorMessage ? (
-          <span css={errorStyles}>{errorMessage}</span>
-        ) : (
-          <div css={wrapperStyles(height, width)}>
-            {enableSearch && (
-              <div css={searchStyles}>
-                <span>Search</span>
-                <input
-                  className="form-control input-sm"
-                  placeholder="Search values"
-                  value={searchValue}
-                  onChange={setSearch}
-                />
-              </div>
-            )}
-            <JSONTree
-              data={values}
-              theme="default"
-              shouldExpandNode={() => true}
-              labelRenderer={(keyPath, nodeType) => {
-                const path = [...keyPath]
-                  .reverse()
-                  .filter((_, index) => index > 0)
-                  .map(key => key.toString());
+              const isComplex = ['Array', 'Object'].includes(nodeType);
+              const value = _.get(values, path);
 
-                const isComplex = ['Array', 'Object'].includes(nodeType);
-                const value = _.get(values, path);
-
-                if (
-                  searchValue &&
-                  !isComplex &&
-                  !path
-                    .join('.')
-                    .toLowerCase()
-                    .includes(searchValue.toLowerCase()) &&
-                  !(value ?? 'null')
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchValue.toLowerCase())
-                ) {
-                  return null;
-                }
-
-                const showButton = !isComplex;
-                const buttonDisabled = nodeType === 'Null';
-
-                let button: ReactNode = null;
-                if (showButton) {
-                  button = (
-                    <button
-                      type="button"
-                      disabled={buttonDisabled}
-                      onClick={() =>
-                        emitGlobalFilter([
-                          [
-                            keyPath.find(
-                              key => !!key && typeof key === 'string',
-                            ) as string,
-                            value,
-                          ],
-                        ])
-                      }
-                    >
-                      <EmitIcon disabled={buttonDisabled} disablePadding />
-                    </button>
-                  );
-                }
-
-                if (button && !buttonDisabled) {
-                  button = (
-                    <Tooltip title="Filter on Key/Value">{button}</Tooltip>
-                  );
-                }
-
-                return (
-                  <div css={labelStyles(showButton)}>
-                    {button}
-                    <span>{keyPath[0]}:</span>
-                  </div>
-                );
-              }}
-              valueRenderer={(value, _, ...keyPath) => {
-                const path = [...keyPath]
-                  .reverse()
-                  .filter((_, index) => index > 0)
-                  .map(key => key.toString())
+              if (
+                searchValue &&
+                !isComplex &&
+                !path
                   .join('.')
-                  .toLowerCase();
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase()) &&
+                !(value ?? 'null')
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase())
+              ) {
+                return null;
+              }
 
-                const valueAsString = value.toString().toLowerCase();
+              const showButton = !isComplex;
+              const buttonDisabled = nodeType === 'Null';
 
-                if (
-                  !path.includes(searchValue.toLowerCase()) &&
-                  !valueAsString.includes(searchValue.toLowerCase())
-                ) {
-                  return null;
-                }
+              let button: ReactNode = null;
+              if (showButton) {
+                button = (
+                  <button
+                    type="button"
+                    disabled={buttonDisabled}
+                    onClick={() =>
+                      emitGlobalFilter(sliceId, [
+                        [
+                          keyPath.find(
+                            key => !!key && typeof key === 'string',
+                          ) as string,
+                          value,
+                        ],
+                      ])
+                    }
+                  >
+                    <EmitIcon disabled={buttonDisabled} disablePadding />
+                  </button>
+                );
+              }
 
-                return value;
-              }}
-            />
-          </div>
-        )}
-      </>
-    );
-  };
+              if (button && !buttonDisabled) {
+                button = (
+                  <Tooltip title="Filter on Key/Value">{button}</Tooltip>
+                );
+              }
+
+              return (
+                <div css={labelStyles(showButton)}>
+                  {button}
+                  <span>{keyPath[0]}:</span>
+                </div>
+              );
+            }}
+            valueRenderer={(value, _, ...keyPath) => {
+              const path = [...keyPath]
+                .reverse()
+                .filter((_, index) => index > 0)
+                .map(key => key.toString())
+                .join('.')
+                .toLowerCase();
+
+              const valueAsString = value.toString().toLowerCase();
+
+              if (
+                !path.includes(searchValue.toLowerCase()) &&
+                !valueAsString.includes(searchValue.toLowerCase())
+              ) {
+                return null;
+              }
+
+              return value;
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
+};
 
 export default memo(JSONViewVisualization);
