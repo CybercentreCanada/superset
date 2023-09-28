@@ -358,7 +358,7 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'url',
+            name: 'action_url',
             config: {
               type: 'TextControl',
               label: t('URL'),
@@ -384,6 +384,20 @@ const config: ControlPanelConfig = {
               },
               default: '',
               description: t('The Base URL for the action button.'),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'action_button_label',
+            config: {
+              type: 'TextControl',
+              label: t('Action Button Label'),
+              renderTrigger: true,
+              default: 'Action Button',
+              description: t('The label to add to the action button.'),
               visibility: ({ controls }) =>
                 Boolean(controls?.enable_action_button?.value),
             },
@@ -493,6 +507,38 @@ const config: ControlPanelConfig = {
               default: '',
               description: t(
                 'A value that will be prefix the parameter value.',
+              ),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'action_find_replace',
+            config: {
+              type: 'TextControl',
+              label: t('Column Value Modifier'),
+              default: '',
+              description: t(
+                'Allows you to specify a simple find-and-replace regex in SED format ' +
+                  '(i.e., /word1/word2/ replaces "word1" with "word2"). The first section must be a ' +
+                  'valid JS regex, and the second can use capture groups using $1, $2, etc.',
+              ),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'parameter_suffix',
+            config: {
+              type: 'TextControl',
+              label: t('Parameter Suffix'),
+              default: '',
+              description: t(
+                'A value that will be suffix the parameter value.',
               ),
               visibility: ({ controls }) =>
                 Boolean(controls?.enable_action_button?.value),
