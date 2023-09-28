@@ -64,8 +64,8 @@ const headerStyles = css`
   flex-direction: row;
 `;
 
-const actionStyles = css`
-  margin-left: 0.5rem;
+const paginationStyles = css`
+  margin-right: 0.5rem;
 `;
 
 export default function AGGridViz({
@@ -107,6 +107,10 @@ export default function AGGridViz({
 
   const actionButtonLink = useMemo(() => {
     let values = selectedData.actionButtonData;
+    if (!formData.enableMultiResults) {
+      values = [values[0]];
+    }
+
     if (formData.actionFindReplace) {
       const [regex, ...replaceStr] = formData.actionFindReplace
         .replace(/^\/(.+)\/$/, '$1')
@@ -126,6 +130,7 @@ export default function AGGridViz({
     )}`;
   }, [
     selectedData.actionButtonData,
+    formData.enableMultiResults,
     formData.actionFindReplace,
     formData.actionUrl,
     formData.parameterName,
@@ -421,7 +426,10 @@ export default function AGGridViz({
         >
           <div css={headerStyles}>
             {pageLength > 0 && (
-              <span className="dt-select-page-size form-inline">
+              <span
+                className="dt-select-page-size form-inline"
+                css={paginationStyles}
+              >
                 Show{' '}
                 <select
                   className="form-control input-sm"
@@ -450,7 +458,6 @@ export default function AGGridViz({
             {formData.enableActionButton && (
               <Button
                 buttonStyle="secondary"
-                css={actionStyles}
                 href={actionButtonLink}
                 target="_blank"
                 referrerPolicy="noreferrer"

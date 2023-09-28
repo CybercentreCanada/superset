@@ -166,11 +166,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableJsonExpand,
     principalColumns,
     onClickBehaviour,
-    enableActionButton,
-    url,
-    parameterName,
-    columnForValue,
-    parameterPrefix,
   }: CccsTableFormData = {
     ...formData,
   };
