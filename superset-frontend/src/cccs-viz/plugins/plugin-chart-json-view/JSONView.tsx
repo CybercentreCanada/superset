@@ -1,5 +1,5 @@
 import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
-import _ from 'lodash';
+import { get, isEmpty, isObject } from 'lodash';
 import React, {
   ChangeEvent,
   ReactNode,
@@ -78,6 +78,7 @@ export type PrettyPrintVisualizationProps = QueryFormData & {
   height: number;
   width: number;
   enableSearch: boolean;
+  compactView: boolean;
   sliceId: number;
 };
 
@@ -87,6 +88,7 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
   height,
   width,
   enableSearch,
+  compactView,
   sliceId,
 }) => {
   const emitGlobalFilter = useEmitGlobalFilter();
@@ -119,15 +121,22 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
           <JSONTree
             data={values}
             theme="default"
+            hideRoot={compactView}
             shouldExpandNode={() => true}
             labelRenderer={(keyPath, nodeType) => {
               const path = [...keyPath]
                 .reverse()
-                .filter((_, index) => index > 0)
+                .filter((_, index) => compactView || index > 0)
                 .map(key => key.toString());
 
-              const isComplex = ['Array', 'Object'].includes(nodeType);
-              const value = _.get(values, path);
+              const isComplex = ['Array', 'Object', 'Custom'].includes(
+                nodeType,
+              );
+              const value = get(values, path);
+
+              if (compactView && isComplex && isEmpty(value)) {
+                return null;
+              }
 
               if (
                 searchValue &&
@@ -183,6 +192,10 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
               );
             }}
             valueRenderer={(value, _, ...keyPath) => {
+              if (compactView && isObject(value) && isEmpty(value)) {
+                return null;
+              }
+
               const path = [...keyPath]
                 .reverse()
                 .filter((_, index) => index > 0)
@@ -201,6 +214,9 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
 
               return value;
             }}
+            isCustomNode={value =>
+              compactView && isObject(value) && isEmpty(value)
+            }
           />
         </div>
       )}

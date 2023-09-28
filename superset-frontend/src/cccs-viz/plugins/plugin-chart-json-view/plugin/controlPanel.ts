@@ -164,6 +164,20 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'compact_view',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Enable Compact View'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Whether to enable a more compact view for the JSON data.',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'key_order',
             config: {
               type: 'TextControl',

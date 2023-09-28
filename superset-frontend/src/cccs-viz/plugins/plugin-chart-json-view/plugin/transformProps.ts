@@ -74,6 +74,10 @@ export default function transformProps(chartProps: ChartProps) {
           // We then iterate through each key in the row, attempting to parse each one as a JSON object.
           // This is to convert a string like "['test', 'one', 'two']" into an array.
           .forEach(([key, val]) => {
+            if (formData.compactView && !val) {
+              return;
+            }
+
             newRow[key] = safeJsonObjectParse(val) ?? val;
           });
 
@@ -92,6 +96,7 @@ export default function transformProps(chartProps: ChartProps) {
     height,
     width,
     enableSearch: formData.enableSearch,
+    compactView: formData.compactView,
     sliceId: formData.sliceId,
   };
 }
