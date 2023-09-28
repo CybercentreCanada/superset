@@ -120,7 +120,9 @@ export default function AGGridViz({
     return `${formData.actionUrl}?${encodeURIComponent(
       formData.parameterName,
     )}=${encodeURIComponent(
-      formData.parameterPrefix + values.join(',') + formData.parameterSuffix,
+      formData.parameterPrefix +
+        values.join(formData.actionJoinCharacter) +
+        formData.parameterSuffix,
     )}`;
   }, [
     selectedData.actionButtonData,
@@ -128,6 +130,7 @@ export default function AGGridViz({
     formData.actionUrl,
     formData.parameterName,
     formData.parameterPrefix,
+    formData.actionJoinCharacter,
     formData.parameterSuffix,
   ]);
 

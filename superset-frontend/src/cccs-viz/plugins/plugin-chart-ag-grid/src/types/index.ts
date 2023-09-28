@@ -16,10 +16,12 @@ export type CccsTableFormData = QueryFormData & {
   percent_metrics: string[];
   onClickBehaviour: string;
   enableActionButton: boolean;
+  enableMultiResults: boolean;
   actionUrl: string;
   parameterName: string;
   columnForValue: string;
   parameterPrefix: string;
+  actionJoinCharacter: string;
   parameterSuffix: string;
   actionFindReplace: string;
   actionButtonLabel: string;

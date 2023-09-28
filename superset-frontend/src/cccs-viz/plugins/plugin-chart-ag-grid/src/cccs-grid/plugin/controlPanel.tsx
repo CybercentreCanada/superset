@@ -358,6 +358,22 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'enable_multi_results',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Enable Multiple Results'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                "Whether to allow multiple entries in the action button's link",
+              ),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
             name: 'action_url',
             config: {
               type: 'TextControl',
@@ -527,6 +543,21 @@ const config: ControlPanelConfig = {
               ),
               visibility: ({ controls }) =>
                 Boolean(controls?.enable_action_button?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'action_join_character',
+            config: {
+              type: 'TextControl',
+              label: t('Join Values String'),
+              default: ',',
+              description: t(
+                'If you allow multiple values in the action button url, this string will be used to join the values.',
+              ),
+              visibility: ({ controls }) =>
+                Boolean(controls?.enable_multi_results?.value),
             },
           },
         ],
