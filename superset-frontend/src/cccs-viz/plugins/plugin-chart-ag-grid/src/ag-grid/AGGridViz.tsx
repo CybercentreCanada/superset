@@ -43,7 +43,6 @@ import {
 import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps } from '../types';
 
-
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -224,8 +223,6 @@ export default function AGGridViz({
         const api = gridRef.current!.api!;
 
         _.range(startRow, endRow + 1).forEach(rowIndex => {
-
-  
           range.columns.forEach((column: any) => {
             const col = column.colDef?.field;
 
@@ -249,11 +246,15 @@ export default function AGGridViz({
               principalData[column].push(value);
             }
           });
-          
+
           columnsToRetain.forEach((column: string) => {
-            const colDef = gridRef.current!.api.getColumnDef(column)
-            const advancedDataType: string = colDef && "advancedDataType" in colDef ? String(colDef["advancedDataType"]) : "NoType"
-            retentionData[advancedDataType] = retentionData[advancedDataType] || [];
+            const colDef = gridRef.current!.api.getColumnDef(column);
+            const advancedDataType: string =
+              colDef && 'advancedDataType' in colDef
+                ? String(colDef.advancedDataType)
+                : 'NoType';
+            retentionData[advancedDataType] =
+              retentionData[advancedDataType] || [];
             const rowNode = api.getModel().getRow(rowIndex)!;
             const value = api.getValue(column, rowNode);
             if (!retentionData[advancedDataType].includes(value)) {
@@ -261,7 +262,6 @@ export default function AGGridViz({
             }
           });
         });
-
       });
     }
 
@@ -361,17 +361,16 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (selectedData.retentionData["cbs_eml_id"]) {
+    if (selectedData.retentionData.cbs_eml_id) {
       menuItems = [
         ...menuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenuSelected}
           label="Retain EML record to alfred"
           key="retain-eml"
-          data={selectedData.retentionData["cbs_eml_id"]}
-      />,
-      ]
-
+          data={selectedData.retentionData.cbs_eml_id}
+        />,
+      ];
     }
     contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
     setInContextMenu(true);
