@@ -28,6 +28,7 @@ import { clearDataMask } from 'src/dataMask/actions';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import Button from 'src/components/Button';
+import { Menu } from 'src/components/Menu';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -43,6 +44,7 @@ import {
 
 import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
+import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -309,6 +311,7 @@ export default function AGGridViz({
       if (emitCrossFilters) {
         menuItems = [
           ...menuItems,
+          <Menu.Divider key="cross-filter-divider" />,
           <EmitFilterMenuItem
             onClick={() => {
               onClick(selectedData.highlightedData);
@@ -361,6 +364,13 @@ export default function AGGridViz({
           />,
         ];
       }
+
+      menuItems = [
+        ...menuItems,
+        <Menu.Divider key="export-divider" />,
+        <ExportMenu key="export-csv" api={gridRef.current!.api} />,
+      ];
+
       contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
     },
     [

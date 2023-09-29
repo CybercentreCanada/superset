@@ -20,16 +20,14 @@ export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
 
   return (
     <Menu.Item
-      onItemHover={() => {}}
       onClick={() => onClick()}
-      // key={props.key ?? 'emit-filter-menu-item'}
       className={
         props.disabled
           ? 'ant-menu-item ant-dropdown-menu-item-disabled'
           : 'ant-menu-item'
       }
       disabled={props.disabled}
-      icon={[props.icon]}
+      icon={props.icon}
     >
       {props.label}
     </Menu.Item>
