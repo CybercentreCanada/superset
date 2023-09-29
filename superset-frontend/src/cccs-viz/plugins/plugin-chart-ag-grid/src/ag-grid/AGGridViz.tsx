@@ -259,12 +259,8 @@ export default function AGGridViz({
 
           columnsToRetain.forEach((column: string) => {
             const colDef = gridRef.current!.api.getColumnDef(column);
-            const advancedDataType: string =
-              colDef && 'advancedDataType' in colDef
-                ? String(colDef.advancedDataType)
-                : 'NoType';
-            retentionData[advancedDataType] =
-              retentionData[advancedDataType] || [];
+            const advancedDataType: string = colDef && "advancedDataType" in colDef ? String(colDef["advancedDataType"]) : "NoType"
+            retentionData[advancedDataType] = retentionData[advancedDataType] || [];
             const rowNode = api.getModel().getRow(rowIndex)!;
             const value = api.getValue(column, rowNode);
             if (!retentionData[advancedDataType].includes(value)) {
