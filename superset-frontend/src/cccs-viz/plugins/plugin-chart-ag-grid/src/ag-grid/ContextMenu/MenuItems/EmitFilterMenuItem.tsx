@@ -1,7 +1,7 @@
 import { Menu } from 'src/components/Menu';
 import React, { ReactNode } from 'react';
 
-interface EmiteFilterMenuItemProps {
+interface EmitFilterMenuItemProps {
   label: string;
   onClick: () => void;
   onSelection: () => void;
@@ -11,7 +11,7 @@ interface EmiteFilterMenuItemProps {
   contextMenuY?: number;
 }
 
-export default function EmiteFilterMenuItem(props: EmiteFilterMenuItemProps) {
+export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
   const onClick = () => {
     props.onClick();
     props.onSelection();

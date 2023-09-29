@@ -19,6 +19,8 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import {
   CellRange,
+  GetMainMenuItemsParams,
+  MenuItemDef,
   ProcessCellForExportParams,
   RangeSelectionChangedEvent,
 } from 'ag-grid-community';
@@ -295,7 +297,7 @@ export default function AGGridViz({
         <EmitFilterMenuItem
           onSelection={handleContextMenuSelected}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emited Filter(s)"
+          label="Clear Emitted Filter(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
@@ -323,6 +325,19 @@ export default function AGGridViz({
   const destroyGrid = () => {
     setIsDestroyed(true);
     setTimeout(() => recreateGrid(), 0);
+  };
+
+  const getMainMenuItems = (
+    params: GetMainMenuItemsParams,
+  ): (string | MenuItemDef)[] => {
+    const menuItems: (MenuItemDef | string)[] = [];
+    const itemsToExclude = ['rowGroup'];
+    params.defaultItems.forEach((item: string) => {
+      if (itemsToExclude.indexOf(item) < 0) {
+        menuItems.push(item);
+      }
+    });
+    return menuItems;
   };
 
   useEffect(() => {
@@ -420,6 +435,7 @@ export default function AGGridViz({
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
           processCellForClipboard={processCellForClipboard}
+          getMainMenuItems={getMainMenuItems}
         />
       </div>
     </>
