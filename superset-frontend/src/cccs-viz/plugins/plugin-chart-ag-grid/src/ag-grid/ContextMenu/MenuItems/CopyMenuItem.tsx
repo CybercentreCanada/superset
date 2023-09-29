@@ -28,7 +28,6 @@ export default function CopyMenuItem(props: CopyMenuItemProps) {
 
   return (
     <Menu.Item
-      onItemHover={() => {}}
       onClick={() => copyText()}
       className="ant-menu-item"
       icon={<CopyFilled />}

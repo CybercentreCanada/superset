@@ -16,7 +16,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { CloseOutlined } from '@ant-design/icons';
-import { ensureIsArray } from '@superset-ui/core';
+import { css, ensureIsArray } from '@superset-ui/core';
 import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
@@ -27,6 +27,8 @@ import { clearDataMask } from 'src/dataMask/actions';
 // import { ExplorePageState } from 'src/explore/types';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
+import Button from 'src/components/Button';
+import { Menu } from 'src/components/Menu';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -41,7 +43,8 @@ import {
 } from '../cccs-grid/plugin/controlPanel';
 
 import EmitIcon from '../../../components/EmitIcon';
-import { AGGridVizProps } from '../types';
+import { AGGridVizProps, DataMap, GridData } from '../types';
+import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -51,13 +54,21 @@ ModuleRegistry.registerModules([
   RichSelectModule,
 ]);
 
-type DataMap = { [key: string]: string[] };
-
-type gridData = {
-  highlightedData: DataMap;
-  principalData: DataMap;
-  retentionData: DataMap;
+const DEFAULT_COL_DEF = {
+  resizable: true,
+  autoHeight: true,
+  sortable: true,
+  enableRowGroup: true,
 };
+
+const headerStyles = css`
+  display: flex;
+  flex-direction: row;
+`;
+
+const paginationStyles = css`
+  margin-right: 0.5rem;
+`;
 
 export default function AGGridViz({
   columnDefs,
@@ -85,44 +96,52 @@ export default function AGGridViz({
 
   const contextMenuRef = useRef<ContextRef>(null);
 
-  const [, setInContextMenu] = useState<boolean>(true);
-  const [selectedData, setSelectedData] = useState<gridData>({
+  const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
     retentionData: {},
+    actionButtonData: [],
   });
-  const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
-  const [pageSize, setPageSize] = useState<number>(pageLength);
-  const [rowDataStateful, setRowDataStateful] = useState(rowData);
+  const [pageSize, setPageSize] = useState(pageLength);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
-  const [emitCrossFiltersStateful, setEmitCrossFiltersStateful] =
-    useState<boolean>(emitCrossFilters);
-
-  useEffect(() => {
-    setEmitCrossFiltersStateful(emitCrossFilters);
-  }, [emitCrossFilters]);
-
-  useEffect(() => {
-    setColumnDefsStateful(columnDefs);
-  }, [columnDefs]);
-
-  useEffect(() => {
-    setRowDataStateful(rowData);
-  }, [rowData]);
-
-  const defaultColDef = useMemo(
-    () => ({
-      resizable: true,
-      autoHeight: true,
-      sortable: true,
-      enableRowGroup: true,
-    }),
-    [],
-  );
 
   const gridRef = useRef<AgGridReactType>(null);
+
+  const actionButtonLink = useMemo(() => {
+    let values = selectedData.actionButtonData;
+    if (!formData.enableMultiResults) {
+      values = [values[0]];
+    }
+
+    if (formData.actionFindReplace) {
+      const [regex, ...replaceStr] = formData.actionFindReplace
+        .replace(/^\/(.+)\/$/, '$1')
+        .split('/');
+
+      values = values.map(v =>
+        v.replace(new RegExp(regex, 'ig'), replaceStr.join('/')),
+      );
+    }
+
+    return `${formData.actionUrl}?${encodeURIComponent(
+      formData.parameterName,
+    )}=${encodeURIComponent(
+      formData.parameterPrefix +
+        values.join(formData.actionJoinCharacter) +
+        formData.parameterSuffix,
+    )}`;
+  }, [
+    selectedData.actionButtonData,
+    formData.enableMultiResults,
+    formData.actionFindReplace,
+    formData.actionUrl,
+    formData.parameterName,
+    formData.parameterPrefix,
+    formData.actionJoinCharacter,
+    formData.parameterSuffix,
+  ]);
 
   const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
@@ -133,16 +152,6 @@ export default function AGGridViz({
     e.preventDefault();
     setSearchValue(e.target.value);
   }, []);
-
-  useEffect(() => {
-    updatePageSize(pageLength);
-  }, [pageLength, updatePageSize]);
-
-  useEffect(() => {
-    if (!includeSearch) {
-      setSearchValue('');
-    }
-  }, [includeSearch]);
 
   const emitFilter = useCallback(
     (data, globally = false) => {
@@ -174,38 +183,39 @@ export default function AGGridViz({
           },
         });
       } else {
-        emitGlobalFilter(groupBy);
+        emitGlobalFilter(formData.sliceId, groupBy);
       }
     },
-    [emitGlobalFilter, setDataMask],
+    [emitGlobalFilter, formData.sliceId, setDataMask],
   ); // only take relevant page size options
 
   const handleOnClickBehavior = useCallback(
     (highlightedData: DataMap, principalData: DataMap) => {
-      const to_emit = emitCrossFiltersStateful;
       // handle default click behaviour
-      if (onClickBehaviour !== 'None') {
+      if (onClickBehaviour !== 'None' && emitCrossFilters) {
         // get action
         const action = DEFAULT_CLICK_ACTIONS.find(
           a => a.verbose_name === onClickBehaviour,
         )?.action_name;
+
         // handle action
-        if (action === 'emit_filters' && to_emit) {
+        if (action === 'emit_filters') {
           emitFilter(highlightedData);
-        } else if (action === 'emit_principal_filters' && to_emit) {
+        } else if (action === 'emit_principal_filters') {
           emitFilter(principalData);
         }
       }
     },
-    [emitCrossFiltersStateful, emitFilter, onClickBehaviour],
+    [emitCrossFilters, emitFilter, onClickBehaviour],
   );
 
   const onRangeSelectionChanged = useCallback(() => {
     const cellRanges = gridRef.current!.api.getCellRanges();
 
     const newSelectedData: { [key: string]: string[] } = {};
-    const principalData: { [key: string]: string[] } = {};
     const retentionData: { [key: string]: string[] } = {};
+    const newPrincipalData: { [key: string]: string[] } = {};
+    const newActionButtonData: any[] = [];
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
@@ -223,12 +233,13 @@ export default function AGGridViz({
         const api = gridRef.current!.api!;
 
         _.range(startRow, endRow + 1).forEach(rowIndex => {
+          const rowNode = api.getModel().getRow(rowIndex)!;
+
           range.columns.forEach((column: any) => {
             const col = column.colDef?.field;
 
             if (col) {
               newSelectedData[col] = newSelectedData[col] || [];
-              const rowNode = api.getModel().getRow(rowIndex)!;
               const value = api.getValue(column, rowNode);
 
               if (!newSelectedData[col].includes(value)) {
@@ -238,12 +249,11 @@ export default function AGGridViz({
           });
 
           principalColumns.forEach((column: string) => {
-            principalData[column] = principalData[column] || [];
-            const rowNode = api.getModel().getRow(rowIndex)!;
+            newPrincipalData[column] = newPrincipalData[column] || [];
             const value = api.getValue(column, rowNode);
 
-            if (!principalData[column].includes(value)) {
-              principalData[column].push(value);
+            if (!newPrincipalData[column].includes(value)) {
+              newPrincipalData[column].push(value);
             }
           });
 
@@ -261,120 +271,166 @@ export default function AGGridViz({
               retentionData[advancedDataType].push(value);
             }
           });
+
+          if (formData.enableActionButton) {
+            const value = api
+              .getValue(formData.columnForValue, rowNode)
+              .toString();
+
+            if (value && !newActionButtonData.includes(value)) {
+              newActionButtonData.push(value);
+            }
+          }
         });
       });
     }
 
     setSelectedData({
       highlightedData: newSelectedData,
-      principalData,
       retentionData,
+      principalData: newPrincipalData,
+      actionButtonData: newActionButtonData,
     });
 
     if (!_.isEmpty(newSelectedData)) {
-      handleOnClickBehavior(newSelectedData, principalData);
+      handleOnClickBehavior(newSelectedData, newPrincipalData);
     }
-  }, [handleOnClickBehavior, principalColumns]);
+  }, [
+    formData.columnForValue,
+    formData.enableActionButton,
+    handleOnClickBehavior,
+    principalColumns,
+  ]);
 
-  const onClick = (data: DataMap, globally = false) => {
-    emitFilter(data, globally);
-  };
+  const onClick = useCallback(
+    (data: DataMap, globally = false) => {
+      emitFilter(data, globally);
+    },
+    [emitFilter],
+  );
 
-  const handleContextMenuSelected = () => {
+  const handleContextMenu = useCallback(() => {
     contextMenuRef.current?.close();
-  };
+  }, []);
 
-  const handleContextMenuClosed = () => {
-    contextMenuRef.current?.close();
-  };
-
-  const handleOnContextMenu = (
-    offsetX: number,
-    offsetY: number,
-    filters: any,
-  ) => {
-    let menuItems = [
-      <CopyMenuItem
-        key="copy-menu-item"
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
-      <CopyWithHeaderMenuItem
-        key="copy-with-header-menu-item"
-        selectedData={selectedData.highlightedData}
-        onSelection={handleContextMenuSelected}
-      />,
-    ];
-
-    if (emitCrossFiltersStateful) {
-      menuItems = [
-        ...menuItems,
-        <EmitFilterMenuItem
-          onClick={() => {
-            onClick(selectedData.highlightedData);
-          }}
-          onSelection={handleContextMenuSelected}
-          label="Emit Filter(s)"
-          disabled={!Object.keys(selectedData.highlightedData).length}
-          key="emit-filters"
-          icon={
-            <EmitIcon
-              disabled={!Object.keys(selectedData.highlightedData).length}
-            />
-          }
+  const handleOnContextMenu = useCallback(
+    (offsetX: number, offsetY: number, filters: any) => {
+      let menuItems = [
+        <CopyMenuItem
+          key="copy-menu-item"
+          selectedData={selectedData.highlightedData}
+          onSelection={handleContextMenu}
         />,
-        <EmitFilterMenuItem
-          onClick={() => {
-            onClick(selectedData.highlightedData, true);
-          }}
-          onSelection={handleContextMenuSelected}
-          label="Filter on Selection"
-          disabled={!Object.keys(selectedData.highlightedData).length}
-          key="filter-on-selection"
-          icon={
-            <EmitIcon
-              disabled={!Object.keys(selectedData.highlightedData).length}
-            />
-          }
-        />,
-        <EmitFilterMenuItem
-          onClick={() => {
-            onClick(selectedData.principalData);
-          }}
-          onSelection={handleContextMenuSelected}
-          label="Emit Principle Column Filter(s)"
-          key="emit-principle-column-filters"
-          disabled={!Object.keys(selectedData.principalData).length}
-          icon={
-            <EmitIcon
-              disabled={!Object.keys(selectedData.principalData).length}
-            />
-          }
-        />,
-        <EmitFilterMenuItem
-          onSelection={handleContextMenuSelected}
-          onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emitted Filter(s)"
-          key="clear-emitted-filters"
-          disabled={crossFilterValue === undefined}
-          icon={<CloseOutlined />}
+        <CopyWithHeaderMenuItem
+          key="copy-with-header-menu-item"
+          selectedData={selectedData.highlightedData}
+          onSelection={handleContextMenu}
         />,
       ];
-    }
-    if (selectedData.retentionData.cbs_eml_id) {
+
+      if (emitCrossFilters) {
+        menuItems = [
+          ...menuItems,
+          <Menu.Divider key="cross-filter-divider" />,
+          <EmitFilterMenuItem
+            onClick={() => {
+              onClick(selectedData.highlightedData);
+            }}
+            onSelection={handleContextMenu}
+            label="Emit Filter(s)"
+            disabled={!Object.keys(selectedData.highlightedData).length}
+            key="emit-filters"
+            icon={
+              <EmitIcon
+                disabled={!Object.keys(selectedData.highlightedData).length}
+              />
+            }
+          />,
+          <EmitFilterMenuItem
+            onClick={() => {
+              onClick(selectedData.highlightedData, true);
+            }}
+            onSelection={handleContextMenu}
+            label="Filter on Selection"
+            disabled={!Object.keys(selectedData.highlightedData).length}
+            key="filter-on-selection"
+            icon={
+              <EmitIcon
+                disabled={!Object.keys(selectedData.highlightedData).length}
+              />
+            }
+          />,
+          <EmitFilterMenuItem
+            onClick={() => {
+              onClick(selectedData.principalData);
+            }}
+            onSelection={handleContextMenu}
+            label="Emit Principle Column Filter(s)"
+            key="emit-principle-column-filters"
+            disabled={!Object.keys(selectedData.principalData).length}
+            icon={
+              <EmitIcon
+                disabled={!Object.keys(selectedData.principalData).length}
+              />
+            }
+          />,
+          <EmitFilterMenuItem
+            onSelection={handleContextMenu}
+            onClick={() => dispatch(clearDataMask(formData.sliceId))}
+            label="Clear Emitted Filter(s)"
+            key="clear-emitted-filters"
+            disabled={crossFilterValue === undefined}
+            icon={<CloseOutlined />}
+          />,
+        ];
+      }
+      if (selectedData.retentionData.cbs_eml_id) {
+        menuItems = [
+          ...menuItems,
+          <RetainEmlMenuItem
+            onSelection={handleContextMenu}
+            label="Retain EML record to alfred"
+            key="retain-eml"
+            data={selectedData.retentionData.cbs_eml_id}
+          />,
+        ];
+      }
       menuItems = [
         ...menuItems,
-        <RetainEmlMenuItem
-          onSelection={handleContextMenuSelected}
-          label="Retain EML record to alfred"
-          key="retain-eml"
-          data={selectedData.retentionData.cbs_eml_id}
-        />,
+        <Menu.Divider key="export-divider" />,
+        <ExportMenu key="export-csv" api={gridRef.current!.api} />,
       ];
-    }
-    contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
-    setInContextMenu(true);
-  };
+
+      contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
+    },
+    [
+      crossFilterValue,
+      dispatch,
+      emitCrossFilters,
+      formData.sliceId,
+      handleContextMenu,
+      onClick,
+      selectedData.highlightedData,
+      selectedData.principalData,
+    ],
+  );
+
+  const onContextMenu = useCallback(
+    (event: any) => {
+      event.preventDefault();
+      handleOnContextMenu(event.clientX, event.clientY, []);
+    },
+    [handleOnContextMenu],
+  );
+
+  const destroyGrid = useCallback(() => {
+    setIsDestroyed(true);
+    setTimeout(() => setIsDestroyed(false), 0);
+  }, []);
+
+  useEffect(() => {
+    updatePageSize(pageLength);
+  }, [pageLength, updatePageSize]);
 
   useEffect(() => {
     if (!includeSearch) {
@@ -382,24 +438,9 @@ export default function AGGridViz({
     }
   }, [includeSearch]);
 
-  const onContextMenu = (event: any) => {
-    event.preventDefault();
-    handleOnContextMenu(event.clientX, event.clientY, []);
-  };
-
-  const recreateGrid = () => {
-    setIsDestroyed(false);
-  };
-
-  const destroyGrid = () => {
-    setIsDestroyed(true);
-    setTimeout(() => recreateGrid(), 0);
-  };
-
   useEffect(() => {
     destroyGrid();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enableGrouping]);
+  }, [destroyGrid, enableGrouping]);
 
   return !isDestroyed ? (
     <>
@@ -407,8 +448,8 @@ export default function AGGridViz({
         ref={contextMenuRef}
         id={contextDivID}
         formData={formData}
-        onSelection={handleContextMenuSelected}
-        onClose={handleContextMenuClosed}
+        onSelection={handleContextMenu}
+        onClose={handleContextMenu}
       />
       <div
         style={{
@@ -423,59 +464,70 @@ export default function AGGridViz({
           className="form-inline"
           style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
         >
-          <div className="row">
-            <div className="col-sm-6">
-              {pageLength > 0 && (
-                <span className="dt-select-page-size form-inline">
-                  Show{' '}
-                  <select
-                    className="form-control input-sm"
-                    value={pageSize}
-                    onBlur={() => {}}
-                    onChange={e => {
-                      updatePageSize(
-                        Number((e.target as HTMLSelectElement).value),
-                      );
-                    }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map(option => {
-                      const [size, text] = Array.isArray(option)
-                        ? option
-                        : [option, option];
-                      return (
-                        <option key={size} value={size}>
-                          {text}
-                        </option>
-                      );
-                    })}
-                  </select>{' '}
-                  entries
-                </span>
-              )}
-            </div>
-            <div className="col-sm-6">
-              {includeSearch ? (
-                <span className="float-right" style={{ fontSize: '90%' }}>
-                  Search{' '}
-                  <input
-                    className="form-control input-sm"
-                    placeholder={`${rowData.length} records...`}
-                    value={searchValue}
-                    onChange={setSearch}
-                  />
-                </span>
-              ) : null}
-            </div>
+          <div css={headerStyles}>
+            {pageLength > 0 && (
+              <span
+                className="dt-select-page-size form-inline"
+                css={paginationStyles}
+              >
+                Show{' '}
+                <select
+                  className="form-control input-sm"
+                  value={pageSize}
+                  onBlur={() => {}}
+                  onChange={e => {
+                    updatePageSize(
+                      Number((e.target as HTMLSelectElement).value),
+                    );
+                  }}
+                >
+                  {PAGE_SIZE_OPTIONS.map(option => {
+                    const [size, text] = Array.isArray(option)
+                      ? option
+                      : [option, option];
+                    return (
+                      <option key={size} value={size}>
+                        {text}
+                      </option>
+                    );
+                  })}
+                </select>{' '}
+                entries
+              </span>
+            )}
+            {formData.enableActionButton && (
+              <Button
+                buttonStyle="secondary"
+                href={actionButtonLink}
+                target="_blank"
+                referrerPolicy="noreferrer"
+                disabled={!selectedData.actionButtonData.length}
+              >
+                {formData.actionButtonLabel}
+              </Button>
+            )}
+            <div style={{ flex: 1 }} />
+            {includeSearch && (
+              <span>
+                Search{' '}
+                <input
+                  className="form-control input-sm"
+                  placeholder={`${rowData.length} records...`}
+                  value={searchValue}
+                  onChange={setSearch}
+                />
+              </span>
+            )}
           </div>
         </div>
         <AgGridReact
           ref={gridRef}
           // animateRows
           className="ag-theme-balham"
-          columnDefs={columnDefsStateful}
-          defaultColDef={defaultColDef}
+          columnDefs={columnDefs}
+          defaultColDef={DEFAULT_COL_DEF}
           enableRangeSelection
-          rowData={rowDataStateful}
+          rowData={rowData}
           enableBrowserTooltips
           onRangeSelectionChanged={onRangeSelectionChanged}
           cacheQuickFilter

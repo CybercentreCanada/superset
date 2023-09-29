@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, Behavior, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
+import { CccsTableChartProps, CccsTableFormData } from '../../types';
+import thumbnail from '../images/thumbnail.png';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
-import thumbnail from '../images/thumbnail.png';
-import { CccsTableFormData, CccsTableChartProps } from '../../types';
 
 export default class CccsTableChartPlugin extends ChartPlugin<
   CccsTableFormData,
@@ -39,11 +39,11 @@ export default class CccsTableChartPlugin extends ChartPlugin<
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: t('Cccs Table: An AG Grid control for Hogwarts data.'),
-      name: t('Cccs Table'),
+      description: t('CCCS Table: An AG Grid control for Hogwarts data.'),
+      name: t('CCCS Table'),
       category: t('Table'),
       tags: [
-        t('Cccs'),
+        t('CCCS'),
         t('Table'),
         t('Grid'),
         t('Popular'),
