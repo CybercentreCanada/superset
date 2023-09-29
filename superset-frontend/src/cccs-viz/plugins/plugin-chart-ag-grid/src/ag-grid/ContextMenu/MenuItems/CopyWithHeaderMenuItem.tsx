@@ -15,11 +15,10 @@ export default function CopyMenuItem(props: CopyMenuItemProps) {
     navigator.clipboard.writeText(JSON.stringify(props.selectedData));
 
     props.onSelection();
-  }, [props.selectedData]);
+  }, [props]);
 
   return (
     <Menu.Item
-      onItemHover={() => {}}
       onClick={() => copyText()}
       className="ant-menu-item"
       icon={<CopyFilled />}

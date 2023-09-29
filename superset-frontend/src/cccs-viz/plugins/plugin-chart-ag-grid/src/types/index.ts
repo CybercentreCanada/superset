@@ -15,6 +15,16 @@ export type CccsTableFormData = QueryFormData & {
   principalColumns: string[];
   percent_metrics: string[];
   onClickBehaviour: string;
+  enableActionButton: boolean;
+  enableMultiResults: boolean;
+  actionUrl: string;
+  parameterName: string;
+  columnForValue: string;
+  parameterPrefix: string;
+  actionJoinCharacter: string;
+  parameterSuffix: string;
+  actionFindReplace: string;
+  actionButtonLabel: string;
 };
 
 export type CccsTableChartProps = ChartProps & {
@@ -43,3 +53,12 @@ export type AGGridVizProps = {
 export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
 }
+
+export type DataMap = { [key: string]: string[] };
+
+export type GridData = {
+  highlightedData: DataMap;
+  principalData: DataMap;
+  retentionData: DataMap;
+  actionButtonData: any[];
+};

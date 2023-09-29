@@ -198,7 +198,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   // If the flag is set to true, add a column which will contain
   // a button to expand all JSON blobs in the row
-  
+
   if (enableJsonExpand) {
     columnDefs.splice(1, 0, {
       colId: 'jsonExpand',
@@ -225,12 +225,16 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     });
   }
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
-  
-  const advancedDataTypesToRetain = ["cbs_eml_id"]
+
+  const advancedDataTypesToRetain = ['cbs_eml_id'];
 
   const columnsToRetain = columnDefs
-                            .filter(col => col.advancedDataType && advancedDataTypesToRetain.includes(col.advancedDataType))
-                            .map(col => col.field)
+    .filter(
+      col =>
+        col.advancedDataType &&
+        advancedDataTypesToRetain.includes(col.advancedDataType),
+    )
+    .map(col => col.field);
 
   return {
     width,
