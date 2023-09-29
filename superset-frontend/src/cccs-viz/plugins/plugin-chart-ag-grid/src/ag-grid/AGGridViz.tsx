@@ -34,7 +34,7 @@ import ChartContextMenu, {
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
-
+import RetainEmlMenuItem from './ContextMenu/MenuItems/RetainEmlMenuItem';
 import {
   DEFAULT_CLICK_ACTIONS,
   PAGE_SIZE_OPTIONS,
@@ -42,6 +42,7 @@ import {
 
 import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps } from '../types';
+
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -56,6 +57,7 @@ type DataMap = { [key: string]: string[] };
 type gridData = {
   highlightedData: DataMap;
   principalData: DataMap;
+  retentionData: DataMap;
 };
 
 export default function AGGridViz({
@@ -72,6 +74,7 @@ export default function AGGridViz({
   onClickBehaviour,
   agGridLicenseKey,
   emitCrossFilters,
+  columnsToRetain,
 }: AGGridVizProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
@@ -87,6 +90,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<gridData>({
     highlightedData: {},
     principalData: {},
+    retentionData: {},
   });
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
@@ -199,8 +203,10 @@ export default function AGGridViz({
 
   const onRangeSelectionChanged = useCallback(() => {
     const cellRanges = gridRef.current!.api.getCellRanges();
+
     const newSelectedData: { [key: string]: string[] } = {};
     const principalData: { [key: string]: string[] } = {};
+    const retentionData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
@@ -218,6 +224,8 @@ export default function AGGridViz({
         const api = gridRef.current!.api!;
 
         _.range(startRow, endRow + 1).forEach(rowIndex => {
+
+  
           range.columns.forEach((column: any) => {
             const col = column.colDef?.field;
 
@@ -241,13 +249,26 @@ export default function AGGridViz({
               principalData[column].push(value);
             }
           });
+          
+          columnsToRetain.forEach((column: string) => {
+            const colDef = gridRef.current!.api.getColumnDef(column)
+            const advancedDataType: string = colDef && "advancedDataType" in colDef ? String(colDef["advancedDataType"]) : "NoType"
+            retentionData[advancedDataType] = retentionData[advancedDataType] || [];
+            const rowNode = api.getModel().getRow(rowIndex)!;
+            const value = api.getValue(column, rowNode);
+            if (!retentionData[advancedDataType].includes(value)) {
+              retentionData[advancedDataType].push(value);
+            }
+          });
         });
+
       });
     }
 
     setSelectedData({
       highlightedData: newSelectedData,
       principalData,
+      retentionData,
     });
 
     if (!_.isEmpty(newSelectedData)) {
@@ -284,6 +305,7 @@ export default function AGGridViz({
         onSelection={handleContextMenuSelected}
       />,
     ];
+
     if (emitCrossFiltersStateful) {
       menuItems = [
         ...menuItems,
@@ -338,6 +360,18 @@ export default function AGGridViz({
           icon={<CloseOutlined />}
         />,
       ];
+    }
+    if (selectedData.retentionData["cbs_eml_id"]) {
+      menuItems = [
+        ...menuItems,
+        <RetainEmlMenuItem
+          onSelection={handleContextMenuSelected}
+          label="Retain EML record to alfred"
+          key="retain-eml"
+          data={selectedData.retentionData["cbs_eml_id"]}
+      />,
+      ]
+
     }
     contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
     setInContextMenu(true);
