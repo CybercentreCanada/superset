@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 import { ensureIsArray } from '@superset-ui/core';
-import { LicenseManager } from 'ag-grid-enterprise';
+import { LicenseManager } from '@ag-grid-enterprise/core';
 import { CloseOutlined } from '@ant-design/icons';
 import ChartContextMenu, {
   Ref as ContextRef,
