@@ -36,6 +36,7 @@ export type AGGridVizProps = {
   onClickBehaviour: string;
   agGridLicenseKey: string;
   emitCrossFilters: boolean;
+  columnsToRetain: string[];
   setDataMask: SetDataMaskHook;
 };
 
