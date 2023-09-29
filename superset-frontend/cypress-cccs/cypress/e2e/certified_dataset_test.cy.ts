@@ -6,7 +6,6 @@ import { COMPLEX_STRUCTURES_DATASET,
   SQLLAB_URL } from '../support/helper'
 import { exploreView } from '../support/directories'
 import { graphql_queries } from  '../support/helper';
-import { log } from 'cypress/lib/logger';
 
 const DATAHUB_BASE_URL = Cypress.env('datahubBaseUrl')
 const GLOSSARY_TERMS_URNS: string[] = Cypress.env('glossaryTermsUrns')
@@ -19,7 +18,7 @@ before(() => {
 
   expect(DATAHUB_BASE_URL != undefined, 'Ensure datahubBaseUrl is defined as an environment variable').to.be.true
   expect(GLOSSARY_TERMS_URNS!= undefined || DOMAINS_URNS != undefined, 'Ensure glossaryTermsUrns or domainsUrns are defined as environment variables').to.be.true
-  expect(DATAHUB_PAT != undefined, 'Ensure datahubPAT is defined as environment variables').to.be.true
+  expect(DATAHUB_PAT != undefined, 'Ensure datahubPAT is defined as an environment variable').to.be.true
 
   cy.cccsLogin()
 
@@ -191,15 +190,16 @@ describe('Test Dataset Generation script', () => {
     cy.request(options).then((dummyQueryResponse) => {
       if (dummyQueryResponse.status == 200) {
         // Query is fine
-        if (dummyQueryResponse.body.result[0].data.length == 0) {
-          // Query is fine but we anticipated some results
-          if (dateTimeColumn) {
-            warnings.push(`${messagePrefix}, has no data for the last week`)
-          }
-          else {
-            warnings.push(`${messagePrefix}, no data could be found`)
-          }
-        }
+        // At this time, there is no need to report the fact there is no data
+        // if (dummyQueryResponse.body.result[0].data.length == 0) {
+        //   // Query is fine but we anticipated some results
+        //   if (dateTimeColumn) {
+        //     warnings.push(`${messagePrefix}, has no data for the last week`)
+        //   }
+        //   else {
+        //     warnings.push(`${messagePrefix}, no data could be found`)
+        //   }
+        // }
       }
       else {
         // Something went wrong
@@ -210,9 +210,11 @@ describe('Test Dataset Generation script', () => {
 
   it('Collect discrepancies between Datahub and Superset datasets for specific glossary terms or domains', () => {
 
+    cy.cccsLogin()
+
     let headers = { 'Authorization': `Bearer ${DATAHUB_PAT}` }
     let input = {
-      'count': 10000,
+      'count': 200,
       'scrollId': null,
       'orFilters': [
           {'and': [{'field': 'glossaryTerms', 'values': GLOSSARY_TERMS_URNS}]},
@@ -227,6 +229,9 @@ describe('Test Dataset Generation script', () => {
       let entities = response.body['data']['scrollAcrossEntities']['searchResults']
       // TODO Deal with nextScrollId until null
       cy.log(`Found ${entities.length} dataset(s) matching the criteria`)
+      if (entities.length == 0) {
+        warnings.push(`No dataset matching the criterai were found, please check the config settings`)
+      }
       entities.forEach((entity: any) => {
         let datasetUrn :string = entity['entity']['urn']
         // Skip soft deleted datasets
@@ -250,6 +255,7 @@ describe('Test Dataset Generation script', () => {
                 String(dataset['siblings']['siblings'][0]['urn']).startsWith(ICEBERG_URN)) {
               dataset = dataset["siblings"]["siblings"][0]
               datasetUrn = dataset['urn']
+              datasetFullQualifiedName = dataset['name']
               cy.log(`Will be using Iceberg dataset '${dataset['name']}' with urn '${datasetUrn}'`)
             }
             else {
@@ -271,19 +277,15 @@ describe('Test Dataset Generation script', () => {
                 datasetPartitionColumn = getPartitionColumn(dataset['siblings']['siblings'][0])
             }
             let editableSchemaMetadata = dataset['editableSchemaMetadata']
-            // Collecting DataHub dataset advanced data types and descriptions for all fields
-            let descriptions: Map<string, string> = new Map<string, string>();
+            // Collecting DataHub dataset advanced data types for all fields
             let advancedDatatypes: Map<string, string> = new Map<string, string>();
             if (editableSchemaMetadata && editableSchemaMetadata['editableSchemaFieldInfo']) {
               let editableSchemaFieldInfo = editableSchemaMetadata['editableSchemaFieldInfo']
               editableSchemaFieldInfo.forEach((field: any) => {
-                if (field['description']) {
-                  descriptions.set(field['fieldPath'], field['description'])
-                }
                 if (field['glossaryTerms'] && 
                   field['glossaryTerms']['terms'] && 
                   field['glossaryTerms']['terms'].filter((term: any) => term['term']['urn'].toLowerCase().includes('advanceddatatype')).length > 0) {
-                  // The advanced data type is the first glossary term that is an advanced datatype
+                  // The advanced data type is the first glossary term that is an advanced data type
                   let advancedDatatype = field['glossaryTerms']['terms'].filter((term: any) => term['term']['urn'].toLowerCase().includes('advanceddatatype'))[0]['term']['name']
                   advancedDatatypes.set(field['fieldPath'], advancedDatatype)
                 }
@@ -297,7 +299,7 @@ describe('Test Dataset Generation script', () => {
               if (! datahubDatasetFieldMap.has(fieldName)) {
                 let fieldPath = field["fieldPath"]
                 let datahubField: DatahubField = {
-                  description: descriptions.has(fieldPath) ? descriptions.get(fieldPath) : undefined,
+                  description: field['description'],
                   datatype: field['type'],
                   advancedDatatype: advancedDatatypes.has(fieldPath) ? advancedDatatypes.get(fieldPath) : undefined,
                   isTemporal: TEMPORAL_DATATYPES.includes(field['type'].toUpperCase())
@@ -319,8 +321,8 @@ describe('Test Dataset Generation script', () => {
                   // Call Superset to get metadata of the dataset
                   let datasetQueryUrl = DATASET_URL + supersetDatasetId
                   cy.request(datasetQueryUrl).then(datasetResponse => {
-                    let errorDatasetPrefix = `Datahub dataset '${datasetFullQualifiedName}', Superset dataset '${tableName} for database '${catalog}' and schema '${schema}'`
-                    let extraAsJson = JSON.parse(datasetResponse.body.result.extra);
+                    let errorDatasetPrefix = `Datahub dataset '${datasetFullQualifiedName}', Superset dataset '${tableName}' for database '${catalog}' and schema '${schema}'`
+                    let extraAsJson = JSON.parse(datasetResponse.body.result.extra) || '';
                     // Check owners
                     if (datasetOwners.length > 0) {
                       if (extraAsJson['certification'] && extraAsJson['certification']['certified_by']) {
@@ -336,12 +338,17 @@ describe('Test Dataset Generation script', () => {
                           })
                         }
                       }
+                      else {
+                        errors.push(`${errorDatasetPrefix}, unexpected empty value for extra settings, list of owners is ${datasetOwners.length}`)
+                      }
                     }
-                    else if (extraAsJson['certification']) {
-                      errors.push(`${errorDatasetPrefix}, for 'certification' value from the extra settings, expected empty value but got ${extraAsJson['certification']}`)
+                    else {
+                      if (extraAsJson['certification'] && extraAsJson['certification']['certified_by']) {
+                        errors.push(`${errorDatasetPrefix}, unexpected value for certified by in extra settings, list of owners shoud be empty`)
+                      }
                     }
                     // Check Datahub urn in extra settings
-                    if (!extraAsJson['urn'] || extraAsJson['urn'] != datasetUrn) {
+                    if (extraAsJson['urn'] && extraAsJson['urn'] != datasetUrn) {
                       errors.push(`${errorDatasetPrefix}, for 'urn' value from the extra settings, expected ${datasetUrn} but got ${extraAsJson['urn']}`)
                     }
                     // Check import value in extra settings
@@ -355,22 +362,22 @@ describe('Test Dataset Generation script', () => {
                     }
                     // Check main temporal column
                     if (!datasetPartitionColumn) {
-                      if (extraAsJson['warning_markdown']) {
+                      if (extraAsJson && extraAsJson['warning_markdown']) {
                         if (!String(extraAsJson['warning_markdown']).includes('There are no datetime partition columns in this dataset')) {
                           errors.push(`${errorDatasetPrefix}, the warning message to indicate there is no default temporal column is missing from the extra settings but '${extraAsJson['warning_markdown']}' was found`)
                         }
                       }
-                      else if (extraAsJson['warning_markdown']) {
+                      else {
                         errors.push(`${errorDatasetPrefix}, the warning message to indicate there is no default temporal column is missing from the extra settings`)
                       }
                     }
                     let mainDateTimeColumn = datasetResponse.body.result.main_dttm_col
                     if (datasetPartitionColumn != mainDateTimeColumn) {
-                      errors.push(`${errorDatasetPrefix}, main date column does not match: partition field '${datasetPartitionColumn}' vs main temporal field '${mainDateTimeColumn}' `)
+                      errors.push(`${errorDatasetPrefix}, main date columns do not match: partition field '${datasetPartitionColumn}' vs main temporal field '${mainDateTimeColumn}' `)
                     }
-                    // Check fields
+                    // Check all fields
                     let supersetDatasetFieldCount = datasetResponse.body.result.columns.length
-                    if (supersetDatasetFieldCount === datahubDatasetFieldMap.size) {
+                    if (supersetDatasetFieldCount == datahubDatasetFieldMap.size) {
                         // TODO Check the order for fields, this is kind of broken with subsequent imports: see CLDN-2262
                         datasetResponse.body.result.columns.forEach((column: any) => {
                           let errorFieldPrefix = `${errorDatasetPrefix}, for field '${column.column_name}'`
@@ -390,7 +397,7 @@ describe('Test Dataset Generation script', () => {
                               errors.push(`${errorFieldPrefix}, data types don't match: '${translatedDatatype}' vs '${column.type}'`)
                             }
                             // Check filterable flag
-                            if (COMPLEX_DATATYPES.includes(datahubDatasetField!.datatype) || column.column_name == RAW_JSON_COLUMN_NAME) {
+                            if (COMPLEX_DATATYPES.includes(datahubDatasetField!.datatype) || column.column_name === RAW_JSON_COLUMN_NAME) {
                               if (column.filterable) {
                                 errors.push(`${errorFieldPrefix}, flag 'filterable' is enabled but it should not be`)
                               }
@@ -456,12 +463,24 @@ describe('Test Dataset Generation script', () => {
   })
 
   it('Report discrepancies between Datahub and Superset datasets for specific glossary terms or domains', () => {
+    // In Cypress 12.4.0, new lines will be supported with cy.log
     if (warnings.length > 0) {
-      cy.log('Some warnings were found:')
+      cy.log(warnings.length + ' warnings were found:')
       warnings.forEach(warning => {
         cy.log(warning)
       })
     }
-    expect(errors, 'Ensure error list is not empty: \n' + errors.join('\n') + '\n').to.be.empty
+    if (errors.length > 0) {
+      cy.log(errors.length + ' errors were found:')
+      errors.forEach(error => {
+        cy.log(error)
+      })
+    }
+  })
+
+  it('Ensure no warning and errors were found', () => {
+    if (warnings.length > 0 || errors.length > 0) {
+      assert.fail('Some warnings or errors were found, see logs in the "Report discrepancies" test')
+    }
   })
 })

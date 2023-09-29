@@ -151,6 +151,7 @@ export const graphql_queries = {
   fragment schemaMetadataFields on SchemaMetadata { \
     fields { \
       fieldPath \
+      description \
       jsonPath \
       type \
       nativeDataType \

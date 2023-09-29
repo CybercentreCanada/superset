@@ -2,6 +2,7 @@ import { chooseSelectDropdownOption, getDropdown, selectDropdownItem, shouldHave
 import { exploreView } from '../support/directories'
 import { cccsExploreView } from 'cypress/support/helper';
 
+const SUPERSET_TOKEN = Cypress.env('supersetToken')
 const PREFIX_EXPLORE_URL = '/explore/';
 const BASE_EXPLORE_URL = PREFIX_EXPLORE_URL + '?datasource_type=table&datasource_id='
 const SQLLAB_URL = '/superset/sqllab/';
@@ -10,29 +11,21 @@ const LOGIN_URL = '/login';
 const IMPORT_DATASET_URL = '/api/v1/dataset/import/'
 
 Cypress.Commands.add('cccsLogin', () => {
-  // Should we really logout for every test? Probably if we want to test different user
-  cy.logout()
-
-  // TODO Consider using the experimentalSessionAndOrigin flag and 
-  // use Cy.session in order to reduce test setup times
-
-  cy.url().then(($url) => {
-    if($url.includes('.cyber.gc.ca')) {
-      // On the HOGWARTS platform, login using oAuth
-      // TODO When running the tests headless, clicking the login button brings the user to the Authentication provider
-      cy.get('.panel-body > div > .btn').click()
-    } 
-    else  {
-      // Probably on a local version, using basic auth to login
-      cy.request({
-        method: 'POST',
-        url: LOGIN_URL,
-        body: { username: 'admin', password: 'admin' },
-      }).then(response => {
-        expect(response.status).to.eq(200);
-      });
-    }
-  })
+  if(Cypress.config().baseUrl.includes('.cyber.gc.ca')) {
+    // On the HOGWARTS platform, login using oAuth
+    expect(SUPERSET_TOKEN != undefined, 'Ensure supersetToken is defined as an environment variable').to.be.true
+    cy.setCookie('session', SUPERSET_TOKEN)
+  } 
+  else  {
+    // Probably on a local version, using basic auth to login
+    cy.request({
+      method: 'POST',
+      url: LOGIN_URL,
+      body: { username: 'admin', password: 'admin' },
+    }).then(response => {
+      expect(response.status).to.eq(200);
+    });
+  }
 });
 
 Cypress.Commands.add('logout', () => {
