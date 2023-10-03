@@ -87,6 +87,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   optionRenderer: c => <ColumnOption showType column={c} />,
   valueRenderer: c => <ColumnOption column={c} />,
   valueKey: 'column_name',
+  canCopy: true,
   mapStateToProps: ({ datasource, controls }, controlState) => ({
     options: datasource?.columns || [],
     queryMode: getQueryMode(controls),
@@ -94,6 +95,10 @@ const allColumnsControl: typeof sharedControls.groupby = {
       isRawMode({ controls }) && ensureIsArray(controlState?.value).length === 0
         ? [t('must have a value')]
         : [],
+    copyOnClick: () =>
+      navigator.clipboard.writeText(
+        ensureIsArray(controlState?.value).join(','),
+      ),
   }),
   visibility: isRawMode,
   resetOnHide: false,
@@ -161,10 +166,15 @@ const config: ControlPanelConfig = {
                     controlState.value,
                   ],
                 );
+                newState.copyOnClick = () =>
+                  navigator.clipboard.writeText(
+                    ensureIsArray(controlState?.value).join(','),
+                  );
 
                 return newState;
               },
               rerender: ['metrics', 'percent_metrics', 'default_group_by'],
+              canCopy: true,
             },
           },
         ],
