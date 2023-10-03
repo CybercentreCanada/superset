@@ -9,7 +9,7 @@ import React, {
 
 import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
-import { ClientSideRowModelModule } from '@ag-grid-enterprise/client-side-row-model';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
