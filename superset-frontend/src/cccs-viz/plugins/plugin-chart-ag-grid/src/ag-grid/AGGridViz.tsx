@@ -7,6 +7,8 @@ import React, {
   useState,
 } from 'react';
 
+import 'ag-grid-enterprise';
+
 import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
