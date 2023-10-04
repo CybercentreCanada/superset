@@ -14,7 +14,8 @@ Cypress.Commands.add('cccsLogin', () => {
   if(Cypress.config().baseUrl.includes('.cyber.gc.ca')) {
     // On the HOGWARTS platform, login using oAuth
     expect(SUPERSET_TOKEN != undefined, 'Ensure supersetToken is defined as an environment variable').to.be.true
-    cy.setCookie('session', SUPERSET_TOKEN)
+    cy.log('Setting cookie in the session')
+    cy.setCookie('session', SUPERSET_TOKEN,  { log: false })
   } 
   else  {
     // Probably on a local version, using basic auth to login
