@@ -102,7 +102,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   }),
   visibility: isRawMode,
   resetOnHide: false,
-  rerender: ['default_group_by'],
+  rerender: ['default_group_by', 'principalColumns'],
 };
 
 const percentMetricsControl: typeof sharedControls.metrics = {
