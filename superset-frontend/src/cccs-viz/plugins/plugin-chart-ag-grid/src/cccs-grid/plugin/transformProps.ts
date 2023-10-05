@@ -102,6 +102,7 @@ const calcColumnColumnDefs = (
       advancedType.toUpperCase() in formatterMap
         ? formatterMap[advancedType.toUpperCase()]
         : undefined;
+    const useValueFormatterForExport = !!valueFormatter;
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
@@ -124,6 +125,7 @@ const calcColumnColumnDefs = (
       headerTooltip: columnDescription,
       autoHeight,
       valueFormatter,
+      useValueFormatterForExport,
     };
   });
 
