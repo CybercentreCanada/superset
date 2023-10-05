@@ -88,6 +88,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   valueRenderer: c => <ColumnOption column={c} />,
   valueKey: 'column_name',
   canCopy: true,
+  canSelectAll: true,
   mapStateToProps: ({ datasource, controls }, controlState) => ({
     options: datasource?.columns || [],
     queryMode: getQueryMode(controls),
@@ -175,6 +176,7 @@ const config: ControlPanelConfig = {
               },
               rerender: ['metrics', 'percent_metrics', 'default_group_by'],
               canCopy: true,
+              canSelectAll: true,
             },
           },
         ],
