@@ -91,7 +91,7 @@ export default function AGGridViz({
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState<number>(pageLength);
-  const [rowDataStateful, setrowDataStateful] = useState(rowData);
+const [rowDataStateful, setrowDataStateful] = useState(rowData);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
 
@@ -106,7 +106,6 @@ export default function AGGridViz({
   const defaultColDef = useMemo(
     () => ({
       resizable: true,
-      autoHeight: true,
       sortable: true,
       enableRowGroup: true,
     }),
@@ -136,57 +135,54 @@ export default function AGGridViz({
     }
   }, [includeSearch]);
 
-  const onRangeSelectionChanged = useCallback(
-    (event: RangeSelectionChangedEvent) => {
-      const cellRanges = gridRef.current!.api.getCellRanges();
-      const newSelectedData: { [key: string]: string[] } = {};
-      const principalData: { [key: string]: string[] } = {};
+  const onRangeSelectionChanged = () => {
+    const cellRanges = gridRef.current!.api.getCellRanges();
+    const newSelectedData: { [key: string]: string[] } = {};
+    const principalData: { [key: string]: string[] } = {};
 
-      if (cellRanges) {
-        cellRanges.forEach(function (range: CellRange) {
-          // get starting and ending row, remember rowEnd could be before rowStart
-          const startRow = Math.min(
-            range.startRow!.rowIndex,
-            range.endRow!.rowIndex,
-          );
-          const endRow = Math.max(
-            range.startRow!.rowIndex,
-            range.endRow!.rowIndex,
-          );
-          const api = gridRef.current!.api!;
-          for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-            range.columns.forEach((column: any) => {
-              const col = column.colDef?.field;
-              newSelectedData[col] = newSelectedData[col] || [];
-              const rowModel = api.getModel();
-              const rowNode = rowModel.getRow(rowIndex)!;
-              const value = api.getValue(column, rowNode);
+    if (cellRanges) {
+      cellRanges.forEach(function (range: CellRange) {
+        // get starting and ending row, remember rowEnd could be before rowStart
+        const startRow = Math.min(
+          range.startRow!.rowIndex,
+          range.endRow!.rowIndex,
+        );
+        const endRow = Math.max(
+          range.startRow!.rowIndex,
+          range.endRow!.rowIndex,
+        );
+        const api = gridRef.current!.api!;
+        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+          range.columns.forEach((column: any) => {
+            const col = column.colDef?.field;
+            newSelectedData[col] = newSelectedData[col] || [];
+            const rowModel = api.getModel();
+            const rowNode = rowModel.getRow(rowIndex)!;
+            const value = api.getValue(column, rowNode);
+            if (!newSelectedData[col].includes(value)) {
+              newSelectedData[col].push(value);
+            }
+          });
+          principalColumns.forEach((column: any) => {
+            const col = column;
+            principalData[col] = principalData[col] || [];
+            const rowModel = api.getModel();
+            const rowNode = rowModel.getRow(rowIndex)!;
+            const value = api.getValue(column, rowNode);
 
-              if (!newSelectedData[col].includes(value)) {
-                newSelectedData[col].push(value);
-              }
-            });
-            principalColumns.forEach((column: any) => {
-              const col = column;
-              principalData[col] = principalData[col] || [];
-              const rowModel = api.getModel();
-              const rowNode = rowModel.getRow(rowIndex)!;
-              const value = api.getValue(column, rowNode);
-
-              if (!principalData[col].includes(value)) {
-                principalData[col].push(value);
-              }
-            });
-          }
-        });
-      }
-      setSelectedData({
-        highlightedData: newSelectedData,
-        principalData,
+            if (!principalData[col].includes(value)) {
+              principalData[col].push(value);
+            }
+          });
+        }
       });
-    },
-    [],
-  );
+    }
+
+    setSelectedData({
+      highlightedData: newSelectedData,
+      principalData,
+    });
+  };
 
   const emitFilter = useCallback(
     Data => {

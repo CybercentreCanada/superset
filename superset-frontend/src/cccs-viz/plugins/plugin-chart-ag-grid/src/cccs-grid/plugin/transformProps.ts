@@ -75,9 +75,8 @@ const calcColumnColumnDefs = (
 ) => {
   const columnDataMap = new Map<string, string>();
   dataset_columns.reduce(function (columnMap, column: Column) {
-    // @ts-ignore
     const name = column.column_name;
-    // @ts-ignore
+    // eslint-disable-next-line no-param-reassign
     columnMap[name] = {
       type: column.type,
       advanced_data_type: (column.advanced_data_type as string) ?? '',
@@ -106,7 +105,7 @@ const calcColumnColumnDefs = (
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
-    const autoHeight = true;
+    const autoHeight = columnType === 'JSON';
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
@@ -199,7 +198,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
       colId: 'jsonExpand',
       pinned: 'left',
       cellRenderer: ExpandAllValueRenderer,
-      autoHeight: true,
       minWidth: 105,
       lockVisible: true,
     } as any);
