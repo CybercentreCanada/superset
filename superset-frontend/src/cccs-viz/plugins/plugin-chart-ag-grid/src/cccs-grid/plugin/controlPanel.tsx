@@ -23,6 +23,8 @@ import {
   formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
+import { useDispatch } from 'react-redux';
+import { setControlValue } from 'src/explore/actions/exploreActions';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
@@ -73,7 +75,13 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['columns', 'groupby', 'metrics', 'percent_metrics'],
+  rerender: [
+    'columns',
+    'groupby',
+    'metrics',
+    'percent_metrics',
+    'principalColumns',
+  ],
 };
 
 const allColumnsControl: typeof sharedControls.groupby = {
@@ -174,7 +182,12 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
+              rerender: [
+                'metrics',
+                'percent_metrics',
+                'default_group_by',
+                'principalColumns',
+              ],
               canCopy: true,
               canSelectAll: true,
             },
@@ -264,6 +277,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: [],
               canSelectAll: true,
+              allowSelectAll: false,
               renderTrigger: true,
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
@@ -290,7 +304,8 @@ const config: ControlPanelConfig = {
                   : controls?.groupby?.value;
                 newState.options = newState.options.filter(
                   (o: { column_name: string }) =>
-                    ensureIsArray(choices).includes(o.column_name),
+                    ensureIsArray(choices).includes(o.column_name) ||
+                    ensureIsArray(controlState.value).includes(o.column_name),
                 );
                 const invalidOptions = ensureIsArray(controlState.value).filter(
                   c => !ensureIsArray(choices).includes(c),
