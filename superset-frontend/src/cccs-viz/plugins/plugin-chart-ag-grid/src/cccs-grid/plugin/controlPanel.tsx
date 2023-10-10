@@ -23,8 +23,6 @@ import {
   formatSelectOptions,
 } from '@superset-ui/chart-controls';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
-import { useDispatch } from 'react-redux';
-import { setControlValue } from 'src/explore/actions/exploreActions';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
