@@ -121,7 +121,8 @@ const calcColumnColumnDefs = (
       rowGroup,
       hide,
       cellRenderer,
-      rowGroupIndex,
+      rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+      initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
       headerTooltip: columnDescription,
       autoHeight,
       valueFormatter,
@@ -215,6 +216,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
         ...c,
         rowGroup,
         rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+        initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
         hide,
       };
     });
