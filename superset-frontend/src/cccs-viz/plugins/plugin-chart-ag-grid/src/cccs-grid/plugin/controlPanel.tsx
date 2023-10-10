@@ -1,5 +1,6 @@
 import {
   ColumnMeta,
+  ColumnOption,
   ControlConfig,
   ControlPanelConfig,
   ControlPanelsContainerProps,
@@ -28,9 +29,7 @@ function getQueryMode(controls: ControlStateMapping): QueryMode {
   if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
     return mode as QueryMode;
   }
-  const rawColumns = controls?.all_columns?.value as
-    | QueryFormColumn[]
-    | undefined;
+  const rawColumns = controls?.columns?.value as QueryFormColumn[] | undefined;
   const hasRawColumns = rawColumns && rawColumns.length > 0;
   return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
 }
@@ -87,7 +86,13 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
     [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
-  rerender: ['all_columns', 'groupby', 'metrics', 'percent_metrics'],
+  rerender: [
+    'columns',
+    'groupby',
+    'metrics',
+    'percent_metrics',
+    'principalColumns',
+  ],
 };
 
 const allColumnsControl: typeof sharedControls.groupby = {
@@ -95,7 +100,12 @@ const allColumnsControl: typeof sharedControls.groupby = {
   label: t('Columns'),
   description: t('Columns to display'),
   allowAll: true,
+  commaChoosesOption: false,
+  optionRenderer: c => <ColumnOption showType column={c} />,
+  valueRenderer: c => <ColumnOption column={c} />,
+  valueKey: 'column_name',
   canCopy: true,
+  canSelectAll: true,
   mapStateToProps: ({ datasource, controls }, controlState) => ({
     options: datasource?.columns || [],
     queryMode: getQueryMode(controls),
@@ -110,7 +120,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   }),
   visibility: isRawMode,
   resetOnHide: false,
-  rerender: ['default_group_by'],
+  rerender: ['default_group_by', 'principalColumns'],
 };
 
 const percentMetricsControl: typeof sharedControls.metrics = {
@@ -174,6 +184,10 @@ const config: ControlPanelConfig = {
                     controlState.value,
                   ],
                 );
+                newState.copyOnClick = () =>
+                  navigator.clipboard.writeText(
+                    ensureIsArray(controlState?.value).join(','),
+                  );
 
                 newState.copyOnClick = () =>
                   navigator.clipboard.writeText(
@@ -182,8 +196,14 @@ const config: ControlPanelConfig = {
 
                 return newState;
               },
-              rerender: ['metrics', 'percent_metrics', 'default_group_by'],
+              rerender: [
+                'metrics',
+                'percent_metrics',
+                'default_group_by',
+                'principalColumns',
+              ],
               canCopy: true,
+              canSelectAll: true,
             },
           },
         ],
@@ -219,7 +239,7 @@ const config: ControlPanelConfig = {
             },
           },
           {
-            name: 'all_columns',
+            name: 'columns',
             config: allColumnsControl,
           },
         ],
@@ -271,6 +291,7 @@ const config: ControlPanelConfig = {
               allowAll: true,
               default: [],
               canSelectAll: true,
+              allowSelectAll: false,
               renderTrigger: true,
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
@@ -293,11 +314,12 @@ const config: ControlPanelConfig = {
                 const newState =
                   originalMapStateToProps?.(state, controlState) ?? {};
                 const choices = isRawMode({ controls })
-                  ? controls?.all_columns?.value
+                  ? controls?.columns?.value
                   : controls?.groupby?.value;
                 newState.options = newState.options.filter(
                   (o: { column_name: string }) =>
-                    ensureIsArray(choices).includes(o.column_name),
+                    ensureIsArray(choices).includes(o.column_name) ||
+                    ensureIsArray(controlState.value).includes(o.column_name),
                 );
                 const invalidOptions = ensureIsArray(controlState.value).filter(
                   c => !ensureIsArray(choices).includes(c),
@@ -653,7 +675,7 @@ config.controlPanelSections.push({
             const newState =
               originalMapStateToProps?.(state, controlState) ?? {};
             const choices = isRawMode({ controls })
-              ? controls?.all_columns?.value
+              ? controls?.columns?.value
               : controls?.groupby?.value;
             newState.options = newState.options.filter(
               (o: { column_name: string }) =>

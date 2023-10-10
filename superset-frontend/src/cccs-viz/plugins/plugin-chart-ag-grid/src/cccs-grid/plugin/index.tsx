@@ -19,6 +19,7 @@
 import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 import thumbnail from '../images/thumbnail.png';
+import example1 from '../images/Table1.png';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
@@ -50,6 +51,7 @@ export default class CccsTableChartPlugin extends ChartPlugin<
         t('Report'),
         t('Tabular'),
       ],
+      exampleGallery: [{ url: example1 }],
       thumbnail,
       behaviors: [Behavior.INTERACTIVE_CHART],
     });

@@ -7,24 +7,28 @@ import React, {
   useState,
 } from 'react';
 
+import 'ag-grid-enterprise';
+
 import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-
-import { ModuleRegistry } from '@ag-grid-community/core';
+import { LicenseManager } from '@ag-grid-enterprise/core';
 import { CloseOutlined } from '@ant-design/icons';
 import { css, ensureIsArray } from '@superset-ui/core';
-import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { LicenseManager } from 'ag-grid-enterprise';
+import { ModuleRegistry } from '@ag-grid-community/core';
+import {
+  CellRange,
+  GetMainMenuItemsParams,
+  MenuItemDef,
+} from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-// import { ExplorePageState } from 'src/explore/types';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import Button from 'src/components/Button';
@@ -95,6 +99,7 @@ export default function AGGridViz({
 
   const contextMenuRef = useRef<ContextRef>(null);
 
+  const [, setInContextMenu] = useState<boolean>(true);
   const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
@@ -146,10 +151,17 @@ export default function AGGridViz({
     setPageSize(newSize <= 0 ? 0 : newSize);
   }, []);
 
-  const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
     e.preventDefault();
-    setSearchValue(e.target.value);
-  }, []);
+    setSearchValue(target.value);
+  };
+
+  useEffect(() => {
+    if (!includeSearch) {
+      setSearchValue('');
+    }
+  }, [includeSearch]);
 
   const emitFilter = useCallback(
     (data, globally = false) => {
@@ -293,114 +305,69 @@ export default function AGGridViz({
     contextMenuRef.current?.close();
   }, []);
 
-  const handleOnContextMenu = useCallback(
-    (offsetX: number, offsetY: number, filters: any) => {
-      let menuItems = [
-        <CopyMenuItem
-          key="copy-menu-item"
-          selectedData={selectedData.highlightedData}
-          onSelection={handleContextMenu}
-        />,
-        <CopyWithHeaderMenuItem
-          key="copy-with-header-menu-item"
-          selectedData={selectedData.highlightedData}
-          onSelection={handleContextMenu}
-        />,
-      ];
+  const copyText = (withHeaders?: boolean) => {
+    gridRef.current?.api?.copySelectedRangeToClipboard({
+      includeHeaders: withHeaders || false,
+    });
+    handleContextMenu();
+  };
 
-      if (emitCrossFilters) {
-        menuItems = [
-          ...menuItems,
-          <Menu.Divider key="cross-filter-divider" />,
-          <EmitFilterMenuItem
-            onClick={() => {
-              onClick(selectedData.highlightedData);
-            }}
-            onSelection={handleContextMenu}
-            label="Emit Filter(s)"
-            disabled={!Object.keys(selectedData.highlightedData).length}
-            key="emit-filters"
-            icon={
-              <EmitIcon
-                disabled={!Object.keys(selectedData.highlightedData).length}
-              />
-            }
-          />,
-          <EmitFilterMenuItem
-            onClick={() => {
-              onClick(selectedData.highlightedData, true);
-            }}
-            onSelection={handleContextMenu}
-            label="Filter on Selection"
-            disabled={!Object.keys(selectedData.highlightedData).length}
-            key="filter-on-selection"
-            icon={
-              <EmitIcon
-                disabled={!Object.keys(selectedData.highlightedData).length}
-              />
-            }
-          />,
-          <EmitFilterMenuItem
-            onClick={() => {
-              onClick(selectedData.principalData);
-            }}
-            onSelection={handleContextMenu}
-            label="Emit Principle Column Filter(s)"
-            key="emit-principle-column-filters"
-            disabled={!Object.keys(selectedData.principalData).length}
-            icon={
-              <EmitIcon
-                disabled={!Object.keys(selectedData.principalData).length}
-              />
-            }
-          />,
-          <EmitFilterMenuItem
-            onSelection={handleContextMenu}
-            onClick={() => dispatch(clearDataMask(formData.sliceId))}
-            label="Clear Emitted Filter(s)"
-            key="clear-emitted-filters"
-            disabled={crossFilterValue === undefined}
-            icon={<CloseOutlined />}
-          />,
-        ];
-      }
-
+  const handleOnContextMenu = (
+    offsetX: number,
+    offsetY: number,
+    filters: any,
+  ) => {
+    let menuItems = [
+      <CopyMenuItem onClick={copyText} />,
+      <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
+    ];
+    if (emitCrossFilters) {
       menuItems = [
         ...menuItems,
-        <Menu.Divider key="export-divider" />,
-        <ExportMenu key="export-csv" api={gridRef.current!.api} />,
+        <EmitFilterMenuItem
+          onClick={() => {
+            onClick(selectedData.highlightedData);
+          }}
+          onSelection={handleContextMenu}
+          label="Emit Filter(s)"
+          disabled={Object.keys(selectedData.highlightedData).length === 0}
+          key={contextDivID.toString()}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
+        />,
+        <EmitFilterMenuItem
+          onClick={() => {
+            onClick(selectedData.principalData);
+          }}
+          onSelection={handleContextMenu}
+          label="Emit Principle Column Filter(s)"
+          disabled={Object.keys(selectedData.principalData).length === 0}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.principalData).length}
+            />
+          }
+        />,
+        <EmitFilterMenuItem
+          onSelection={handleContextMenu}
+          onClick={() => dispatch(clearDataMask(formData.sliceId))}
+          label="Clear Emited Filter(s)"
+          disabled={crossFilterValue === undefined}
+          icon={<CloseOutlined />}
+        />,
       ];
-
-      contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
-    },
-    [
-      crossFilterValue,
-      dispatch,
-      emitCrossFilters,
-      formData.sliceId,
-      handleContextMenu,
-      onClick,
-      selectedData.highlightedData,
-      selectedData.principalData,
-    ],
-  );
-
-  const onContextMenu = useCallback(
-    (event: any) => {
-      event.preventDefault();
-      handleOnContextMenu(event.clientX, event.clientY, []);
-    },
-    [handleOnContextMenu],
-  );
-
-  const destroyGrid = useCallback(() => {
-    setIsDestroyed(true);
-    setTimeout(() => setIsDestroyed(false), 0);
-  }, []);
-
-  useEffect(() => {
-    updatePageSize(pageLength);
-  }, [pageLength, updatePageSize]);
+    }
+    menuItems = [
+      ...menuItems,
+      <Menu.Divider key="export-divider" />,
+      <ExportMenu key="export-csv" api={gridRef.current!.api} />,
+    ];
+    contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
+    setInContextMenu(true);
+  };
 
   useEffect(() => {
     if (!includeSearch) {
@@ -408,9 +375,36 @@ export default function AGGridViz({
     }
   }, [includeSearch]);
 
+  const onContextMenu = (event: any) => {
+    event.preventDefault();
+    handleOnContextMenu(event.clientX, event.clientY, []);
+  };
+
+  const recreateGrid = () => {
+    setIsDestroyed(false);
+  };
+
+  const destroyGrid = () => {
+    setIsDestroyed(true);
+    setTimeout(() => recreateGrid(), 0);
+  };
+
   useEffect(() => {
     destroyGrid();
-  }, [destroyGrid, enableGrouping]);
+  }, [enableGrouping]);
+
+  const getMainMenuItems = (
+    params: GetMainMenuItemsParams,
+  ): (string | MenuItemDef)[] => {
+    const menuItems: (MenuItemDef | string)[] = [];
+    const itemsToExclude = ['rowGroup'];
+    params.defaultItems.forEach((item: string) => {
+      if (itemsToExclude.indexOf(item) < 0) {
+        menuItems.push(item);
+      }
+    });
+    return menuItems;
+  };
 
   return !isDestroyed ? (
     <>
@@ -492,7 +486,6 @@ export default function AGGridViz({
         </div>
         <AgGridReact
           ref={gridRef}
-          // animateRows
           className="ag-theme-balham"
           columnDefs={columnDefs}
           defaultColDef={DEFAULT_COL_DEF}
@@ -513,6 +506,7 @@ export default function AGGridViz({
           pagination={pageSize > 0}
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
+          getMainMenuItems={getMainMenuItems}
         />
       </div>
     </>

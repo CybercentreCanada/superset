@@ -9,7 +9,7 @@ import {
 } from '@superset-ui/core';
 
 import { ValueFormatterParams } from 'ag-grid-community';
-import rendererMap from '../../rendererMap';
+import { formatterMap, rendererMap } from '../../maps';
 import ExpandAllValueRenderer from '../../renderers/ExpandAllValueRenderer';
 import { CccsTableChartProps, CccsTableFormData } from '../../types';
 
@@ -103,10 +103,15 @@ const calcColumnColumnDefs = (
         : rendererMap[advancedType.toUpperCase()] ??
           rendererMap[columnType] ??
           undefined;
+    const valueFormatter =
+      advancedType.toUpperCase() in formatterMap
+        ? formatterMap[advancedType.toUpperCase()]
+        : undefined;
+    const useValueFormatterForExport = !!valueFormatter;
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
-    const autoHeight = true;
+    const autoHeight = columnType === 'JSON';
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
@@ -123,11 +128,13 @@ const calcColumnColumnDefs = (
       rowGroup,
       hide,
       cellRenderer,
-      rowGroupIndex,
-      // getQuickFilterText: (params: any) => valueFormatter(params),
+      rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+      initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
       headerTooltip: columnDescription,
       autoHeight,
       maxWidth,
+      valueFormatter,
+      useValueFormatterForExport,
     };
   });
 
@@ -175,7 +182,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   const columns =
     formData.queryMode === 'raw'
-      ? formData.allColumns || []
+      ? formData.columns || []
       : formData.groupby || [];
 
   const { metrics, percentMetrics } = formData;
@@ -203,7 +210,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
       colId: 'jsonExpand',
       pinned: 'left',
       cellRenderer: ExpandAllValueRenderer,
-      autoHeight: true,
       minWidth: 105,
       lockVisible: true,
     } as any);
@@ -219,6 +225,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
         ...c,
         rowGroup,
         rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+        initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
         hide,
       };
     });

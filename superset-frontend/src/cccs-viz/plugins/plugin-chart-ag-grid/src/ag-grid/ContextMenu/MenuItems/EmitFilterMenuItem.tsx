@@ -23,8 +23,8 @@ export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
       onClick={() => onClick()}
       className={
         props.disabled
-          ? 'ant-menu-item ant-dropdown-menu-item-disabled'
-          : 'ant-menu-item'
+          ? 'ant-dropdown-menu-item ant-dropdown-menu-item-disabled'
+          : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
       icon={props.icon}
