@@ -72,6 +72,7 @@ const calcColumnColumnDefs = (
   defaultGroupBy: string[],
   dataset_columns: Column[],
   enable_row_numbers = true,
+  orderByCols: any,
 ) => {
   const columnDataMap = new Map<string, string>();
   dataset_columns.reduce(function (columnMap, column: Column) {
@@ -92,6 +93,10 @@ const calcColumnColumnDefs = (
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
+    const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
+    const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
+    const sort =
+      sortIndex > -1 ? (orderByColsArray[sortIndex][1] ? 'asc' : 'desc') : null;
     const cellRenderer =
       advancedType.toUpperCase() in rendererMap
         ? rendererMap[advancedType.toUpperCase()]
@@ -127,6 +132,8 @@ const calcColumnColumnDefs = (
       autoHeight,
       valueFormatter,
       useValueFormatterForExport,
+      sort,
+      sortIndex: sortIndex > -1 ? sortIndex : null,
     };
   });
 
@@ -164,6 +171,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableGrouping,
     enableJsonExpand,
     principalColumns,
+    orderByCols,
   }: CccsTableFormData = {
     ...formData,
   };
@@ -183,6 +191,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     defaultGroupBy,
     datasource?.columns as Column[],
     enableRowNumbers,
+    orderByCols,
   );
   columnDefs = columnDefs.concat(
     calcMetricColumnDefs(
