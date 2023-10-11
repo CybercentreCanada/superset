@@ -37,7 +37,6 @@ export type AGGridVizProps = {
   setDataMask: SetDataMaskHook;
 };
 
-export interface AgGridChartDataResponseResult
-  extends ChartDataResponseResult {
+export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
 }
