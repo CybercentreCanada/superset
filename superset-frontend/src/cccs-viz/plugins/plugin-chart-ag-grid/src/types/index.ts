@@ -14,6 +14,7 @@ export type CccsTableFormData = QueryFormData & {
   emitCrossFilters: boolean;
   principalColumns: string[];
   percent_metrics: string[];
+  jumpActionConfigs?: any[];
 };
 
 export type CccsTableChartProps = ChartProps & {
@@ -35,6 +36,7 @@ export type AGGridVizProps = {
   agGridLicenseKey: string;
   emitCrossFilters: boolean;
   setDataMask: SetDataMaskHook;
+  jumpActionConfigs?: any[];
 };
 
 export interface AgGridChartDataResponseResult extends ChartDataResponseResult {

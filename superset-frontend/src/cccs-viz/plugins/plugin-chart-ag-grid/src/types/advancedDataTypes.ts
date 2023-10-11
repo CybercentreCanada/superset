@@ -12,7 +12,7 @@ export const rendererMap = {
 };
 
 export const formatIpV4 = (v: any) => {
-  const value = Number(v.value);
+  const value = Number(v.value ?? v);
   const converted = `${(value >> 24) & 0xff}.${(value >> 16) & 0xff}.${
     (value >> 8) & 0xff
   }.${value & 0xff}`;

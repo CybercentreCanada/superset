@@ -16,9 +16,9 @@ interface ExportMenuProps {
 
 // For some reason, the CSS on the submenu doesn't match the rest of the menu.
 // So we manually override it
-const subMenuStyles = (theme: SupersetTheme) => css`
+export const subMenuStyles = (theme: SupersetTheme) => css`
   .ant-dropdown-menu-submenu-title {
-    padding: 0 20px;
+    padding-right: 40px;
     height: 32px;
     display: flex;
     align-items: center;

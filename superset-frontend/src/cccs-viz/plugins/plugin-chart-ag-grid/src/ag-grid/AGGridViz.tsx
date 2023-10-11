@@ -42,6 +42,7 @@ import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuIt
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 import { AGGridVizProps } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
+import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -56,6 +57,7 @@ type DataMap = { [key: string]: string[] };
 type gridData = {
   highlightedData: DataMap;
   principalData: DataMap;
+  advancedTypeData: DataMap;
 };
 
 export default function AGGridViz({
@@ -71,6 +73,7 @@ export default function AGGridViz({
   principalColumns,
   agGridLicenseKey,
   emitCrossFilters,
+  jumpActionConfigs,
 }: AGGridVizProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
@@ -85,6 +88,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<gridData>({
     highlightedData: {},
     principalData: {},
+    advancedTypeData: {},
   });
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
@@ -111,7 +115,6 @@ export default function AGGridViz({
   );
 
   const gridRef = useRef<AgGridReactType>(null);
-
   const updatePageSize = (newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
@@ -137,6 +140,7 @@ export default function AGGridViz({
     const cellRanges = gridRef.current!.api.getCellRanges();
     const newSelectedData: { [key: string]: string[] } = {};
     const principalData: { [key: string]: string[] } = {};
+    const advancedTypeData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
       cellRanges.forEach(function (range: CellRange) {
@@ -151,14 +155,26 @@ export default function AGGridViz({
         );
         const api = gridRef.current!.api!;
         for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+          const rowModel = api.getModel();
+          const rowNode = rowModel.getRow(rowIndex)!;
           range.columns.forEach((column: any) => {
-            const col = column.colDef?.field;
+            const { colDef } = column;
+            const col = colDef.field;
             newSelectedData[col] = newSelectedData[col] || [];
-            const rowModel = api.getModel();
-            const rowNode = rowModel.getRow(rowIndex)!;
             const value = api.getValue(column, rowNode);
+            const formattedValue = colDef.valueFormatter(value);
             if (!newSelectedData[col].includes(value)) {
               newSelectedData[col].push(value);
+            }
+            const advancedType: string = colDef?.advancedType
+              ? String(colDef.advancedType)
+              : colDef?.type
+              ? String(colDef.type)
+              : 'NoType';
+            advancedTypeData[advancedType] =
+              advancedTypeData[advancedType] || [];
+            if (!advancedTypeData[advancedType].includes(formattedValue)) {
+              advancedTypeData[advancedType].push(formattedValue);
             }
           });
           principalColumns.forEach((column: any) => {
@@ -179,6 +195,7 @@ export default function AGGridViz({
     setSelectedData({
       highlightedData: newSelectedData,
       principalData,
+      advancedTypeData,
     });
   };
 
@@ -295,6 +312,15 @@ export default function AGGridViz({
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
+      ];
+    }
+    if (jumpActionConfigs) {
+      menuItems = [
+        ...menuItems,
+        getJumpToDashboardContextMenuItems(
+          jumpActionConfigs,
+          selectedData.advancedTypeData,
+        ),
       ];
     }
     menuItems = [

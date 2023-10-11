@@ -172,6 +172,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableJsonExpand,
     principalColumns,
     orderByCols,
+    jumpActionConfigs,
   }: CccsTableFormData = {
     ...formData,
   };
@@ -232,6 +233,27 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   }
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
+  const parsedJumpActionConfigs = {};
+  jumpActionConfigs?.forEach((e: any) => {
+    if (e.dashboardID in parsedJumpActionConfigs) {
+      parsedJumpActionConfigs[e.dashboardID] = parsedJumpActionConfigs[
+        e.dashboardID
+      ].concat({
+        advancedDataType: e.advancedDataType,
+        nativefilters: e.filters,
+        name: e.dashBoardName,
+      });
+    } else {
+      parsedJumpActionConfigs[e.dashboardID] = [
+        {
+          advancedDataType: e.advancedDataType,
+          nativefilters: e.filters,
+          name: e.dashBoardName,
+        },
+      ];
+    }
+  });
+
   return {
     width,
     height,
@@ -245,5 +267,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     agGridLicenseKey,
     setDataMask,
     emitCrossFilters,
+    jumpActionConfigs,
   };
 }
