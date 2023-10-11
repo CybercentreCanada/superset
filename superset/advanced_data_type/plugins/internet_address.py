@@ -60,7 +60,7 @@ def cidr_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
             resp["values"].append(
                 {"start": int(ip_range[0]), "end": int(ip_range[-1])}
                 if ip_range[0] != ip_range[-1]
-                else str(ip_range[0])
+                else int(ip_range[0])
             )
         except ValueError as ex:
             resp["error_message"] = str(ex)
