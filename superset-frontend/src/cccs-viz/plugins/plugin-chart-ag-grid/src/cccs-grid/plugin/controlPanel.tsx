@@ -292,7 +292,6 @@ const config: ControlPanelConfig = {
               default: [],
               canSelectAll: true,
               allowSelectAll: false,
-              renderTrigger: true,
               optionRenderer: (c: ColumnMeta) => (
                 // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
@@ -321,18 +320,23 @@ const config: ControlPanelConfig = {
                     ensureIsArray(choices).includes(o.column_name) ||
                     ensureIsArray(controlState.value).includes(o.column_name),
                 );
-                const invalidOptions = ensureIsArray(controlState.value).filter(
-                  c => !ensureIsArray(choices).includes(c),
+                const invalidOptions = ensureIsArray(newState.options).filter(
+                  c => !ensureIsArray(choices).includes(c.column_name),
                 );
                 newState.externalValidationErrors =
                   invalidOptions.length > 0
                     ? invalidOptions.length > 1
                       ? [
-                          `'${invalidOptions.join(', ')}'${t(
-                            ' are not valid options',
-                          )}`,
+                          `'${invalidOptions
+                            .map(o => o.verbose_name ?? o.column_name)
+                            .join(', ')}'${t(' are not valid options')}`,
                         ]
-                      : [`'${invalidOptions}'${t(' is not a valid option')}`]
+                      : [
+                          `'${
+                            invalidOptions[0].verbose_name ??
+                            invalidOptions[0].column_name
+                          }'${t(' is not a valid option')}`,
+                        ]
                     : [];
                 return newState;
               },

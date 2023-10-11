@@ -8,7 +8,7 @@ import {
   FileExcelOutlined,
   FileOutlined,
 } from '@ant-design/icons';
-import { GridApi } from 'ag-grid-community';
+import { GridApi, ProcessCellForExportParams } from 'ag-grid-community';
 
 interface ExportMenuProps {
   api: GridApi;
@@ -39,7 +39,15 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
       if (exportType === 'csv') {
         props.api.exportDataAsCsv();
       } else {
-        props.api.exportDataAsExcel();
+        props.api.exportDataAsExcel({
+          processCellCallback(params: ProcessCellForExportParams) {
+            const { value } = params;
+            return params.formatValue(value);
+          },
+          processRowGroupCallback(params) {
+            return `row group: ${params.node.key}`;
+          },
+        });
       }
     },
     [props.api],
