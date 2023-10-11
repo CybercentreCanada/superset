@@ -104,8 +104,8 @@ const calcColumnColumnDefs = (
           rendererMap[columnType] ??
           undefined;
     const valueFormatter =
-      advancedType.toUpperCase() in formatterMap
-        ? formatterMap[advancedType.toUpperCase()]
+      advancedDataType.toUpperCase() in formatterMap
+        ? formatterMap[advancedDataType.toUpperCase()]
         : undefined;
     const useValueFormatterForExport = !!valueFormatter;
     const isSortable = true;
