@@ -46,6 +46,7 @@ export type AGGridVizProps = {
   onClickBehaviour: string;
   agGridLicenseKey: string;
   emitCrossFilters: boolean;
+  columnsToRetain: string[];
   setDataMask: SetDataMaskHook;
 };
 
@@ -58,5 +59,6 @@ export type DataMap = { [key: string]: string[] };
 export type GridData = {
   highlightedData: DataMap;
   principalData: DataMap;
+  retentionData: DataMap;
   actionButtonData: any[];
 };

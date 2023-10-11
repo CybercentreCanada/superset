@@ -93,14 +93,14 @@ const calcColumnColumnDefs = (
     const columnType = columnDataMap[column]?.type || '';
     const isDate = !!columnDataMap[column]?.is_dttm;
     const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
-    const advancedType = columnDataMap[column]?.advanced_data_type || '';
+    const advancedDataType = columnDataMap[column]?.advanced_data_type || '';
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
     const cellRenderer =
       isDate || columnTypeGeneric === GenericDataType.TEMPORAL
         ? rendererMap.DATE
-        : rendererMap[advancedType.toUpperCase()] ??
+        : rendererMap[advancedDataType.toUpperCase()] ??
           rendererMap[columnType] ??
           undefined;
     const valueFormatter =
@@ -124,7 +124,7 @@ const calcColumnColumnDefs = (
       headerName: columnHeader,
       sortable: isSortable,
       enableRowGroup,
-      advancedType,
+      advancedDataType,
       rowGroup,
       hide,
       cellRenderer,
@@ -205,6 +205,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   // If the flag is set to true, add a column which will contain
   // a button to expand all JSON blobs in the row
+
   if (enableJsonExpand) {
     columnDefs.splice(1, 0, {
       colId: 'jsonExpand',
@@ -232,6 +233,16 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   }
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
+  const advancedDataTypesToRetain = ['cbs_eml_id'];
+
+  const columnsToRetain = columnDefs
+    .filter(
+      col =>
+        col.advancedDataType &&
+        advancedDataTypesToRetain.includes(col.advancedDataType),
+    )
+    .map(col => col.field);
+
   return {
     width,
     height,
@@ -246,5 +257,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     agGridLicenseKey,
     setDataMask,
     emitCrossFilters,
+    columnsToRetain,
   };
 }

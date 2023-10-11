@@ -22,7 +22,13 @@ const subMenuStyles = (theme: SupersetTheme) => css`
     height: 32px;
     display: flex;
     align-items: center;
+
+    &:hover {
+      background-color: initial;
+      color: ${theme.colors.primary.base};
+    }
   }
+
   .anticon > svg {
     height: 16px;
     width: 16px;

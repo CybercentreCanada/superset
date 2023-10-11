@@ -18,6 +18,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { LicenseManager } from '@ag-grid-enterprise/core';
 import { CloseOutlined } from '@ant-design/icons';
 import { css, ensureIsArray } from '@superset-ui/core';
+import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
@@ -40,7 +41,7 @@ import ChartContextMenu, {
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
-
+import RetainEmlMenuItem from './ContextMenu/MenuItems/RetainEmlMenuItem';
 import {
   DEFAULT_CLICK_ACTIONS,
   PAGE_SIZE_OPTIONS,
@@ -88,6 +89,7 @@ export default function AGGridViz({
   onClickBehaviour,
   agGridLicenseKey,
   emitCrossFilters,
+  columnsToRetain,
 }: AGGridVizProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
@@ -103,6 +105,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
+    retentionData: {},
     actionButtonData: [],
   });
   const [searchValue, setSearchValue] = useState('');
@@ -221,7 +224,9 @@ export default function AGGridViz({
 
   const onRangeSelectionChanged = useCallback(() => {
     const cellRanges = gridRef.current!.api.getCellRanges();
+
     const newSelectedData: { [key: string]: string[] } = {};
+    const retentionData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
     const newActionButtonData: any[] = [];
 
@@ -265,6 +270,20 @@ export default function AGGridViz({
             }
           });
 
+          columnsToRetain.forEach((column: string) => {
+            const colDef = gridRef.current!.api.getColumnDef(column);
+            const advancedDataType: string =
+              colDef && 'advancedDataType' in colDef
+                ? String(colDef['advancedDataType'])
+                : 'NoType';
+            retentionData[advancedDataType] =
+              retentionData[advancedDataType] || [];
+            const value = api.getValue(column, rowNode);
+            if (!retentionData[advancedDataType].includes(value)) {
+              retentionData[advancedDataType].push(value);
+            }
+          });
+
           if (formData.enableActionButton) {
             const value = api
               .getValue(formData.columnForValue, rowNode)
@@ -280,6 +299,7 @@ export default function AGGridViz({
 
     setSelectedData({
       highlightedData: newSelectedData,
+      retentionData,
       principalData: newPrincipalData,
       actionButtonData: newActionButtonData,
     });
@@ -288,6 +308,7 @@ export default function AGGridViz({
       handleOnClickBehavior(newSelectedData, newPrincipalData);
     }
   }, [
+    columnsToRetain,
     formData.columnForValue,
     formData.enableActionButton,
     handleOnClickBehavior,
@@ -360,6 +381,17 @@ export default function AGGridViz({
         />,
       ];
     }
+    if (selectedData.retentionData.cbs_eml_id) {
+      menuItems = [
+        ...menuItems,
+        <RetainEmlMenuItem
+          onSelection={handleContextMenu}
+          label="Retain EML record to alfred"
+          key="retain-eml"
+          data={selectedData.retentionData.cbs_eml_id}
+        />,
+      ];
+    }
     menuItems = [
       ...menuItems,
       <Menu.Divider key="export-divider" />,
@@ -368,26 +400,25 @@ export default function AGGridViz({
     contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
     setInContextMenu(true);
   };
+  const onContextMenu = (event: any) => {
+    event.preventDefault();
+    handleOnContextMenu(event.clientX, event.clientY, []);
+  };
+
+  const destroyGrid = useCallback(() => {
+    setIsDestroyed(true);
+    setTimeout(() => setIsDestroyed(false), 0);
+  }, []);
+
+  useEffect(() => {
+    updatePageSize(pageLength);
+  }, [pageLength, updatePageSize]);
 
   useEffect(() => {
     if (!includeSearch) {
       setSearchValue('');
     }
   }, [includeSearch]);
-
-  const onContextMenu = (event: any) => {
-    event.preventDefault();
-    handleOnContextMenu(event.clientX, event.clientY, []);
-  };
-
-  const recreateGrid = () => {
-    setIsDestroyed(false);
-  };
-
-  const destroyGrid = () => {
-    setIsDestroyed(true);
-    setTimeout(() => recreateGrid(), 0);
-  };
 
   useEffect(() => {
     destroyGrid();
