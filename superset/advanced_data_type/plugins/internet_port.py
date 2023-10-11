@@ -27,27 +27,27 @@ from superset.advanced_data_type.types import (
 from superset.utils.core import FilterOperator, FilterStringOperators
 
 port_conversion_dict: Dict[str, List[int]] = {
-    "http": [80],
-    "ssh": [22],
-    "https": [443],
-    "ftp": [20, 21],
-    "ftps": [989, 990],
-    "telnet": [23],
-    "telnets": [992],
-    "smtp": [25],
-    "submissions": [465],  # aka smtps, ssmtp, urd
-    "kerberos": [88],
-    "kerberos-adm": [749],
-    "poperator3": [110],
-    "poperator3s": [995],
-    "nntp": [119],
-    "nntps": [563],
-    "ntp": [123],
-    "snmp": [161],
-    "ldap": [389],
-    "ldaps": [636],
-    "imap2": [143],  # aka imap
-    "imaps": [993],
+    "http": ["80"],
+    "ssh": ["22"],
+    "https": ["443"],
+    "ftp": ["20", "21"],
+    "ftps": ["989", "990"],
+    "telnet": ["23"],
+    "telnets": ["992"],
+    "smtp": ["25"],
+    "submissions": ["465"],  # aka smtps, ssmtp, urd
+    "kerberos": ["88"],
+    "kerberos-adm": ["749"],
+    "poperator3": ["110"],
+    "poperator3s": ["995"],
+    "nntp": ["119"],
+    "nntps": ["563"],
+    "ntp": ["123"],
+    "snmp": ["161"],
+    "ldap": ["389"],
+    "ldaps": ["636"],
+    "imap2": ["143"],  # aka imap
+    "imaps": ["993"],
 }
 
 
@@ -80,7 +80,7 @@ def port_translation_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespo
                 if not 1 <= int(string_value) <= 65535:
                     raise ValueError
             resp["values"].append(
-                [int(string_value)]
+                [string_value]
                 if string_value.isnumeric()
                 else port_conversion_dict[string_value]
             )
