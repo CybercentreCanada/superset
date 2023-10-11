@@ -285,12 +285,10 @@ export default function AGGridViz({
           });
 
           if (formData.enableActionButton) {
-            const value = api
-              .getValue(formData.columnForValue, rowNode)
-              .toString();
+            const value = api.getValue(formData.columnForValue, rowNode);
 
-            if (value && !newActionButtonData.includes(value)) {
-              newActionButtonData.push(value);
+            if (value && !newActionButtonData.includes(value.toString())) {
+              newActionButtonData.push(value.toString());
             }
           }
         });
