@@ -12,9 +12,8 @@ interface CopyMenuItemProps {
 export default function CopyMenuItem(props: CopyMenuItemProps) {
   return (
     <Menu.Item
-      onItemHover={() => {}}
       onClick={() => props.onClick()}
-      key="drill-detail-no-filters"
+      key="copy-menu-item"
       className="ant-dropdown-menu-item"
       icon={<CopyFilled />}
     >

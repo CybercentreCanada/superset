@@ -27,6 +27,7 @@ export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
+      key={props.key}
       icon={props.icon}
     >
       {props.label}

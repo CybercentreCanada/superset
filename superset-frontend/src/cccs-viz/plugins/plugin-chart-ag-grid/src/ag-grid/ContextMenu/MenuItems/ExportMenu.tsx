@@ -22,10 +22,6 @@ const subMenuStyles = (theme: SupersetTheme) => css`
     height: 32px;
     display: flex;
     align-items: center;
-    &:hover {
-      background-color: initial;
-      color: ${theme.colors.primary.base};
-    }
   }
   .anticon > svg {
     height: 16px;
@@ -57,12 +53,14 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
     <Menu.SubMenu
       icon={<DownloadOutlined />}
       title="Export"
+      key="export-submenu"
       {...{ ...props, api: undefined }}
       css={subMenuStyles}
     >
       <Menu.Item
         onClick={() => exportData('csv')}
         className="ant-menu-item"
+        key="export-csv-submenu-item"
         icon={<FileOutlined />}
       >
         CSV Export
@@ -70,6 +68,7 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
       <Menu.Item
         onClick={() => exportData('excel')}
         className="ant-menu-item"
+        key="export-excel-submenu-item"
         icon={<FileExcelOutlined />}
       >
         Excel Export
