@@ -18,7 +18,6 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { LicenseManager } from '@ag-grid-enterprise/core';
 import { CloseOutlined } from '@ant-design/icons';
 import { css, ensureIsArray } from '@superset-ui/core';
-import { CellRange } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
