@@ -73,6 +73,7 @@ const calcColumnColumnDefs = (
   defaultGroupBy: string[],
   dataset_columns: Column[],
   enable_row_numbers = true,
+  orderByCols: any,
 ) => {
   const columnDataMap = dataset_columns.reduce(
     (columnMap, column: Column) => ({
@@ -97,6 +98,10 @@ const calcColumnColumnDefs = (
     const columnHeader = columnDataMap[column]?.verbose_name
       ? columnDataMap[column]?.verbose_name
       : column;
+    const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
+    const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
+    const sort =
+      sortIndex > -1 ? (orderByColsArray[sortIndex][1] ? 'asc' : 'desc') : null;
     const cellRenderer =
       isDate || columnTypeGeneric === GenericDataType.TEMPORAL
         ? rendererMap.DATE
@@ -135,6 +140,8 @@ const calcColumnColumnDefs = (
       maxWidth,
       valueFormatter,
       useValueFormatterForExport,
+      sort,
+      sortIndex: sortIndex > -1 ? sortIndex : null,
     };
   });
 
@@ -173,6 +180,8 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableJsonExpand,
     principalColumns,
     onClickBehaviour,
+    orderByCols,
+    jumpActionConfigs,
   }: CccsTableFormData = {
     ...formData,
   };
@@ -192,6 +201,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     defaultGroupBy,
     datasource?.columns as Column[],
     enableRowNumbers,
+    orderByCols,
   );
   columnDefs = columnDefs.concat(
     calcMetricColumnDefs(
@@ -233,15 +243,26 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   }
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
-  const advancedDataTypesToRetain = ['cbs_eml_id'];
-
-  const columnsToRetain = columnDefs
-    .filter(
-      col =>
-        col.advancedDataType &&
-        advancedDataTypesToRetain.includes(col.advancedDataType),
-    )
-    .map(col => col.field);
+  const parsedJumpActionConfigs = {};
+  jumpActionConfigs?.forEach((e: any) => {
+    if (e.dashboardID in parsedJumpActionConfigs) {
+      parsedJumpActionConfigs[e.dashboardID] = parsedJumpActionConfigs[
+        e.dashboardID
+      ].concat({
+        advancedDataType: e.advancedDataType,
+        nativefilters: e.filters,
+        name: e.dashBoardName,
+      });
+    } else {
+      parsedJumpActionConfigs[e.dashboardID] = [
+        {
+          advancedDataType: e.advancedDataType,
+          nativefilters: e.filters,
+          name: e.dashBoardName,
+        },
+      ];
+    }
+  });
 
   return {
     width,
@@ -257,6 +278,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     agGridLicenseKey,
     setDataMask,
     emitCrossFilters,
-    columnsToRetain,
+    jumpActionConfigs,
   };
 }

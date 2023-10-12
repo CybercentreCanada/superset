@@ -24,6 +24,8 @@ import {
 import React from 'react';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
+import DrillActionConfig from '../../ag-grid/JumpActionConfigControl';
+
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
   if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
@@ -751,6 +753,17 @@ config.controlPanelSections.push({
           choices: PAGE_SIZE_OPTIONS,
           description: t('Rows per page, 0 means no pagination'),
           validators: [legacyValidateInteger],
+        },
+      },
+    ],
+    [
+      {
+        name: 'jump_action_configs',
+        config: {
+          type: DrillActionConfig,
+          renderTrigger: true,
+          label: t('Jump Actions'),
+          description: t('Configure dashboard jump actions.'),
         },
       },
     ],

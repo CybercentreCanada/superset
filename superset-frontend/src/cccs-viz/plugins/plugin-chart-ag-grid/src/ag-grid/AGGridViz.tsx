@@ -49,6 +49,7 @@ import {
 import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
+import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -88,7 +89,7 @@ export default function AGGridViz({
   onClickBehaviour,
   agGridLicenseKey,
   emitCrossFilters,
-  columnsToRetain,
+  jumpActionConfigs,
 }: AGGridVizProps) {
   LicenseManager.setLicenseKey(agGridLicenseKey);
 
@@ -104,7 +105,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
-    retentionData: {},
+    advancedTypeData: {},
     actionButtonData: [],
   });
   const [searchValue, setSearchValue] = useState('');
@@ -222,12 +223,16 @@ export default function AGGridViz({
   );
 
   const onRangeSelectionChanged = useCallback(() => {
-    const cellRanges = gridRef.current!.api.getCellRanges();
+    const api = gridRef.current!.api!;
+    const cellRanges = api.getCellRanges();
+
+    const col_api = gridRef.current!.columnApi!;
+    const all_columns = col_api.getColumns();
 
     const newSelectedData: { [key: string]: string[] } = {};
-    const retentionData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
     const newActionButtonData: any[] = [];
+    const advancedTypeData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
@@ -236,53 +241,43 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
-
         const endRow = Math.max(
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
-
-        const api = gridRef.current!.api!;
-
         _.range(startRow, endRow + 1).forEach(rowIndex => {
           const rowNode = api.getModel().getRow(rowIndex)!;
 
-          range.columns.forEach((column: any) => {
-            const col = column.colDef?.field;
-
-            if (col) {
+          all_columns?.forEach((column: any) => {
+            const colDef = column.getColDef();
+            const col = colDef.field;
+            const value = api.getValue(column, rowNode);
+            const formattedValue = colDef.valueFormatter
+              ? colDef.valueFormatter(value)
+              : value;
+            if (range.columns.includes(column)) {
               newSelectedData[col] = newSelectedData[col] || [];
-              const value = api.getValue(column, rowNode);
-
               if (!newSelectedData[col].includes(value)) {
                 newSelectedData[col].push(value);
               }
             }
-          });
-
-          principalColumns.forEach((column: string) => {
-            newPrincipalData[column] = newPrincipalData[column] || [];
-            const value = api.getValue(column, rowNode);
-
-            if (!newPrincipalData[column].includes(value)) {
-              newPrincipalData[column].push(value);
+            if (principalColumns.includes(column)) {
+              newPrincipalData[column] = newPrincipalData[column] || [];
+              if (!newPrincipalData[column].includes(value)) {
+                newPrincipalData[column].push(value);
+              }
+            }
+            const advancedType: string = colDef?.advancedDataType
+              ? String(colDef.advancedDataType)
+              : colDef?.type
+              ? String(colDef.type)
+              : 'NoType';
+            advancedTypeData[advancedType] =
+              advancedTypeData[advancedType] || [];
+            if (!advancedTypeData[advancedType].includes(formattedValue)) {
+              advancedTypeData[advancedType].push(formattedValue);
             }
           });
-
-          columnsToRetain.forEach((column: string) => {
-            const colDef = gridRef.current!.api.getColumnDef(column);
-            const advancedDataType: string =
-              colDef && 'advancedDataType' in colDef
-                ? String(colDef['advancedDataType'])
-                : 'NoType';
-            retentionData[advancedDataType] =
-              retentionData[advancedDataType] || [];
-            const value = api.getValue(column, rowNode);
-            if (!retentionData[advancedDataType].includes(value)) {
-              retentionData[advancedDataType].push(value);
-            }
-          });
-
           if (formData.enableActionButton) {
             const value = api.getValue(formData.columnForValue, rowNode);
 
@@ -296,16 +291,15 @@ export default function AGGridViz({
 
     setSelectedData({
       highlightedData: newSelectedData,
-      retentionData,
       principalData: newPrincipalData,
       actionButtonData: newActionButtonData,
+      advancedTypeData,
     });
 
     if (!_.isEmpty(newSelectedData)) {
       handleOnClickBehavior(newSelectedData, newPrincipalData);
     }
   }, [
-    columnsToRetain,
     formData.columnForValue,
     formData.enableActionButton,
     handleOnClickBehavior,
@@ -378,15 +372,24 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (selectedData.retentionData.cbs_eml_id) {
+    if (selectedData.advancedTypeData.harmonized_email_id) {
       menuItems = [
         ...menuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
           label="Retain EML record to alfred"
           key="retain-eml"
-          data={selectedData.retentionData.cbs_eml_id}
+          data={selectedData.advancedTypeData.harmonized_email_id}
         />,
+      ];
+    }
+    if (jumpActionConfigs) {
+      menuItems = [
+        ...menuItems,
+        getJumpToDashboardContextMenuItems(
+          jumpActionConfigs,
+          selectedData.advancedTypeData,
+        ),
       ];
     }
     menuItems = [

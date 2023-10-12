@@ -25,6 +25,7 @@ export type CccsTableFormData = QueryFormData & {
   parameterSuffix: string;
   actionFindReplace: string;
   actionButtonLabel: string;
+  jumpActionConfigs?: any[];
 };
 
 export type CccsTableChartProps = ChartProps & {
@@ -48,6 +49,7 @@ export type AGGridVizProps = {
   emitCrossFilters: boolean;
   columnsToRetain: string[];
   setDataMask: SetDataMaskHook;
+  jumpActionConfigs?: any[];
 };
 
 export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
@@ -59,6 +61,6 @@ export type DataMap = { [key: string]: string[] };
 export type GridData = {
   highlightedData: DataMap;
   principalData: DataMap;
-  retentionData: DataMap;
+  advancedTypeData: DataMap;
   actionButtonData: any[];
 };
