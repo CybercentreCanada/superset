@@ -142,6 +142,7 @@ const calcColumnColumnDefs = (
       useValueFormatterForExport,
       sort,
       sortIndex: sortIndex > -1 ? sortIndex : null,
+      type: columnType,
     };
   });
 

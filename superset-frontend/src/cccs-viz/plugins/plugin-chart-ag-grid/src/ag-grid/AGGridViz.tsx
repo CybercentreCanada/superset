@@ -50,6 +50,7 @@ import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -252,9 +253,6 @@ export default function AGGridViz({
             const colDef = column.getColDef();
             const col = colDef.field;
             const value = api.getValue(column, rowNode);
-            const formattedValue = colDef.valueFormatter
-              ? colDef.valueFormatter(value)
-              : value;
             if (range.columns.includes(column)) {
               newSelectedData[col] = newSelectedData[col] || [];
               if (!newSelectedData[col].includes(value)) {
@@ -267,16 +265,29 @@ export default function AGGridViz({
                 newPrincipalData[column].push(value);
               }
             }
-            const advancedType: string = colDef?.advancedDataType
+            let advancedType: string = colDef?.advancedDataType
               ? String(colDef.advancedDataType)
               : colDef?.type
               ? String(colDef.type)
               : 'NoType';
+            let formattedValue: any[] = colDef.valueFormatter
+              ? [colDef.valueFormatter(value)]
+              : [value];
+            if (advancedType.startsWith('ARRAY(')) {
+              advancedType = advancedType
+                .replace('ARRAY(', '')
+                .replace(')', '');
+              formattedValue = JSON.parse(value).map((v: any) =>
+                colDef.valueFormatter ? colDef.valueFormatter(v) : v,
+              );
+            }
             advancedTypeData[advancedType] =
               advancedTypeData[advancedType] || [];
-            if (!advancedTypeData[advancedType].includes(formattedValue)) {
-              advancedTypeData[advancedType].push(formattedValue);
-            }
+            formattedValue.forEach(v => {
+              if (!advancedTypeData[advancedType].includes(v)) {
+                advancedTypeData[advancedType].push(v);
+              }
+            });
           });
           if (formData.enableActionButton) {
             const value = api.getValue(formData.columnForValue, rowNode);
@@ -380,6 +391,17 @@ export default function AGGridViz({
           label="Retain EML record to alfred"
           key="retain-eml"
           data={selectedData.advancedTypeData.harmonized_email_id}
+        />,
+      ];
+    }
+    if (selectedData.advancedTypeData.file_sha256) {
+      menuItems = [
+        ...menuItems,
+        <OpenInAssemblyLineMenuItem
+          onSelection={handleContextMenu}
+          label="Open in AssemblyLine"
+          key="open-file-in-assembly-line"
+          data={selectedData.advancedTypeData.file_sha256}
         />,
       ];
     }
