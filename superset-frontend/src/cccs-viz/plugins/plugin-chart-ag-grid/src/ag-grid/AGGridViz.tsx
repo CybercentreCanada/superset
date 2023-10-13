@@ -363,6 +363,20 @@ export default function AGGridViz({
         />,
         <EmitFilterMenuItem
           onClick={() => {
+            onClick(selectedData.highlightedData, true);
+          }}
+          onSelection={handleContextMenu}
+          label="Filter on Selection"
+          disabled={!Object.keys(selectedData.highlightedData).length}
+          key="filter-on-selection"
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
+        />,
+        <EmitFilterMenuItem
+          onClick={() => {
             onClick(selectedData.principalData);
           }}
           onSelection={handleContextMenu}
@@ -388,7 +402,7 @@ export default function AGGridViz({
         ...menuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
-          label="Retain EML record to alfred"
+          label="Retain EML record to Alfred"
           key="retain-eml"
           data={selectedData.advancedTypeData.harmonized_email_id}
         />,
