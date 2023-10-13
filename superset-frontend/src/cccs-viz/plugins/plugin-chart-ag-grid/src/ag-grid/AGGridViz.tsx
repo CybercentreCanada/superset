@@ -162,7 +162,9 @@ export default function AGGridViz({
             const col = colDef.field;
             newSelectedData[col] = newSelectedData[col] || [];
             const value = api.getValue(column, rowNode);
-            const formattedValue = colDef.valueFormatter(value);
+            const formattedValue = colDef.valueFormatter.name
+              ? colDef.valueFormatter(value)
+              : value;
             if (!newSelectedData[col].includes(value)) {
               newSelectedData[col].push(value);
             }
