@@ -517,7 +517,7 @@ const config: ControlPanelConfig = {
                   originalMapStateToProps?.(state, controlState) ?? {};
 
                 const choices = isRawMode({ controls })
-                  ? controls?.all_columns?.value
+                  ? controls?.columns?.value
                   : controls?.groupby?.value;
 
                 newState.options = newState.options.filter(
