@@ -253,16 +253,16 @@ export default function AGGridViz({
             const colDef = column.getColDef();
             const col = colDef.field;
             const value = api.getValue(column, rowNode);
-            if (range.columns.includes(column)) {
+            if (range.columns.map(c => c.getColDef().field).includes(col)) {
               newSelectedData[col] = newSelectedData[col] || [];
               if (!newSelectedData[col].includes(value)) {
                 newSelectedData[col].push(value);
               }
             }
-            if (principalColumns.includes(column)) {
-              newPrincipalData[column] = newPrincipalData[column] || [];
-              if (!newPrincipalData[column].includes(value)) {
-                newPrincipalData[column].push(value);
+            if (principalColumns.includes(col)) {
+              newPrincipalData[col] = newPrincipalData[col] || [];
+              if (!newPrincipalData[col].includes(value)) {
+                newPrincipalData[col].push(value);
               }
             }
             let advancedType: string = colDef?.advancedDataType
@@ -270,16 +270,18 @@ export default function AGGridViz({
               : colDef?.type
               ? String(colDef.type)
               : 'NoType';
-            let formattedValue: any[] = colDef.valueFormatter
-              ? [colDef.valueFormatter(value)]
-              : [value];
+            let formattedValue: any[] = [value];
             if (advancedType.startsWith('ARRAY(')) {
               advancedType = advancedType
                 .replace('ARRAY(', '')
                 .replace(')', '');
               formattedValue = JSON.parse(value).map((v: any) =>
-                colDef.valueFormatter ? colDef.valueFormatter(v) : v,
+                colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
               );
+            } else {
+              formattedValue = colDef.valueFormatter?.name
+                ? [colDef.valueFormatter(value)]
+                : [value];
             }
             advancedTypeData[advancedType] =
               advancedTypeData[advancedType] || [];
