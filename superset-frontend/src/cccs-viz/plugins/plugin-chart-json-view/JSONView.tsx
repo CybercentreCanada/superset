@@ -83,8 +83,6 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
   compactView,
   sliceId,
 }) => {
-  const emitGlobalFilter = useEmitGlobalFilter();
-
   const [searchValue, setSearchValue] = useState('');
 
   const setSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +142,6 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
               ) {
                 return null;
               }
-
 
               return (
                 <div css={labelStyles()}>
