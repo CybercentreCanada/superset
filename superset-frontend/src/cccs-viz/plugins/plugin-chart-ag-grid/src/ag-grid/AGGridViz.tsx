@@ -275,9 +275,11 @@ export default function AGGridViz({
               advancedType = advancedType
                 .replace('ARRAY(', '')
                 .replace(')', '');
-              formattedValue = JSON.parse(value).map((v: any) =>
-                colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
-              );
+              formattedValue = value
+                ? JSON.parse(value).map((v: any) =>
+                    colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
+                  )
+                : [];
             } else {
               formattedValue = colDef.valueFormatter?.name
                 ? [colDef.valueFormatter(value)]
@@ -286,14 +288,13 @@ export default function AGGridViz({
             advancedTypeData[advancedType] =
               advancedTypeData[advancedType] || [];
             formattedValue.forEach(v => {
-              if (!advancedTypeData[advancedType].includes(v)) {
+              if (v && !advancedTypeData[advancedType].includes(v)) {
                 advancedTypeData[advancedType].push(v);
               }
             });
           });
           if (formData.enableActionButton) {
             const value = api.getValue(formData.columnForValue, rowNode);
-
             if (value && !newActionButtonData.includes(value.toString())) {
               newActionButtonData.push(value.toString());
             }
@@ -399,7 +400,10 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (selectedData.advancedTypeData.harmonized_email_id) {
+    if (
+      selectedData.advancedTypeData.harmonized_email_id &&
+      selectedData.advancedTypeData.harmonized_email_id.length > 0
+    ) {
       menuItems = [
         ...menuItems,
         <RetainEmlMenuItem
@@ -410,7 +414,10 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (selectedData.advancedTypeData.file_sha256) {
+    if (
+      selectedData.advancedTypeData.file_sha256 &&
+      selectedData.advancedTypeData.file_sha256.length > 0
+    ) {
       menuItems = [
         ...menuItems,
         <OpenInAssemblyLineMenuItem
