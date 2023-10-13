@@ -1,15 +1,7 @@
 import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
 import { get, isEmpty, isObject } from 'lodash';
-import React, {
-  ChangeEvent,
-  ReactNode,
-  memo,
-  useCallback,
-  useState,
-} from 'react';
+import React, { ChangeEvent, memo, useCallback, useState } from 'react';
 import { JSONTree } from 'react-json-tree';
-import { Tooltip } from 'src/components/Tooltip';
-import EmitIcon from '../components/EmitIcon';
 import useEmitGlobalFilter from '../hooks/useEmitGlobalFilter';
 
 const errorStyles = (theme: SupersetTheme) => css`
@@ -52,7 +44,7 @@ const searchStyles = (theme: SupersetTheme) => css`
   }
 `;
 
-const labelStyles = (buttonActive = true) => css`
+const labelStyles = (buttonActive = false) => css`
   display: grid;
   gap: 1rem;
   grid-template-columns: auto ${buttonActive && ' auto'};
@@ -153,40 +145,9 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
                 return null;
               }
 
-              const showButton = !isComplex;
-              const buttonDisabled = nodeType === 'Null';
-
-              let button: ReactNode = null;
-              if (showButton) {
-                button = (
-                  <button
-                    type="button"
-                    disabled={buttonDisabled}
-                    onClick={() =>
-                      emitGlobalFilter(sliceId, [
-                        [
-                          keyPath.find(
-                            key => !!key && typeof key === 'string',
-                          ) as string,
-                          value,
-                        ],
-                      ])
-                    }
-                  >
-                    <EmitIcon disabled={buttonDisabled} disablePadding />
-                  </button>
-                );
-              }
-
-              if (button && !buttonDisabled) {
-                button = (
-                  <Tooltip title="Filter on Key/Value">{button}</Tooltip>
-                );
-              }
 
               return (
-                <div css={labelStyles(showButton)}>
-                  {button}
+                <div css={labelStyles()}>
                   <span>{keyPath[0]}:</span>
                 </div>
               );

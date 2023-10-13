@@ -223,6 +223,16 @@ export default function AGGridViz({
     [emitCrossFilters, emitFilter, onClickBehaviour],
   );
 
+  const unnestValue = (value: string): string[] => {
+    let parsed;
+    try {
+      parsed = JSON.parse(value);
+      return parsed;
+    } catch (e) {
+      return [value];
+    }
+  };
+
   const onRangeSelectionChanged = useCallback(() => {
     const api = gridRef.current!.api!;
     const cellRanges = api.getCellRanges();
@@ -265,26 +275,17 @@ export default function AGGridViz({
                 newPrincipalData[col].push(value);
               }
             }
-            let advancedType: string = colDef?.advancedDataType
+            const advancedType: string = colDef?.advancedDataType
               ? String(colDef.advancedDataType)
               : colDef?.type
               ? String(colDef.type)
               : 'NoType';
-            let formattedValue: any[] = [value];
-            if (advancedType.startsWith('ARRAY(')) {
-              advancedType = advancedType
-                .replace('ARRAY(', '')
-                .replace(')', '');
-              formattedValue = value
-                ? JSON.parse(value).map((v: any) =>
+            const formattedValue: any[] =
+              typeof value === 'string'
+                ? unnestValue(value).map(v =>
                     colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
                   )
-                : [];
-            } else {
-              formattedValue = colDef.valueFormatter?.name
-                ? [colDef.valueFormatter(value)]
                 : [value];
-            }
             advancedTypeData[advancedType] =
               advancedTypeData[advancedType] || [];
             formattedValue.forEach(v => {
