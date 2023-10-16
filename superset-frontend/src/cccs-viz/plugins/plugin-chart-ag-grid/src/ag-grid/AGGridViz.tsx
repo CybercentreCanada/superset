@@ -316,7 +316,12 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (jumpActionConfigs) {
+    if (
+      jumpActionConfigs &&
+      jumpActionConfigs.filter(j =>
+        Object.keys(selectedData.advancedTypeData).includes(j.advancedDataType),
+      ).length > 0
+    ) {
       menuItems = [
         ...menuItems,
         getJumpToDashboardContextMenuItems(
