@@ -11,7 +11,12 @@ const generateNativeFilterUrlString = (
   column = '',
 ) => {
   const stringSelectedData = urlSelectedData.map(e => `${e.toString()}`);
-  const navtiveFilter = {
+  const nativeFilter = {
+    __cache: {
+      label: stringSelectedData,
+      validateStatus: false,
+      value: stringSelectedData,
+    },
     extraFormData: {
       filters: [{ col: column, op: 'IN', val: stringSelectedData }],
     },
@@ -23,7 +28,7 @@ const generateNativeFilterUrlString = (
     id: nativefilterID,
     ownState: {},
   };
-  return navtiveFilter;
+  return nativeFilter;
 };
 
 export const getJumpToDashboardContextMenuItems = (
