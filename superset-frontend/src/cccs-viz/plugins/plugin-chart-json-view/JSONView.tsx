@@ -2,7 +2,6 @@ import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
 import { get, isEmpty, isObject } from 'lodash';
 import React, { ChangeEvent, memo, useCallback, useState } from 'react';
 import { JSONTree } from 'react-json-tree';
-import useEmitGlobalFilter from '../hooks/useEmitGlobalFilter';
 
 const errorStyles = (theme: SupersetTheme) => css`
   color: ${theme.colors.error.base};

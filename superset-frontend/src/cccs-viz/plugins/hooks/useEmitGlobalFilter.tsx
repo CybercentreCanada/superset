@@ -60,10 +60,7 @@ const useEmitGlobalFilter = () => {
 
             const op = Array.isArray(processedValue)
               ? Operators.IN
-              : // Check to see if the value is a number or not
-              /^\d+(\.\d+)?$/.test(processedValue?.toString())
-              ? Operators.EQUALS
-              : Operators.ILIKE;
+              : Operators.EQUALS;
 
             // I reverse-engineered this from the redux store. There's probably a better way to do this,
             // but this is what works for now.
@@ -72,8 +69,7 @@ const useEmitGlobalFilter = () => {
               subject: col,
               operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
               operatorId: op,
-              comparator:
-                op !== Operators.ILIKE ? processedValue : `%${processedValue}%`,
+              comparator: processedValue,
               clause: CLAUSES.WHERE,
               sqlExpression: null,
               isExtra: false,
