@@ -250,6 +250,7 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
             }}
             label={' '}
             value={filterState.filters || []}
+            ghostButton
           />
         </AdhocControlContainer>
       </StyledFormItem>
