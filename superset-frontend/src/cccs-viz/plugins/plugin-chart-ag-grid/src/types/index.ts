@@ -63,4 +63,5 @@ export type GridData = {
   principalData: DataMap;
   advancedTypeData: DataMap;
   actionButtonData: any[];
+  jumpToData: DataMap;
 };

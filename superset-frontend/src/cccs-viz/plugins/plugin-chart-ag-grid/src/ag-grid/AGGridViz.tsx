@@ -108,7 +108,9 @@ export default function AGGridViz({
     principalData: {},
     advancedTypeData: {},
     actionButtonData: [],
+    jumpToData: {},
   });
+  const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState(pageLength);
   const [isDestroyed, setIsDestroyed] = useState(false);
@@ -244,6 +246,7 @@ export default function AGGridViz({
     const newPrincipalData: { [key: string]: string[] } = {};
     const newActionButtonData: any[] = [];
     const advancedTypeData: { [key: string]: string[] } = {};
+    const jumpToData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
@@ -263,11 +266,28 @@ export default function AGGridViz({
             const colDef = column.getColDef();
             const col = colDef.field;
             const value = api.getValue(column, rowNode);
+            const formattedValue: any[] =
+              typeof value === 'string'
+                ? unnestValue(value).map(v =>
+                    colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
+                  )
+                : [value];
+            const advancedType: string = colDef?.advancedDataType
+              ? String(colDef.advancedDataType)
+              : colDef?.type
+              ? String(colDef.type)
+              : 'NoType';
             if (range.columns.map(c => c.getColDef().field).includes(col)) {
               newSelectedData[col] = newSelectedData[col] || [];
               if (!newSelectedData[col].includes(value)) {
                 newSelectedData[col].push(value);
               }
+              jumpToData[advancedType] = jumpToData[advancedType] || [];
+              formattedValue.forEach(v => {
+                if (v && !jumpToData[advancedType].includes(v)) {
+                  jumpToData[advancedType].push(v);
+                }
+              });
             }
             if (principalColumns.includes(col)) {
               newPrincipalData[col] = newPrincipalData[col] || [];
@@ -275,17 +295,6 @@ export default function AGGridViz({
                 newPrincipalData[col].push(value);
               }
             }
-            const advancedType: string = colDef?.advancedDataType
-              ? String(colDef.advancedDataType)
-              : colDef?.type
-              ? String(colDef.type)
-              : 'NoType';
-            const formattedValue: any[] =
-              typeof value === 'string'
-                ? unnestValue(value).map(v =>
-                    colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
-                  )
-                : [value];
             advancedTypeData[advancedType] =
               advancedTypeData[advancedType] || [];
             formattedValue.forEach(v => {
@@ -303,12 +312,12 @@ export default function AGGridViz({
         });
       });
     }
-
     setSelectedData({
       highlightedData: newSelectedData,
       principalData: newPrincipalData,
       actionButtonData: newActionButtonData,
       advancedTypeData,
+      jumpToData,
     });
 
     if (!_.isEmpty(newSelectedData)) {
@@ -339,11 +348,7 @@ export default function AGGridViz({
     handleContextMenu();
   };
 
-  const handleOnContextMenu = (
-    offsetX: number,
-    offsetY: number,
-    filters: any,
-  ) => {
+  useEffect(() => {
     let menuItems = [
       <CopyMenuItem onClick={copyText} />,
       <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
@@ -430,11 +435,16 @@ export default function AGGridViz({
       ];
     }
     if (jumpActionConfigs) {
+      const disabled =
+        jumpActionConfigs.filter(j =>
+          Object.keys(selectedData.jumpToData).includes(j.advancedDataType),
+        ).length <= 0;
       menuItems = [
         ...menuItems,
         getJumpToDashboardContextMenuItems(
           jumpActionConfigs,
-          selectedData.advancedTypeData,
+          selectedData.jumpToData,
+          disabled,
         ),
       ];
     }
@@ -443,7 +453,25 @@ export default function AGGridViz({
       <Menu.Divider key="export-divider" />,
       <ExportMenu key="export-csv" api={gridRef.current!.api} />,
     ];
-    contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
+
+    setMenuItems(menuItems);
+  }, [
+    contextDivID,
+    crossFilterValue,
+    emitCrossFilters,
+    formData.sliceId,
+    jumpActionConfigs,
+    selectedData.highlightedData,
+    selectedData.jumpToData,
+    selectedData.principalData,
+  ]);
+
+  const handleOnContextMenu = (
+    offsetX: number,
+    offsetY: number,
+    filters: any,
+  ) => {
+    contextMenuRef.current?.open(offsetX, offsetY, filters);
     setInContextMenu(true);
   };
   const onContextMenu = (event: any) => {
@@ -491,6 +519,7 @@ export default function AGGridViz({
         formData={formData}
         onSelection={handleContextMenu}
         onClose={handleContextMenu}
+        menuItems={menuItems}
       />
       <div
         style={{

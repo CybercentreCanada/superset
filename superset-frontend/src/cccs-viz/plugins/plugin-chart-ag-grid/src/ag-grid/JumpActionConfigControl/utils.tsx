@@ -11,7 +11,12 @@ const generateNativeFilterUrlString = (
   column = '',
 ) => {
   const stringSelectedData = urlSelectedData.map(e => `${e.toString()}`);
-  const navtiveFilter = {
+  const nativeFilter = {
+    __cache: {
+      label: stringSelectedData,
+      validateStatus: false,
+      value: stringSelectedData,
+    },
     extraFormData: {
       filters: [{ col: column, op: 'IN', val: stringSelectedData }],
     },
@@ -23,7 +28,7 @@ const generateNativeFilterUrlString = (
     id: nativefilterID,
     ownState: {},
   };
-  return navtiveFilter;
+  return nativeFilter;
 };
 
 export const getJumpToDashboardContextMenuItems = (
@@ -61,7 +66,7 @@ export const getJumpToDashboardContextMenuItems = (
       };
 
       const DashboardMenuItem = (
-        <Menu.Item onClick={action} className="ant-menu-item">
+        <Menu.Item onClick={action} className="ant-dropdown-menu-item">
           {jumpActionName}
         </Menu.Item>
       );
@@ -76,6 +81,11 @@ export const getJumpToDashboardContextMenuItems = (
       title="Jump To Dashboard"
       css={subMenuStyles}
       disabled={disableOveride}
+      className={
+        disableOveride
+          ? 'ant-dropdown-menu-item-disabled'
+          : 'ant-dropdown-menu-item'
+      }
     >
       {sub_menu}
     </Menu.SubMenu>
