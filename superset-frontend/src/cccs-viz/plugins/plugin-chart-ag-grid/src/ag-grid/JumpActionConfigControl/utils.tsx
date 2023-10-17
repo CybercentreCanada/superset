@@ -3,7 +3,6 @@ import React from 'react';
 import { FundOutlined } from '@ant-design/icons';
 import rison from 'rison';
 import { Menu } from 'src/components/Menu';
-import { subMenuStyles } from '../ContextMenu/MenuItems/ExportMenu';
 
 const generateNativeFilterUrlString = (
   nativefilterID: string,
@@ -79,7 +78,6 @@ export const getJumpToDashboardContextMenuItems = (
     <Menu.SubMenu
       icon={<FundOutlined />}
       title="Jump To Dashboard"
-      css={subMenuStyles}
       disabled={disableOveride}
       className={
         disableOveride
