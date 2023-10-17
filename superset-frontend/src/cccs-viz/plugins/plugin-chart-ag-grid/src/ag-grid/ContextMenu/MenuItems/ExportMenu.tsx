@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 
-import { SupersetTheme, css } from '@superset-ui/core';
 import { Menu } from 'src/components/Menu';
 
 import {
