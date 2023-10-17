@@ -28,8 +28,9 @@ advanced_data_type_convert_schema = {
             "items": {"default": "http"},
             "minItems": 0,
         },
+        "operator": {"type": "string", "default": "=="},
     },
-    "required": ["type", "values"],
+    "required": ["type", "values", "operator"],
 }
 
 

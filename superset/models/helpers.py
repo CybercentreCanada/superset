@@ -1785,6 +1785,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                         {
                             "type": col_advanced_data_type,
                             "values": values,
+                            "operator": op,
                         }
                     )
                     if bus_resp["error_message"]:
