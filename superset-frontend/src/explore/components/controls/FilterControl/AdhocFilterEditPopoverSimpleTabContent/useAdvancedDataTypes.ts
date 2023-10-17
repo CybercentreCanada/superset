@@ -32,6 +32,7 @@ const INITIAL_ADVANCED_DATA_TYPES_STATE: AdvancedDataTypesState = {
 
 const useAdvancedDataTypes = (
   validHandler: (isValid: boolean) => void,
+  selectedAdvancedDataTypeOperator: string | undefined,
   default_state: AdvancedDataTypesState = INITIAL_ADVANCED_DATA_TYPES_STATE,
 ) => {
   const [advancedDataTypesState, setAdvancedDataTypesState] =
@@ -39,6 +40,10 @@ const useAdvancedDataTypes = (
   const [subjectAdvancedDataType, setSubjectAdvancedDataType] = useState<
     string | undefined
   >();
+  const selectedOperator =
+    selectedAdvancedDataTypeOperator === undefined
+      ? ''
+      : selectedAdvancedDataTypeOperator;
 
   const fetchAdvancedDataTypeValueCallback = useCallback(
     (
@@ -56,6 +61,7 @@ const useAdvancedDataTypes = (
         const queryParams = rison.encode({
           type: subjectAdvancedDataType,
           values,
+          operator: selectedOperator,
         });
         const endpoint = `/api/v1/advanced_data_type/convert?q=${queryParams}`;
         SupersetClient.get({ endpoint })
@@ -83,7 +89,7 @@ const useAdvancedDataTypes = (
           });
       }, 600)();
     },
-    [validHandler],
+    [validHandler, selectedOperator],
   );
 
   const fetchSubjectAdvancedDataType = (props: Props) => {
