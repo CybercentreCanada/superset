@@ -16,22 +16,6 @@ interface ExportMenuProps {
 
 // For some reason, the CSS on the submenu doesn't match the rest of the menu.
 // So we manually override it
-export const subMenuStyles = (theme: SupersetTheme) => css`
-  .ant-dropdown-menu-submenu-title {
-    padding-right: 40px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    &:hover {
-      background-color: initial;
-      color: ${theme.colors.primary.base};
-    }
-  }
-  .anticon > svg {
-    height: 16px;
-    width: 16px;
-  }
-`;
 
 const ExportMenu: React.FC<ExportMenuProps> = props => {
   const exportData = useCallback(
@@ -58,7 +42,6 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
       icon={<DownloadOutlined />}
       title="Export"
       {...{ ...props, api: undefined }}
-      css={subMenuStyles}
     >
       <Menu.Item
         onClick={() => exportData('csv')}

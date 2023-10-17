@@ -57,7 +57,7 @@ type DataMap = { [key: string]: string[] };
 type gridData = {
   highlightedData: DataMap;
   principalData: DataMap;
-  advancedTypeData: DataMap;
+  jumpToData: DataMap;
 };
 
 export default function AGGridViz({
@@ -85,10 +85,11 @@ export default function AGGridViz({
   const contextMenuRef = useRef<ContextRef>(null);
 
   const [, setInContextMenu] = useState<boolean>(true);
+  const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
   const [selectedData, setSelectedData] = useState<gridData>({
     highlightedData: {},
     principalData: {},
-    advancedTypeData: {},
+    jumpToData: {},
   });
   const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
   const [searchValue, setSearchValue] = useState('');
@@ -140,7 +141,7 @@ export default function AGGridViz({
     const cellRanges = gridRef.current!.api.getCellRanges();
     const newSelectedData: { [key: string]: string[] } = {};
     const principalData: { [key: string]: string[] } = {};
-    const advancedTypeData: { [key: string]: string[] } = {};
+    const jumpToData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
       cellRanges.forEach(function (range: CellRange) {
@@ -162,7 +163,7 @@ export default function AGGridViz({
             const col = colDef.field;
             newSelectedData[col] = newSelectedData[col] || [];
             const value = api.getValue(column, rowNode);
-            const formattedValue = colDef.valueFormatter.name
+            const formattedValue = colDef.valueFormatter?.name
               ? colDef.valueFormatter(value)
               : value;
             if (!newSelectedData[col].includes(value)) {
@@ -173,10 +174,9 @@ export default function AGGridViz({
               : colDef?.type
               ? String(colDef.type)
               : 'NoType';
-            advancedTypeData[advancedType] =
-              advancedTypeData[advancedType] || [];
-            if (!advancedTypeData[advancedType].includes(formattedValue)) {
-              advancedTypeData[advancedType].push(formattedValue);
+            jumpToData[advancedType] = jumpToData[advancedType] || [];
+            if (!jumpToData[advancedType].includes(formattedValue)) {
+              jumpToData[advancedType].push(formattedValue);
             }
           });
           principalColumns.forEach((column: any) => {
@@ -193,11 +193,10 @@ export default function AGGridViz({
         }
       });
     }
-
     setSelectedData({
       highlightedData: newSelectedData,
       principalData,
-      advancedTypeData,
+      jumpToData,
     });
   };
 
@@ -273,11 +272,7 @@ export default function AGGridViz({
     handleContextMenuSelected();
   };
 
-  const handleOnContextMenu = (
-    offsetX: number,
-    offsetY: number,
-    filters: any,
-  ) => {
+  useEffect(() => {
     let menuItems = [
       <CopyMenuItem onClick={copyText} />,
       <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
@@ -316,17 +311,17 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (
-      jumpActionConfigs &&
-      jumpActionConfigs.filter(j =>
-        Object.keys(selectedData.advancedTypeData).includes(j.advancedDataType),
-      ).length > 0
-    ) {
+    if (jumpActionConfigs) {
+      const disabled =
+        jumpActionConfigs.filter(j =>
+          Object.keys(selectedData.jumpToData).includes(j.advancedDataType),
+        ).length <= 0;
       menuItems = [
         ...menuItems,
         getJumpToDashboardContextMenuItems(
           jumpActionConfigs,
-          selectedData.advancedTypeData,
+          selectedData.jumpToData,
+          disabled,
         ),
       ];
     }
@@ -335,7 +330,25 @@ export default function AGGridViz({
       <Menu.Divider key="export-divider" />,
       <ExportMenu key="export-csv" api={gridRef.current!.api} />,
     ];
-    contextMenuRef.current?.open(offsetX, offsetY, filters, menuItems);
+
+    setMenuItems(menuItems);
+  }, [
+    contextDivID,
+    crossFilterValue,
+    emitCrossFilters,
+    formData.sliceId,
+    jumpActionConfigs,
+    selectedData.highlightedData,
+    selectedData.jumpToData,
+    selectedData.principalData,
+  ]);
+
+  const handleOnContextMenu = (
+    offsetX: number,
+    offsetY: number,
+    filters: any,
+  ) => {
+    contextMenuRef.current?.open(offsetX, offsetY, filters);
     setInContextMenu(true);
   };
 
@@ -384,6 +397,7 @@ export default function AGGridViz({
         formData={formData}
         onSelection={handleContextMenuSelected}
         onClose={handleContextMenuClosed}
+        menuItems={menuItems}
       />
       <div
         style={{

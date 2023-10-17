@@ -24,6 +24,7 @@ export interface ChartContextMenuProps {
   formData: QueryFormData;
   onSelection: () => void;
   onClose: () => void;
+  menuItems: JSX.Element[];
 }
 
 export interface Ref {
@@ -37,7 +38,7 @@ export interface Ref {
 }
 
 const ChartContextMenu = (
-  { id, formData, onSelection, onClose }: ChartContextMenuProps,
+  { id, formData, onSelection, onClose, menuItems }: ChartContextMenuProps,
   ref: RefObject<Ref>,
 ) => {
   const canExplore = useSelector((state: RootState) =>
@@ -45,14 +46,12 @@ const ChartContextMenu = (
   );
   const [visible, setVisible] = useState(false);
 
-  const [{ clientX, clientY, extraContextMenuItems }, setState] = useState<{
+  const [{ clientX, clientY }, setState] = useState<{
     clientX: number;
     clientY: number;
     filters?: BinaryQueryObjectFilterClause[];
-    extraContextMenuItems?: any[];
   }>({ clientX: 0, clientY: 0 });
 
-  const menuItems: any = [];
   const showDrillToDetail =
     isFeatureEnabled(FeatureFlag.DRILL_TO_DETAIL) && canExplore;
 
@@ -61,7 +60,6 @@ const ChartContextMenu = (
       clientX: number,
       clientY: number,
       filters?: BinaryQueryObjectFilterClause[],
-      extraContextMenuItems?: any[],
     ) => {
       const itemsCount =
         [
@@ -73,7 +71,6 @@ const ChartContextMenu = (
         clientX,
         clientY: adjustedY,
         filters,
-        extraContextMenuItems,
       });
 
       // Since Ant Design's Dropdown does not offer an imperative API
@@ -103,8 +100,8 @@ const ChartContextMenu = (
     <Dropdown
       overlay={
         <Menu>
-          {menuItems.length || (extraContextMenuItems || []).length ? (
-            [...menuItems, ...(extraContextMenuItems || [])]
+          {menuItems.length ? (
+            [...menuItems]
           ) : (
             <Menu.Item disabled>No actions</Menu.Item>
           )}

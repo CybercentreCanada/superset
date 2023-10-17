@@ -66,7 +66,7 @@ export const getJumpToDashboardContextMenuItems = (
       };
 
       const DashboardMenuItem = (
-        <Menu.Item onClick={action} className="ant-menu-item">
+        <Menu.Item onClick={action} className="ant-dropdown-menu-item">
           {jumpActionName}
         </Menu.Item>
       );
@@ -81,6 +81,11 @@ export const getJumpToDashboardContextMenuItems = (
       title="Jump To Dashboard"
       css={subMenuStyles}
       disabled={disableOveride}
+      className={
+        disableOveride
+          ? 'ant-dropdown-menu-item-disabled'
+          : 'ant-dropdown-menu-item'
+      }
     >
       {sub_menu}
     </Menu.SubMenu>
