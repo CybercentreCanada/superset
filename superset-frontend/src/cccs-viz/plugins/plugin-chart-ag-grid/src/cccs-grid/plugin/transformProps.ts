@@ -71,8 +71,9 @@ const calcColumnColumnDefs = (
   columns: QueryFormColumn[],
   defaultGroupBy: string[],
   dataset_columns: Column[],
-  enable_row_numbers = true,
+  enableRowNumbers = true,
   orderByCols: any,
+  disableJsonRendering = false,
 ) => {
   const columnDataMap = new Map<string, string>();
   dataset_columns.reduce(function (columnMap, column: Column) {
@@ -101,7 +102,9 @@ const calcColumnColumnDefs = (
       advancedType.toUpperCase() in rendererMap
         ? rendererMap[advancedType.toUpperCase()]
         : columnType in rendererMap
-        ? rendererMap[columnType]
+        ? disableJsonRendering && columnType === 'JSON'
+          ? undefined
+          : rendererMap[columnType]
         : undefined;
     const valueFormatter =
       advancedType.toUpperCase() in formatterMap
@@ -137,7 +140,7 @@ const calcColumnColumnDefs = (
     };
   });
 
-  if (enable_row_numbers) {
+  if (enableRowNumbers) {
     columnDefs.splice(0, 0, {
       headerName: '#',
       colId: 'rowNum',
@@ -170,6 +173,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableRowNumbers,
     enableGrouping,
     enableJsonExpand,
+    disableJsonRendering,
     principalColumns,
     orderByCols,
     jumpActionConfigs,
@@ -193,6 +197,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     datasource?.columns as Column[],
     enableRowNumbers,
     orderByCols,
+    disableJsonRendering,
   );
   columnDefs = columnDefs.concat(
     calcMetricColumnDefs(

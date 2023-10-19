@@ -462,7 +462,24 @@ config.controlPanelSections.push({
             'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
           ),
           visibility: ({ controls }) =>
-            Boolean(!controls?.enable_grouping?.value),
+            Boolean(!controls?.enable_grouping?.value) &&
+            Boolean(!controls?.disable_json_rendering?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'disable_json_rendering',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Disable JSON Cell Rendering'),
+          renderTrigger: true,
+          default: false,
+          description: t(
+            'Using JSON Cell renderers in the grid cells can significantly worsen performance in certain cases when many columns selected (especially in FireFox browsers). It depends on the case, but typically this can occur when there are > 40 columns and there are JSON columns. This option allows the user to disable json cell rendering.',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(!controls?.enable_json_expand?.value),
         },
       },
     ],

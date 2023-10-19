@@ -11,6 +11,7 @@ export type CccsTableFormData = QueryFormData & {
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   enableJsonExpand: boolean;
+  disableJsonRendering: boolean;
   emitCrossFilters: boolean;
   principalColumns: string[];
   percent_metrics: string[];
