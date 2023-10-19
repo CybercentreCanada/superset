@@ -114,7 +114,7 @@ const calcColumnColumnDefs = (
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
-    const autoHeight = columnType === 'JSON';
+    const autoHeight = cellRenderer?.name === 'JsonValueRenderer';
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
