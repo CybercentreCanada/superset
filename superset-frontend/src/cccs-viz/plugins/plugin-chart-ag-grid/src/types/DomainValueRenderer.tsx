@@ -20,11 +20,7 @@ export default class DomainValueRenderer extends Component<
   }
 
   render() {
-    return (
-      <span>
-        <a href="http://10.162.232.22:8000/gwwk.html">{this.state.cellValue}</a>
-      </span>
-    );
+    return <span>{this.state.cellValue}</span>;
   }
 
   static getValueToDisplay(params: { valueFormatted: any; value: any }) {

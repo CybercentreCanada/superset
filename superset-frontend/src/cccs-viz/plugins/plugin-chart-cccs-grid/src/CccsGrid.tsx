@@ -402,8 +402,6 @@ export default function CccsGrid({
   };
 
   const onRangeSelectionChanged = (params: any) => {
-    console.log("calculating")
-
     const gridApi = params.api;
     const cellRanges = gridApi.getCellRanges();
 
