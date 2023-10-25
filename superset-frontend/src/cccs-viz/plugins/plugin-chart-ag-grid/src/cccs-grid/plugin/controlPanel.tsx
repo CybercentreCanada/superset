@@ -462,8 +462,7 @@ config.controlPanelSections.push({
             'Whether to enable row level JSON expand buttons. NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "JSON Row Expand" is selected, "Row Grouping" will not be visible.',
           ),
           visibility: ({ controls }) =>
-            Boolean(!controls?.enable_grouping?.value) &&
-            Boolean(!controls?.disable_json_rendering?.value),
+            Boolean(!controls?.enable_grouping?.value),
         },
       },
     ],
