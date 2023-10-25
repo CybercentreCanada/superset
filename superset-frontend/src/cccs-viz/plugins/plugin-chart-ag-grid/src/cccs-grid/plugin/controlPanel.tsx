@@ -469,22 +469,6 @@ config.controlPanelSections.push({
     ],
     [
       {
-        name: 'disable_json_rendering',
-        config: {
-          type: 'CheckboxControl',
-          label: t('Disable JSON Cell Rendering'),
-          renderTrigger: true,
-          default: false,
-          description: t(
-            'Using JSON Cell renderers in the grid cells can significantly worsen performance in certain cases when many columns selected (especially in FireFox browsers). It depends on the case, but typically this can occur when there are > 40 columns and there are JSON columns. This option allows the user to disable json cell rendering.',
-          ),
-          visibility: ({ controls }) =>
-            Boolean(!controls?.enable_json_expand?.value),
-        },
-      },
-    ],
-    [
-      {
         name: 'page_length',
         config: {
           type: 'SelectControl',

@@ -73,7 +73,6 @@ const calcColumnColumnDefs = (
   dataset_columns: Column[],
   enableRowNumbers = true,
   orderByCols: any,
-  disableJsonRendering = false,
 ) => {
   const columnDataMap = new Map<string, string>();
   dataset_columns.reduce(function (columnMap, column: Column) {
@@ -102,9 +101,7 @@ const calcColumnColumnDefs = (
       advancedType.toUpperCase() in rendererMap
         ? rendererMap[advancedType.toUpperCase()]
         : columnType in rendererMap
-        ? disableJsonRendering && columnType === 'JSON'
-          ? undefined
-          : rendererMap[columnType]
+        ? rendererMap[columnType]
         : undefined;
     const valueFormatter =
       advancedType.toUpperCase() in formatterMap
@@ -114,7 +111,7 @@ const calcColumnColumnDefs = (
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
-    const autoHeight = cellRenderer?.name === 'JsonValueRenderer';
+    const autoHeight = columnType === 'JSON';
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
@@ -173,7 +170,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableRowNumbers,
     enableGrouping,
     enableJsonExpand,
-    disableJsonRendering,
     principalColumns,
     orderByCols,
     jumpActionConfigs,
@@ -197,7 +193,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     datasource?.columns as Column[],
     enableRowNumbers,
     orderByCols,
-    disableJsonRendering,
   );
   columnDefs = columnDefs.concat(
     calcMetricColumnDefs(
