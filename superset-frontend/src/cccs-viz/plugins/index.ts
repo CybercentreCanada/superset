@@ -30,3 +30,4 @@ export { default as AtAGlanceUserIDSasChartPlugin } from './plugin-chart-at-a-gl
 export { default as ApplicationLinksChartPlugin } from './plugin-chart-application-links/src/plugin';
 export { default as IFrameVisualizationChartPlugin } from './plugin-chart-iframe/src/plugin';
 export { default as DatasetExplorerChartPlugin } from './plugin-chart-dataset-explorer/src/plugin';
+export { default as CccsTableChartPlugin } from './plugin-chart-ag-grid/src/cccs-grid/plugin';
