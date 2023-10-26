@@ -6,7 +6,7 @@ import { LicenseManager } from '@ag-grid-enterprise/core';
 import styles from './styles';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 
 type AtAGlanceUserIDProps = QueryFormData & {
   ipDashboardId: string;
