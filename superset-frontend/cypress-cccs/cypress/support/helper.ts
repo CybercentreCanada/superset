@@ -49,8 +49,8 @@ export const baseFormData = {
 }
 
 export const cccsExploreView = {
-    agGrid: '.cccs_grid > .ag-theme-balham',
-    agGridSearchBox: '.cccs_grid > .ag-theme-balham > .form-inline > .row > :nth-child(2) > .float-right > .form-control', 
+    agGrid: '.cccs_grid > :first-child > .ag-theme-balham',
+    agGridSearchBox: '.cccs_grid > :first-child > .form-inline > .row > :nth-child(2) > .float-right > .form-control', 
     errorArea: '.css-tl6px0',
     errorMessage: '.error-body',
     noResult: '.ant-empty',
