@@ -15,7 +15,7 @@ export const
   EMPLOYEES_DATASET = 'AnalyticalPlatformQA-Employees'
 
 export const cccsDefaults = {
-    viz: 'Hogwarts Table',
+    viz: 'CCCS Table',
     viz_type: 'cccs_grid',
     certifiedByAPA2Key: '"certified_by": "Analytical Platform Team"'
 }

@@ -277,7 +277,7 @@ describe('Smoke Test', () => {
     });
   });
     
-  it('Test quick filter on an IPv4 in Hogwarts Table viz', () => {
+  it('Test quick filter on an IPv4 in CCCS Table viz', () => {
 
     const formData = {
       query_mode: 'raw',
