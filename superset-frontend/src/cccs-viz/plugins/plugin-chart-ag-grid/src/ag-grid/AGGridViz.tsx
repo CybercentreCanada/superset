@@ -356,6 +356,7 @@ export default function AGGridViz({
     if (emitCrossFilters) {
       menuItems = [
         ...menuItems,
+        <Menu.Divider key="cross-filter-divider" />,
         <EmitFilterMenuItem
           onClick={() => {
             onClick(selectedData.highlightedData);

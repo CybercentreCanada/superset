@@ -216,7 +216,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
 
   // If the flag is set to true, add a column which will contain
   // a button to expand all JSON blobs in the row
-
   if (enableJsonExpand) {
     columnDefs.splice(1, 0, {
       colId: 'jsonExpand',
