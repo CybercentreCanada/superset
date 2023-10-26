@@ -296,6 +296,7 @@ const config = {
       vm: require.resolve('vm-browserify'),
       path: false,
     },
+    fullySpecified: false
   },
   context: APP_DIR, // to automatically find tsconfig.json
   module: {
@@ -357,6 +358,12 @@ const config = {
         test: /\.js$/,
         include: /node_modules\/react-dom/,
         use: ['react-hot-loader/webpack'],
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
       },
       {
         test: /\.css$/,

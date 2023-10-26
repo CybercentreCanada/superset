@@ -1,8 +1,8 @@
-import { GroupCellRenderer } from 'ag-grid-community';
+import { RowEvent } from 'ag-grid-community';
 import React, { Component } from 'react';
 import { JSONTree } from 'react-json-tree';
 
-import './Buttons.css';
+import '../Button.css';
 
 function safeJsonObjectParse(
   data: unknown,
@@ -29,15 +29,15 @@ function safeJsonObjectParse(
 }
 
 // JSX which shows the JSON tree inline, and a button to collapse it
-function collapseJSON(this: any, reverseState: any, jsonObject: any) {
+function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
   return (
-    <>
+    <span style={{ display: 'flex' }}>
       <div style={{ float: 'left' }}>
         <button
-          className="Button Collapse"
+          className="ag-grid-btn ag-grid-btn-collapse"
           type="button"
           title="Collapse"
-          onClick={reverseState}
+          onClick={toggleExpand}
         >
           {' '}
         </button>
@@ -49,19 +49,19 @@ function collapseJSON(this: any, reverseState: any, jsonObject: any) {
           shouldExpandNode={() => true}
         />
       </div>
-    </>
+    </span>
   );
 }
 
 // JSX which shows the JSON data on one line, and a button to open the JSON tree
-function expandJSON(this: any, reverseState: any, cellData: any) {
+function expandJSON(this: any, toggleExpand: any, cellData: any) {
   return (
     <>
       <button
-        className="Button Expand"
+        className="ag-grid-btn ag-grid-btn-expand"
         type="button"
         title="Expand"
-        onClick={reverseState}
+        onClick={toggleExpand}
       >
         {' '}
       </button>
@@ -72,17 +72,20 @@ function expandJSON(this: any, reverseState: any, cellData: any) {
 
 export default class JsonValueRenderer extends Component<
   {},
-  { api: any; cellValue: any; expanded: boolean; rowIndex: number }
+  { cellValue: any; expanded: boolean; rowNode: any }
 > {
   constructor(props: any) {
     super(props);
 
     this.state = {
-      api: props.api,
       cellValue: JsonValueRenderer.getValueToDisplay(props),
-      expanded: false,
-      rowIndex: props.rowIndex,
+      expanded: props.node.expanded,
+      rowNode: props.node,
     };
+    this.state.rowNode.addEventListener(
+      'expandedChanged',
+      this.onExpandChanged,
+    );
   }
 
   // update cellValue when the cell's props are updated
@@ -93,31 +96,11 @@ export default class JsonValueRenderer extends Component<
   }
 
   // Set the current `expanded` field to the opposite of what it currently is
-  // and trigger the 'checkState` function in the expand all button for the row
-  reverseState = () => {
-    this.setState(
-      prevState => ({ ...prevState, expanded: !prevState.expanded }),
-      () => {
-        const instances = this.state.api.getCellRendererInstances();
-
-        // Make sure row grouping is not enabled, but if it is, don't
-        // trigger the 'checkState` function in the expand all button for the row
-        if (
-          instances.filter(
-            (instance: any) => instance instanceof GroupCellRenderer,
-          ).length === 0
-        ) {
-          instances
-            .filter(
-              (instance: any) =>
-                instance.params.rowIndex === this.state.rowIndex &&
-                instance.params.column.colDef.cellRenderer ===
-                  'expandAllValueRenderer',
-            )
-            .map((instance: any) => instance.componentInstance.checkState());
-        }
-      },
-    );
+  toggleExpand = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      expanded: !prevState.expanded,
+    }));
   };
 
   // Take the boolean value passed in and set the `expanded` field equal to it
@@ -128,6 +111,16 @@ export default class JsonValueRenderer extends Component<
   // Return whether 'expanded' is set to true or false
   getExpandedValue = () => this.state.expanded;
 
+  onExpandChanged = (params: RowEvent) => {
+    this.setState(prevState => ({
+      ...prevState,
+      rowNode: params.node,
+    }));
+    if (this.state.expanded !== this.state.rowNode.expanded) {
+      this.toggleExpand();
+    }
+  };
+
   render() {
     const cellData = this.state.cellValue;
     const jsonObject = safeJsonObjectParse(this.state.cellValue);
@@ -136,9 +129,9 @@ export default class JsonValueRenderer extends Component<
     // on the value which the `expanded` field is set to
     if (jsonObject) {
       if (this.state.expanded === false) {
-        return expandJSON(this.reverseState, cellData);
+        return expandJSON(this.toggleExpand, cellData);
       }
-      return collapseJSON(this.reverseState, jsonObject);
+      return collapseJSON(this.toggleExpand, jsonObject);
     }
     // If the cellData is set to 'null' or undefined, return null
     return cellData !== 'null' && cellData !== undefined ? cellData : null;
