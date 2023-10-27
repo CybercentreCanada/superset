@@ -38,7 +38,7 @@ import os
 logger = logging.getLogger(__name__)
 
 config = app.config
-API_HOST='https://fission-proxy.hogwarts.pb.azure.chimera.cyber.gc.ca'
+API_HOST=os.environ.get('FISSION_PROXY_URL')
 
 class FissionRestApi(BaseApi):
     """
@@ -65,28 +65,33 @@ class FissionRestApi(BaseApi):
         """
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(user.username,
-                                                                          os.environ.get('SUPERSET_SCOPE'),
+                                                                          os.environ.get('FISSION_SCOPE'),
                                                                           'superset',
                                                                           cache_result=True)
+        alfred_instance = os.environ.get('ALFRED_ENV')
+        if alfred_instance:
+           request_url = request.url + f'&alfred_instance={alfred_instance}'
+           logger.info(request_url)
+        else:
+           logger.info('ALFRED_ENV environment variable not set')
         
-        logger.info(f"Args is {request.args}")
+        logger.info('Args is %s', request.args)
         headers = {
           'Authorization': f"Bearer {token}",
           "X-Auth-Request-Access-Token": token
         }
 
-        url = request.url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
+        url = request_url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
             url             = url,
             data            = request.get_data(),
             allow_redirects = False,
-            headers         = headers 
+            headers         = headers,
+            timeout         = 30
         )
         try:
           result = res.json()
         except:
           result = str(res.text)
-
         return self.response(res.status_code, result=result)
-

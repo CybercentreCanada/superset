@@ -46,6 +46,8 @@ export type AGGridVizProps = {
   principalColumns: string[];
   onClickBehaviour: string;
   agGridLicenseKey: string;
+  assemblyLineUrl: string;
+  enableAlfred: boolean;
   emitCrossFilters: boolean;
   columnsToRetain: string[];
   setDataMask: SetDataMaskHook;
@@ -54,6 +56,8 @@ export type AGGridVizProps = {
 
 export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
+  assemblyLineUrl: string;
+  enableAlfred: boolean;
 }
 
 export type DataMap = { [key: string]: string[] };

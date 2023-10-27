@@ -89,6 +89,8 @@ export default function AGGridViz({
   principalColumns,
   onClickBehaviour,
   agGridLicenseKey,
+  assemblyLineUrl,
+  enableAlfred,
   emitCrossFilters,
   jumpActionConfigs,
 }: AGGridVizProps) {
@@ -408,6 +410,7 @@ export default function AGGridViz({
       ];
     }
     if (
+      enableAlfred &&
       selectedData.advancedTypeData.harmonized_email_id &&
       selectedData.advancedTypeData.harmonized_email_id.length > 0
     ) {
@@ -422,6 +425,7 @@ export default function AGGridViz({
       ];
     }
     if (
+      assemblyLineUrl &&
       selectedData.advancedTypeData.file_sha256 &&
       selectedData.advancedTypeData.file_sha256.length > 0
     ) {
@@ -432,6 +436,7 @@ export default function AGGridViz({
           label="Open in AssemblyLine"
           key="open-file-in-assembly-line"
           data={selectedData.advancedTypeData.file_sha256}
+          base_url={assemblyLineUrl}
         />,
       ];
     }

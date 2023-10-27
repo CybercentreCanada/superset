@@ -6,6 +6,7 @@ import AlSvg from '../../../cccs-grid/images/al.svg';
 interface OpenInAssemblyLineMenuItemProps {
   label: string;
   data: string[];
+  base_url: string;
   onSelection: () => void;
   key?: string;
   disabled?: boolean;
@@ -17,7 +18,7 @@ export default function OpenInAssemblyLineMenuItem(
   props: OpenInAssemblyLineMenuItemProps,
 ) {
   const onClick = () => {
-    let url = 'https://malware-pb.cyber.gc.ca/search/submission?query=';
+    let url = `https://${props.base_url}/search/submission?query=`;
     url += props.data.join('+');
     window.open(url);
     props.onSelection();
