@@ -105,13 +105,12 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        ['adhoc_filters'],
         [
           {
             name: 'columns',
             override: {
-              label: t('Keys to Render'),
-              description: 'The keys to render.',
+              label: t('Columns'),
+              description: 'The columns to show in the json viewer.',
               multi: true,
               allowAll: true,
               default: [],
@@ -130,9 +129,11 @@ const config: ControlPanelConfig = {
                     : ['Please add at least one column to render.'];
                 return newState;
               },
+              rerender: ['column_order'],
             },
           },
         ],
+        ['adhoc_filters'],
         [
           {
             name: 'row_limit',
@@ -178,32 +179,37 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'key_order',
+            name: 'column_order',
             config: {
               type: 'TextControl',
-              label: t('Key Order'),
+              label: t('Column Order'),
+              renderTrigger: true,
               description: t(
-                'A list of keys, separated by commas, setting the order of keys in the resulting JSON.',
+                'A list of column names, separated by commas, setting the order of keys in the resulting JSON.',
               ),
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
               ) => {
-                const missingKey = (controlState.value as string)
+                const originalMapStateToProps =
+                  sharedControls?.columns?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                const missingColumn = (controlState.value as string)
                   ?.split(',')
                   ?.find(
-                    key => (state.form_data.columns?.indexOf(key) ?? -1) < 0,
+                    col =>
+                      ((
+                        state.form_data.columns || state.form_data.all_columns
+                      )?.indexOf(col) ?? -1) < 0 &&
+                      (state.form_data.groupby?.indexOf(col) ?? -1) < 0,
                   );
-
-                if (missingKey) {
-                  return {
-                    danger: `Key order should only contain keys matching selected columns. ${missingKey} is not a selected column. It will be ignored.`,
-                  };
-                }
-
-                return {
-                  danger: '',
-                };
+                newState.externalValidationErrors = missingColumn
+                  ? [
+                      `Column order should only contain columns selected to be displayed. ${missingColumn} is not a selected column. It will be ignored.`,
+                    ]
+                  : [];
+                return newState;
               },
             },
           },

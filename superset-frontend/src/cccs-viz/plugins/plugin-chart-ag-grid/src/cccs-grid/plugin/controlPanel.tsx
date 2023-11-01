@@ -122,7 +122,7 @@ const allColumnsControl: typeof sharedControls.groupby = {
   }),
   visibility: isRawMode,
   resetOnHide: false,
-  rerender: ['default_group_by', 'principalColumns'],
+  rerender: ['default_group_by', 'principalColumns', 'column_for_value'],
 };
 
 const percentMetricsControl: typeof sharedControls.metrics = {
@@ -208,6 +208,7 @@ const config: ControlPanelConfig = {
                 'percent_metrics',
                 'default_group_by',
                 'principalColumns',
+                'column_for_value',
               ],
               canCopy: true,
               canSelectAll: true,
@@ -377,244 +378,6 @@ const config: ControlPanelConfig = {
         ],
       ],
     },
-    {
-      label: t('Action Button'),
-      expanded: false,
-      controlSetRows: [
-        [
-          {
-            name: 'enable_action_button',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Enable Action Button'),
-              renderTrigger: true,
-              default: false,
-              description: t('Whether to enable the action button'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'enable_multi_results',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Enable Multiple Results'),
-              renderTrigger: true,
-              default: false,
-              description: t(
-                "Whether to allow multiple entries in the action button's link",
-              ),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'action_url',
-            config: {
-              type: 'TextControl',
-              label: t('URL'),
-              renderTrigger: true,
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const originalMapStateToProps =
-                  sharedControls?.groupby?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-
-                if (state.controls?.enable_action_button?.value) {
-                  newState.externalValidationErrors = controlState.value
-                    ? []
-                    : ['Please add a value for URL.'];
-                } else {
-                  newState.externalValidationErrors = [];
-                }
-
-                return newState;
-              },
-              default: '',
-              description: t('The Base URL for the action button.'),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'action_button_label',
-            config: {
-              type: 'TextControl',
-              label: t('Action Button Label'),
-              renderTrigger: true,
-              default: 'Action Button',
-              description: t('The label to add to the action button.'),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'parameter_name',
-            config: {
-              type: 'TextControl',
-              label: t('Parameter Name'),
-              renderTrigger: true,
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const originalMapStateToProps =
-                  sharedControls?.groupby?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-
-                if (state.controls?.enable_action_button?.value) {
-                  newState.externalValidationErrors = controlState.value
-                    ? []
-                    : ['Please add a value for Parameter Name.'];
-                } else {
-                  newState.externalValidationErrors = [];
-                }
-
-                return newState;
-              },
-              default: '',
-              description: t('The name for the URL parameter.'),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'column_for_value',
-            config: {
-              type: 'SelectControl',
-              label: t('Column To Use'),
-              description: t(
-                'Select a column used as input for the action button',
-              ),
-              default: [],
-              renderTrigger: true,
-              optionRenderer: (c: ColumnMeta) => (
-                <StyledColumnOption showType column={c} />
-              ),
-              valueRenderer: (c: ColumnMeta) => (
-                <StyledColumnOption column={c} />
-              ),
-              valueKey: 'column_name',
-              mapStateToProps: (state, controlState) => {
-                const { controls } = state;
-                const originalMapStateToProps = isRawMode({ controls })
-                  ? sharedControls?.columns?.mapStateToProps
-                  : sharedControls?.groupby?.mapStateToProps;
-
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-
-                const choices = isRawMode({ controls })
-                  ? controls?.columns?.value
-                  : controls?.groupby?.value;
-
-                newState.options = newState.options.filter(
-                  (o: { column_name: string }) =>
-                    ensureIsArray(choices).includes(o.column_name),
-                );
-
-                if (state.controls?.enable_action_button?.value) {
-                  const invalidOptions = ensureIsArray(
-                    controlState.value,
-                  ).filter(c => !ensureIsArray(choices).includes(c));
-
-                  newState.externalValidationErrors =
-                    invalidOptions.length > 0
-                      ? invalidOptions.length > 1
-                        ? [
-                            `'${invalidOptions.join(', ')}'${t(
-                              ' are not valid options',
-                            )}`,
-                          ]
-                        : [`'${invalidOptions}'${t(' is not a valid option')}`]
-                      : [];
-                } else {
-                  newState.externalValidationErrors = [];
-                }
-
-                return newState;
-              },
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'parameter_prefix',
-            config: {
-              type: 'TextControl',
-              label: t('Parameter Prefix'),
-              default: '',
-              description: t(
-                'A value that will be prefix the parameter value.',
-              ),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'action_find_replace',
-            config: {
-              type: 'TextControl',
-              label: t('Column Value Modifier'),
-              default: '',
-              description: t(
-                'Allows you to specify a simple find-and-replace regex in SED format ' +
-                  '(i.e., /word1/word2/ replaces "word1" with "word2"). The first section must be a ' +
-                  'valid JS regex, and the second can use capture groups using $1, $2, etc.',
-              ),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'action_join_character',
-            config: {
-              type: 'TextControl',
-              label: t('Join Values String'),
-              default: ',',
-              description: t(
-                'If you allow multiple values in the action button url, this string will be used to join the values.',
-              ),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_multi_results?.value),
-            },
-          },
-        ],
-        [
-          {
-            name: 'parameter_suffix',
-            config: {
-              type: 'TextControl',
-              label: t('Parameter Suffix'),
-              default: '',
-              description: t(
-                'A value that will be suffix the parameter value.',
-              ),
-              visibility: ({ controls }) =>
-                Boolean(controls?.enable_action_button?.value),
-            },
-          },
-        ],
-      ],
-    },
   ],
 };
 
@@ -770,4 +533,239 @@ config.controlPanelSections.push({
   ],
 });
 
+config.controlPanelSections.push({
+  label: t('Action Button'),
+  expanded: false,
+  tabOverride: 'customize',
+  controlSetRows: [
+    [
+      {
+        name: 'enable_action_button',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Enable Action Button'),
+          renderTrigger: true,
+          default: false,
+          description: t('Whether to enable the action button'),
+        },
+      },
+    ],
+    [
+      {
+        name: 'enable_multi_results',
+        config: {
+          type: 'CheckboxControl',
+          label: t('Enable Multiple Results'),
+          renderTrigger: true,
+          default: false,
+          description: t(
+            "Whether to allow multiple entries in the action button's link",
+          ),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'action_url',
+        config: {
+          type: 'TextControl',
+          label: t('URL'),
+          renderTrigger: true,
+          mapStateToProps: (
+            state: ControlPanelState,
+            controlState: ControlState,
+          ) => {
+            const originalMapStateToProps =
+              sharedControls?.groupby?.mapStateToProps;
+            const newState =
+              originalMapStateToProps?.(state, controlState) ?? {};
+
+            if (state.controls?.enable_action_button?.value) {
+              newState.externalValidationErrors = controlState.value
+                ? []
+                : ['Please add a value for URL.'];
+            } else {
+              newState.externalValidationErrors = [];
+            }
+
+            return newState;
+          },
+          default: '',
+          description: t('The Base URL for the action button.'),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'action_button_label',
+        config: {
+          type: 'TextControl',
+          label: t('Action Button Label'),
+          renderTrigger: true,
+          default: 'Action Button',
+          description: t('The label to add to the action button.'),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'parameter_name',
+        config: {
+          type: 'TextControl',
+          label: t('Parameter Name'),
+          renderTrigger: true,
+          mapStateToProps: (
+            state: ControlPanelState,
+            controlState: ControlState,
+          ) => {
+            const originalMapStateToProps =
+              sharedControls?.groupby?.mapStateToProps;
+            const newState =
+              originalMapStateToProps?.(state, controlState) ?? {};
+
+            if (state.controls?.enable_action_button?.value) {
+              newState.externalValidationErrors = controlState.value
+                ? []
+                : ['Please add a value for Parameter Name.'];
+            } else {
+              newState.externalValidationErrors = [];
+            }
+
+            return newState;
+          },
+          default: '',
+          description: t('The name for the URL parameter.'),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'column_for_value',
+        config: {
+          type: 'SelectControl',
+          label: t('Column To Use'),
+          description: t('Select a column used as input for the action button'),
+          default: [],
+          renderTrigger: true,
+          optionRenderer: (c: ColumnMeta) => (
+            <StyledColumnOption showType column={c} />
+          ),
+          valueRenderer: (c: ColumnMeta) => <StyledColumnOption column={c} />,
+          valueKey: 'column_name',
+          mapStateToProps: (state, controlState) => {
+            const { controls } = state;
+            const originalMapStateToProps = isRawMode({ controls })
+              ? sharedControls?.columns?.mapStateToProps
+              : sharedControls?.groupby?.mapStateToProps;
+
+            const newState =
+              originalMapStateToProps?.(state, controlState) ?? {};
+
+            const choices = isRawMode({ controls })
+              ? controls?.columns?.value
+              : controls?.groupby?.value;
+
+            newState.options = newState.options.filter(
+              (o: { column_name: string }) =>
+                ensureIsArray(choices).includes(o.column_name),
+            );
+
+            if (state.controls?.enable_action_button?.value) {
+              const invalidOptions = ensureIsArray(controlState.value).filter(
+                c => !ensureIsArray(choices).includes(c),
+              );
+
+              newState.externalValidationErrors =
+                invalidOptions.length > 0
+                  ? invalidOptions.length > 1
+                    ? [
+                        `'${invalidOptions.join(', ')}'${t(
+                          ' are not valid options',
+                        )}`,
+                      ]
+                    : [`'${invalidOptions}'${t(' is not a valid option')}`]
+                  : [];
+            } else {
+              newState.externalValidationErrors = [];
+            }
+
+            return newState;
+          },
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'parameter_prefix',
+        config: {
+          renderTrigger: true,
+          type: 'TextControl',
+          label: t('Parameter Prefix'),
+          default: '',
+          description: t('A value that will be prefix the parameter value.'),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'action_find_replace',
+        config: {
+          type: 'TextControl',
+          renderTrigger: true,
+          label: t('Column Value Modifier'),
+          default: '',
+          description: t(
+            'Allows you to specify a simple find-and-replace regex in SED format ' +
+              '(i.e., /word1/word2/ replaces "word1" with "word2"). The first section must be a ' +
+              'valid JS regex, and the second can use capture groups using $1, $2, etc.',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'action_join_character',
+        config: {
+          renderTrigger: true,
+          type: 'TextControl',
+          label: t('Value Separator'),
+          default: ',',
+          description: t(
+            'If you allow multiple values in the action button url, this string will be used as the seperator for those values. Defaults to ","',
+          ),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_multi_results?.value),
+        },
+      },
+    ],
+    [
+      {
+        name: 'parameter_suffix',
+        config: {
+          renderTrigger: true,
+          type: 'TextControl',
+          label: t('Parameter Suffix'),
+          default: '',
+          description: t('A value that will be suffix the parameter value.'),
+          visibility: ({ controls }) =>
+            Boolean(controls?.enable_action_button?.value),
+        },
+      },
+    ],
+  ],
+});
 export default config;
