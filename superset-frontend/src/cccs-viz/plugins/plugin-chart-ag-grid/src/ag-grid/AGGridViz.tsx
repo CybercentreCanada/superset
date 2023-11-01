@@ -16,8 +16,8 @@ import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { LicenseManager } from '@ag-grid-enterprise/core';
-import { CloseOutlined } from '@ant-design/icons';
-import { css, ensureIsArray } from '@superset-ui/core';
+import { CloseOutlined, FilterOutlined } from '@ant-design/icons';
+import { Filter, css, ensureIsArray, isNativeFilter } from '@superset-ui/core';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
@@ -51,6 +51,7 @@ import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
+import { setFocusedNativeFilter, setHoveredNativeFilter } from 'src/dashboard/actions/nativeFilters';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -350,6 +351,16 @@ export default function AGGridViz({
     handleContextMenu();
   };
 
+  const adhocFiltersInScope = useSelector<RootState, Filter[]>(
+    state =>
+      Object.values(state.nativeFilters.filters).filter(
+        f =>
+          isNativeFilter(f) &&
+          f.filterType === 'filter_adhoc' &&
+          f.chartsInScope?.includes(formData.sliceId),
+      ) as Filter[],
+  );
+
   useEffect(() => {
     let menuItems = [
       <CopyMenuItem onClick={copyText} />,
@@ -358,7 +369,29 @@ export default function AGGridViz({
     if (emitCrossFilters) {
       menuItems = [
         ...menuItems,
-        <Menu.Divider key="cross-filter-divider" />,
+        <Menu.Divider key="filter-on-select-divider" />,
+        <EmitFilterMenuItem
+          onClick={() => {
+            onClick(selectedData.highlightedData, true);
+          }}
+          onSelection={handleContextMenu}
+          label="Filter on Selection"
+          disabled={!adhocFiltersInScope.length}
+          key="filter-on-selection"
+          icon={
+            <FilterOutlined
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
+          tooltip={
+            !adhocFiltersInScope.length
+              ? 'No adhoc filter exists with this chart in scope'
+              : `Will apply selection to adhoc filters: ${adhocFiltersInScope
+                  .map(f => f.name)
+                  .join(', ')}`
+          }
+        />,
+        <Menu.Divider key="cross-filter-divider-start" />,
         <EmitFilterMenuItem
           onClick={() => {
             onClick(selectedData.highlightedData);
@@ -367,20 +400,6 @@ export default function AGGridViz({
           label="Emit Filter(s)"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
           key={contextDivID.toString()}
-          icon={
-            <EmitIcon
-              disabled={!Object.keys(selectedData.highlightedData).length}
-            />
-          }
-        />,
-        <EmitFilterMenuItem
-          onClick={() => {
-            onClick(selectedData.highlightedData, true);
-          }}
-          onSelection={handleContextMenu}
-          label="Filter on Selection"
-          disabled={!Object.keys(selectedData.highlightedData).length}
-          key="filter-on-selection"
           icon={
             <EmitIcon
               disabled={!Object.keys(selectedData.highlightedData).length}
@@ -407,6 +426,7 @@ export default function AGGridViz({
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
+        <Menu.Divider key="cross-filter-divider-end" />,
       ];
     }
     if (
