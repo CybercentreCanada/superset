@@ -51,7 +51,6 @@ import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
-import { setFocusedNativeFilter, setHoveredNativeFilter } from 'src/dashboard/actions/nativeFilters';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
