@@ -573,6 +573,7 @@ export default function AGGridViz({
             )}
             {formData.enableActionButton && (
               <Button
+                data-test="special-action-button"
                 buttonStyle="secondary"
                 href={actionButtonLink}
                 target="_blank"
