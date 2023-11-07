@@ -41,47 +41,59 @@ const useEmitGlobalFilter = () => {
         .filter(f => f.chartsInScope?.includes(sliceId))
         .map(f => dataMasks[f.id])
         .forEach(filter => {
-          const newFilters = groupBy.map(([col, _val]) => {
-            const rawValue =
-              Array.isArray(_val) && _val.length < 2
-                ? // If the value is an array of a single entry, strip it to just the underlying value.
-                  _val[0]
-                : // Otherwise, preserve (note this applies to non-array values too)
-                  _val;
+          const newFilters = groupBy
+            .map(([col, _val]) => {
+              const rawValue =
+                Array.isArray(_val) && _val.length < 2
+                  ? // If the value is an array of a single entry, strip it to just the underlying value.
+                    _val[0]
+                  : // Otherwise, preserve (note this applies to non-array values too)
+                    _val;
 
-            // Since some values are nested JSON (i.e. the string "['test', 'test2']"), we need to try and parse this out.
-            const processedValue = Array.isArray(rawValue)
-              ? // If it's an array, we flatMap and try to parse every entry
-                rawValue.flatMap(entry =>
-                  ensureIsArray(safeJsonObjectParse(entry) ?? entry),
-                )
-              : // If it's not an array, we just parse the single raw value
-                safeJsonObjectParse(rawValue) ?? rawValue;
+              // Since some values are nested JSON (i.e. the string "['test', 'test2']"), we need to try and parse this out.
+              const processedValue = Array.isArray(rawValue)
+                ? // If it's an array, we flatMap and try to parse every entry
+                  rawValue.flatMap(entry =>
+                    ensureIsArray(safeJsonObjectParse(entry) ?? entry),
+                  )
+                : // If it's not an array, we just parse the single raw value
+                  safeJsonObjectParse(rawValue) ?? rawValue;
 
-            const op = Array.isArray(processedValue)
-              ? Operators.IN
-              : Operators.EQUALS;
+              const op = Array.isArray(processedValue)
+                ? Operators.IN
+                : Operators.EQUALS;
 
-            // I reverse-engineered this from the redux store. There's probably a better way to do this,
-            // but this is what works for now.
-            return {
-              expressionType: EXPRESSION_TYPES.SIMPLE,
-              subject: col,
-              operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
-              operatorId: op,
-              comparator: processedValue,
-              clause: CLAUSES.WHERE,
-              sqlExpression: null,
-              isExtra: false,
-              isNew: true,
-              datasourceWarning: false,
-              filterOptionName: `filter_${Math.random()
-                .toString(36)
-                .substring(2, 15)}_${Math.random()
-                .toString(36)
-                .substring(2, 15)}`,
-            };
-          });
+              // I reverse-engineered this from the redux store. There's probably a better way to do this,
+              // but this is what works for now.
+              return {
+                expressionType: EXPRESSION_TYPES.SIMPLE,
+                subject: col,
+                operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
+                operatorId: op,
+                comparator: processedValue,
+                clause: CLAUSES.WHERE,
+                sqlExpression: null,
+                isExtra: false,
+                isNew: true,
+                datasourceWarning: false,
+                filterOptionName: `filter_${Math.random()
+                  .toString(36)
+                  .substring(2, 15)}_${Math.random()
+                  .toString(36)
+                  .substring(2, 15)}`,
+              };
+            })
+            .filter(f => {
+              const adhoc_filters = filter.extraFormData
+                ?.adhoc_filters as any[];
+              return !adhoc_filters.some(
+                a =>
+                  a.subject === f.subject &&
+                  a.operator === f.operator &&
+                  a.comparator === f.comparator &&
+                  a.operatorId === f.operatorId,
+              );
+            });
 
           const newFilterList = [
             ...((filter.extraFormData?.adhoc_filters as any[]) ?? []),

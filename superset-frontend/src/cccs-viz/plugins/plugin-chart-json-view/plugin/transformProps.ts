@@ -50,12 +50,9 @@ export default function transformProps(chartProps: ChartProps) {
    * be seen until restarting the development server.
    */
 
-  const { queriesData, height, width, formData } = chartProps;
+  const { queriesData, height, width, formData, datasource } = chartProps;
 
   const data = queriesData.flatMap(q => q.data) as TimeseriesDataRecord[];
-  const columnOrder = (
-    formData.columnOrder?.split(',') ?? []
-  ).reverse() as string[];
 
   let errorMessage = '';
 
@@ -68,11 +65,6 @@ export default function transformProps(chartProps: ChartProps) {
         const newRow: any = {};
 
         Object.entries(row)
-          // oh boy
-          .sort(
-            (tuple1, tuple2) =>
-              columnOrder.indexOf(tuple2[0]) - columnOrder.indexOf(tuple1[0]),
-          )
           // We then iterate through each key in the row, attempting to parse each one as a JSON object.
           // This is to convert a string like "['test', 'one', 'two']" into an array.
           .forEach(([key, val]) => {
@@ -80,7 +72,12 @@ export default function transformProps(chartProps: ChartProps) {
               return;
             }
 
-            newRow[key] = safeJsonObjectParse(val) ?? val;
+            const display_key = formData.useColumnNames
+              ? key
+              : datasource.columns.find(c => c.column_name === key)
+                  ?.verbose_name || key;
+
+            newRow[display_key] = safeJsonObjectParse(val) ?? val;
           });
 
         return newRow;

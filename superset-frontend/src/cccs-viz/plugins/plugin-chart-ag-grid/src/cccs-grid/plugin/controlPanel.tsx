@@ -45,19 +45,6 @@ export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   200,
 ]);
 
-export const DEFAULT_CLICK_ACTIONS = [
-  { verbose_name: 'None', action_name: 'none' },
-  { verbose_name: 'Emit Filters', action_name: 'emit_filters' },
-  {
-    verbose_name: 'Emit Principal Filters',
-    action_name: 'emit_principal_filters',
-  },
-];
-
-const DEFAULT_CLICK_ACTIONS_OPTIONS = formatSelectOptions(
-  DEFAULT_CLICK_ACTIONS.map(o => o.verbose_name),
-);
-
 /**
  * Visibility check
  */
@@ -123,6 +110,15 @@ const allColumnsControl: typeof sharedControls.groupby = {
   visibility: isRawMode,
   resetOnHide: false,
   rerender: ['default_group_by', 'principalColumns', 'column_for_value'],
+};
+
+const enableActionButtonControl: ControlConfig<'CheckboxControl'> = {
+  type: 'CheckboxControl',
+  label: t('Enable Action Button'),
+  renderTrigger: true,
+  default: false,
+  description: t('Whether to enable the action button'),
+  rerender: ['column_for_value', 'parameter_name', 'action_url'],
 };
 
 const percentMetricsControl: typeof sharedControls.metrics = {
@@ -360,22 +356,6 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [
-          {
-            name: 'on_click_behaviour',
-            config: {
-              type: 'SelectControl',
-              freeForm: false,
-              renderTrigger: false,
-              label: t('Default click behaviour'),
-              default: 'None',
-              choices: DEFAULT_CLICK_ACTIONS_OPTIONS,
-              description: t(
-                'Select an action to occur by default when a cell/row is clicked. Actions are from the right-click context menu. Default is to do nothing.',
-              ),
-            },
-          },
-        ],
       ],
     },
   ],
@@ -541,13 +521,7 @@ config.controlPanelSections.push({
     [
       {
         name: 'enable_action_button',
-        config: {
-          type: 'CheckboxControl',
-          label: t('Enable Action Button'),
-          renderTrigger: true,
-          default: false,
-          description: t('Whether to enable the action button'),
-        },
+        config: enableActionButtonControl,
       },
     ],
     [
@@ -675,24 +649,31 @@ config.controlPanelSections.push({
 
             newState.options = newState.options.filter(
               (o: { column_name: string }) =>
-                ensureIsArray(choices).includes(o.column_name),
+                ensureIsArray(choices).includes(o.column_name) ||
+                ensureIsArray(controlState.value).includes(o.column_name),
             );
 
             if (state.controls?.enable_action_button?.value) {
-              const invalidOptions = ensureIsArray(controlState.value).filter(
-                c => !ensureIsArray(choices).includes(c),
+              const invalidOptions = ensureIsArray(newState.options).filter(
+                c => !ensureIsArray(choices).includes(c.column_name),
               );
-
               newState.externalValidationErrors =
                 invalidOptions.length > 0
                   ? invalidOptions.length > 1
                     ? [
-                        `'${invalidOptions.join(', ')}'${t(
-                          ' are not valid options',
-                        )}`,
+                        `'${invalidOptions
+                          .map(o => o.verbose_name ?? o.column_name)
+                          .join(', ')}'${t(' are not valid options')}`,
                       ]
-                    : [`'${invalidOptions}'${t(' is not a valid option')}`]
-                  : [];
+                    : [
+                        `'${
+                          invalidOptions[0].verbose_name ??
+                          invalidOptions[0].column_name
+                        }'${t(' is not a valid option')}`,
+                      ]
+                  : ensureIsArray(controlState.value).length
+                  ? []
+                  : [t('Please select a valid column')];
             } else {
               newState.externalValidationErrors = [];
             }

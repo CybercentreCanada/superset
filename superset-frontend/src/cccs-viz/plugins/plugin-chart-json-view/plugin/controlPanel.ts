@@ -129,7 +129,6 @@ const config: ControlPanelConfig = {
                     : ['Please add at least one column to render.'];
                 return newState;
               },
-              rerender: ['column_order'],
             },
           },
         ],
@@ -179,38 +178,15 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'column_order',
+            name: 'use_column_names',
             config: {
-              type: 'TextControl',
-              label: t('Column Order'),
+              type: 'CheckboxControl',
+              label: t('Use column names'),
               renderTrigger: true,
               description: t(
-                'A list of column names, separated by commas, setting the order of keys in the resulting JSON.',
+                'Force the JSON keys to display as the underlying column name. By default, the column label (verbose name) is used when one exists for a given column.',
               ),
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const originalMapStateToProps =
-                  sharedControls?.columns?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                const missingColumn = (controlState.value as string)
-                  ?.split(',')
-                  ?.find(
-                    col =>
-                      ((
-                        state.form_data.columns || state.form_data.all_columns
-                      )?.indexOf(col) ?? -1) < 0 &&
-                      (state.form_data.groupby?.indexOf(col) ?? -1) < 0,
-                  );
-                newState.externalValidationErrors = missingColumn
-                  ? [
-                      `Column order should only contain columns selected to be displayed. ${missingColumn} is not a selected column. It will be ignored.`,
-                    ]
-                  : [];
-                return newState;
-              },
+              default: false,
             },
           },
         ],

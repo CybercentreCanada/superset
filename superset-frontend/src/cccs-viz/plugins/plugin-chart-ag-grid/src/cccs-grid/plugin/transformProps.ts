@@ -180,7 +180,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     enableGrouping,
     enableJsonExpand,
     principalColumns,
-    onClickBehaviour,
     orderByCols,
     jumpActionConfigs,
   }: CccsTableFormData = {
@@ -276,7 +275,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     pageLength,
     enableGrouping,
     principalColumns,
-    onClickBehaviour,
     agGridLicenseKey,
     assemblyLineUrl,
     enableAlfred,

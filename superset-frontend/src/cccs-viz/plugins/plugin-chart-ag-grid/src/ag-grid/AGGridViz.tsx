@@ -41,10 +41,7 @@ import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
 import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 import RetainEmlMenuItem from './ContextMenu/MenuItems/RetainEmlMenuItem';
-import {
-  DEFAULT_CLICK_ACTIONS,
-  PAGE_SIZE_OPTIONS,
-} from '../cccs-grid/plugin/controlPanel';
+import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
 
 import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
@@ -87,7 +84,6 @@ export default function AGGridViz({
   enableGrouping,
   setDataMask,
   principalColumns,
-  onClickBehaviour,
   agGridLicenseKey,
   assemblyLineUrl,
   enableAlfred,
@@ -207,26 +203,6 @@ export default function AGGridViz({
     [emitGlobalFilter, formData.sliceId, setDataMask],
   ); // only take relevant page size options
 
-  const handleOnClickBehavior = useCallback(
-    (highlightedData: DataMap, principalData: DataMap) => {
-      // handle default click behaviour
-      if (onClickBehaviour !== 'None' && emitCrossFilters) {
-        // get action
-        const action = DEFAULT_CLICK_ACTIONS.find(
-          a => a.verbose_name === onClickBehaviour,
-        )?.action_name;
-
-        // handle action
-        if (action === 'emit_filters') {
-          emitFilter(highlightedData);
-        } else if (action === 'emit_principal_filters') {
-          emitFilter(principalData);
-        }
-      }
-    },
-    [emitCrossFilters, emitFilter, onClickBehaviour],
-  );
-
   const unnestValue = (value: string): string[] => {
     let parsed;
     try {
@@ -321,16 +297,7 @@ export default function AGGridViz({
       advancedTypeData,
       jumpToData,
     });
-
-    if (!_.isEmpty(newSelectedData)) {
-      handleOnClickBehavior(newSelectedData, newPrincipalData);
-    }
-  }, [
-    formData.columnForValue,
-    formData.enableActionButton,
-    handleOnClickBehavior,
-    principalColumns,
-  ]);
+  }, [formData.columnForValue, formData.enableActionButton, principalColumns]);
 
   const onClick = useCallback(
     (data: DataMap, globally = false) => {
@@ -385,9 +352,11 @@ export default function AGGridViz({
           tooltip={
             !adhocFiltersInScope.length
               ? 'No adhoc filter exists with this chart in scope'
-              : `Will apply selection to adhoc filters: ${adhocFiltersInScope
+              : adhocFiltersInScope.length > 1
+              ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
                   .join(', ')}`
+              : `Will apply selection to adhoc filter: ${adhocFiltersInScope[0].name}`
           }
         />,
         <Menu.Divider key="cross-filter-divider-start" />,
@@ -437,7 +406,7 @@ export default function AGGridViz({
         ...menuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
-          label="Retain EML record to Alfred"
+          label="Retain EML record to ALFRED"
           key="retain-eml"
           data={selectedData.advancedTypeData.harmonized_email_id}
         />,
@@ -452,7 +421,7 @@ export default function AGGridViz({
         ...menuItems,
         <OpenInAssemblyLineMenuItem
           onSelection={handleContextMenu}
-          label="Open in AssemblyLine"
+          label="Open in ASSEMBLYLINE"
           key="open-file-in-assembly-line"
           data={selectedData.advancedTypeData.file_sha256}
           base_url={assemblyLineUrl}
@@ -489,6 +458,7 @@ export default function AGGridViz({
     selectedData.highlightedData,
     selectedData.jumpToData,
     selectedData.principalData,
+    adhocFiltersInScope.length,
   ]);
 
   const handleOnContextMenu = (

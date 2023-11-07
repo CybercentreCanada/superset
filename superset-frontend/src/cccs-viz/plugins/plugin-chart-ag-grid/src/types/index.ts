@@ -14,7 +14,6 @@ export type CccsTableFormData = QueryFormData & {
   emitCrossFilters: boolean;
   principalColumns: string[];
   percent_metrics: string[];
-  onClickBehaviour: string;
   enableActionButton: boolean;
   enableMultiResults: boolean;
   actionUrl: string;
@@ -44,7 +43,6 @@ export type AGGridVizProps = {
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   principalColumns: string[];
-  onClickBehaviour: string;
   agGridLicenseKey: string;
   assemblyLineUrl: string;
   enableAlfred: boolean;
