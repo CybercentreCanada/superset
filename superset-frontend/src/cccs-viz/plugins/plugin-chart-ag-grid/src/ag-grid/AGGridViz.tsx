@@ -2,7 +2,6 @@ import React, {
   ChangeEvent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -31,7 +30,6 @@ import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
-import Button from 'src/components/Button';
 import { Menu } from 'src/components/Menu';
 import ChartContextMenu, {
   Ref as ContextRef,
