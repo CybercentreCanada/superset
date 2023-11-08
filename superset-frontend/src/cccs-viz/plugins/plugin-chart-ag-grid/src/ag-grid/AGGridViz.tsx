@@ -105,7 +105,6 @@ export default function AGGridViz({
     highlightedData: {},
     principalData: {},
     advancedTypeData: {},
-    actionButtonData: [],
     jumpToData: {},
   });
   const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
@@ -115,40 +114,6 @@ export default function AGGridViz({
   const [contextDivID] = useState(Math.random());
 
   const gridRef = useRef<AgGridReactType>(null);
-
-  const actionButtonLink = useMemo(() => {
-    let values = selectedData.actionButtonData;
-    if (!formData.enableMultiResults) {
-      values = [values[0]];
-    }
-
-    if (formData.actionFindReplace) {
-      const [regex, ...replaceStr] = formData.actionFindReplace
-        .replace(/^\/(.+)\/$/, '$1')
-        .split('/');
-
-      values = values.map(v =>
-        v.replace(new RegExp(regex, 'ig'), replaceStr.join('/')),
-      );
-    }
-
-    return `${formData.actionUrl}?${encodeURIComponent(
-      formData.parameterName,
-    )}=${encodeURIComponent(
-      formData.parameterPrefix +
-        values.join(formData.actionJoinCharacter) +
-        formData.parameterSuffix,
-    )}`;
-  }, [
-    selectedData.actionButtonData,
-    formData.enableMultiResults,
-    formData.actionFindReplace,
-    formData.actionUrl,
-    formData.parameterName,
-    formData.parameterPrefix,
-    formData.actionJoinCharacter,
-    formData.parameterSuffix,
-  ]);
 
   const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
@@ -222,7 +187,6 @@ export default function AGGridViz({
 
     const newSelectedData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
-    const newActionButtonData: any[] = [];
     const advancedTypeData: { [key: string]: string[] } = {};
     const jumpToData: { [key: string]: string[] } = {};
 
@@ -281,23 +245,16 @@ export default function AGGridViz({
               }
             });
           });
-          if (formData.enableActionButton) {
-            const value = api.getValue(formData.columnForValue, rowNode);
-            if (value && !newActionButtonData.includes(value.toString())) {
-              newActionButtonData.push(value.toString());
-            }
-          }
         });
       });
     }
     setSelectedData({
       highlightedData: newSelectedData,
       principalData: newPrincipalData,
-      actionButtonData: newActionButtonData,
       advancedTypeData,
       jumpToData,
     });
-  }, [formData.columnForValue, formData.enableActionButton, principalColumns]);
+  }, [principalColumns]);
 
   const onClick = useCallback(
     (data: DataMap, globally = false) => {
@@ -559,18 +516,6 @@ export default function AGGridViz({
                 </select>{' '}
                 entries
               </span>
-            )}
-            {formData.enableActionButton && (
-              <Button
-                data-test="special-action-button"
-                buttonStyle="secondary"
-                href={actionButtonLink}
-                target="_blank"
-                referrerPolicy="noreferrer"
-                disabled={!selectedData.actionButtonData.length}
-              >
-                {formData.actionButtonLabel}
-              </Button>
             )}
             <div style={{ flex: 1 }} />
             {includeSearch && (

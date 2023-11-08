@@ -14,16 +14,6 @@ export type CccsTableFormData = QueryFormData & {
   emitCrossFilters: boolean;
   principalColumns: string[];
   percent_metrics: string[];
-  enableActionButton: boolean;
-  enableMultiResults: boolean;
-  actionUrl: string;
-  parameterName: string;
-  columnForValue: string;
-  parameterPrefix: string;
-  actionJoinCharacter: string;
-  parameterSuffix: string;
-  actionFindReplace: string;
-  actionButtonLabel: string;
   jumpActionConfigs?: any[];
 };
 
@@ -64,6 +54,5 @@ export type GridData = {
   highlightedData: DataMap;
   principalData: DataMap;
   advancedTypeData: DataMap;
-  actionButtonData: any[];
   jumpToData: DataMap;
 };
