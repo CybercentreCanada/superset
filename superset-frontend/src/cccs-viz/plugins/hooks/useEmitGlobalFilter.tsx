@@ -84,8 +84,8 @@ const useEmitGlobalFilter = () => {
               };
             })
             .filter(f => {
-              const adhoc_filters = filter.extraFormData
-                ?.adhoc_filters as any[];
+              const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
+                []) as any[];
               return !adhoc_filters.some(
                 a =>
                   a.subject === f.subject &&

@@ -341,7 +341,7 @@ export default function AGGridViz({
             onClick(selectedData.highlightedData, true);
           }}
           onSelection={handleContextMenu}
-          label="Filter on Selection"
+          label="Filter On Selection"
           disabled={!adhocFiltersInScope.length}
           key="filter-on-selection"
           icon={
