@@ -86,13 +86,16 @@ const useEmitGlobalFilter = () => {
             .filter(f => {
               const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
                 []) as any[];
-              return !adhoc_filters.some(
-                a =>
-                  a.subject === f.subject &&
-                  a.operator === f.operator &&
-                  a.comparator === f.comparator &&
-                  a.operatorId === f.operatorId,
-              );
+              const res =
+                f.subject !== 'undefined' &&
+                !adhoc_filters.some(
+                  a =>
+                    a.subject === f.subject &&
+                    a.operator === f.operator &&
+                    a.comparator === f.comparator &&
+                    a.operatorId === f.operatorId,
+                );
+              return res;
             });
 
           const newFilterList = [
