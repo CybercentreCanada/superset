@@ -349,16 +349,17 @@ export default function AGGridViz({
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
-        <Menu.Divider key="cross-filter-divider-end" />,
       ];
     }
+    // special menu items
+    let specialMenuItems: JSX.Element[] = [];
     if (
       enableAlfred &&
       selectedData.advancedTypeData.harmonized_email_id &&
       selectedData.advancedTypeData.harmonized_email_id.length > 0
     ) {
-      menuItems = [
-        ...menuItems,
+      specialMenuItems = [
+        ...specialMenuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
           label="Retain EML record to ALFRED"
@@ -372,8 +373,8 @@ export default function AGGridViz({
       selectedData.advancedTypeData.file_sha256 &&
       selectedData.advancedTypeData.file_sha256.length > 0
     ) {
-      menuItems = [
-        ...menuItems,
+      specialMenuItems = [
+        ...specialMenuItems,
         <OpenInAssemblyLineMenuItem
           onSelection={handleContextMenu}
           label="Open in ASSEMBLYLINE"
@@ -388,8 +389,8 @@ export default function AGGridViz({
         jumpActionConfigs.filter(j =>
           Object.keys(selectedData.jumpToData).includes(j.advancedDataType),
         ).length <= 0;
-      menuItems = [
-        ...menuItems,
+      specialMenuItems = [
+        ...specialMenuItems,
         getJumpToDashboardContextMenuItems(
           jumpActionConfigs,
           selectedData.jumpToData,
@@ -397,12 +398,18 @@ export default function AGGridViz({
         ),
       ];
     }
+    if (specialMenuItems.length) {
+      menuItems = [
+        ...menuItems,
+        <Menu.Divider key="special-items-divider" />,
+        ...specialMenuItems,
+      ];
+    }
     menuItems = [
       ...menuItems,
       <Menu.Divider key="export-divider" />,
       <ExportMenu key="export-csv" api={gridRef.current!.api} />,
     ];
-
     setMenuItems(menuItems);
   }, [
     contextDivID,
