@@ -2,12 +2,11 @@ import React from 'react';
 
 const EmitIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({
   disabled = false,
-  disablePadding = false,
 }) => (
-  <div style={{ paddingRight: 8 * +!disablePadding, display: 'inline' }}>
+  <span role="img" className="anticon">
     <svg
-      width="16"
-      height="16"
+      width="12"
+      height="12"
       viewBox="0 0 24 24"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
@@ -21,7 +20,7 @@ const EmitIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({
         fill={disabled ? '#97b9c2' : '#20A7C9'}
       />
     </svg>
-  </div>
+  </span>
 );
 
 export default EmitIcon;
