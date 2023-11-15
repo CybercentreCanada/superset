@@ -362,7 +362,7 @@ export default function AGGridViz({
         ...specialMenuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
-          label="Retain EML record to ALFRED"
+          label="Retain EML Record To ALFRED"
           key="retain-eml"
           data={selectedData.advancedTypeData.harmonized_email_id}
         />,
