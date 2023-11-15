@@ -103,10 +103,6 @@ const useEmitGlobalFilter = () => {
             ...newFilters,
           ];
 
-          if (newFilterList.length === 0) {
-            return;
-          }
-
           const newLabel = newFilterList
             .map(
               f =>
