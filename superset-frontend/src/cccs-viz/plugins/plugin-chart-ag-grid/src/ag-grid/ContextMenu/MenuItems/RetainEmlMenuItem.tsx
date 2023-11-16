@@ -25,7 +25,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
     const endpoint = `/api/v1/fission/retain-eml-record?cbs_email_ids=${props.data}`;
     dispatch(
       addInfoToast(
-        'Retention started. A new tab will open upon successful retention',
+        'Retention started. A new tab will open upon successful retention.',
       ),
     );
     SupersetClient.get({ endpoint })
@@ -35,7 +35,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
       .catch(error => {
         dispatch(
           addDangerToast(
-            'Retention Failed. The records you attempted to retain we not retained.',
+            'Retention Failed. The records you attempted to retain were not retained.',
           ),
         );
       });
