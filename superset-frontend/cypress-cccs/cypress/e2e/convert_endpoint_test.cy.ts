@@ -157,8 +157,10 @@ describe('Test /convert endpoi5nt', () => {
       testInvalidValuesForEqualsOperator('aws_arn', AWS_ARN_VALID_OPERATORS, values)
     })
     it('Test aws_arn with valid values', () => {
-      // TODO Fix the end point to allow the following in comments
-      let values: Array<any> = ['arn:aws:iam::123456789012:user/johndoe'/*, 'arn:aws:sns:us-east-1:123456789012:example-sns-topic-name', 'arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE'*/]
+      let values: Array<any> = [
+        'arn:aws:iam::123456789012:user/johndoe', 
+        'arn:aws:sns:us-east-1:123456789012:example-sns-topic-name', 
+        'arn:aws:ec2:us-east-1:123456789012:vpc/vpc-0e9801d129EXAMPLE']
       testValidValuesForEqualsOperator('aws_arn', AWS_ARN_VALID_OPERATORS, values)
     })
   }
@@ -216,14 +218,13 @@ describe('Test /convert endpoi5nt', () => {
   {
     const IPV4_VALID_OPERATORS = ['EQUALS','GREATER_THAN_OR_EQUAL','GREATER_THAN','IN','LESS_THAN','LESS_THAN_OR_EQUAL']
   it('Test ipv4 with invalid values', () => {
-      let values: Array<any> = ['SomeGarbage', '1.1.1', '1.1.1.1/33', '1.1.1.256', -10000, 10000000000]
+      let values: Array<any> = ['SomeGarbage', '1.1.1', '1.1.1.1/33', '1.1.1.256', '/32', -10000, 10000000000]
       testInvalidValuesForEqualsOperator('ipv4', IPV4_VALID_OPERATORS, values)
     })
     it('Test ipv4 with valid values', () => {
-      let values: Array<any> = ['1.1.1.1', '1.1.1.1/32', '255.255.255.255', '1.1.1.1/0']
-      let expectedValues: Array<any> = [16843009, 16843009, 4294967295, {"end": 4294967295, "start": 0}]
-      // TODO The following shouldn't be strings
-      let expectedDisplayValues: Array<any> = ['16843009', '16843009', '4294967295', '0 - 4294967295']
+      let values: Array<any> = ['1.1.1.1', '1.1.1.1/32', '255.255.255.255', '1.1.1.1/0'/*, This should be fine '000001.1.1.1'*/]
+      let expectedValues: Array<any> = [16843009, 16843009, 4294967295, {"end": 4294967295, "start": 0} /*, '16843009'*/]
+      let expectedDisplayValues: Array<any> = ['16843009', '16843009', '4294967295', '0 - 4294967295'/*, '16843009'*/]
       testValidValuesForEqualsOperator('ipv4', IPV4_VALID_OPERATORS, values, expectedValues, expectedDisplayValues)
     })
   }

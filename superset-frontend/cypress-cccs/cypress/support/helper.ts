@@ -50,7 +50,7 @@ export const baseFormData = {
 
 export const cccsExploreView = {
     agGrid: '.cccs_grid > :first-child > .ag-theme-balham',
-    agGridSearchBox: '.cccs_grid > :first-child > .form-inline > .row > :nth-child(2) > .float-right > .form-control', 
+    agGridSearchBox: '.cccs_grid > :first-child > .form-inline > :first-child > :nth-child(2) > .form-control', 
     errorArea: '.css-tl6px0',
     errorMessage: '.error-body',
     noResult: '.ant-empty',
