@@ -178,16 +178,6 @@ const config: ControlPanelConfig = {
                     ensureIsArray(controlState?.value).join(','),
                   );
 
-                newState.copyOnClick = () =>
-                  navigator.clipboard.writeText(
-                    ensureIsArray(controlState?.value).join(','),
-                  );
-
-                newState.copyOnClick = () =>
-                  navigator.clipboard.writeText(
-                    ensureIsArray(controlState?.value).join(','),
-                  );
-
                 return newState;
               },
               rerender: [

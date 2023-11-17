@@ -31,7 +31,10 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-import {rendererMap, formatIpV4} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes'
+import {
+  rendererMap,
+  formatIpv4,
+} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes';
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -152,7 +155,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       params.value != null &&
       params.colDef.cellRenderer === 'ipv4ValueRenderer'
     ) {
-      return formatIpV4(params.value.toString());
+      return formatIpv4(params.value.toString());
     }
     return params.value != null ? params.value.toString() : '';
   };

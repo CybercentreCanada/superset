@@ -11,7 +11,7 @@ export const rendererMap = {
   JSON: JsonValueRenderer,
 };
 
-export const formatIpV4 = (v: any) => {
+export const formatIpv4 = (v: any) => {
   const value = Number(v.value ?? v);
   const converted = `${(value >> 24) & 0xff}.${(value >> 16) & 0xff}.${
     (value >> 8) & 0xff
@@ -20,5 +20,5 @@ export const formatIpV4 = (v: any) => {
 };
 
 export const formatterMap = {
-  IPV4: formatIpV4,
+  IPV4: formatIpv4,
 };
