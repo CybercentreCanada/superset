@@ -5,7 +5,7 @@ import {
   isNativeFilter,
 } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearDataMask, setDataMaskForFilterConfigComplete, updateDataMask } from 'src/dataMask/actions';
+import { updateDataMask } from 'src/dataMask/actions';
 import {
   OPERATOR_ENUM_TO_OPERATOR_TYPE,
   Operators,
