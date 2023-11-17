@@ -113,6 +113,9 @@ const calcColumnColumnDefs = (
         ? formatterMap[advancedDataType.toUpperCase()]
         : undefined;
     const useValueFormatterForExport = !!valueFormatter;
+    const getQuickFilterText = valueFormatter
+      ? (params: any) => params.colDef.valueFormatter(params.value)
+      : undefined;
     const isSortable = true;
     const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
@@ -140,6 +143,7 @@ const calcColumnColumnDefs = (
       maxWidth,
       valueFormatter,
       useValueFormatterForExport,
+      getQuickFilterText,
       sort,
       sortIndex: sortIndex > -1 ? sortIndex : null,
       type: columnType,
