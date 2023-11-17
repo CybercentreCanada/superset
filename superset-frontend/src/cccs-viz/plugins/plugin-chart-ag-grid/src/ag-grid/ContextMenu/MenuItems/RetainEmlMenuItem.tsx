@@ -7,6 +7,7 @@ import {
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
 import AlfredIcon from 'src/cccs-viz/plugins/components/AlfredIcon';
+import { Tooltip } from 'antd';
 
 interface RetainEmlMenuItemProps {
   label: string;
@@ -16,6 +17,7 @@ interface RetainEmlMenuItemProps {
   disabled?: boolean;
   isContextMenu?: boolean;
   contextMenuY?: number;
+  tooltip?: string;
 }
 
 export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
@@ -23,19 +25,20 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
 
   const onClick = () => {
     const endpoint = `/api/v1/fission/retain-eml-record?cbs_email_ids=${props.data}`;
+    const timeout = 180;
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',
       ),
     );
-    SupersetClient.get({ endpoint })
+    SupersetClient.get({ endpoint, timeout })
       .then(({ json }) => {
         window.open(json.result, '_blank');
       })
       .catch(error => {
         dispatch(
           addDangerToast(
-            'Retention Failed. The records you attempted to retain were not retained.',
+            'Retention failed. The records you attempted to retain were not retained.',
           ),
         );
       });
@@ -53,9 +56,13 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<AlfredIcon />}
+      icon={<AlfredIcon disabled={props.disabled} />}
     >
-      {props.label}
+      {props.tooltip ? (
+        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
+      ) : (
+        props.label
+      )}
     </Menu.Item>
   );
 }

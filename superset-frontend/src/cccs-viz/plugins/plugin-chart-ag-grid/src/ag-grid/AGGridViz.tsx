@@ -365,6 +365,14 @@ export default function AGGridViz({
           label="Retain EML Record To ALFRED"
           key="retain-eml"
           data={selectedData.advancedTypeData.harmonized_email_id}
+          disabled={
+            selectedData.advancedTypeData.harmonized_email_id.length > 30
+          }
+          tooltip={
+            selectedData.advancedTypeData.harmonized_email_id.length > 30
+              ? 'Cannot retain more than 30 EML IDs.'
+              : undefined
+          }
         />,
       ];
     }
