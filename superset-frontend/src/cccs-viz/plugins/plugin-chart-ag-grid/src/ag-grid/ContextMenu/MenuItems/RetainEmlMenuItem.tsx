@@ -6,7 +6,7 @@ import {
   addInfoToast,
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
-import { RiseOutlined } from '@ant-design/icons';
+import AlfredIcon from 'src/cccs-viz/plugins/components/AlfredIcon';
 
 interface RetainEmlMenuItemProps {
   label: string;
@@ -53,7 +53,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<RiseOutlined />}
+      icon={<AlfredIcon />}
     >
       {props.label}
     </Menu.Item>
