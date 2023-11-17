@@ -114,7 +114,8 @@ const calcColumnColumnDefs = (
         : undefined;
     const useValueFormatterForExport = !!valueFormatter;
     const getQuickFilterText = valueFormatter
-      ? (params: any) => params.colDef.valueFormatter(params.value)
+      ? (params: any) =>
+          params.value ? params.colDef.valueFormatter(params.value) : undefined
       : undefined;
     const isSortable = true;
     const enableRowGroup = true;
