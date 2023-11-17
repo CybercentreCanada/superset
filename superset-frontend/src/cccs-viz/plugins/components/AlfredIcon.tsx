@@ -1,5 +1,5 @@
 import React from 'react';
-import alfredLogo from './alfred-logo-black-small.png'
+import alfredLogo from './alfred-logo-black-small.png';
 
 const AlfredIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> =
   () => (
