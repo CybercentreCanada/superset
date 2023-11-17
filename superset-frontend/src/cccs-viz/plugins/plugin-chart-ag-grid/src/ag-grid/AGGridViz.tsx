@@ -345,7 +345,7 @@ export default function AGGridViz({
         <EmitFilterMenuItem
           onSelection={handleContextMenu}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emited Filter(s)"
+          label="Clear Emitted Filter(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
