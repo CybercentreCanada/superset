@@ -25,7 +25,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
 
   const onClick = () => {
     const endpoint = `/api/v1/fission/retain-eml-record?cbs_email_ids=${props.data}`;
-    const timeout = 180;
+    const timeout = 180000; // 3 minutes
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',
