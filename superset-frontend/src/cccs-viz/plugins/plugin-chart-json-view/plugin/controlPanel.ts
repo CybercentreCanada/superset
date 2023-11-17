@@ -110,7 +110,7 @@ const config: ControlPanelConfig = {
             name: 'columns',
             override: {
               label: t('Columns'),
-              description: 'The columns to show in the json viewer.',
+              description: 'The columns to show in the JSON viewer.',
               multi: true,
               allowAll: true,
               default: [],
