@@ -1,7 +1,8 @@
-import CountryValueRenderer from './CountryValueRenderer';
-import DomainValueRenderer from './DomainValueRenderer';
-import Ipv6ValueRenderer from './Ipv6ValueRenderer';
-import JsonValueRenderer from './JsonValueRenderer';
+import CountryValueRenderer from "../renderers/CountryValueRenderer";
+import DomainValueRenderer from "../renderers/DomainValueRenderer";
+import Ipv6ValueRenderer from "../renderers/Ipv6ValueRenderer";
+import JsonValueRenderer from "../renderers/JsonValueRenderer";
+import TimestampValueRenderer from "../renderers/TimestampValueRenderer";
 
 // Key is column advanced type, value is renderer
 export const rendererMap = {
@@ -9,6 +10,10 @@ export const rendererMap = {
   DOMAIN: DomainValueRenderer,
   COUNTRY: CountryValueRenderer,
   JSON: JsonValueRenderer,
+  DATE: TimestampValueRenderer,
+  DATETIME: TimestampValueRenderer,
+  'TIMESTAMP WITHOUT TIME ZONE': TimestampValueRenderer,
+  'TIMESTAMP WITH TIME ZONE': TimestampValueRenderer,
 };
 
 export const formatIpv4 = (v: any) => {
@@ -16,7 +21,7 @@ export const formatIpv4 = (v: any) => {
   const converted = `${(value >> 24) & 0xff}.${(value >> 16) & 0xff}.${
     (value >> 8) & 0xff
   }.${value & 0xff}`;
-  return converted;
+  return value === null ? '' : converted;
 };
 
 export const formatterMap = {

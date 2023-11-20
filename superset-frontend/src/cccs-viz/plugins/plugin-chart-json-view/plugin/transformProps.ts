@@ -83,7 +83,7 @@ export default function transformProps(chartProps: ChartProps) {
         return newRow;
       });
 
-      if (Array.isArray(values) && values.length < 2 && values.length > 0) {
+      if (Array.isArray(values) && values.length === 1) {
         values = values[0];
       }
     }
