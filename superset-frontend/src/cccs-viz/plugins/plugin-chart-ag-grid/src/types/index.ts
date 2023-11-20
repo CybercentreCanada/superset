@@ -26,7 +26,7 @@ export type AGGridVizProps = {
   formData: CccsTableFormData;
   width: any;
   height: any;
-  rowData: any[];
+  rowData: { [index: string]: any }[];
   columnDefs: any[];
   includeSearch: boolean;
   pageLength: number;
@@ -34,11 +34,25 @@ export type AGGridVizProps = {
   enableGrouping: boolean;
   principalColumns: string[];
   agGridLicenseKey: string;
+  assemblyLineUrl: string;
+  enableAlfred: boolean;
   emitCrossFilters: boolean;
+  columnsToRetain: string[];
   setDataMask: SetDataMaskHook;
   jumpActionConfigs?: any[];
 };
 
 export interface AgGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
+  assemblyLineUrl: string;
+  enableAlfred: boolean;
 }
+
+export type DataMap = { [key: string]: string[] };
+
+export type GridData = {
+  highlightedData: DataMap;
+  principalData: DataMap;
+  advancedTypeData: DataMap;
+  jumpToData: DataMap;
+};

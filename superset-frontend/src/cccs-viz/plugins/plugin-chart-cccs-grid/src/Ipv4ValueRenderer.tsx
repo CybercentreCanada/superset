@@ -19,7 +19,7 @@ export default class Ipv4ValueRenderer extends Component<
     };
   }
 
-  formatIpV4(v: any) {
+  formatIpv4(v: any) {
     const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
       (v >> 8) & 0xff
     }.${v & 0xff}`;
@@ -29,7 +29,7 @@ export default class Ipv4ValueRenderer extends Component<
   render() {
     let ipString = this.state.cellValue;
     if (typeof this.state.cellValue === 'number') {
-      ipString = this.formatIpV4(this.state.cellValue);
+      ipString = this.formatIpv4(this.state.cellValue);
     }
 
     return ipString;

@@ -1,3 +1,9 @@
+import {
+  BinaryQueryObjectFilterClause,
+  FeatureFlag,
+  isFeatureEnabled,
+  QueryFormData,
+} from '@superset-ui/core';
 import React, {
   forwardRef,
   RefObject,
@@ -7,17 +13,11 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { useSelector } from 'react-redux';
-import {
-  BinaryQueryObjectFilterClause,
-  FeatureFlag,
-  isFeatureEnabled,
-  QueryFormData,
-} from '@superset-ui/core';
-import { RootState } from 'src/dashboard/types';
-import { findPermission } from 'src/utils/findPermission';
-import { Menu } from 'src/components/Menu';
 import { AntdDropdown as Dropdown } from 'src/components';
 import { getMenuAdjustedY } from 'src/components/Chart/utils';
+import { Menu } from 'src/components/Menu';
+import { RootState } from 'src/dashboard/types';
+import { findPermission } from 'src/utils/findPermission';
 
 export interface ChartContextMenuProps {
   id: number;
