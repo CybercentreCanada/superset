@@ -17,6 +17,7 @@
  * under the License.
  */
 import { ChartProps, TimeseriesDataRecord } from '@superset-ui/core';
+import { safeJsonObjectParse } from '../../utils';
 
 export default function transformProps(chartProps: ChartProps) {
   /**
@@ -48,41 +49,53 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const { formData, queriesData } = chartProps;
 
-  const { url, parameterName, parameterPrefix, groupby } = formData;
+  const { queriesData, height, width, formData, datasource } = chartProps;
 
-  const data = queriesData[0]?.data as TimeseriesDataRecord[];
+  const data = queriesData.flatMap(q => q.data) as TimeseriesDataRecord[];
 
-  let value: string | number | true | Date = '';
   let errorMessage = '';
 
-  if (Array.isArray(data) && data.length > 1) {
-    errorMessage =
-      'The query returned too many rows when only one was expected.';
-  }
+  let values: TimeseriesDataRecord | TimeseriesDataRecord[] | null = null;
+  if (Array.isArray(data)) {
+    if (data.length < 1) {
+      errorMessage = 'The query returned no rows.';
+    } else {
+      values = (data ?? []).map(row => {
+        const newRow: any = {};
 
-  if (Array.isArray(data) && data.length === 0) {
-    errorMessage = 'The query returned no rows.';
-  }
+        Object.entries(row)
+          // We then iterate through each key in the row, attempting to parse each one as a JSON object.
+          // This is to convert a string like "['test', 'one', 'two']" into an array.
+          .forEach(([key, val]) => {
+            if (formData.compactView && !val) {
+              return;
+            }
 
-  if (
-    url.includes('fission.hogwarts') &&
-    (navigator.userAgent.includes('Edg/') ||
-      navigator.userAgent.includes('Chrome/'))
-  ) {
-    errorMessage = 'fission-incompat';
-  }
+            const display_key = formData.useColumnNames
+              ? key
+              : datasource.columns.find(c => c.column_name === key)
+                  ?.verbose_name || key;
 
-  if (Array.isArray(data) && data.length === 1) {
-    value = data[0][groupby] || '';
+            newRow[display_key] = safeJsonObjectParse(val) ?? val;
+          });
+
+        return newRow;
+      });
+
+      if (Array.isArray(values) && values.length === 1) {
+        values = values[0];
+      }
+    }
   }
 
   return {
-    url_parameter_value: value,
-    parameter_name: parameterName,
-    url,
-    parameter_prefix: parameterPrefix,
+    values,
     errorMessage,
+    height,
+    width,
+    enableSearch: formData.enableSearch,
+    compactView: formData.compactView,
+    sliceId: formData.sliceId,
   };
 }

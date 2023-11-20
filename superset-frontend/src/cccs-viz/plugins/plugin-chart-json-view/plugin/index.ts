@@ -35,15 +35,15 @@ export default class IFrameVisualizationChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'IFrame Visualization',
-      name: t('IFrame Visualization'),
+      description: 'JSON View',
+      name: t('JSON View'),
       thumbnail,
     });
 
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../IFrameVisualization'),
+      loadChart: () => import('../JSONView'),
       metadata,
       transformProps,
     });
