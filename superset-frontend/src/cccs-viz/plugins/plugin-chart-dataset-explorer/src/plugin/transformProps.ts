@@ -31,10 +31,7 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-import {
-  rendererMap,
-  formatIpv4,
-} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes';
+import { formatIpv4 } from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
