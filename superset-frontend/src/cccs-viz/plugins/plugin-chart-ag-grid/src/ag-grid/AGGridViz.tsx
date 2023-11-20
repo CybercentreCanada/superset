@@ -2,7 +2,6 @@ import React, {
   ChangeEvent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -13,9 +12,11 @@ import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
-
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import { LicenseManager } from '@ag-grid-enterprise/core';
+import { CloseOutlined, FilterOutlined } from '@ant-design/icons';
+import { Filter, css, ensureIsArray, isNativeFilter } from '@superset-ui/core';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
@@ -27,22 +28,24 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-import { ensureIsArray } from '@superset-ui/core';
-import { LicenseManager } from '@ag-grid-enterprise/core';
-import { CloseOutlined } from '@ant-design/icons';
+import _ from 'lodash';
+import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import { Menu } from 'src/components/Menu';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
 
-import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
-
+import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
+import RetainEmlMenuItem from './ContextMenu/MenuItems/RetainEmlMenuItem';
 import { PAGE_SIZE_OPTIONS } from '../cccs-grid/plugin/controlPanel';
-import { AGGridVizProps } from '../types';
+
+import EmitIcon from '../../../components/EmitIcon';
+import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -52,13 +55,21 @@ ModuleRegistry.registerModules([
   RichSelectModule,
 ]);
 
-type DataMap = { [key: string]: string[] };
-
-type gridData = {
-  highlightedData: DataMap;
-  principalData: DataMap;
-  jumpToData: DataMap;
+const DEFAULT_COL_DEF = {
+  resizable: true,
+  autoHeight: true,
+  sortable: true,
+  enableRowGroup: true,
 };
+
+const headerStyles = css`
+  display: flex;
+  flex-direction: row;
+`;
+
+const paginationStyles = css`
+  margin-right: 0.5rem;
+`;
 
 export default function AGGridViz({
   columnDefs,
@@ -72,6 +83,8 @@ export default function AGGridViz({
   setDataMask,
   principalColumns,
   agGridLicenseKey,
+  assemblyLineUrl,
+  enableAlfred,
   emitCrossFilters,
   jumpActionConfigs,
 }: AGGridVizProps) {
@@ -81,49 +94,29 @@ export default function AGGridViz({
     state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
   const dispatch = useDispatch();
+  const emitGlobalFilter = useEmitGlobalFilter();
 
   const contextMenuRef = useRef<ContextRef>(null);
 
   const [, setInContextMenu] = useState<boolean>(true);
-  const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
-  const [selectedData, setSelectedData] = useState<gridData>({
+  const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
+    advancedTypeData: {},
     jumpToData: {},
   });
-  const [columnDefsStateful, setColumnDefsStateful] = useState(columnDefs);
+  const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
   const [searchValue, setSearchValue] = useState('');
-  const [pageSize, setPageSize] = useState<number>(pageLength);
-  const [rowDataStateful, setrowDataStateful] = useState(rowData);
+  const [pageSize, setPageSize] = useState(pageLength);
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
 
-  useEffect(() => {
-    setColumnDefsStateful(columnDefs);
-  }, [columnDefs]);
-
-  useEffect(() => {
-    setrowDataStateful(rowData);
-  }, [rowData]);
-
-  const defaultColDef = useMemo(
-    () => ({
-      resizable: true,
-      sortable: true,
-      enableRowGroup: true,
-    }),
-    [],
-  );
-
   const gridRef = useRef<AgGridReactType>(null);
-  const updatePageSize = (newSize: number) => {
+
+  const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
-  };
-
-  useEffect(() => {
-    updatePageSize(pageLength);
-  }, [pageLength]);
+  }, []);
 
   const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
@@ -137,14 +130,66 @@ export default function AGGridViz({
     }
   }, [includeSearch]);
 
-  const onRangeSelectionChanged = () => {
-    const cellRanges = gridRef.current!.api.getCellRanges();
+  const emitFilter = useCallback(
+    (data, globally = false) => {
+      const groupBy: [string, any][] = Object.entries(data);
+
+      // If not global, use the same setup as usual
+      if (!globally) {
+        setDataMask({
+          extraFormData: {
+            filters:
+              groupBy.length === 0
+                ? []
+                : groupBy.map(([col, _val]) => {
+                    const val = ensureIsArray(_val);
+                    if (val === null || val === undefined)
+                      return {
+                        col,
+                        op: 'IS NULL',
+                      };
+                    return {
+                      col,
+                      op: 'IN',
+                      val,
+                    };
+                  }),
+          },
+          filterState: {
+            value: groupBy.length ? groupBy.map(col => col[1]) : null,
+          },
+        });
+      } else {
+        emitGlobalFilter(formData.sliceId, groupBy);
+      }
+    },
+    [emitGlobalFilter, formData.sliceId, setDataMask],
+  ); // only take relevant page size options
+
+  const unnestValue = (value: string): string[] => {
+    let parsed;
+    try {
+      parsed = JSON.parse(value);
+      return parsed;
+    } catch (e) {
+      return [value];
+    }
+  };
+
+  const onRangeSelectionChanged = useCallback(() => {
+    const api = gridRef.current!.api!;
+    const cellRanges = api.getCellRanges();
+
+    const col_api = gridRef.current!.columnApi!;
+    const all_columns = col_api.getColumns();
+
     const newSelectedData: { [key: string]: string[] } = {};
-    const principalData: { [key: string]: string[] } = {};
+    const newPrincipalData: { [key: string]: string[] } = {};
+    const advancedTypeData: { [key: string]: string[] } = {};
     const jumpToData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
-      cellRanges.forEach(function (range: CellRange) {
+      cellRanges.forEach((range: CellRange) => {
         // get starting and ending row, remember rowEnd could be before rowStart
         const startRow = Math.min(
           range.startRow!.rowIndex,
@@ -154,123 +199,88 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
-        const api = gridRef.current!.api!;
-        for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
-          const rowModel = api.getModel();
-          const rowNode = rowModel.getRow(rowIndex)!;
-          range.columns.forEach((column: any) => {
-            const { colDef } = column;
+        _.range(startRow, endRow + 1).forEach(rowIndex => {
+          const rowNode = api.getModel().getRow(rowIndex)!;
+
+          all_columns?.forEach((column: any) => {
+            const colDef = column.getColDef();
             const col = colDef.field;
-            newSelectedData[col] = newSelectedData[col] || [];
             const value = api.getValue(column, rowNode);
-            const formattedValue = colDef.valueFormatter?.name
-              ? colDef.valueFormatter(value)
-              : value;
-            if (!newSelectedData[col].includes(value)) {
-              newSelectedData[col].push(value);
-            }
-            const advancedType: string = colDef?.advancedType
-              ? String(colDef.advancedType)
+            const formattedValue: any[] =
+              typeof value === 'string'
+                ? unnestValue(value).map(v =>
+                    colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
+                  )
+                : [value];
+            const advancedType: string = colDef?.advancedDataType
+              ? String(colDef.advancedDataType)
               : colDef?.type
               ? String(colDef.type)
               : 'NoType';
-            jumpToData[advancedType] = jumpToData[advancedType] || [];
-            if (!jumpToData[advancedType].includes(formattedValue)) {
-              jumpToData[advancedType].push(formattedValue);
+            if (range.columns.map(c => c.getColDef().field).includes(col)) {
+              newSelectedData[col] = newSelectedData[col] || [];
+              if (!newSelectedData[col].includes(value)) {
+                newSelectedData[col].push(value);
+              }
+              jumpToData[advancedType] = jumpToData[advancedType] || [];
+              formattedValue.forEach(v => {
+                if (v && !jumpToData[advancedType].includes(v)) {
+                  jumpToData[advancedType].push(v);
+                }
+              });
             }
-          });
-          principalColumns.forEach((column: any) => {
-            const col = column;
-            principalData[col] = principalData[col] || [];
-            const rowModel = api.getModel();
-            const rowNode = rowModel.getRow(rowIndex)!;
-            const value = api.getValue(column, rowNode);
-
-            if (!principalData[col].includes(value)) {
-              principalData[col].push(value);
+            if (principalColumns.includes(col)) {
+              newPrincipalData[col] = newPrincipalData[col] || [];
+              if (!newPrincipalData[col].includes(value)) {
+                newPrincipalData[col].push(value);
+              }
             }
+            advancedTypeData[advancedType] =
+              advancedTypeData[advancedType] || [];
+            formattedValue.forEach(v => {
+              if (v && !advancedTypeData[advancedType].includes(v)) {
+                advancedTypeData[advancedType].push(v);
+              }
+            });
           });
-        }
+        });
       });
     }
     setSelectedData({
       highlightedData: newSelectedData,
-      principalData,
+      principalData: newPrincipalData,
+      advancedTypeData,
       jumpToData,
     });
-  };
+  }, [principalColumns]);
 
-  const emitFilter = useCallback(
-    Data => {
-      const groupBy = Object.keys(Data);
-      const groupByValues = Object.values(Data);
-      setDataMask({
-        extraFormData: {
-          filters:
-            groupBy.length === 0
-              ? []
-              : groupBy.map(col => {
-                  const val = ensureIsArray(Data?.[col]);
-                  if (val === null || val === undefined)
-                    return {
-                      col,
-                      op: 'IS NULL',
-                    };
-                  return {
-                    col,
-                    op: 'IN',
-                    val,
-                  };
-                }),
-        },
-        filterState: {
-          value: groupByValues.length ? groupByValues : null,
-        },
-      });
+  const onClick = useCallback(
+    (data: DataMap, globally = false) => {
+      emitFilter(data, globally);
     },
-    [setDataMask],
-  ); // only take relevant page size options
-
-  const onClick = (data: DataMap) => {
-    emitFilter(data);
-  };
-
-  const handleContextMenuSelected = () => {
-    contextMenuRef.current?.close();
-  };
-
-  const handleContextMenuClosed = () => {
-    contextMenuRef.current?.close();
-  };
-
-  const emitIcon = (disabled?: boolean) => (
-    <div style={{ paddingRight: 8, display: 'inline' }}>
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        focusable="false"
-      >
-        '
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M18.1573 17.864C21.2763 14.745 21.2763 9.66935 18.1573 6.5503C15.0382 3.43125 9.96264 3.43125 6.84359 6.5503L5.42938 5.13609C9.32836 1.2371 15.6725 1.2371 19.5715 5.13609C23.4705 9.03507 23.4705 15.3792 19.5715 19.2782C15.6725 23.1772 9.32836 23.1772 5.42938 19.2782L6.84359 17.864C9.96264 20.9831 15.0375 20.9838 18.1573 17.864ZM2.00035 11.5C2.00035 11.2239 2.2242 11 2.50035 11H5.00035L5.00035 10C5.00035 9.58798 5.47073 9.35279 5.80035 9.60001L9.00035 12C9.17125 12.1032 6.98685 13.637 5.77613 14.4703C5.44613 14.6975 5.00035 14.4601 5.00035 14.0595V13L2.50035 13C2.22421 13 2.00035 12.7761 2.00035 12.5L2.00035 11.5ZM9.67202 9.37873C11.2319 7.81885 13.7697 7.81956 15.3289 9.37873C16.888 10.9379 16.8887 13.4757 15.3289 15.0356C13.769 16.5955 11.2312 16.5948 9.67202 15.0356L8.2578 16.4498C10.5976 18.7896 14.4033 18.7896 16.7431 16.4498C19.0829 14.11 19.0829 10.3043 16.7431 7.96451C14.4033 5.6247 10.5976 5.6247 8.2578 7.96451L9.67202 9.37873Z"
-          fill={disabled ? '#97b9c2' : '#20A7C9'}
-        />
-      </svg>
-    </div>
+    [emitFilter],
   );
+
+  const handleContextMenu = useCallback(() => {
+    contextMenuRef.current?.close();
+  }, []);
 
   const copyText = (withHeaders?: boolean) => {
     gridRef.current?.api?.copySelectedRangeToClipboard({
       includeHeaders: withHeaders || false,
     });
-    handleContextMenuSelected();
+    handleContextMenu();
   };
+
+  const adhocFiltersInScope = useSelector<RootState, Filter[]>(
+    state =>
+      Object.values(state.nativeFilters.filters).filter(
+        f =>
+          isNativeFilter(f) &&
+          f.filterType === 'filter_adhoc' &&
+          f.chartsInScope?.includes(formData.sliceId),
+      ) as Filter[],
+  );
 
   useEffect(() => {
     let menuItems = [
@@ -280,34 +290,105 @@ export default function AGGridViz({
     if (emitCrossFilters) {
       menuItems = [
         ...menuItems,
-        <Menu.Divider key="cross-filter-divider" />,
+        <Menu.Divider key="filter-on-select-divider" />,
+        <EmitFilterMenuItem
+          onClick={() => {
+            onClick(selectedData.highlightedData, true);
+          }}
+          onSelection={handleContextMenu}
+          label="Filter On Selection"
+          disabled={!adhocFiltersInScope.length}
+          key="filter-on-selection"
+          icon={
+            <FilterOutlined
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
+          tooltip={
+            !adhocFiltersInScope.length
+              ? 'No adhoc filter exists with this chart in scope'
+              : adhocFiltersInScope.length > 1
+              ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
+                  .map(f => f.name)
+                  .join(', ')}`
+              : `Will apply selection to adhoc filter: ${adhocFiltersInScope[0].name}`
+          }
+        />,
+        <Menu.Divider key="cross-filter-divider-start" />,
         <EmitFilterMenuItem
           onClick={() => {
             onClick(selectedData.highlightedData);
           }}
-          onSelection={handleContextMenuSelected}
+          onSelection={handleContextMenu}
           label="Emit Filter(s)"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
           key={contextDivID.toString()}
-          icon={emitIcon(
-            Object.keys(selectedData.highlightedData).length === 0,
-          )}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.highlightedData).length}
+            />
+          }
         />,
         <EmitFilterMenuItem
           onClick={() => {
             onClick(selectedData.principalData);
           }}
-          onSelection={handleContextMenuSelected}
+          onSelection={handleContextMenu}
           label="Emit Principle Column Filter(s)"
           disabled={Object.keys(selectedData.principalData).length === 0}
-          icon={emitIcon(Object.keys(selectedData.principalData).length === 0)}
+          icon={
+            <EmitIcon
+              disabled={!Object.keys(selectedData.principalData).length}
+            />
+          }
         />,
         <EmitFilterMenuItem
-          onSelection={handleContextMenuSelected}
+          onSelection={handleContextMenu}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
           label="Clear Emitted Filter(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
+        />,
+      ];
+    }
+    // special menu items
+    let specialMenuItems: JSX.Element[] = [];
+    if (
+      enableAlfred &&
+      selectedData.advancedTypeData.harmonized_email_id &&
+      selectedData.advancedTypeData.harmonized_email_id.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <RetainEmlMenuItem
+          onSelection={handleContextMenu}
+          label="Retain EML Record To ALFRED"
+          key="retain-eml"
+          data={selectedData.advancedTypeData.harmonized_email_id}
+          disabled={
+            selectedData.advancedTypeData.harmonized_email_id.length > 30
+          }
+          tooltip={
+            selectedData.advancedTypeData.harmonized_email_id.length > 30
+              ? 'Cannot retain more than 30 EML IDs.'
+              : undefined
+          }
+        />,
+      ];
+    }
+    if (
+      assemblyLineUrl &&
+      selectedData.advancedTypeData.file_sha256 &&
+      selectedData.advancedTypeData.file_sha256.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <OpenInAssemblyLineMenuItem
+          onSelection={handleContextMenu}
+          label="Open in ASSEMBLYLINE"
+          key="open-file-in-assembly-line"
+          data={selectedData.advancedTypeData.file_sha256}
+          base_url={assemblyLineUrl}
         />,
       ];
     }
@@ -316,8 +397,8 @@ export default function AGGridViz({
         jumpActionConfigs.filter(j =>
           Object.keys(selectedData.jumpToData).includes(j.advancedDataType),
         ).length <= 0;
-      menuItems = [
-        ...menuItems,
+      specialMenuItems = [
+        ...specialMenuItems,
         getJumpToDashboardContextMenuItems(
           jumpActionConfigs,
           selectedData.jumpToData,
@@ -325,12 +406,18 @@ export default function AGGridViz({
         ),
       ];
     }
+    if (specialMenuItems.length) {
+      menuItems = [
+        ...menuItems,
+        <Menu.Divider key="special-items-divider" />,
+        ...specialMenuItems,
+      ];
+    }
     menuItems = [
       ...menuItems,
       <Menu.Divider key="export-divider" />,
       <ExportMenu key="export-csv" api={gridRef.current!.api} />,
     ];
-
     setMenuItems(menuItems);
   }, [
     contextDivID,
@@ -341,6 +428,7 @@ export default function AGGridViz({
     selectedData.highlightedData,
     selectedData.jumpToData,
     selectedData.principalData,
+    adhocFiltersInScope.length,
   ]);
 
   const handleOnContextMenu = (
@@ -351,6 +439,19 @@ export default function AGGridViz({
     contextMenuRef.current?.open(offsetX, offsetY, filters);
     setInContextMenu(true);
   };
+  const onContextMenu = (event: any) => {
+    event.preventDefault();
+    handleOnContextMenu(event.clientX, event.clientY, []);
+  };
+
+  const destroyGrid = useCallback(() => {
+    setIsDestroyed(true);
+    setTimeout(() => setIsDestroyed(false), 0);
+  }, []);
+
+  useEffect(() => {
+    updatePageSize(pageLength);
+  }, [pageLength, updatePageSize]);
 
   useEffect(() => {
     if (!includeSearch) {
@@ -358,19 +459,9 @@ export default function AGGridViz({
     }
   }, [includeSearch]);
 
-  const onContextMenu = (event: any) => {
-    event.preventDefault();
-    handleOnContextMenu(event.clientX, event.clientY, []);
-  };
-
-  const recreateGrid = () => {
-    setIsDestroyed(false);
-  };
-
-  const destroyGrid = () => {
-    setIsDestroyed(true);
-    setTimeout(() => recreateGrid(), 0);
-  };
+  useEffect(() => {
+    destroyGrid();
+  }, [enableGrouping]);
 
   const getMainMenuItems = (
     params: GetMainMenuItemsParams,
@@ -385,18 +476,14 @@ export default function AGGridViz({
     return menuItems;
   };
 
-  useEffect(() => {
-    destroyGrid();
-  }, [enableGrouping]);
-
   return !isDestroyed ? (
     <>
       <ChartContextMenu
         ref={contextMenuRef}
         id={contextDivID}
         formData={formData}
-        onSelection={handleContextMenuSelected}
-        onClose={handleContextMenuClosed}
+        onSelection={handleContextMenu}
+        onClose={handleContextMenu}
         menuItems={menuItems}
       />
       <div
@@ -412,59 +499,58 @@ export default function AGGridViz({
           className="form-inline"
           style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
         >
-          <div className="row">
-            <div className="col-sm-6">
-              {pageLength > 0 && (
-                <span className="dt-select-page-size form-inline">
-                  Show{' '}
-                  <select
-                    className="form-control input-sm"
-                    value={pageSize}
-                    onBlur={() => {}}
-                    onChange={e => {
-                      updatePageSize(
-                        Number((e.target as HTMLSelectElement).value),
-                      );
-                    }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map(option => {
-                      const [size, text] = Array.isArray(option)
-                        ? option
-                        : [option, option];
-                      return (
-                        <option key={size} value={size}>
-                          {text}
-                        </option>
-                      );
-                    })}
-                  </select>{' '}
-                  entries
-                </span>
-              )}
-            </div>
-            <div className="col-sm-6">
-              {includeSearch ? (
-                <span className="float-right" style={{ fontSize: '90%' }}>
-                  Search{' '}
-                  <input
-                    className="form-control input-sm"
-                    placeholder={`${rowData.length} records...`}
-                    value={searchValue}
-                    onChange={setSearch}
-                  />
-                </span>
-              ) : null}
-            </div>
+          <div css={headerStyles}>
+            {pageLength > 0 && (
+              <span
+                className="dt-select-page-size form-inline"
+                css={paginationStyles}
+              >
+                Show{' '}
+                <select
+                  className="form-control input-sm"
+                  value={pageSize}
+                  onBlur={() => {}}
+                  onChange={e => {
+                    updatePageSize(
+                      Number((e.target as HTMLSelectElement).value),
+                    );
+                  }}
+                >
+                  {PAGE_SIZE_OPTIONS.map(option => {
+                    const [size, text] = Array.isArray(option)
+                      ? option
+                      : [option, option];
+                    return (
+                      <option key={size} value={size}>
+                        {text}
+                      </option>
+                    );
+                  })}
+                </select>{' '}
+                entries
+              </span>
+            )}
+            <div style={{ flex: 1 }} />
+            {includeSearch && (
+              <span>
+                Search{' '}
+                <input
+                  className="form-control input-sm"
+                  placeholder={`${rowData.length} records...`}
+                  value={searchValue}
+                  onChange={setSearch}
+                />
+              </span>
+            )}
           </div>
         </div>
         <AgGridReact
           ref={gridRef}
-          // animateRows
           className="ag-theme-balham"
-          columnDefs={columnDefsStateful}
-          defaultColDef={defaultColDef}
+          columnDefs={columnDefs}
+          defaultColDef={DEFAULT_COL_DEF}
           enableRangeSelection
-          rowData={rowDataStateful}
+          rowData={rowData}
           enableBrowserTooltips
           onRangeSelectionChanged={onRangeSelectionChanged}
           cacheQuickFilter

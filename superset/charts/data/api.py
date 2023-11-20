@@ -359,6 +359,8 @@ class ChartDataRestApi(ChartRestApi):
 
         if (form_data["viz_type"] == "cccs_grid"):
             result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+            result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
+            result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
             
         if result_format in ChartDataResultFormat.table_like():
             # Verify user has permission to export file

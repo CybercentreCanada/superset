@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, useState } from 'react';
-import FormItem from 'src/components/Form/FormItem';
-import { Select } from 'src/components';
 import {
   FeatureFlag,
   hasGenericChartAxes,
@@ -28,15 +25,26 @@ import {
   SupersetTheme,
   t,
 } from '@superset-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Select } from 'src/components';
+import FormItem from 'src/components/Form/FormItem';
+import { Input } from 'src/components/Input';
+import { Tooltip } from 'src/components/Tooltip';
+import AdhocFilter, {
+  CLAUSES,
+  EXPRESSION_TYPES,
+} from 'src/explore/components/controls/FilterControl/AdhocFilter';
+import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
 import {
-  Operators,
-  OPERATORS_OPTIONS,
-  HAVING_OPERATORS,
-  MULTI_OPERATORS,
+  AGGREGATES,
   CUSTOM_OPERATORS,
   DISABLE_INPUT_OPERATORS,
-  AGGREGATES,
+  HAVING_OPERATORS,
+  MULTI_OPERATORS,
+  OPERATORS_OPTIONS,
   OPERATOR_ENUM_TO_OPERATOR_TYPE,
+  OPERATOR_TOOLTIP_MAP,
+  Operators,
 } from 'src/explore/constants';
 import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
 import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
@@ -71,6 +79,16 @@ const SelectWithLabel = styled(Select)<{ labelText: string }>`
     white-space: nowrap;
     color: ${({ theme }) => theme.colors.grayscale.light1};
     width: max-content;
+  }
+`;
+
+const iconStyles = css`
+  &.anticon {
+    font-size: unset;
+    .anticon {
+      line-height: unset;
+      vertical-align: unset;
+    }
   }
 `;
 
@@ -486,18 +504,20 @@ const AdhocFilterEditPopoverSimpleTabContent: React.FC<Props> = props => {
 
   const operatorsAndOperandComponent = (
     <>
-      <Select
-        css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
-        options={(props.operators ?? OPERATORS_OPTIONS)
-          .filter(op => isOperatorRelevantWrapper(op, subject))
-          .map((option, index) => ({
-            value: option,
-            label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
-            key: option,
-            order: index,
-          }))}
-        {...operatorSelectProps}
-      />
+      <Tooltip title={OPERATOR_TOOLTIP_MAP[operatorId]} css={iconStyles}>
+        <Select
+          css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
+          options={(props.operators ?? OPERATORS_OPTIONS)
+            .filter(op => isOperatorRelevantWrapper(op, subject))
+            .map((option, index) => ({
+              value: option,
+              label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
+              key: option,
+              order: index,
+            }))}
+          {...operatorSelectProps}
+        />
+      </Tooltip>
       {MULTI_OPERATORS.has(operatorId) || suggestions.length > 0 ? (
         <Tooltip
           title={

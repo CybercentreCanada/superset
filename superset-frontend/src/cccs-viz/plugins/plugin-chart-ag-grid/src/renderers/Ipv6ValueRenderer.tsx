@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-// import { IPv6 } from "ip-num";
-// import bigInt from "big-integer";
 
 export default class Ipv6ValueRenderer extends Component<
   {},
