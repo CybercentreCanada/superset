@@ -1,4 +1,19 @@
-import React from 'react';
+import {
+  ColumnMeta,
+  ColumnOption,
+  ControlConfig,
+  ControlPanelConfig,
+  ControlPanelsContainerProps,
+  ControlPanelState,
+  ControlState,
+  ControlStateMapping,
+  Dataset,
+  defineSavedMetrics,
+  formatSelectOptions,
+  QueryModeLabel,
+  sections,
+  sharedControls,
+} from '@superset-ui/chart-controls';
 import {
   ensureIsArray,
   legacyValidateInteger,
@@ -6,22 +21,7 @@ import {
   QueryMode,
   t,
 } from '@superset-ui/core';
-import {
-  ColumnOption,
-  ControlConfig,
-  ControlPanelConfig,
-  ControlPanelsContainerProps,
-  ControlStateMapping,
-  QueryModeLabel,
-  sections,
-  sharedControls,
-  ControlPanelState,
-  ControlState,
-  Dataset,
-  ColumnMeta,
-  defineSavedMetrics,
-  formatSelectOptions,
-} from '@superset-ui/chart-controls';
+import React from 'react';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../../ag-grid/JumpActionConfigControl';
@@ -88,8 +88,6 @@ const allColumnsControl: typeof sharedControls.groupby = {
   ...sharedControls.groupby,
   label: t('Columns'),
   description: t('Columns to display'),
-  multi: true,
-  freeForm: true,
   allowAll: true,
   commaChoosesOption: false,
   optionRenderer: c => <ColumnOption showType column={c} />,
@@ -494,5 +492,4 @@ config.controlPanelSections.push({
     ],
   ],
 });
-
 export default config;
