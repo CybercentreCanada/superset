@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { isFeatureEnabled, Preset, FeatureFlag } from '@superset-ui/core';
+import { FeatureFlag, Preset, isFeatureEnabled } from '@superset-ui/core';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -34,6 +34,7 @@ import SunburstChartPlugin from '@superset-ui/legacy-plugin-chart-sunburst';
 import TableChartPlugin from '@superset-ui/plugin-chart-table';
 import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import WorldMapChartPlugin from '@superset-ui/legacy-plugin-chart-world-map';
+import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import {
   AreaChartPlugin,
   BarChartPlugin,
@@ -44,31 +45,31 @@ import {
   LineChartPlugin,
   TimePivotChartPlugin,
 } from '@superset-ui/legacy-preset-chart-nvd3';
-import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import {
   BigNumberChartPlugin,
   BigNumberTotalChartPlugin,
-  EchartsPieChartPlugin,
-  EchartsBoxPlotChartPlugin,
   EchartsAreaChartPlugin,
-  EchartsTimeseriesChartPlugin,
+  EchartsBoxPlotChartPlugin,
+  EchartsFunnelChartPlugin,
+  EchartsGaugeChartPlugin,
+  EchartsGraphChartPlugin,
+  EchartsMixedTimeseriesChartPlugin,
+  EchartsPieChartPlugin,
+  EchartsRadarChartPlugin,
+  EchartsSunburstChartPlugin,
   EchartsTimeseriesBarChartPlugin,
+  EchartsTimeseriesChartPlugin,
   EchartsTimeseriesLineChartPlugin,
   EchartsTimeseriesScatterChartPlugin,
   EchartsTimeseriesSmoothLineChartPlugin,
   EchartsTimeseriesStepChartPlugin,
-  EchartsGraphChartPlugin,
-  EchartsGaugeChartPlugin,
-  EchartsRadarChartPlugin,
-  EchartsFunnelChartPlugin,
-  EchartsTreemapChartPlugin,
-  EchartsMixedTimeseriesChartPlugin,
   EchartsTreeChartPlugin,
   EchartsSunburstChartPlugin,
   EchartsBubbleChartPlugin,
   EchartsWaterfallChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
+  AdhocFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
@@ -78,20 +79,33 @@ import {
 } from 'src/filters/components';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
+import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
+import TableChartPlugin from '@superset-ui/plugin-chart-table';
+import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import {
-  GwwkChartsChartPlugin,
-  GwwkDatasetsChartPlugin,
-  GwwkDashboardsChartPlugin,
+  ApplicationLinksChartPlugin,
+  AtAGlanceChartDnsPlugin,
+  AtAGlanceChartIpPlugin,
+  AtAGlanceUserIDSasChartPlugin,
+  AtAGlanceUserIdChartPlugin,
+  BigNumberChartPlugin,
   CccsTableChartPlugin,
   DatasetExplorerChartPlugin,
-  BigNumberChartPlugin,
-  AtAGlanceChartIpPlugin,
-  AtAGlanceChartDnsPlugin,
-  AtAGlanceUserIdChartPlugin,
-  AtAGlanceUserIDSasChartPlugin,
-  ApplicationLinksChartPlugin,
+  GwwkChartsChartPlugin,
+  GwwkDashboardsChartPlugin,
+  GwwkDatasetsChartPlugin,
   IFrameVisualizationChartPlugin,
+  JSONViewChartPlugin,
 } from 'src/cccs-viz/plugins/';
+import {
+  AdhocFilterPlugin,
+  GroupByFilterPlugin,
+  RangeFilterPlugin,
+  SelectFilterPlugin,
+  TimeColumnFilterPlugin,
+  TimeFilterPlugin,
+  TimeGrainFilterPlugin,
+} from 'src/filters/components';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable';
 
@@ -119,6 +133,7 @@ export default class MainPreset extends Preset {
         new AtAGlanceChartIpPlugin().configure({ key: 'at_a_glance_ip' }),
         new AtAGlanceChartDnsPlugin().configure({ key: 'at_a_glance_dns' }),
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
+        new JSONViewChartPlugin().configure({ key: 'json_view' }),
         new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
         new GwwkChartsChartPlugin().configure({ key: 'gwwk_charts' }),
         new GwwkDatasetsChartPlugin().configure({ key: 'gwwk_datasets' }),

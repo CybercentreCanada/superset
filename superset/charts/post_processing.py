@@ -268,6 +268,34 @@ def table(
     return df
 
 
+def AgGrid(result: Dict[Any, Any], form_data: Dict[str, Any]) -> Dict[Any, Any]:
+    """
+    CCCS Grid.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+        result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
+        result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
+def AtAGlanceUserIDCore(
+    result: Dict[Any, Any], form_data: Dict[str, Any]
+) -> Dict[Any, Any]:
+    """
+    AAG User ID.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
 post_processors = {
     "pivot_table_v2": pivot_table_v2,
     "table": table,

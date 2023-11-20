@@ -31,7 +31,7 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-import {rendererMap, formatIpV4} from '../../../plugin-chart-cccs-grid/src/utils/advancedDataTypes'
+import { formatIpv4, rendererMap } from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -146,13 +146,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     return metricMap;
   }, metricVerboseNameMap);
 
-
   const valueFormatter = (params: any) => {
     if (
       params.value != null &&
       params.colDef.cellRenderer === 'ipv4ValueRenderer'
     ) {
-      return formatIpV4(params.value.toString());
+      return formatIpv4(params.value.toString());
     }
     return params.value != null ? params.value.toString() : '';
   };

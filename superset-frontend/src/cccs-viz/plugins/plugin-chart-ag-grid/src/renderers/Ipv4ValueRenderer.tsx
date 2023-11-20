@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { formatIpv4 } from '../types/advancedDataTypes';
 
 export default class Ipv4ValueRenderer extends Component<
   {},
@@ -19,15 +20,8 @@ export default class Ipv4ValueRenderer extends Component<
     };
   }
 
-  formatIpV4(v: any) {
-    const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
-      (v >> 8) & 0xff
-    }.${v & 0xff}`;
-    return converted;
-  }
-
   render() {
-    return this.formatIpV4(Number(this.state.cellValue));
+    return formatIpv4(Number(this.state.cellValue));
   }
 
   static getValueToDisplay(params: { valueFormatted: any; value: any }) {
