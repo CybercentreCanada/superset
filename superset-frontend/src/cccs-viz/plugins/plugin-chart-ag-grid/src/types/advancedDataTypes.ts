@@ -17,11 +17,14 @@ export const rendererMap = {
 };
 
 export const formatIpv4 = (v: any) => {
+  if (v.value === null) {
+    return '';
+  }
   const value = Number(v.value ?? v);
   const converted = `${(value >> 24) & 0xff}.${(value >> 16) & 0xff}.${
     (value >> 8) & 0xff
   }.${value & 0xff}`;
-  return value === null ? '' : converted;
+  return converted;
 };
 
 export const formatterMap = {
