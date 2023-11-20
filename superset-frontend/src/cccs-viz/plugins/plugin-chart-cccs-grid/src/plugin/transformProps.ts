@@ -222,9 +222,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
       const autoHeight = true;
-      const rowGroupIndex = default_group_by.findIndex((element: any) => {
-        return element === column;
-      });
+      const rowGroupIndex = default_group_by.findIndex(
+        (element: any) => element === column,
+      );
       const rowGroup = rowGroupIndex >= 0;
       const hide = rowGroup;
       return {

@@ -31,7 +31,7 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-import { formatIpv4 } from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
+import { formatIpv4, rendererMap } from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -145,7 +145,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     metricMap[name] = metric.verbose_name;
     return metricMap;
   }, metricVerboseNameMap);
-
 
   const valueFormatter = (params: any) => {
     if (
