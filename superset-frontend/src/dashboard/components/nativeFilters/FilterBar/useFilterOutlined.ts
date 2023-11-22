@@ -17,7 +17,18 @@
  * under the License.
  */
 
-import useTruncation from './useChildElementTruncation';
-import useCSSTextTruncation, { truncationCSS } from './useCSSTextTruncation';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/dashboard/types';
+import getChartAndLabelComponentIdFromPath from 'src/dashboard/util/getChartAndLabelComponentIdFromPath';
 
-export { useTruncation, useCSSTextTruncation, truncationCSS };
+export const useFilterOutlined = () =>
+  useSelector<RootState, { outlinedFilterId: string; lastUpdated: number }>(
+    state => ({
+      outlinedFilterId: (
+        getChartAndLabelComponentIdFromPath(
+          state.dashboardState.directPathToChild || [],
+        ) as Record<string, string>
+      )?.native_filter,
+      lastUpdated: state.dashboardState.directPathLastUpdated,
+    }),
+  );

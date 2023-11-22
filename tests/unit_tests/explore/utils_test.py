@@ -83,7 +83,6 @@ def test_unsaved_chart_unknown_query_id(mocker: MockFixture) -> None:
                 datasource_type=DatasourceType.QUERY,
             )
 
-
 def test_unsaved_chart_unauthorized_dataset(mocker: MockFixture) -> None:
     from superset.connectors.sqla.models import SqlaTable
     from superset.explore import utils
@@ -113,7 +112,6 @@ def test_unsaved_chart_authorized_dataset(mocker: MockFixture) -> None:
             chart_id=0,
             datasource_type=DatasourceType.TABLE,
         )
-
 
 def test_saved_chart_unknown_chart_id(mocker: MockFixture) -> None:
     from superset.connectors.sqla.models import SqlaTable

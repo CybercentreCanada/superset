@@ -115,12 +115,6 @@ def get_or_create_user(get_user, create_user) -> ab_models.User:
     return _get_user
 
 
-@pytest.fixture
-def test_client(app_context: AppContext):
-    with app.test_client() as client:
-        yield client
-
-
 @pytest.fixture(autouse=True, scope="session")
 def setup_sample_data() -> Any:
     # TODO(john-bodley): Determine a cleaner way of setting up the sample data without

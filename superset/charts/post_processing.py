@@ -367,11 +367,49 @@ def apply_post_process(
 
     post_processor = post_processors[viz_type]
 
-    if result["query_context"].result_format == ChartDataResultFormat.CSV:
-        for query in result["queries"]:
-            df = pd.read_csv(StringIO(query["data"]))
-            processed_df = post_processor(df, form_data)  # type: ignore
+    for query in result["queries"]:
+        if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
+            raise Exception(f"Result format {query['result_format']} not supported")
 
+        if not query["data"]:
+            # do not try to process empty data
+            continue
+
+        if query["result_format"] == ChartDataResultFormat.JSON:
+            df = pd.DataFrame.from_dict(query["data"])
+        elif query["result_format"] == ChartDataResultFormat.CSV:
+            df = pd.read_csv(StringIO(query["data"]))
+
+        # convert all columns to verbose (label) name
+        if datasource:
+            df.rename(columns=datasource.data["verbose_map"], inplace=True)
+
+        processed_df = post_processor(df, form_data, datasource)
+
+        query["colnames"] = list(processed_df.columns)
+        query["indexnames"] = list(processed_df.index)
+        query["coltypes"] = extract_dataframe_dtypes(processed_df, datasource)
+        query["rowcount"] = len(processed_df.index)
+
+        # Flatten hierarchical columns/index since they are represented as
+        # `Tuple[str]`. Otherwise encoding to JSON later will fail because
+        # maps cannot have tuples as their keys in JSON.
+        processed_df.columns = [
+            " ".join(str(name) for name in column).strip()
+            if isinstance(column, tuple)
+            else column
+            for column in processed_df.columns
+        ]
+        processed_df.index = [
+            " ".join(str(name) for name in index).strip()
+            if isinstance(index, tuple)
+            else index
+            for index in processed_df.index
+        ]
+
+        if query["result_format"] == ChartDataResultFormat.JSON:
+            query["data"] = processed_df.to_dict()
+        elif query["result_format"] == ChartDataResultFormat.CSV:
             buf = StringIO()
             processed_df.to_csv(buf)
             buf.seek(0)
