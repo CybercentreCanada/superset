@@ -24,24 +24,29 @@ import React, {
   useState,
 } from 'react';
 import {
-  QueryFormData,
-  SuperChart,
-  DataMask,
-  t,
-  styled,
-  Behavior,
   ChartDataResponseResult,
-  JsonObject,
+  Behavior,
+  DataMask,
+  FeatureFlag,
   getChartMetadataRegistry,
+  JsonObject,
+  QueryFormData,
+  styled,
+  SuperChart,
+  t,
 } from '@superset-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEqual, isEqualWith } from 'lodash';
 import { getChartDataRequest } from 'src/components/Chart/chartAction';
 import Loading from 'src/components/Loading';
 import BasicErrorAlert from 'src/components/ErrorMessage/BasicErrorAlert';
-import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
+import ErrorMessageWithStackTrace from 'src/components/ErrorMessage/ErrorMessageWithStackTrace';
+import { isFeatureEnabled } from 'src/featureFlags';
 import { waitForAsyncData } from 'src/middleware/asyncEvent';
-import { ClientErrorObject } from 'src/utils/getClientErrorObject';
+import {
+  ClientErrorObject,
+  getClientErrorObject,
+} from 'src/utils/getClientErrorObject';
 import { FilterBarOrientation, RootState } from 'src/dashboard/types';
 import {
   onFiltersRefreshSuccess,
@@ -96,7 +101,7 @@ const FilterValue: React.FC<FilterControlProps> = ({
   const dependencies = useFilterDependencies(id, dataMaskSelected);
   const shouldRefresh = useShouldFilterRefresh();
   const [state, setState] = useState<ChartDataResponseResult[]>([]);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<ClientErrorObject>();
   const [formData, setFormData] = useState<Partial<QueryFormData>>({
     inView: false,
   });
@@ -182,11 +187,11 @@ const FilterValue: React.FC<FilterControlProps> = ({
                   setState(asyncResult);
                   handleFilterLoadFinish();
                 })
-                .catch((error: ClientErrorObject) => {
-                  setError(
-                    error.message || error.error || t('Check configuration'),
-                  );
-                  handleFilterLoadFinish();
+                .catch((error: Response) => {
+                  getClientErrorObject(error).then(clientErrorObject => {
+                    setError(clientErrorObject);
+                    handleFilterLoadFinish();
+                  });
                 });
             } else {
               throw new Error(
@@ -195,13 +200,15 @@ const FilterValue: React.FC<FilterControlProps> = ({
             }
           } else {
             setState(json.result);
-            setError('');
+            setError(undefined);
             handleFilterLoadFinish();
           }
         })
         .catch((error: Response) => {
-          setError(error.statusText);
-          handleFilterLoadFinish();
+          getClientErrorObject(error).then(clientErrorObject => {
+            setError(clientErrorObject);
+            handleFilterLoadFinish();
+          });
         });
     }
   }, [
@@ -255,15 +262,6 @@ const FilterValue: React.FC<FilterControlProps> = ({
     [dispatch],
   );
 
-  const setHoveredFilter = useCallback(
-    () => dispatchHoverAction(dispatch, id),
-    [dispatch, id],
-  );
-  const unsetHoveredFilter = useCallback(
-    () => dispatchHoverAction(dispatch),
-    [dispatch],
-  );
-
   const hooks = useMemo(
     () => ({
       setDataMask,
@@ -306,10 +304,15 @@ const FilterValue: React.FC<FilterControlProps> = ({
 
   if (error) {
     return (
-      <BasicErrorAlert
-        title={t('Cannot load filter')}
-        body={error}
-        level="error"
+      <ErrorMessageWithStackTrace
+        error={error.errors?.[0]}
+        fallback={
+          <BasicErrorAlert
+            title={t('Cannot load filter')}
+            body={error.error}
+            level="error"
+          />
+        }
       />
     );
   }

@@ -178,12 +178,10 @@ const ControlHeader: FC<ControlHeaderProps> = ({
     >
       <div className="pull-left">
         <FormLabel
-          css={(theme: SupersetTheme) =>
-            css`
-              margin-bottom: ${theme.gridUnit * 0.5}px;
-              position: relative;
-            `
-          }
+          css={(theme: SupersetTheme) => css`
+            margin-bottom: ${theme.gridUnit * 0.5}px;
+            position: relative;
+          `}
         >
           {leftNode && <span>{leftNode}</span>}
           <span

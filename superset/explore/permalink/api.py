@@ -32,7 +32,7 @@ from superset.datasets.commands.exceptions import (
 from superset.explore.permalink.commands.create import CreateExplorePermalinkCommand
 from superset.explore.permalink.commands.get import GetExplorePermalinkCommand
 from superset.explore.permalink.exceptions import ExplorePermalinkInvalidStateError
-from superset.explore.permalink.schemas import ExplorePermalinkPostSchema
+from superset.explore.permalink.schemas import ExplorePermalinkStateSchema
 from superset.extensions import event_logger
 from superset.key_value.exceptions import KeyValueAccessDeniedError
 from superset.views.base_api import BaseSupersetApi, requires_json, statsd_metrics
@@ -41,15 +41,15 @@ logger = logging.getLogger(__name__)
 
 
 class ExplorePermalinkRestApi(BaseSupersetApi):
-    add_model_schema = ExplorePermalinkPostSchema()
+    add_model_schema = ExplorePermalinkStateSchema()
     method_permission_name = MODEL_API_RW_METHOD_PERMISSION_MAP
     allow_browser_login = True
     class_permission_name = "ExplorePermalinkRestApi"
     resource_name = "explore"
     openapi_spec_tag = "Explore Permanent Link"
-    openapi_spec_component_schemas = (ExplorePermalinkPostSchema,)
+    openapi_spec_component_schemas = (ExplorePermalinkStateSchema,)
 
-    @expose("/permalink", methods=["POST"])
+    @expose("/permalink", methods=("POST",))
     @protect()
     @safe
     @statsd_metrics
@@ -83,7 +83,7 @@ class ExplorePermalinkRestApi(BaseSupersetApi):
                         description: The key to retrieve the permanent link data.
                       url:
                         type: string
-                        description: pemanent link.
+                        description: permanent link.
             400:
               $ref: '#/components/responses/400'
             401:
@@ -110,7 +110,7 @@ class ExplorePermalinkRestApi(BaseSupersetApi):
         except (ChartNotFoundError, DatasetNotFoundError) as ex:
             return self.response(404, message=str(ex))
 
-    @expose("/permalink/<string:key>", methods=["GET"])
+    @expose("/permalink/<string:key>", methods=("GET",))
     @protect()
     @safe
     @statsd_metrics

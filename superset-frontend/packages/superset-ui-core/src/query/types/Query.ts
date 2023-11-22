@@ -61,7 +61,6 @@ export type QueryObjectFilterClause =
   | UnaryQueryObjectFilterClause;
 
 export type QueryObjectExtras = Partial<{
-  /** HAVING condition for Druid */
   /** HAVING condition for SQLAlchemy */
   having?: string;
   relative_start?: string;
@@ -107,7 +106,7 @@ export interface QueryObject
   /** SIMPLE where filters */
   filters?: QueryObjectFilterClause[];
 
-  /** Time column for SQL, time-grain for Druid (deprecated) */
+  /** Time column for SQL */
   granularity?: string;
 
   /** If set, will group by timestamp */
@@ -118,9 +117,6 @@ export interface QueryObject
 
   /** Free-form HAVING SQL, multiple clauses are concatenated by AND */
   having?: string;
-
-  /** SIMPLE having filters */
-  having_filters?: QueryObjectFilterClause[];
 
   post_processing?: (PostProcessingRule | undefined)[];
 
@@ -252,8 +248,8 @@ export const CtasEnum = {
 };
 
 export type QueryColumn = {
-  name: string;
-  column_name?: string;
+  name?: string;
+  column_name: string;
   type: string | null;
   is_dttm: boolean;
 };
@@ -385,17 +381,17 @@ export const testQuery: Query = {
   type: DatasourceType.Query,
   columns: [
     {
-      name: 'Column 1',
+      column_name: 'Column 1',
       type: 'STRING',
       is_dttm: false,
     },
     {
-      name: 'Column 3',
+      column_name: 'Column 3',
       type: 'STRING',
       is_dttm: false,
     },
     {
-      name: 'Column 2',
+      column_name: 'Column 2',
       type: 'TIMESTAMP',
       is_dttm: true,
     },
@@ -407,17 +403,17 @@ export const testQueryResults = {
     displayLimitReached: false,
     columns: [
       {
-        name: 'Column 1',
+        column_name: 'Column 1',
         type: 'STRING',
         is_dttm: false,
       },
       {
-        name: 'Column 3',
+        column_name: 'Column 3',
         type: 'STRING',
         is_dttm: false,
       },
       {
-        name: 'Column 2',
+        column_name: 'Column 2',
         type: 'TIMESTAMP',
         is_dttm: true,
       },
@@ -428,17 +424,17 @@ export const testQueryResults = {
     expanded_columns: [],
     selected_columns: [
       {
-        name: 'Column 1',
+        column_name: 'Column 1',
         type: 'STRING',
         is_dttm: false,
       },
       {
-        name: 'Column 3',
+        column_name: 'Column 3',
         type: 'STRING',
         is_dttm: false,
       },
       {
-        name: 'Column 2',
+        column_name: 'Column 2',
         type: 'TIMESTAMP',
         is_dttm: true,
       },

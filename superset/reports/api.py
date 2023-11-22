@@ -93,6 +93,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
         "context_markdown",
         "creation_method",
         "crontab",
+        "custom_width",
         "dashboard.dashboard_title",
         "dashboard.id",
         "database.database_name",
@@ -159,6 +160,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
         "context_markdown",
         "creation_method",
         "crontab",
+        "custom_width",
         "dashboard",
         "database",
         "description",
@@ -235,7 +237,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
     openapi_spec_tag = "Report Schedules"
     openapi_spec_methods = openapi_spec_methods_override
 
-    @expose("/<int:pk>", methods=["DELETE"])
+    @expose("/<int:pk>", methods=("DELETE",))
     @protect()
     @safe
     @permission_name("delete")
@@ -291,7 +293,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
             )
             return self.response_422(message=str(ex))
 
-    @expose("/", methods=["POST"])
+    @expose("/", methods=("POST",))
     @protect()
     @statsd_metrics
     @permission_name("post")
@@ -365,7 +367,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
             )
             return self.response_422(message=str(ex))
 
-    @expose("/<int:pk>", methods=["PUT"])
+    @expose("/<int:pk>", methods=("PUT",))
     @protect()
     @safe
     @statsd_metrics
@@ -448,7 +450,7 @@ class ReportScheduleRestApi(BaseSupersetModelRestApi):
             )
             return self.response_422(message=str(ex))
 
-    @expose("/", methods=["DELETE"])
+    @expose("/", methods=("DELETE",))
     @protect()
     @safe
     @statsd_metrics

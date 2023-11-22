@@ -1199,8 +1199,10 @@ under the License.
 - [1.4.2](#142-sat-mar-19-000806-2022-0200)
 - [1.4.1](#141)
 
-### 2.1 (Thu Mar 16 21:13:05 2023 -0700)
+### 2.1.0 (Thu Mar 16 21:13:05 2023 -0700)
+
 **Database Migrations**
+
 - [#23139](https://github.com/apache/superset/pull/23139) fix: memoized decorator memory leak (@dpgaspar)
 - [#19676](https://github.com/apache/superset/pull/19676) chore(frontend): Spelling (@jsoref)
 - [#22852](https://github.com/apache/superset/pull/22852) chore: removing unnecessary double spaces, a.k.a. "shotgun holes" (@rusackas)

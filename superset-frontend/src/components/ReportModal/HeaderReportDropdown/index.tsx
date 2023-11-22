@@ -17,8 +17,8 @@
  * under the License.
  */
 import React, { useState, useEffect } from 'react';
-import { usePrevious } from 'src/hooks/usePrevious';
 import { useSelector, useDispatch } from 'react-redux';
+import { isEmpty } from 'lodash';
 import {
   t,
   SupersetTheme,
@@ -28,10 +28,11 @@ import {
   FeatureFlag,
   isFeatureEnabled,
   getExtensionsRegistry,
+  usePrevious,
 } from '@superset-ui/core';
 import Icons from 'src/components/Icons';
 import { Switch } from 'src/components/Switch';
-import { AlertObject } from 'src/views/CRUD/alert/types';
+import { AlertObject } from 'src/features/alerts/types';
 import { Menu } from 'src/components/Menu';
 import Checkbox from 'src/components/Checkbox';
 import { noOp } from 'src/utils/common';
@@ -102,6 +103,9 @@ export interface HeaderReportProps {
   isDropdownVisible?: boolean;
 }
 
+// Same instance to be used in useEffects
+const EMPTY_OBJECT = {};
+
 export default function HeaderReportDropDown({
   dashboardId,
   chart,
@@ -115,7 +119,10 @@ export default function HeaderReportDropDown({
     const resourceType = dashboardId
       ? CreationMethod.DASHBOARDS
       : CreationMethod.CHARTS;
-    return reportSelector(state, resourceType, dashboardId || chart?.id);
+    return (
+      reportSelector(state, resourceType, dashboardId || chart?.id) ||
+      EMPTY_OBJECT
+    );
   });
 
   const isReportActive: boolean = report?.active || false;
@@ -132,6 +139,12 @@ export default function HeaderReportDropDown({
       // this is in the case that there is an anonymous user.
       return false;
     }
+
+    // Cannot add reports if the resource is not saved
+    if (!(dashboardId || chart?.id)) {
+      return false;
+    }
+
     const roles = Object.keys(user.roles || []);
     const permissions = roles.map(key =>
       user.roles[key].filter(
@@ -197,7 +210,21 @@ export default function HeaderReportDropDown({
   };
 
   const textMenu = () =>
-    report ? (
+    isEmpty(report) ? (
+      <Menu selectable={false} css={onMenuHover}>
+        <Menu.Item onClick={handleShowMenu}>
+          {DropdownItemExtension ? (
+            <StyledDropdownItemWithIcon>
+              <div>{t('Set up an email report')}</div>
+              <DropdownItemExtension />
+            </StyledDropdownItemWithIcon>
+          ) : (
+            t('Set up an email report')
+          )}
+        </Menu.Item>
+        <Menu.Divider />
+      </Menu>
+    ) : (
       isDropdownVisible && (
         <Menu selectable={false} css={{ border: 'none' }}>
           <Menu.Item
@@ -217,20 +244,6 @@ export default function HeaderReportDropDown({
           </Menu.Item>
         </Menu>
       )
-    ) : (
-      <Menu selectable={false} css={onMenuHover}>
-        <Menu.Item onClick={handleShowMenu}>
-          {DropdownItemExtension ? (
-            <StyledDropdownItemWithIcon>
-              <div>{t('Set up an email report')}</div>
-              <DropdownItemExtension />
-            </StyledDropdownItemWithIcon>
-          ) : (
-            t('Set up an email report')
-          )}
-        </Menu.Item>
-        <Menu.Divider />
-      </Menu>
     );
   const menu = () => (
     <Menu selectable={false} css={{ width: '200px' }}>
@@ -257,7 +270,17 @@ export default function HeaderReportDropDown({
   );
 
   const iconMenu = () =>
-    report ? (
+    isEmpty(report) ? (
+      <span
+        role="button"
+        title={t('Schedule email report')}
+        tabIndex={0}
+        className="action-button action-schedule-report"
+        onClick={() => setShowModal(true)}
+      >
+        <Icons.Calendar />
+      </span>
+    ) : (
       <>
         <NoAnimationDropdown
           overlay={menu()}
@@ -275,16 +298,6 @@ export default function HeaderReportDropDown({
           </span>
         </NoAnimationDropdown>
       </>
-    ) : (
-      <span
-        role="button"
-        title={t('Schedule email report')}
-        tabIndex={0}
-        className="action-button action-schedule-report"
-        onClick={() => setShowModal(true)}
-      >
-        <Icons.Calendar />
-      </span>
     );
 
   return (
