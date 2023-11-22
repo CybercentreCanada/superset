@@ -907,16 +907,12 @@ const FiltersConfigForm = (
                         if (checked) {
                           validatePreFilter();
                         }
-                      />
-                    </StyledRowSubFormItem>
-                    {showTimeRangePicker && (
-                      <StyledRowFormItem
-                        name={['filters', filterId, 'time_range']}
-                        label={<StyledLabel>{t('Time range')}</StyledLabel>}
-                        initialValue={
-                          filterToEdit?.time_range || t('No filter')
-                        }
-                        required={!hasAdhoc}
+                      }}
+                    >
+                      <StyledRowSubFormItem
+                        name={['filters', filterId, 'adhoc_filters']}
+                        initialValue={filterToEdit?.adhoc_filters}
+                        required
                         rules={[
                           {
                             validator: preFilterValidator,
