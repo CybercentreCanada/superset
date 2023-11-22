@@ -151,10 +151,6 @@ export interface CommonBootstrapData {
   menu_data: MenuData;
   datahub_url: String;
   advanced_data_types: Record<string, any>[];
-}
-
-export interface BootstrapData {
-  user?: BootstrapUser;
   common: CommonBootstrapData;
   config?: any;
   embedded?: {
