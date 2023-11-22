@@ -453,7 +453,7 @@ superset load-examples
 # Start the Flask dev web server from inside your virtualenv.
 # Note that your page may not have CSS at this point.
 # See instructions below how to build the front-end assets.
-FLASK_ENV=development superset run -p 8088 --with-threads --reload --debugger
+superset run -p 8088 --with-threads --reload --debugger --debug
 ```
 
 Or you can install via our Makefile
@@ -477,7 +477,7 @@ $ make pre-commit
 via `.flaskenv`, however if needed, it should be set to `superset.app:create_app()`**
 
 If you have made changes to the FAB-managed templates, which are not built the same way as the newer, React-powered front-end assets, you need to start the app without the `--with-threads` argument like so:
-`FLASK_ENV=development superset run -p 8088 --reload --debugger`
+`superset run -p 8088 --reload --debugger --debug`
 
 #### Dependencies
 
@@ -518,7 +518,7 @@ def FLASK_APP_MUTATOR(app):
 Then make sure you run your WSGI server using the right worker type:
 
 ```bash
-FLASK_ENV=development gunicorn "superset.app:create_app()" -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -b 127.0.0.1:8088 --reload
+gunicorn "superset.app:create_app()" -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -b 127.0.0.1:8088 --reload
 ```
 
 You can log anything to the browser console, including objects:
@@ -546,6 +546,11 @@ We recommend using [nvm](https://github.com/nvm-sh/nvm) to manage your node envi
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh | bash
+
+incase it shows '-bash: nvm: command not found'
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 cd superset-frontend
 nvm install --lts
@@ -580,6 +585,15 @@ There are three types of assets you can build:
 2. `npm run dev-server`: local development assets, with sourcemaps and hot refresh support
 3. `npm run build-instrumented`: instrumented application code for collecting code coverage from Cypress tests
 
+If this type of error comes while building assets(i.e using above commands):
+```bash
+Error: You must provide the URL of lib/mappings.wasm by calling SourceMapConsumer.initialize
+```
+Then put this:
+```bash
+export NODE_OPTIONS=--no-experimental-fetch
+```
+
 #### Webpack dev server
 
 The dev server by default starts at `http://localhost:9000` and proxies the backend requests to `http://localhost:8088`.
@@ -589,7 +603,7 @@ So a typical development workflow is the following:
 1. [run Superset locally](#flask-server) using Flask, on port `8088` — but don't access it directly,<br/>
    ```bash
    # Install Superset and dependencies, plus load your virtual environment first, as detailed above.
-   FLASK_ENV=development superset run -p 8088 --with-threads --reload --debugger
+   superset run -p 8088 --with-threads --reload --debugger --debug
    ```
 2. in parallel, run the Webpack dev server locally on port `9000`,<br/>
    ```bash
@@ -642,7 +656,7 @@ FEATURE_FLAGS = {
 }
 ```
 
-If you want to use the same flag in the client code, also add it to the FeatureFlag TypeScript enum in [@superset-ui/core](https://github.com/apache-superset/superset-ui/blob/master/packages/superset-ui-core/src/utils/featureFlags.ts). For example,
+If you want to use the same flag in the client code, also add it to the FeatureFlag TypeScript enum in [@superset-ui/core](https://github.com/apache/superset/blob/master/superset-frontend/packages/superset-ui-core/src/utils/featureFlags.ts). For example,
 
 ```typescript
 export enum FeatureFlag {
@@ -854,10 +868,10 @@ npm install
 npm run cypress-run-chrome
 
 # run tests from a specific file
-npm run cypress-run-chrome -- --spec cypress/integration/explore/link.test.ts
+npm run cypress-run-chrome -- --spec cypress/e2e/explore/link.test.ts
 
 # run specific file with video capture
-npm run cypress-run-chrome -- --spec cypress/integration/dashboard/index.test.js --config video=true
+npm run cypress-run-chrome -- --spec cypress/e2e/dashboard/index.test.js --config video=true
 
 # to open the cypress ui
 npm run cypress-debug
@@ -892,6 +906,39 @@ npm run cypress open
 ```
 
 ### Debugging Server App
+
+#### Local
+
+For debugging locally using VSCode, you can configure a launch configuration file .vscode/launch.json such as
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "superset",
+                "SUPERSET_ENV": "development"
+            },
+            "args": [
+                "run",
+                "-p 8088",
+                "--with-threads",
+                "--reload",
+                "--debugger"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
+}
+```
+
+#### Docker
 
 Follow these instructions to debug the Flask app running inside a docker container.
 
@@ -970,7 +1017,7 @@ tcp        0      0 0.0.0.0:8088            0.0.0.0:*               LISTEN      
 
 You are now ready to attach a debugger to the process. Using VSCode you can configure a launch configuration file .vscode/launch.json like so.
 
-```
+```json
 {
     "version": "0.2.0",
     "configurations": [
@@ -1356,13 +1403,11 @@ Note not all fields are correctly categorized. The fields vary based on visualiz
 
 ### Time
 
-| Field               | Type     | Notes                                 |
-| ------------------- | -------- | ------------------------------------- |
-| `druid_time_origin` | _string_ | The Druid **Origin** widget           |
-| `granularity`       | _string_ | The Druid **Time Granularity** widget |
-| `granularity_sqla`  | _string_ | The SQLA **Time Column** widget       |
-| `time_grain_sqla`   | _string_ | The SQLA **Time Grain** widget        |
-| `time_range`        | _string_ | The **Time range** widget             |
+| Field              | Type     | Notes                                 |
+| ------------------ | -------- | ------------------------------------- |
+| `granularity_sqla` | _string_ | The SQLA **Time Column** widget       |
+| `time_grain_sqla`  | _string_ | The SQLA **Time Grain** widget        |
+| `time_range`       | _string_ | The **Time range** widget             |
 
 ### GROUP BY
 

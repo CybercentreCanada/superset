@@ -59,11 +59,6 @@ fetchMock.get(
           extra: {},
         },
         {
-          text: 'granter',
-          value: 5,
-          extra: {},
-        },
-        {
           text: 'Public',
           value: 2,
           extra: {},
@@ -104,7 +99,6 @@ const dashboardInfo = {
   certification_details: 'Sample certification',
   changed_by: null,
   changed_by_name: '',
-  changed_by_url: '',
   changed_on: '2021-03-30T19:30:14.020942',
   charts: [
     'Vaccine Candidates per Country & Stage',
@@ -217,7 +211,9 @@ test('should render - FeatureFlag enabled', async () => {
   expect(
     screen.getByRole('heading', { name: 'Certification' }),
   ).toBeInTheDocument();
-  expect(screen.getAllByRole('heading')).toHaveLength(4);
+  // Tags will be included since isFeatureFlag always returns true in this test
+  expect(screen.getByRole('heading', { name: 'Tags' })).toBeInTheDocument();
+  expect(screen.getAllByRole('heading')).toHaveLength(5);
 
   expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Advanced' })).toBeInTheDocument();
@@ -226,7 +222,7 @@ test('should render - FeatureFlag enabled', async () => {
   expect(screen.getAllByRole('button')).toHaveLength(4);
 
   expect(screen.getAllByRole('textbox')).toHaveLength(4);
-  expect(screen.getAllByRole('combobox')).toHaveLength(2);
+  expect(screen.getAllByRole('combobox')).toHaveLength(3);
 
   expect(spyColorSchemeControlWrapper).toBeCalledWith(
     expect.objectContaining({ colorScheme: 'supersetColors' }),
@@ -245,10 +241,10 @@ test('should open advance', async () => {
   ).toBeInTheDocument();
 
   expect(screen.getAllByRole('textbox')).toHaveLength(4);
-  expect(screen.getAllByRole('combobox')).toHaveLength(2);
+  expect(screen.getAllByRole('combobox')).toHaveLength(3);
   userEvent.click(screen.getByRole('button', { name: 'Advanced' }));
   expect(screen.getAllByRole('textbox')).toHaveLength(5);
-  expect(screen.getAllByRole('combobox')).toHaveLength(2);
+  expect(screen.getAllByRole('combobox')).toHaveLength(3);
 });
 
 test('should close modal', async () => {
@@ -382,7 +378,7 @@ test('should show all roles', async () => {
     useRedux: true,
   });
 
-  expect(screen.getAllByRole('combobox')).toHaveLength(2);
+  expect(screen.getAllByRole('combobox')).toHaveLength(3);
   expect(
     screen.getByRole('combobox', { name: SupersetCore.t('Roles') }),
   ).toBeInTheDocument();
@@ -391,7 +387,7 @@ test('should show all roles', async () => {
 
   const options = await findAllSelectOptions();
 
-  expect(options).toHaveLength(6);
+  expect(options).toHaveLength(5);
   expect(options[0]).toHaveTextContent('Admin');
 });
 
@@ -415,7 +411,7 @@ test('should show active owners with dashboard rbac', async () => {
     useRedux: true,
   });
 
-  expect(screen.getAllByRole('combobox')).toHaveLength(2);
+  expect(screen.getAllByRole('combobox')).toHaveLength(3);
   expect(
     screen.getByRole('combobox', { name: SupersetCore.t('Owners') }),
   ).toBeInTheDocument();

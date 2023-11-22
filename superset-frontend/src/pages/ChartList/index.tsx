@@ -18,6 +18,7 @@
  */
 import {
   ensureIsArray,
+  FeatureFlag,
   getChartMetadataRegistry,
   JsonResponse,
   styled,
@@ -28,7 +29,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import rison from 'rison';
 import { uniqBy } from 'lodash';
 import moment from 'moment';
-import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
+import { isFeatureEnabled } from 'src/featureFlags';
 import {
   createErrorHandler,
   createFetchRelated,
@@ -41,7 +42,8 @@ import {
 } from 'src/views/CRUD/hooks';
 import handleResourceExport from 'src/utils/export';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
-import SubMenu, { SubMenuProps } from 'src/views/components/SubMenu';
+import { TagsList } from 'src/components/Tags';
+import SubMenu, { SubMenuProps } from 'src/features/home/SubMenu';
 import FaveStar from 'src/components/FaveStar';
 import { Link, useHistory } from 'react-router-dom';
 import ListView, {
@@ -58,6 +60,7 @@ import withToasts from 'src/components/MessageToasts/withToasts';
 import PropertiesModal from 'src/explore/components/PropertiesModal';
 import ImportModelsModal from 'src/components/ImportModal/index';
 import Chart, { ChartLinkedDashboard } from 'src/types/Chart';
+import Tag from 'src/types/TagType';
 import { Tooltip } from 'src/components/Tooltip';
 import Icons from 'src/components/Icons';
 import { nativeFilterGate } from 'src/dashboard/components/nativeFilters/utils';
@@ -65,9 +68,9 @@ import setupPlugins from 'src/setup/setupPlugins';
 import InfoTooltip from 'src/components/InfoTooltip';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import { GenericLink } from 'src/components/GenericLink/GenericLink';
-import getBootstrapData from 'src/utils/getBootstrapData';
 import Owner from 'src/types/Owner';
-import ChartCard from './ChartCard';
+import { loadTags } from 'src/components/Tags/utils';
+import ChartCard from 'src/features/charts/ChartCard';
 
 const FlexRowContainer = styled.div`
   align-items: center;
@@ -148,11 +151,9 @@ interface ChartListProps {
   };
 }
 
-const Actions = styled.div`
+const StyledActions = styled.div`
   color: ${({ theme }) => theme.colors.grayscale.base};
 `;
-
-const bootstrapData = getBootstrapData();
 
 function ChartList(props: ChartListProps) {
   const {
@@ -194,6 +195,16 @@ function ChartList(props: ChartListProps) {
   const [importingChart, showImportModal] = useState<boolean>(false);
   const [passwordFields, setPasswordFields] = useState<string[]>([]);
   const [preparingExport, setPreparingExport] = useState<boolean>(false);
+  const [sshTunnelPasswordFields, setSSHTunnelPasswordFields] = useState<
+    string[]
+  >([]);
+  const [sshTunnelPrivateKeyFields, setSSHTunnelPrivateKeyFields] = useState<
+    string[]
+  >([]);
+  const [
+    sshTunnelPrivateKeyPasswordFields,
+    setSSHTunnelPrivateKeyPasswordFields,
+  ] = useState<string[]>([]);
 
   // TODO: Fix usage of localStorage keying on the user id
   const userSettings = dangerouslyGetItemDoNotUse(userId?.toString(), null) as {
@@ -220,8 +231,6 @@ function ChartList(props: ChartListProps) {
   const canExport =
     hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
   const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
-  const enableBroadUserAccess =
-    bootstrapData.common.conf.ENABLE_BROAD_ACTIVITY_ACCESS;
   const handleBulkChartExport = (chartsToExport: Chart[]) => {
     const ids = chartsToExport.map(({ id }) => id);
     handleResourceExport('chart', ids, () => {
@@ -261,8 +270,8 @@ function ChartList(props: ChartListProps) {
       ? {
           filters: [
             {
-              col: 'dashboards',
-              opr: FilterOperator.relationManyMany,
+              col: 'dashboard_title',
+              opr: FilterOperator.startsWith,
               value: filterValue,
             },
           ],
@@ -278,9 +287,7 @@ function ChartList(props: ChartListProps) {
       ...filters,
     });
     const response: void | JsonResponse = await SupersetClient.get({
-      endpoint: !filterValue
-        ? `/api/v1/dashboard/?q=${queryParams}`
-        : `/api/v1/chart/?q=${queryParams}`,
+      endpoint: `/api/v1/dashboard/?q=${queryParams}`,
     }).catch(() =>
       addDangerToast(t('An error occurred while fetching dashboards')),
     );
@@ -403,17 +410,9 @@ function ChartList(props: ChartListProps) {
       {
         Cell: ({
           row: {
-            original: {
-              last_saved_by: lastSavedBy,
-              changed_by_url: changedByUrl,
-            },
+            original: { last_saved_by: lastSavedBy },
           },
-        }: any) =>
-          enableBroadUserAccess ? (
-            <a href={changedByUrl}>{changedByName(lastSavedBy)}</a>
-          ) : (
-            <>{changedByName(lastSavedBy)}</>
-          ),
+        }: any) => <>{changedByName(lastSavedBy)}</>,
         Header: t('Modified by'),
         accessor: 'last_saved_by.first_name',
         size: 'xl',
@@ -450,6 +449,27 @@ function ChartList(props: ChartListProps) {
         size: 'xl',
       },
       {
+        Cell: ({
+          row: {
+            original: { tags = [] },
+          },
+        }: any) => (
+          // Only show custom type tags
+          <TagsList
+            tags={tags.filter((tag: Tag) =>
+              tag.type
+                ? tag.type === 1 || tag.type === 'TagTypes.custom'
+                : true,
+            )}
+            maxTags={3}
+          />
+        ),
+        Header: t('Tags'),
+        accessor: 'tags',
+        disableSortBy: true,
+        hidden: !isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM),
+      },
+      {
         Cell: ({ row: { original } }: any) => {
           const handleDelete = () =>
             handleChartDelete(
@@ -465,7 +485,7 @@ function ChartList(props: ChartListProps) {
           }
 
           return (
-            <Actions className="actions">
+            <StyledActions className="actions">
               {canDelete && (
                 <ConfirmStatusChange
                   title={t('Please confirm')}
@@ -528,7 +548,7 @@ function ChartList(props: ChartListProps) {
                   </span>
                 </Tooltip>
               )}
-            </Actions>
+            </StyledActions>
           );
         },
         Header: t('Actions'),
@@ -567,8 +587,8 @@ function ChartList(props: ChartListProps) {
     [],
   );
 
-  const filters: Filters = useMemo(
-    () => [
+  const filters: Filters = useMemo(() => {
+    const filters_list = [
       {
         Header: t('Owner'),
         key: 'owner',
@@ -673,16 +693,27 @@ function ChartList(props: ChartListProps) {
           { label: t('No'), value: false },
         ],
       },
-      {
-        Header: t('Search'),
-        key: 'search',
-        id: 'slice_name',
-        input: 'search',
-        operator: FilterOperator.chartAllText,
-      },
-    ],
-    [addDangerToast, favoritesFilter, props.user],
-  );
+    ] as Filters;
+    if (isFeatureEnabled(FeatureFlag.TAGGING_SYSTEM)) {
+      filters_list.push({
+        Header: t('Tags'),
+        key: 'tags',
+        id: 'tags',
+        input: 'select',
+        operator: FilterOperator.chartTags,
+        unfilteredLabel: t('All'),
+        fetchSelects: loadTags,
+      });
+    }
+    filters_list.push({
+      Header: t('Search'),
+      key: 'search',
+      id: 'slice_name',
+      input: 'search',
+      operator: FilterOperator.chartAllText,
+    });
+    return filters_list;
+  }, [addDangerToast, favoritesFilter, props.user]);
 
   const sortTypes = [
     {
@@ -853,6 +884,14 @@ function ChartList(props: ChartListProps) {
         onHide={closeChartImportModal}
         passwordFields={passwordFields}
         setPasswordFields={setPasswordFields}
+        sshTunnelPasswordFields={sshTunnelPasswordFields}
+        setSSHTunnelPasswordFields={setSSHTunnelPasswordFields}
+        sshTunnelPrivateKeyFields={sshTunnelPrivateKeyFields}
+        setSSHTunnelPrivateKeyFields={setSSHTunnelPrivateKeyFields}
+        sshTunnelPrivateKeyPasswordFields={sshTunnelPrivateKeyPasswordFields}
+        setSSHTunnelPrivateKeyPasswordFields={
+          setSSHTunnelPrivateKeyPasswordFields
+        }
       />
       {preparingExport && <Loading />}
     </>

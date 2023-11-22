@@ -55,7 +55,6 @@ export interface Dashboard {
   certified_by?: string;
   certification_details?: string;
   changed_by_name: string;
-  changed_by_url: string;
   changed_on_delta_humanized?: string;
   changed_on_utc?: string;
   changed_by: string;
@@ -136,6 +135,13 @@ export type ImportResourceName =
   | 'database'
   | 'dataset'
   | 'saved_query';
+
+export interface Tag {
+  changed_on_delta_humanized: string;
+  name: string;
+  id: number;
+  created_by: object;
+}
 
 export type DatabaseObject = Partial<Database> &
   Pick<Database, 'sqlalchemy_uri'>;

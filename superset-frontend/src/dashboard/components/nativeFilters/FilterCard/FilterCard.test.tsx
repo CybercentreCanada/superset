@@ -23,7 +23,7 @@ import { Filter, NativeFilterType } from '@superset-ui/core';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from 'spec/helpers/testing-library';
 import { DASHBOARD_ROOT_ID } from 'src/dashboard/util/constants';
-import { SET_FOCUSED_NATIVE_FILTER } from 'src/dashboard/actions/nativeFilters';
+import { SET_DIRECT_PATH } from 'src/dashboard/actions/dashboardState';
 import { FilterCardContent } from './FilterCardContent';
 
 const baseInitialState = {
