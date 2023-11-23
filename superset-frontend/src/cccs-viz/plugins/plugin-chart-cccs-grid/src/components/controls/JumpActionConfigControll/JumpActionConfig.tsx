@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import SelectControl from 'src/explore/components/controls/SelectControl';
-import { bootstrapData } from 'src/preamble';
 import Button from 'src/components/Button';
 import {
   t,
@@ -9,6 +8,7 @@ import {
   withTheme,
   SupersetTheme,
 } from '@superset-ui/core';
+import { bootstrapData } from 'src/preamble';
 
 interface Props {
   dashboardID: number;
@@ -113,7 +113,7 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
         (e: any) => e.value === selectedDashboardID,
       );
       const advancedDataTypeNameLabel =
-        bootstrapData?.common?.advanced_data_types.find(
+        bootstrapData.common?.advanced_data_types.find(
           (e: { id: string }) => e.id === advancedDataTypeName,
         )?.verbose_name || advancedDataTypeName;
       const selectedFiltersWithColumn = filterList.filter((filter: any) =>

@@ -18,7 +18,6 @@
  */
 import {
   createDurationFormatter,
-  createD3NumberFormatter,
   getNumberFormatter,
   getNumberFormatterRegistry,
   NumberFormats,
@@ -72,23 +71,6 @@ export default function setupFormatters(
       'DURATION_SUB',
       createDurationFormatter({ formatSubMilliseconds: true }),
     );
-
-  decimals.forEach(decimal => {
-    currencies.forEach(symbol => {
-      getNumberFormatterRegistry().registerValue(
-        `${symbol},.${decimal}f`,
-        createD3NumberFormatter({
-          formatString: `$,.${decimal}f`,
-          locale: {
-            decimal: '.',
-            thousands: ',',
-            grouping: [3],
-            currency: [symbol, ''],
-          },
-        }),
-      );
-    });
-  });
 
   getTimeFormatterRegistry()
     .registerValue('smart_date', smartDateFormatter)

@@ -1,4 +1,4 @@
-import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
+import { GroupCellRenderer } from '@ag-grid-community/core';
 import React, { Component } from 'react';
 import './Buttons.css';
 
