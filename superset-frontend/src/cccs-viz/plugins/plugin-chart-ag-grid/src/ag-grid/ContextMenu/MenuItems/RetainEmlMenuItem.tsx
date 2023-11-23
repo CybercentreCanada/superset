@@ -11,7 +11,7 @@ import { Tooltip } from 'antd';
 
 interface RetainEmlMenuItemProps {
   label: string;
-  data: string[];
+  data: any;
   onSelection: () => void;
   key?: string;
   disabled?: boolean;
@@ -24,14 +24,23 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
   const dispatch = useDispatch();
 
   const onClick = () => {
-    const endpoint = `/api/v1/fission/retain-eml-record?cbs_email_ids=${props.data}`;
+    const endpoint = `/api/v1/fission/retain-eml-record`;
+    const jsonPayload = props.data;
     const timeout = 180000; // 3 minutes
+    // format dates into datestrings that look like Y-m-d
+    jsonPayload.dates = props.data.dates.map((d: string) => {
+      let date = new Date(Date.parse(d));
+      if (date.toLocaleDateString() === 'Invalid Date') {
+        date = new Date(d);
+      }
+      return date.toLocaleDateString('en-us').replaceAll('/', '-');
+    });
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',
       ),
     );
-    SupersetClient.get({ endpoint, timeout })
+    SupersetClient.post({ endpoint, jsonPayload, timeout })
       .then(({ json }) => {
         window.open(json.result, '_blank');
       })

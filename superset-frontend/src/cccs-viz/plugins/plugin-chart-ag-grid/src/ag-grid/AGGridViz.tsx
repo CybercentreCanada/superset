@@ -364,7 +364,14 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label="Retain EML Record To ALFRED"
           key="retain-eml"
-          data={selectedData.advancedTypeData.harmonized_email_id}
+          data={{
+            email_ids: selectedData.advancedTypeData.harmonized_email_id,
+            dates:
+              selectedData.advancedTypeData['TIMESTAMP WITH TIME ZONE'] ||
+              selectedData.advancedTypeData['TIMESTAMP WITHOUT TIME ZONE'] ||
+              selectedData.advancedTypeData.DATE ||
+              selectedData.advancedTypeData.DATETIME,
+          }}
           disabled={
             selectedData.advancedTypeData.harmonized_email_id.length > 30
           }
