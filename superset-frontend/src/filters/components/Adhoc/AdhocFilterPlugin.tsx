@@ -27,6 +27,7 @@ import {
   SupersetApiError,
   SupersetClient,
   t,
+  useChangeEffect,
 } from '@superset-ui/core';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useImmerReducer } from 'use-immer';
@@ -39,7 +40,6 @@ import { cacheWrapper } from 'src/utils/cacheWrapper';
 // eslint-disable-next-line import/no-unresolved
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 // eslint-disable-next-line import/no-unresolved
-import { useChangeEffect } from 'src/hooks/useChangeEffect';
 import { PluginFilterAdhocProps } from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
 import { getDataRecordFormatter, getAdhocExtraFormData } from '../../utils';

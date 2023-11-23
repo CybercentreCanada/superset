@@ -319,7 +319,6 @@ const FILTERS_WITH_ADHOC_FILTERS = ['filter_select', 'filter_range'];
 
 // TODO: Rename the filter plugins and remove this mapping
 const FILTER_TYPE_NAME_MAPPING = {
-  [t('Adhoc filter')]: t('Adhoc'),
   [t('Select filter')]: t('Value'),
   [t('Range filter')]: t('Numerical range'),
   [t('Time filter')]: t('Time range'),
@@ -997,40 +996,38 @@ const FiltersConfigForm = (
                           });
                           forceUpdate();
                           validatePreFilter();
+                        }}
+                        label={
+                          <span>
+                            <StyledLabel>{t('Pre-filter')}</StyledLabel>
+                            {!hasTimeRange && <StyledAsterisk />}
+                          </span>
                         }
-                      }}
-                    >
-                      <StyledRowSubFormItem
-                        name={['filters', filterId, 'adhoc_filters']}
-                        initialValue={filterToEdit?.adhoc_filters}
-                        required
+                      />
+                    </StyledRowSubFormItem>
+                    {showTimeRangePicker && (
+                      <StyledRowFormItem
+                        name={['filters', filterId, 'time_range']}
+                        label={<StyledLabel>{t('Time range')}</StyledLabel>}
+                        initialValue={
+                          filterToEdit?.time_range || t('No filter')
+                        }
+                        required={!hasAdhoc}
                         rules={[
                           {
                             validator: preFilterValidator,
                           },
                         ]}
                       >
-                        <AdhocFilterControl
-                          columns={
-                            datasetDetails?.columns?.filter(
-                              (c: ColumnMeta) => c.filterable,
-                            ) || []
-                          }
-                          savedMetrics={datasetDetails?.metrics || []}
-                          datasource={datasetDetails}
-                          onChange={(filters: AdhocFilter[]) => {
+                        <DateFilterControl
+                          name="time_range"
+                          onChange={timeRange => {
                             setNativeFilterFieldValues(form, filterId, {
-                              adhoc_filters: filters,
+                              time_range: timeRange,
                             });
                             forceUpdate();
                             validatePreFilter();
                           }}
-                          label={
-                            <span>
-                              <StyledLabel>{t('Pre-filter')}</StyledLabel>
-                              {!hasTimeRange && <StyledAsterisk />}
-                            </span>
-                          }
                         />
                       </StyledRowFormItem>
                     )}
@@ -1060,39 +1057,98 @@ const FiltersConfigForm = (
                       initialValue={sort}
                       label={<StyledLabel>{t('Sort type')}</StyledLabel>}
                     >
-                      <StyledRowFormItem
-                        name={[
-                          'filters',
-                          filterId,
-                          'controlValues',
-                          'enableSingleValue',
-                        ]}
-                        initialValue={enableSingleValue}
+                      <Radio.Group
+                        onChange={value => {
+                          onSortChanged(value.target.value);
+                        }}
+                      >
+                        <Radio value>{t('Sort ascending')}</Radio>
+                        <Radio value={false}>{t('Sort descending')}</Radio>
+                      </Radio.Group>
+                    </StyledRowFormItem>
+                    {hasMetrics && (
+                      <StyledRowSubFormItem
+                        name={['filters', filterId, 'sortMetric']}
+                        initialValue={filterToEdit?.sortMetric}
                         label={
-                          <StyledLabel>{t('Single value type')}</StyledLabel>
+                          <>
+                            <StyledLabel>{t('Sort Metric')}</StyledLabel>&nbsp;
+                            <InfoTooltipWithTrigger
+                              placement="top"
+                              tooltip={t(
+                                'If a metric is specified, sorting will be done based on the metric value',
+                              )}
+                            />
+                          </>
+                        }
+                        data-test="field-input"
+                      >
+                        <Select
+                          allowClear
+                          ariaLabel={t('Sort metric')}
+                          name="sortMetric"
+                          options={metrics.map((metric: Metric) => ({
+                            value: metric.metric_name,
+                            label: metric.verbose_name ?? metric.metric_name,
+                          }))}
+                          onChange={value => {
+                            if (value !== undefined) {
+                              setNativeFilterFieldValues(form, filterId, {
+                                sortMetric: value,
+                              });
+                              forceUpdate();
+                            }
+                          }}
+                        />
+                      </StyledRowSubFormItem>
+                    )}
+                  </CollapsibleControl>
+                </CleanFormItem>
+              ) : (
+                <CleanFormItem name={['filters', filterId, 'rangeFilter']}>
+                  <CollapsibleControl
+                    initialValue={hasEnableSingleValue}
+                    title={t('Single Value')}
+                    onChange={checked => {
+                      onEnableSingleValueChanged(
+                        checked ? SingleValueType.Exact : undefined,
+                      );
+                      formChanged();
+                    }}
+                  >
+                    <StyledRowFormItem
+                      name={[
+                        'filters',
+                        filterId,
+                        'controlValues',
+                        'enableSingleValue',
+                      ]}
+                      initialValue={enableSingleValue}
+                      label={
+                        <StyledLabel>{t('Single value type')}</StyledLabel>
+                      }
+                    >
+                      <Radio.Group
+                        onChange={value =>
+                          onEnableSingleValueChanged(value.target.value)
                         }
                       >
-                        <Radio.Group
-                          onChange={value =>
-                            onEnableSingleValueChanged(value.target.value)
-                          }
-                        >
-                          <Radio value={SingleValueType.Minimum}>
-                            {t('Minimum')}
-                          </Radio>
-                          <Radio value={SingleValueType.Exact}>
-                            {t('Exact')}
-                          </Radio>
-                          <Radio value={SingleValueType.Maximum}>
-                            {t('Maximum')}
-                          </Radio>
-                        </Radio.Group>
-                      </StyledRowFormItem>
-                    </CollapsibleControl>
-                  </CleanFormItem>
-                )}
-              </Collapse.Panel>
-            )}
+                        <Radio value={SingleValueType.Minimum}>
+                          {t('Minimum')}
+                        </Radio>
+                        <Radio value={SingleValueType.Exact}>
+                          {t('Exact')}
+                        </Radio>
+                        <Radio value={SingleValueType.Maximum}>
+                          {t('Maximum')}
+                        </Radio>
+                      </Radio.Group>
+                    </StyledRowFormItem>
+                  </CollapsibleControl>
+                </CleanFormItem>
+              )}
+            </Collapse.Panel>
+          )}
           <Collapse.Panel
             forceRender
             header={FilterPanels.settings.name}

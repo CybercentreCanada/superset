@@ -526,16 +526,25 @@ class Header extends React.PureComponent {
             showTooltip: true,
           }}
           titlePanelAdditionalItems={[
-            !editMode && (
-              <PublishedStatus
-                dashboardId={dashboardInfo.id}
-                isPublished={isPublished}
-                savePublished={this.props.savePublished}
-                canEdit={userCanEdit}
-                canSave={userCanSaveAs}
-                visible={!editMode}
-              />
-            ),
+            <>
+              {!editMode && (
+                <PublishedStatus
+                  dashboardId={dashboardInfo.id}
+                  isPublished={isPublished}
+                  savePublished={this.props.savePublished}
+                  canEdit={userCanEdit}
+                  canSave={userCanSaveAs}
+                  visible={!editMode}
+                />
+              )}
+              <a
+                href={`${datahubUrl}dashboard/urn:li:dashboard:(superset,${dashboardInfo.id})`}
+                style={{ paddingLeft: '0.5em' }}
+                data-test="datahub_link"
+              >
+                <Icons.Datahub viewBox="0 0 180 180" />
+              </a>
+            </>,
           ]}
           rightPanelAdditionalItems={
             <div className="button-container">
