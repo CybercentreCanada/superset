@@ -31,6 +31,8 @@ from superset.advanced_data_type.schemas import (
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
 
+from superset.constants import RouteMethod
+
 logger = logging.getLogger(__name__)
 
 config = app.config
@@ -61,14 +63,12 @@ class FissionRestApi(BaseApi):
     def get(self, path, **kwargs: Any) -> Response:
         """Proxy to hogwarts fission"""
         user = current_user
-        token = security_manager.get_on_behalf_of_access_token_with_cache(
-            user.username,
-            os.environ.get("FISSION_SCOPE"),
-            "superset",
-            cache_result=True,
-        )
+        token = security_manager.get_on_behalf_of_access_token_with_cache(user.username,
+                                                                          os.environ.get('FISSION_SCOPE'),
+                                                                          'superset',
+                                                                          cache_result=True)
 
-        logger.info("Args is %s", request.args)
+        logger.info('Args is %s', request.args)
         headers = {
             "Authorization": f"Bearer {token}",
             "X-Auth-Request-Access-Token": token,
@@ -88,4 +88,50 @@ class FissionRestApi(BaseApi):
         except requests.JSONDecodeError as e:
             logger.error('response does not contain valid json: %s', e)
             result = str(res.text)
+        return self.response(res.status_code, result=result)
+    
+    @protect()
+    @safe
+    @expose("/<path>", methods=["POST"])
+    @permission_name("read")
+    @event_logger.log_this_with_context(
+        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
+        log_to_statsd=False,  # pylint: disable-arguments-renamed
+    )
+    def post(self, path, **kwargs: Any) -> Response:
+        """Proxy to hogwarts fission
+        """
+        
+        request_payload = request.json
+        alfred_env = os.environ.get('ALFRED_ENV')
+        if alfred_env:
+           request_payload["alfred_env"] = alfred_env
+           logger.info(f'ALFRED_ENV: {alfred_env}')
+        else:
+           logger.info('ALFRED_ENV environment variable not set')
+        
+
+        logger.info('Payload is %s', request_payload)
+        user = current_user
+        token = security_manager.get_on_behalf_of_access_token_with_cache(user.username,
+                                                                          os.environ.get('FISSION_SCOPE'),
+                                                                          'superset',
+                                                                          cache_result=True)
+        headers = {
+          'Authorization': f"Bearer {token}",
+          "X-Auth-Request-Access-Token": token
+        }
+
+        url = request.url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
+        res = requests.post(  # ref. https://stackoverflow.com/a/36601467/248616
+            url             = url,
+            json            = request_payload,
+            allow_redirects = False,
+            headers         = headers,
+            timeout         = 180000 # 3 minutes
+        )
+        try:
+          result = res.json()
+        except:
+          result = str(res.text)
         return self.response(res.status_code, result=result)

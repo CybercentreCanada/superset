@@ -366,14 +366,16 @@ export default function AGGridViz({
           label="Retain EML Record To ALFRED"
           key="retain-eml"
           data={{
-            email_ids: Array.from(new Set(selectedData.typeData.harmonized_email_id)),
-            dates: [
-              ...(Object.entries(selectedData.typeData).filter((k) => k[0].includes('TIME')).map((v) => v[1])).flat(),
-              ...(selectedData.typeData.DATE || []),
-              ...(selectedData.typeData.DATETIME || []),
-            ],
+            email_ids: selectedData.advancedTypeData.harmonized_email_id,
+            dates:
+              selectedData.advancedTypeData['TIMESTAMP WITH TIME ZONE'] ||
+              selectedData.advancedTypeData['TIMESTAMP WITHOUT TIME ZONE'] ||
+              selectedData.advancedTypeData.DATE ||
+              selectedData.advancedTypeData.DATETIME,
           }}
-          disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
+          disabled={
+            selectedData.advancedTypeData.harmonized_email_id.length > 30
+          }
           tooltip={
             new Set(selectedData.typeData.harmonized_email_id).size > RETENTION_LIMIT
               ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
