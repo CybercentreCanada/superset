@@ -83,7 +83,7 @@ class FissionRestApi(BaseApi):
           "X-Auth-Request-Access-Token": token
         }
 
-        url = request_url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
+        url = request_url.replace(f'{request.host_url}api/v1/fission/', f'{API_HOST}/')
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
             url             = url,
@@ -120,6 +120,8 @@ class FissionRestApi(BaseApi):
         
 
         logger.info('Payload is %s', request_payload)
+        url = request.url.replace(f'{request.host_url}api/v1/fission/', f'{API_HOST}/')
+        logger.info(f'Sending to {url}')
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(user.username,
                                                                           os.environ.get('FISSION_SCOPE'),
@@ -130,10 +132,10 @@ class FissionRestApi(BaseApi):
           "X-Auth-Request-Access-Token": token
         }
 
-        url = request.url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
         res = requests.post(  # ref. https://stackoverflow.com/a/36601467/248616
             url             = url,
             json            = request_payload,
+            data            = request_payload,
             allow_redirects = False,
             headers         = headers,
             timeout         = 180000 # 3 minutes
