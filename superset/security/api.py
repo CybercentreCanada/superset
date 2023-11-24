@@ -24,8 +24,6 @@ from flask_appbuilder.security.decorators import permission_name, protect
 from flask_wtf.csrf import generate_csrf
 from marshmallow import EXCLUDE, fields, post_load, Schema, ValidationError
 
-from superset import security_manager
-from superset.constants import MODEL_API_RW_METHOD_PERMISSION_MAP, RouteMethod
 from superset.embedded_dashboard.commands.exceptions import (
     EmbeddedDashboardNotFoundError,
 )
@@ -164,39 +162,3 @@ class SecurityRestApi(BaseSupersetApi):
             return self.response_400(message=error.message)
         except ValidationError as error:
             return self.response_400(message=error.messages)
-
-
-class UsersApi(BaseSupersetModelRestApi):
-    datamodel = SQLAInterface(security_manager.user_model)
-
-    resource_name = "users"
-    allow_browser_login = True
-    method_permission_name = {
-        **MODEL_API_RW_METHOD_PERMISSION_MAP,
-        **{"delete": "delete_user"},
-    }
-    include_route_methods = {RouteMethod.GET_LIST, RouteMethod.GET, RouteMethod.DELETE}
-    openapi_spec_tag = "Users"
-
-    list_columns = [
-        "id",
-        "first_name",
-        "last_name",
-        "username",
-        "active",
-        "email",
-        "last_login",
-        "login_count",
-        "fail_login_count",
-        "roles",
-    ]
-    show_columns = list_columns
-    edit_columns = ["first_name", "last_name", "active", "email"]
-    add_columns = [
-        "first_name",
-        "last_name",
-        "username",
-        "password",
-        "active",
-        "email",
-    ]

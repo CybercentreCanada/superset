@@ -408,6 +408,7 @@ const config: ControlPanelConfig = {
                 !controls?.server_pagination?.value,
             },
           },
+          null,
         ],
         [
           {

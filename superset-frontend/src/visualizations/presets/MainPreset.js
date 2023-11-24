@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FeatureFlag, Preset, isFeatureEnabled } from '@superset-ui/core';
+import { isFeatureEnabled, Preset, FeatureFlag } from '@superset-ui/core';
 import CalendarChartPlugin from '@superset-ui/legacy-plugin-chart-calendar';
 import ChordChartPlugin from '@superset-ui/legacy-plugin-chart-chord';
 import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map';
@@ -34,7 +34,6 @@ import SunburstChartPlugin from '@superset-ui/legacy-plugin-chart-sunburst';
 import TableChartPlugin from '@superset-ui/plugin-chart-table';
 import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import WorldMapChartPlugin from '@superset-ui/legacy-plugin-chart-world-map';
-import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import {
   AreaChartPlugin,
   BarChartPlugin,
@@ -45,30 +44,28 @@ import {
   LineChartPlugin,
   TimePivotChartPlugin,
 } from '@superset-ui/legacy-preset-chart-nvd3';
+import { DeckGLChartPreset } from '@superset-ui/legacy-preset-chart-deckgl';
 import {
+  BigNumberChartPlugin,
   BigNumberTotalChartPlugin,
-  EchartsAreaChartPlugin,
-  EchartsBoxPlotChartPlugin,
-  EchartsFunnelChartPlugin,
-  EchartsGaugeChartPlugin,
-  EchartsGraphChartPlugin,
-  EchartsMixedTimeseriesChartPlugin,
   EchartsPieChartPlugin,
-  EchartsRadarChartPlugin,
-  EchartsSunburstChartPlugin,
-  EchartsTimeseriesBarChartPlugin,
+  EchartsBoxPlotChartPlugin,
+  EchartsAreaChartPlugin,
   EchartsTimeseriesChartPlugin,
+  EchartsTimeseriesBarChartPlugin,
   EchartsTimeseriesLineChartPlugin,
   EchartsTimeseriesScatterChartPlugin,
   EchartsTimeseriesSmoothLineChartPlugin,
   EchartsTimeseriesStepChartPlugin,
-  EchartsTreeChartPlugin,
+  EchartsGraphChartPlugin,
+  EchartsGaugeChartPlugin,
+  EchartsRadarChartPlugin,
+  EchartsFunnelChartPlugin,
   EchartsTreemapChartPlugin,
+  EchartsMixedTimeseriesChartPlugin,
+  EchartsTreeChartPlugin,
+  EchartsSunburstChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
-import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
-import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
-import TableChartPlugin from '@superset-ui/plugin-chart-table';
-import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import {
   ApplicationLinksChartPlugin,
   AtAGlanceChartDnsPlugin,
@@ -86,13 +83,15 @@ import {
 } from 'src/cccs-viz/plugins/';
 import {
   AdhocFilterPlugin,
-  GroupByFilterPlugin,
-  RangeFilterPlugin,
   SelectFilterPlugin,
-  TimeColumnFilterPlugin,
+  RangeFilterPlugin,
   TimeFilterPlugin,
+  TimeColumnFilterPlugin,
   TimeGrainFilterPlugin,
+  GroupByFilterPlugin,
 } from 'src/filters/components';
+import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
+import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable';
 
@@ -128,9 +127,9 @@ export default class MainPreset extends Preset {
         new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),
-        new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
         new BigNumberChartPlugin().configure({ key: 'big_number' }),
         new BigNumberTotalChartPlugin().configure({ key: 'big_number_total' }),
+        new EchartsBoxPlotChartPlugin().configure({ key: 'box_plot' }),
         new BubbleChartPlugin().configure({ key: 'bubble' }),
         new BulletChartPlugin().configure({ key: 'bullet' }),
         new CalendarChartPlugin().configure({ key: 'cal_heatmap' }),
@@ -166,7 +165,9 @@ export default class MainPreset extends Preset {
         new TimeTableChartPlugin().configure({ key: 'time_table' }),
         new WordCloudChartPlugin().configure({ key: 'word_cloud' }),
         new WorldMapChartPlugin().configure({ key: 'world_map' }),
-        new EchartsAreaChartPlugin().configure({ key: 'echarts_area' }),
+        new EchartsAreaChartPlugin().configure({
+          key: 'echarts_area',
+        }),
         new EchartsTimeseriesChartPlugin().configure({
           key: 'echarts_timeseries',
         }),

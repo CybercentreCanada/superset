@@ -293,7 +293,7 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
       {frame === 'Common' && (
         <CommonFrame value={timeRangeValue} onChange={setTimeRangeValue} />
       )}
-      {frame === 'Today' && <div data-test="today" />}
+{frame === 'Today' && <div data-test="today" />}
       {frame === 'Yesterday' && <div data-test="yesterday" />}
       {frame === 'Calendar' && (
         <CalendarFrame value={timeRangeValue} onChange={setTimeRangeValue} />

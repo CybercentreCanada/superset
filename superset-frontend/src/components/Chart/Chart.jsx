@@ -130,7 +130,6 @@ const Styles = styled.div`
 
 const MonospaceDiv = styled.div`
   font-family: ${({ theme }) => theme.typography.families.monospace};
-  white-space: pre;
   word-break: break-word;
   overflow-x: auto;
   white-space: pre-wrap;

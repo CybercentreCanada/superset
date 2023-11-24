@@ -148,7 +148,6 @@ export default class SelectControl extends React.PureComponent {
     if (typeof val === 'object' && val?.[valueKey] !== undefined) {
       onChangeVal = val[valueKey];
     }
-
     this.props.onChange(onChangeVal, []);
   }
 
@@ -252,21 +251,6 @@ export default class SelectControl extends React.PureComponent {
       canSelectAll,
     } = this.props;
 
-    const getValue = () => {
-      const currentValue =
-        value ||
-        (this.props.default !== undefined ? this.props.default : undefined);
-
-      // safety check - the value is intended to be undefined but null was used
-      if (
-        currentValue === null &&
-        !this.state.options.find(o => o.value === null)
-      ) {
-        return undefined;
-      }
-      return currentValue;
-    };
-
     const headerProps = {
       name,
       label,
@@ -288,6 +272,21 @@ export default class SelectControl extends React.PureComponent {
       selectAllOnClick: () => {
         this.onChange(this.props.options);
       },
+    };
+
+    const getValue = () => {
+      const currentValue =
+        value ||
+        (this.props.default !== undefined ? this.props.default : undefined);
+
+      // safety check - the value is intended to be undefined but null was used
+      if (
+        currentValue === null &&
+        !this.state.options.find(o => o.value === null)
+      ) {
+        return undefined;
+      }
+      return currentValue;
     };
 
     const selectProps = {
