@@ -51,9 +51,7 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
 
   const highlightedFilterId =
     nativeFilters?.focusedFilterId || nativeFilters?.hoveredFilterId;
-  if (
-    !(focusedFilterScope || highlightedFilterId || dashboardState.focusedChart)
-  ) {
+  if (!(focusedFilterScope || highlightedFilterId)) {
     return {};
   }
 
@@ -80,13 +78,10 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
     }
   } else if (
     chartId === focusedFilterScope?.chartId ||
-    (focusedFilterScope?.scope &&
-      getChartIdsInFilterBoxScope({
-        filterScope: focusedFilterScope?.scope,
-      }).includes(chartId))
+    getChartIdsInFilterBoxScope({
+      filterScope: focusedFilterScope?.scope,
+    }).includes(chartId)
   ) {
-    return focusedChartStyles;
-  } else if (dashboardState.focusedChart === chartId) {
     return focusedChartStyles;
   }
 

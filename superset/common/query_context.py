@@ -52,7 +52,6 @@ class QueryContext:
     form_data: dict[str, Any] | None
     result_type: ChartDataResultType
     result_format: ChartDataResultFormat
-    viz_type: Optional[str]
     force: bool
     custom_cache_timeout: int | None
 
@@ -83,7 +82,6 @@ class QueryContext:
         self.form_data = form_data
         self.force = force
         self.custom_cache_timeout = custom_cache_timeout
-        self.viz_type = viz_type
         self.cache_values = cache_values
         self._processor = QueryContextProcessor(self)
 

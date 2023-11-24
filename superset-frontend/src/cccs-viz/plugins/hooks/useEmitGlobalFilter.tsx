@@ -16,7 +16,7 @@ import { RootState } from 'src/dashboard/types';
 import {
   CLAUSES,
   EXPRESSION_TYPES,
-} from 'src/explore/components/controls/FilterControl/AdhocFilter';
+} from 'src/explore/components/controls/FilterControl/types';
 import { safeJsonObjectParse } from '../utils';
 
 const useEmitGlobalFilter = () => {

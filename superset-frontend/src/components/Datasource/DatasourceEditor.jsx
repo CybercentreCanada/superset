@@ -53,7 +53,6 @@ import SpatialControl from 'src/explore/components/controls/SpatialControl';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { isFeatureEnabled } from 'src/featureFlags';
 import Icons from 'src/components/Icons';
-import { bootstrapData } from 'src/preamble';
 import CollectionTable from './CollectionTable';
 import Fieldset from './Fieldset';
 import Field from './Field';
@@ -986,7 +985,7 @@ class DatasourceEditor extends React.PureComponent {
             description={t(
               'Extra data to specify table metadata. Currently supports ' +
                 'metadata of the format: `{ "certification": { "certified_by": ' +
-                '["Data Platform Team", "Engineering Team"], "details": "This table is the source of truth." ' +
+                '"Data Platform Team", "details": "This table is the source of truth." ' +
                 '}, "warning_markdown": "This is a warning." }`.',
             )}
             control={

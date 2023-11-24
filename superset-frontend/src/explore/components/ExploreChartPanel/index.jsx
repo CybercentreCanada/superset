@@ -242,7 +242,7 @@ const ExploreChartPanel = ({
         css={css`
           min-height: 0;
           flex: 1;
-          overflow: hidden;
+          overflow: auto;
         `}
         ref={chartPanelRef}
       >

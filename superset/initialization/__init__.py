@@ -57,7 +57,8 @@ from superset.utils.core import is_test, pessimistic_connection_handling
 from superset.utils.log import DBEventLogger, get_event_logger_from_cfg_value
 
 if TYPE_CHECKING:
-    from superset.app import SupersetAppfrom superset.utils.core import is_test, pessimistic_connection_handling
+    from superset.app import SupersetApp
+    from superset.utils.core import is_test, pessimistic_connection_handling
 from superset.utils.log import DBEventLogger, get_event_logger_from_cfg_value
 
 

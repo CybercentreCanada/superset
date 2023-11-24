@@ -45,9 +45,6 @@ if TYPE_CHECKING:
     from superset.connectors.sqla.models import SqlaTable
 
 
-TEMPORAL_TYPES = {"DATETIME", "DATE", "TIME", "TIMEDELTA"}
-
-
 def get_physical_table_metadata(
     database: Database,
     table_name: str,

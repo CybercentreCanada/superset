@@ -91,7 +91,6 @@ class QueryContextFactory:  # pylint: disable=too-few-public-methods
             force=force,
             custom_cache_timeout=custom_cache_timeout,
             cache_values=cache_values,
-            viz_type=viz_type,
         )
 
     # pylint: disable=no-self-use

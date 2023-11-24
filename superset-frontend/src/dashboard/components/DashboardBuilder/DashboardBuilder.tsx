@@ -617,8 +617,6 @@ const DashboardBuilder: FC<DashboardBuilderProps> = () => {
       </div>
     ),
     [
-      focusedFilterId,
-      focusedChart,
       nativeFiltersEnabled,
       filterBarOrientation,
       editMode,

@@ -73,7 +73,6 @@ const propTypes = {
   ]),
   isLoading: PropTypes.bool,
   canDelete: PropTypes.func,
-  ghostButton: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -353,31 +352,26 @@ class AdhocFilterControl extends React.Component {
       <div className="metrics-select" data-test="adhoc-filter-control">
         <HeaderContainer>
           <ControlHeader {...this.props} />
-          {this.props.ghostButton
-            ? null
-            : this.addNewFilterPopoverTrigger(
-                <AddIconButton data-test="add-filter-button">
-                  <Icons.PlusLarge
-                    iconSize="s"
-                    iconColor={theme.colors.grayscale.light5}
-                  />
-                </AddIconButton>,
-              )}
+          {this.addNewFilterPopoverTrigger(
+            <AddIconButton data-test="add-filter-button">
+              <Icons.PlusLarge
+                iconSize="s"
+                iconColor={theme.colors.grayscale.light5}
+              />
+            </AddIconButton>,
+          )}
         </HeaderContainer>
         <LabelsContainer>
           {this.state.values.length > 0
             ? this.state.values.map((value, index) =>
                 this.valueRenderer(value, index),
               )
-            : null}
-          {this.state.values.length === 0 || this.props.ghostButton
-            ? this.addNewFilterPopoverTrigger(
+            : this.addNewFilterPopoverTrigger(
                 <AddControlLabel>
                   <Icons.PlusSmall iconColor={theme.colors.grayscale.light1} />
                   {t('Add filter')}
                 </AddControlLabel>,
-              )
-            : null}
+              )}
         </LabelsContainer>
       </div>
     );
