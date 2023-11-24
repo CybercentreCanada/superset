@@ -28,13 +28,16 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
     const jsonPayload = props.data;
     const timeout = 180000; // 3 minutes
     // format dates into datestrings that look like Y-m-d
-    jsonPayload.dates = props.data.dates.map((d: string) => {
+    const allDates = props.data.dates.map((d: string) => {
       let date = new Date(Date.parse(d));
       if (date.toLocaleDateString() === 'Invalid Date') {
         date = new Date(d);
       }
       return date.toLocaleDateString('en-us').replaceAll('/', '-');
     });
+
+    jsonPayload.dates = [...new Set(allDates)];
+
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',
