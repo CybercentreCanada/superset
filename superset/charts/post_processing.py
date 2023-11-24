@@ -27,7 +27,7 @@ for these chart types.
 """
 import logging
 from io import StringIO
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union
 
 import pandas as pd
 from flask_babel import gettext as __

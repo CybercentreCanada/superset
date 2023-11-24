@@ -72,7 +72,6 @@ import {
   AtAGlanceChartIpPlugin,
   AtAGlanceUserIDSasChartPlugin,
   AtAGlanceUserIdChartPlugin,
-  BigNumberChartPlugin,
   CccsTableChartPlugin,
   DatasetExplorerChartPlugin,
   GwwkChartsChartPlugin,
