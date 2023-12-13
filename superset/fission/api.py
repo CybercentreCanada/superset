@@ -137,7 +137,7 @@ class FissionRestApi(BaseApi):
             json=request_payload,
             allow_redirects=False,
             headers=headers,
-            timeout=180000,  # 3 minutes
+            timeout=180,  # 3 minutes
         )
         try:
             result = res.json()

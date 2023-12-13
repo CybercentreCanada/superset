@@ -53,6 +53,6 @@ export type DataMap = { [key: string]: string[] };
 export type GridData = {
   highlightedData: DataMap;
   principalData: DataMap;
-  advancedTypeData: DataMap;
+  typeData: DataMap;
   jumpToData: DataMap;
 };
