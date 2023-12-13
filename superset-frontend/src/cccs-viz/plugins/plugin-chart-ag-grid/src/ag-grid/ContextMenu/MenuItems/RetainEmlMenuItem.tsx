@@ -30,7 +30,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
     // format dates into datestrings that look like Y-m-d
     const allDates = props.data.dates.map((d: string) => {
       let date = new Date(Date.parse(d));
-      if (date.toLocaleDateString() === 'Invalid Date') {
+      if (Number.isNaN(date.getTime())) {
         date = new Date(d);
       }
       return date.toLocaleDateString('en-us').replaceAll('/', '-');
