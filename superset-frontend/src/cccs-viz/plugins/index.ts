@@ -23,8 +23,6 @@ export { default as AtAGlanceChartDnsPlugin } from './plugin-chart-at-a-glance-d
 export { default as AtAGlanceChartIpPlugin } from './plugin-chart-at-a-glance-ip/src/plugin';
 export { default as AtAGlanceUserIDSasChartPlugin } from './plugin-chart-at-a-glance-user-id-sas/src/plugin';
 export { default as AtAGlanceUserIdChartPlugin } from './plugin-chart-at-a-glance-user-id/src/plugin';
-export { default as BigNumberChartPlugin } from './plugin-chart-big-number-currency-selection/BigNumber';
-export { default as BigNumberCurrencySelectionChartPlugin } from './plugin-chart-big-number-currency-selection/BigNumberTotal';
 export { default as CccsGridChartPlugin } from './plugin-chart-cccs-grid/src/plugin';
 export { default as DatasetExplorerChartPlugin } from './plugin-chart-dataset-explorer/src/plugin';
 export { default as GwwkChartsChartPlugin } from './plugin-chart-gwwk-charts/src/Charts';
