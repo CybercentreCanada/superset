@@ -528,15 +528,15 @@ class Header extends React.PureComponent {
           titlePanelAdditionalItems={[
             <>
               {!editMode && (
-              <PublishedStatus
-                dashboardId={dashboardInfo.id}
-                isPublished={isPublished}
-                savePublished={this.props.savePublished}
-                canEdit={userCanEdit}
-                canSave={userCanSaveAs}
-                visible={!editMode}
-              />
-            )}
+                <PublishedStatus
+                  dashboardId={dashboardInfo.id}
+                  isPublished={isPublished}
+                  savePublished={this.props.savePublished}
+                  canEdit={userCanEdit}
+                  canSave={userCanSaveAs}
+                  visible={!editMode}
+                />
+              )}
               <a
                 href={`${datahubUrl}dashboard/urn:li:dashboard:(superset,${dashboardInfo.id})`}
                 style={{ paddingLeft: '0.5em' }}

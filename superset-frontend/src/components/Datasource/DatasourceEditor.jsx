@@ -34,6 +34,7 @@ import {
   t,
   withTheme,
 } from '@superset-ui/core';
+import { bootstrapData } from 'src/preamble';
 import { Select, AsyncSelect, Row, Col } from 'src/components';
 import { FormLabel } from 'src/components/Form';
 import Button from 'src/components/Button';
