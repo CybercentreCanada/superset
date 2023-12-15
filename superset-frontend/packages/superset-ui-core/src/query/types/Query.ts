@@ -161,7 +161,6 @@ export interface QueryContext {
   result_format: string;
   queries: QueryObject[];
   form_data?: QueryFormData;
-  viz_type: string;
 }
 
 export const ErrorTypeEnum = {
