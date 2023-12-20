@@ -46,6 +46,7 @@ import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
+import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -389,6 +390,20 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.advancedTypeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      selectedData.advancedTypeData.eml_path &&
+      selectedData.advancedTypeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <DownloadEmailMenuItem
+          onSelection={handleContextMenu}
+          label="Download Email"
+          key="download-email"
+          data={selectedData.advancedTypeData.eml_path}
         />,
       ];
     }
