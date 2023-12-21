@@ -1,5 +1,11 @@
+import { SupersetClient } from '@superset-ui/core';
 import React from 'react';
 import { Menu } from 'src/components/Menu';
+import { useDispatch } from 'react-redux';
+import {
+  addInfoToast,
+  addDangerToast,
+} from 'src/components/MessageToasts/actions';
 import Icon from '@ant-design/icons';
 import AlSvg from '../../../cccs-grid/images/al.svg';
 
@@ -16,8 +22,24 @@ interface DownloadEmailMenuItemProps {
 export default function DownloadEmailMenuItem(
   props: DownloadEmailMenuItemProps,
 ) {
+  const dispatch = useDispatch();
   const onClick = () => {
-    let url = props.data;
+    const endpoint = `/api/v1/fission/get-eml?file=${props.data}`;
+    const timeout = 180000; // 3 minutes
+    dispatch(
+      addInfoToast(
+        'Download started',),);
+    SupersetClient.get({ endpoint, timeout })
+      .then(({ json }) => {
+        window.open(json.result, '_blank');
+        })
+      .catch(error => {
+        dispatch(
+          addDangerToast(
+            'Download failed.',
+          ),
+        );
+     });
 
     props.onSelection();
   };
