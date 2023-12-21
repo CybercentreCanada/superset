@@ -32,6 +32,7 @@ from superset.advanced_data_type.schemas import (
 from superset.advanced_data_type.types import AdvancedDataTypeResponse
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
+from superset.fission.utils import retain_eml_to_alfred
 
 logger = logging.getLogger(__name__)
 
@@ -99,48 +100,34 @@ class FissionRestApi(BaseApi):
 
     @protect()
     @safe
-    @expose("/<path>", methods=["POST"])
+    @expose("/retain-eml-record", methods=["POST"])
     @permission_name("read")
     @event_logger.log_this_with_context(
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
         log_to_statsd=False,  # pylint: disable-arguments-renamed
     )
     def post(self, path, **kwargs: Any) -> Response:
-        """Proxy to hogwarts fission"""
-
+        """Instead of proxying to fission, we are going to handle the request here"""
         request_payload = request.json
+        if not request_payload:
+            logger.info("no JSON payload in request")
+            return self.response_400('no JSON payload in request')
+        if 'email_ids' not in request_payload:
+          return self.response_400('No field email_ids found in json body of request')
         alfred_env = os.environ.get("ALFRED_ENV")
-        if alfred_env:
-            request_payload["alfred_env"] = alfred_env
-            logger.info(f"ALFRED_ENV: {alfred_env}")
-        else:
+        if not alfred_env:
             logger.info("ALFRED_ENV environment variable not set")
-
+            return self.response_400('ALFRED_ENV environment variable not set')        
         logger.info("Payload is %s", request_payload)
-        url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
-        logger.info(f"Sending to {url}")
+        email_ids = request_payload['email_ids']
+        dates = None
+        if 'dates' in request_payload:
+          dates = request_payload['dates']
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            os.environ.get("FISSION_SCOPE"),
+            os.environ.get("SUPERSET_SCOPE"),
             "superset",
             cache_result=True,
         )
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "X-Auth-Request-Access-Token": token,
-            "Content-Type": "application/json",
-        }
-
-        res = requests.post(  # ref. https://stackoverflow.com/a/36601467/248616
-            url=url,
-            json=request_payload,
-            allow_redirects=False,
-            headers=headers,
-            timeout=180,  # 3 minutes
-        )
-        try:
-            result = res.json()
-        except:
-            result = str(res.text)
-        return self.response(res.status_code, result=result)
+        return retain_eml_to_alfred(email_ids, alfred_env, token, dates)
