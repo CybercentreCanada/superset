@@ -106,7 +106,7 @@ class FissionRestApi(BaseApi):
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
         log_to_statsd=False,  # pylint: disable-arguments-renamed
     )
-    def post(self, path, **kwargs: Any) -> Response:
+    def post(self, **kwargs: Any) -> Response:
         """Instead of proxying to fission, we are going to handle the request here"""
         request_payload = request.json
         if not request_payload:
