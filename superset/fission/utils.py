@@ -334,9 +334,9 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         )
         logger.info("Completed Retention.")
 
-        return make_response(retention_url, 200)
+        return 200, retention_url
 
     except Exception as e:
         logger.info(e)
         logger.info(str(traceback.format_exc()))
-        return make_response(str(traceback.format_exc()), 400)
+        return 400, str(traceback.format_exc())
