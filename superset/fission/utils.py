@@ -254,7 +254,11 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         if dates:
             logger.info(f'Found dates: "{ids_string}" in arguments')
             for date in dates:
-                datetimes.append(datetime.strptime(date, "%Y-%m-%d"))
+                try:
+                    datetimes.append(datetime.strptime(date, "%d-%m-%Y"))
+                except ValueError as ve:
+                    logger.info(ve)
+                    continue
         if alfred_env:
             logger.info(f'Found Alfred-env: "{alfred_env}" in arguments')
         else:
