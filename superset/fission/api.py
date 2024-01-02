@@ -130,9 +130,6 @@ class FissionRestApi(BaseApi):
             "superset",
             cache_result=True,
         )
-        res = retain_eml_to_alfred(email_ids, alfred_env, 'token', dates)
-        try:
-          result = res.json()
-        except:
-          result = str(res.text)
-        return self.response(res.status_code, result=result)
+        status, result = retain_eml_to_alfred(email_ids, alfred_env, 'token', dates)
+        logger.info(f'result: {result}')
+        return self.response(status, result=result)
