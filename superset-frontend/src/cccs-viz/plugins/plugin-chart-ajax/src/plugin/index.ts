@@ -35,8 +35,8 @@ export default class AjaxVisualizationChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'Ajax Visualization',
-      name: t('Ajax Visualization'),
+      description: 'Ajax Chart Visualization',
+      name: t('Ajax Chart Visualization'),
       thumbnail,
     });
 
