@@ -1,7 +1,11 @@
+from marshmallow.validate import ValidationError
 import pandas as pd
 import traceback
 import jwt
 import os
+from superset.utils import core as utils
+from superset.exceptions import SupersetException
+
 
 from trino.dbapi import connect
 from trino.auth import JWTAuthentication
@@ -24,7 +28,7 @@ import logging
 import os.path
 from datetime import datetime
 from datetime import timedelta
-from typing import Optional
+from typing import Optional, Union
 import json
 
 from alfred_client.instance import InstanceUtil
@@ -39,6 +43,11 @@ logger = logging.getLogger(__name__)
 # limit to 100 emls retained at a time
 limit = 100
 
+def validate_json(value: Union[bytes, bytearray, str]) -> None:
+    try:
+        utils.validate_json(value)
+    except SupersetException as ex:
+        raise ValidationError("JSON not valid") from ex
 
 class TokenOAuthInstance(AbstractInstance):
     """
@@ -238,7 +247,6 @@ def sanitize_results(data):
     else:
         return data
     return result
-
 
 def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
     try:
