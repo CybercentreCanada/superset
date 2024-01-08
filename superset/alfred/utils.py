@@ -108,7 +108,7 @@ def create_retention(
     token: str = None,
 ) -> list:
     """
-    This method takes an list of json and sends it to the Alfred Retention UI.
+    This method takes a list of JSON objects and sends it to the Alfred Retention UI.
 
     input:
         data_set: Input logs from the original datasource
