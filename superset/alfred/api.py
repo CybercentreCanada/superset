@@ -18,21 +18,21 @@ import logging
 import os
 from typing import Any
 
-import requests  # pip package requests
-from flask import current_app, current_app as app, request, Response
+from flask import current_app as app, request, Response
 from flask.wrappers import Response
-from flask_appbuilder.api import BaseApi, expose, permission_name, protect, rison, safe
+from flask_appbuilder.api import BaseApi, expose, permission_name, protect, safe
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from marshmallow import ValidationError
+
 
 from superset.advanced_data_type.schemas import (
-    advanced_data_type_convert_schema,
     AdvancedDataTypeSchema,
 )
-from superset.advanced_data_type.types import AdvancedDataTypeResponse
+from superset.alfred.schemas import RetainToAlfredSchema
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
-from superset.fission.utils import retain_eml_to_alfred
+from superset.alfred.utils import retain_eml_to_alfred
 
 logger = logging.getLogger(__name__)
 
@@ -45,11 +45,14 @@ class AlfredRestApi(BaseApi):
 
     allow_browser_login = True
     include_route_methods = {RouteMethod.POST}
-    resource_name = "cccs-alfred"
+    resource_name = "alfred"
     class_permission_name = "AdvancedDataType"
 
     openapi_spec_tag = "Alfred"
     openapi_spec_component_schemas = (AdvancedDataTypeSchema,)
+    
+    add_model_schema = RetainToAlfredSchema()
+
 
     @protect()
     @safe
@@ -68,7 +71,12 @@ class AlfredRestApi(BaseApi):
             Response: 
                 200 Success, { result: "<alfred-url-for-staged-retention>"}
         """
-        request_payload = request.json
+        try:
+            request_payload = self.add_model_schema.load(request.json)
+        # This validates custom Schema with custom validations
+        except ValidationError as error:
+            return self.response_400(message=error.messages)
+        
         if not request_payload:
             logger.info("no JSON payload in request")
             return self.response_400('no JSON payload in request')

@@ -24,7 +24,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
   const dispatch = useDispatch();
 
   const onClick = () => {
-    const endpoint = `/api/v1/fission/retain-eml-record`;
+    const endpoint = `/api/v1/alfred/retain-eml-record`;
     const jsonPayload = props.data;
     const timeout = 180000; // 3 minutes
     // format dates into datestrings that look like Y-m-d

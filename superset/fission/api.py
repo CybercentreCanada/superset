@@ -19,20 +19,17 @@ import os
 from typing import Any
 
 import requests  # pip package requests
-from flask import current_app, current_app as app, request, Response
+from flask import current_app as app, request, Response
 from flask.wrappers import Response
-from flask_appbuilder.api import BaseApi, expose, permission_name, protect, rison, safe
+from flask_appbuilder.api import BaseApi, expose, permission_name, protect, safe
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from superset.advanced_data_type.schemas import (
-    advanced_data_type_convert_schema,
     AdvancedDataTypeSchema,
 )
-from superset.advanced_data_type.types import AdvancedDataTypeResponse
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
-from superset.fission.utils import retain_eml_to_alfred
 
 logger = logging.getLogger(__name__)
 
