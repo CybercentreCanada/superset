@@ -71,7 +71,6 @@ class TokenOAuthInstance(AbstractInstance):
 
     def _add_header(self):
         expiry_buffer = timedelta(minutes=30)
-
         if (
             self.__oath_token_expiry is None
             or self.__oath_token_expiry - datetime.now() < expiry_buffer
@@ -79,10 +78,6 @@ class TokenOAuthInstance(AbstractInstance):
             logger.info("Authenticating via hogwarts vault...")
             api = InstanceUtil.build_scope(self.url)
             vault_client = VaultClient()
-            # jh_ctx_refresh_token = ContextualRefreshToken(os.environ.get('VAULT_REFRESH_TOKEN'))
-
-            # vault_client.refresh(jh_ctx_refresh_token)
-
             alfred_app = vault_client.get_oauth_client("alfred")
             obo_access_token, obo_ctx_refresh_token = vault_client.on_behalf_of(
                 f"{alfred_app.audience}/{alfred_app.scope}",
@@ -310,22 +305,15 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         columns = list(map(lambda d: d[0], cur.description))
         results = cur.fetchmany(limit + 1)
         logger.info("Received response...")
-        logger.info(results)
         processed_rows = []
-
-        logger.info("ROWS")
         for row in results:
-            logger.info(row)
+
             processed_rows.append(sanitize_results(row))
 
         json_rows = pd.DataFrame.from_records(processed_rows, columns=columns).to_json(
             orient="records"
         )
-        logger.info("JSON ROWS")
-        logger.info(json_rows)
         data_to_map = json.loads(json_rows)
-        logger.info("DATA")
-        logger.info(data_to_map)
 
         rationale = "Malicious Activity"
         classification = "PB//CND"
@@ -345,6 +333,6 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         return 200, retention_url
 
     except Exception as e:
-        logger.info(e)
-        logger.info(str(traceback.format_exc()))
+        logger.error(e)
+        logger.error(str(traceback.format_exc()))
         return 400, str(traceback.format_exc())
