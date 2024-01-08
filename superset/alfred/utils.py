@@ -118,7 +118,7 @@ def create_retention(
         event_type: One of BEACON, BROWSER_BASED_EXPLOITATION, DOS, EMAIL, EXFILTRATION, GENERIC_EVENT, IMPROPER_USAGE, MALWARE_ARTIFACTS,
                         MALWARE_DOWNLOAD, PHISHING, REMOTE_ACCESS, REMOTE_EXPLOITATION, SCAN, SCRAPING, TRAFFIC_INTERCEPTION
         markup: Defaults to PB//CND,
-        cccs_formatting: Perform additional event splitting and formatting to match CCCS expected incident/event format. Default- True
+        cccs_formatting: Perform additional event splitting and formatting to match CCCS expected incident/event format. Default value is True
 
     output:
         retention_id
