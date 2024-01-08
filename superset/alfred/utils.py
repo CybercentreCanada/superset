@@ -23,6 +23,7 @@ from trino.client import NamedRowTuple
 from alfred_client import AlfredService
 from alfred_client.instance import InstanceUtil
 from alfred_client import RetentionInstance
+from alfred_client.instance.AbstractInstance import AbstractInstance
 
 import logging
 import os.path
@@ -31,12 +32,6 @@ from datetime import timedelta
 from typing import Optional, Union
 import json
 
-from alfred_client.instance import InstanceUtil
-from alfred_client.instance.AbstractInstance import AbstractInstance
-
-# Determine if we are in JupyHub Hogwarts environment by the presence of the hogwarts library.
-
-import jwt
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +46,7 @@ def validate_json(value: Union[bytes, bytearray, str]) -> None:
 
 class TokenOAuthInstance(AbstractInstance):
     """
-    Alfred Instance with OAuth with on-behalf-of authentication instance only supported from Hogwarts. This
-    implementation will fail if the hogwarts library is not present. This is a fair indication that the user is not in
-    the JH environment.
+    Alfred Instance with OAuth with on-behalf-of authentication instance only supported from Hogwarts.
     """
 
     def __init__(self, url: str, token: str):
