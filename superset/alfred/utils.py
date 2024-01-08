@@ -269,7 +269,10 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             token_client_name="superset",
         )
 
-        trino_host = "trino-stg.hogwarts.pb.azure.chimera.cyber.gc.ca"
+        trino_host = os.environ.get('TRINO_HOST')
+        if not trino_host:
+            logger.error("TRINO_HOST environment variable not set")
+            raise Exception('TRINO_HOST environment variable not set')
         logger.info(f"Establishing connection to trino at {trino_host}...")
         conn = connect(
             auth=JWTAuthentication(trino_acces_token),
