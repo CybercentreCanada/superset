@@ -374,8 +374,8 @@ export default function AGGridViz({
           }}
           disabled={selectedData.typeData.harmonized_email_id.length > 30}
           tooltip={
-            selectedData.typeData.harmonized_email_id.length > 30
-              ? 'Cannot retain more than 30 EML IDs.'
+            selectedData.typeData.harmonized_email_id.length > 100
+              ? 'Cannot retain more than 100 EML IDs.'
               : undefined
           }
         />,
