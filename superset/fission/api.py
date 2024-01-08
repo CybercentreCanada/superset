@@ -76,12 +76,12 @@ class FissionRestApi(BaseApi):
 
         url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
-            method=request.method,
-            url=url,
-            data=request.get_data(),
-            allow_redirects=False,
-            headers=headers,
-            timeout=180,
+            method          = request.method,
+            url             = url,
+            data            = request.get_data(),
+            allow_redirects = False,
+            headers         = headers,
+            timeout         = 180 # extending timeout for fission loading times
         )
         try:
             result = res.json()
