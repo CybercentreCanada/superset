@@ -76,21 +76,23 @@ class AlfredRestApi(BaseApi):
         # This validates custom Schema with custom validations
         except ValidationError as error:
             return self.response_400(message=error.messages)
-        
+
         if not request_payload:
             logger.info("no JSON payload in request")
             return self.response_400('no JSON payload in request')
         if 'email_ids' not in request_payload:
             return self.response_400('No field email_ids found in json body of request')
-        alfred_env = os.environ.get("ALFRED_ENV")
-        if not alfred_env:
-            logger.info("ALFRED_ENV environment variable not set")
-            return self.response_400('ALFRED_ENV environment variable not set')        
+
         logger.info("Payload is %s", request_payload)
         email_ids = request_payload['email_ids']
         dates = None
         if 'dates' in request_payload:
             dates = request_payload['dates']
+
+        alfred_env = os.environ.get("ALFRED_ENV")
+        if not alfred_env:
+            logger.info("ALFRED_ENV environment variable not set")
+            return self.response_400('ALFRED_ENV environment variable not set')
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
