@@ -317,7 +317,6 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
 
         rationale = "Malicious Activity"
         classification = "PB//CND"
-        cccs_formatting = True  # Extra formatting to fit CCCS standards
 
         logger.info("Creating Retention...")
         retention_url = create_retention(
@@ -325,7 +324,6 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             alfred_env,
             rationale=rationale,
             markup=classification,
-            cccs_formatting=cccs_formatting,
             token=access_token,
         )
         logger.info("Completed Retention.")
