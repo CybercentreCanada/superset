@@ -11,5 +11,5 @@ class RetainToAlfredSchema(Schema):
         dates: list of dates in the format mm-dd-yyyy to lookup email ids 
             by to improve performance, not required
     """
-    eml_ids = fields.List(fields.String())
+    email_ids = fields.List(fields.String())
     dates = fields.List(fields.String(), allow_none=True)
