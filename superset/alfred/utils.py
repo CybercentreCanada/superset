@@ -100,7 +100,7 @@ class TokenOAuthInstance(AbstractInstance):
 def create_retention(
     data_set,
     alfred_instance,
-    metadata_system="HOGWARTS",
+    metadata_system="Analytical Platform",
     rationale=None,
     event_type="GENERIC_EVENT",
     markup="PB//CND",
