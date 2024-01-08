@@ -112,7 +112,7 @@ def create_retention(
 
     input:
         data_set: Input logs from the original datasource
-        alfred_instance: What Alfred to retain to. Speficied in alfred_client.instance.InstanceUtil (ALFRED_STG_PB, ALFRED_PRD_PB, ALFRED_REPORTS_PB)
+        alfred_instance: The Alfred instance to which to retain. Specified in alfred_client.instance.InstanceUtil (ALFRED_STG_PB, ALFRED_PRD_PB, ALFRED_REPORTS_PB)
         metadata_system: The system the metadata was retrieved from.
         rationale: One of Malicious Activity, Situational Awareness, Capability Development
         event_type: One of BEACON, BROWSER_BASED_EXPLOITATION, DOS, EMAIL, EXFILTRATION, GENERIC_EVENT, IMPROPER_USAGE, MALWARE_ARTIFACTS,
