@@ -75,7 +75,7 @@ class FissionRestApi(BaseApi):
           "X-Auth-Request-Access-Token": token
         }
 
-        url = request_url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
+        url = request.url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
             url             = url,
@@ -84,8 +84,4 @@ class FissionRestApi(BaseApi):
             headers         = headers,
             timeout         = 180 # extending timeout for fission loading times
         )
-        try:
-          result = res.json()
-        except:
-          result = str(res.text)
-        return self.response(res.status_code, result=result)
+        return res
