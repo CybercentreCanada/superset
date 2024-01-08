@@ -40,7 +40,7 @@ config = app.config
 
 class AlfredRestApi(BaseApi):
     """
-    Fission rest endpoint to proxy hogwarts fission
+    Rest API for creating alfred retentions
     """
 
     allow_browser_login = True
