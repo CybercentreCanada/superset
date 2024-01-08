@@ -78,7 +78,7 @@ class AlfredRestApi(BaseApi):
             return self.response_400(message=error.messages)
 
         if not request_payload:
-            logger.info("no JSON payload in request")
+            logger.error("no JSON payload in request")
             return self.response_400('No JSON payload in request.')
         if 'email_ids' not in request_payload:
             return self.response_400('No field named "email_ids" found in the JSON body of then request')
@@ -91,7 +91,7 @@ class AlfredRestApi(BaseApi):
 
         alfred_env = os.environ.get("ALFRED_ENV")
         if not alfred_env:
-            logger.info("ALFRED_ENV environment variable not set")
+            logger.error("ALFRED_ENV environment variable not set")
             return self.response_400('ALFRED_ENV environment variable not set')
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(
@@ -101,5 +101,4 @@ class AlfredRestApi(BaseApi):
             cache_result=True,
         )
         status, result = retain_eml_to_alfred(email_ids, alfred_env, token, dates)
-        logger.info('result: %s', result)
         return self.response(status, result=result)
