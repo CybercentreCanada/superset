@@ -377,7 +377,7 @@ export default function AGGridViz({
           disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
           tooltip={
             selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT
-              ? 'Cannot retain more than RETENTION_LIMIT harmonized email IDs.'
+              ? `Cannot retain more than ${RETENTION_LIMIT} harmonized email IDs.`
               : undefined
           }
         />,
