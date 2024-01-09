@@ -62,7 +62,7 @@ const DEFAULT_COL_DEF = {
   enableRowGroup: true,
 };
 
-RETENTION_LIMIT = 100;
+const RETENTION_LIMIT = 100;
 
 const headerStyles = css`
   display: flex;
