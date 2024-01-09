@@ -62,6 +62,8 @@ const DEFAULT_COL_DEF = {
   enableRowGroup: true,
 };
 
+RETENTION_LIMIT = 100;
+
 const headerStyles = css`
   display: flex;
   flex-direction: row;
@@ -372,10 +374,10 @@ export default function AGGridViz({
               ...(selectedData.typeData.DATETIME || []),
             ],
           }}
-          disabled={selectedData.typeData.harmonized_email_id.length > 100}
+          disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
           tooltip={
-            selectedData.typeData.harmonized_email_id.length > 100
-              ? 'Cannot retain more than 100 harmonized email IDs.'
+            selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT
+              ? 'Cannot retain more than RETENTION_LIMIT harmonized email IDs.'
               : undefined
           }
         />,
