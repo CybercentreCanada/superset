@@ -81,7 +81,7 @@ class AlfredRestApi(BaseApi):
             logger.error("no JSON payload in request")
             return self.response_400('No JSON payload in request.')
         if 'email_ids' not in request_payload:
-            return self.response_400('No field named "email_ids" found in the JSON body of then request')
+            return self.response_400('No field named "email_ids" found in the JSON body of the request')
 
         logger.info("Payload is %s", request_payload)
         email_ids = request_payload['email_ids']
