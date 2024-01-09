@@ -97,7 +97,6 @@ def create_retention(
     rationale=None,
     event_type="GENERIC_EVENT",
     markup="PB//CND",
-    cccs_formatting=True,
     token: str = None,
 ) -> list:
     """
@@ -111,8 +110,6 @@ def create_retention(
         event_type: One of BEACON, BROWSER_BASED_EXPLOITATION, DOS, EMAIL, EXFILTRATION, GENERIC_EVENT, IMPROPER_USAGE, MALWARE_ARTIFACTS,
                         MALWARE_DOWNLOAD, PHISHING, REMOTE_ACCESS, REMOTE_EXPLOITATION, SCAN, SCRAPING, TRAFFIC_INTERCEPTION
         markup: Defaults to PB//CND,
-        cccs_formatting: Perform additional event splitting and formatting to match CCCS expected incident/event format. Default value is True
-
     output:
         retention_id
     """
@@ -141,8 +138,7 @@ def create_retention(
             log["rationale"] = rationale
 
         # Preform org/comm grouping
-        if cccs_formatting:
-            if "new event id" not in log and "event description" not in log:
+        if "new event id" not in log and "event description" not in log:
                 # Group Comms by the department
                 dept = (
                     log["Event Organization"]
@@ -193,10 +189,7 @@ def create_retention(
                 # Set the Event ID
                 log["new event id"] = f"LS-<{event_type}_{dept_map[dept]}>"
 
-        else:
-            if "new event id" not in log:
-                log["new event id"] = f"LS-<{event_type}_1>"
-
+      
     # Create Retention and Stage it
     logger.info(f"Creating Retention...")
     retention = RetentionInstance(
