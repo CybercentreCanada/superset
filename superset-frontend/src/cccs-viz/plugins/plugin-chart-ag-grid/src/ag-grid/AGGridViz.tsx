@@ -372,7 +372,7 @@ export default function AGGridViz({
               ...(selectedData.typeData.DATETIME || []),
             ],
           }}
-          disabled={selectedData.typeData.harmonized_email_id.length > 30}
+          disabled={selectedData.typeData.harmonized_email_id.length > 100}
           tooltip={
             selectedData.typeData.harmonized_email_id.length > 100
               ? 'Cannot retain more than 100 harmonized email IDs.'
