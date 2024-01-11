@@ -127,7 +127,7 @@ const config: ControlPanelConfig = {
               },
               renderTrigger: true,
               default: '',
-              description: t('The Base URL for the Iframe.'),
+              description: t('The Base URL for the Ajax visualization.'),
             },
           },
         ],
