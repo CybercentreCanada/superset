@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import base64
 from typing import Any
 import logging
 from flask import current_app as app
@@ -68,6 +69,12 @@ class FissionRestApi(BaseApi):
                                                                           os.environ.get('FISSION_SCOPE'),
                                                                           'superset',
                                                                           cache_result=True)
+        alfred_instance = os.environ.get('ALFRED_ENV')
+        if alfred_instance:
+           request_url = request.url + f'&alfred_instance={alfred_instance}'
+           logger.info(request_url)
+        else:
+           logger.info('ALFRED_ENV environment variable not set')
         
         logger.info('Args is %s', request.args)
         headers = {
@@ -76,16 +83,23 @@ class FissionRestApi(BaseApi):
         }
 
         url = request_url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
-        res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
+
+        res = requests.request( # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
             url             = url,
             data            = request.get_data(),
             allow_redirects = False,
             headers         = headers,
-            timeout         = 180 # extending timeout for fission loading times
+            timeout         = 30
         )
-        try:
-          result = res.json()
-        except:
-          result = str(res.text)
+
+        if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image
+            encoded_image = base64.b64encode(res.content).decode('utf-8')  # Encode the image in base64
+            result = {'image': f'data:image/png;base64,{encoded_image}'}  # Store in a JSON-friendly format
+        else:
+            try:
+                result = res.json()
+            except:
+                result = str(res.text)
+
         return self.response(res.status_code, result=result)
