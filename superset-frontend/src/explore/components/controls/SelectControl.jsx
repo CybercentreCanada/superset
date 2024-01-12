@@ -284,9 +284,7 @@ export default class SelectControl extends React.PureComponent {
         this.props.copyOnClick(getValue());
       },
       canSelectAll,
-      selectAllOnClick: () => {
-        this.onChange(this.props.options);
-      },
+      selectAllOnClick: canSelectAll ? this.selectAllOnClick : undefined,
     };
 
     const selectProps = {
