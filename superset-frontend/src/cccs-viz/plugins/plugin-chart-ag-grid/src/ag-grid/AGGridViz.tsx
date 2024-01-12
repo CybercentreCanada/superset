@@ -368,8 +368,7 @@ export default function AGGridViz({
           data={{
             email_ids: selectedData.typeData.harmonized_email_id,
             dates: [
-              ...(selectedData.typeData['TIMESTAMP WITH TIME ZONE'] || []),
-              ...(selectedData.typeData['TIMESTAMP WITHOUT TIME ZONE'] || []),
+              ...(Object.entries(selectedData.typeData).filter((k) => k[0].includes('TIMESTAMP')).map((v) => [...v[1]])),
               ...(selectedData.typeData.DATE || []),
               ...(selectedData.typeData.DATETIME || []),
             ],
