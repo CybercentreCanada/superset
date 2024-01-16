@@ -6,7 +6,7 @@ const InlineImg = {
   display: 'inline-block',
   transform: 'translateY(-10%)',
   '-ms-transform': 'translateY(-10%)',
-};
+};n 
 
 const InlineText = {
   display: 'inline-block',
