@@ -35,7 +35,10 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
         if (Number.isNaN(date.getTime())) {
           date = new Date(d);
         }
-        return date.toLocaleDateString('en-us').replaceAll('/', '-');
+        const day = date.getDate();
+        const month = date.getMonth() + 1 // months are labelled 0-11;
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
       });
     } catch (error) {
       console.error(`Error parsing dates, ignoring date columns: ${error}`)
