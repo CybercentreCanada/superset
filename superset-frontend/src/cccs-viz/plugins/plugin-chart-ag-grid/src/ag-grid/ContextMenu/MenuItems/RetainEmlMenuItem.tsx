@@ -28,16 +28,22 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
     const jsonPayload = props.data;
     const timeout = 180000; // 3 minutes
     // format dates into datestrings that look like Y-m-d
-    const allDates = props.data.dates.map((d: string) => {
-      let date = new Date(Date.parse(d));
-      if (Number.isNaN(date.getTime())) {
-        date = new Date(d);
-      }
-      return date.toLocaleDateString('en-us').replaceAll('/', '-');
-    });
+    let allDates = []
+    try {
+      allDates = props.data.dates.map((d: string) => {
+        let date = new Date(Date.parse(d));
+        if (Number.isNaN(date.getTime())) {
+          date = new Date(d);
+        }
+        return date.toLocaleDateString('en-us').replaceAll('/', '-');
+      });
+    } catch (error) {
+      console.error(`Error parsing dates, ignoring date columns: ${error}`)
+      allDates = [];
+    }
 
     jsonPayload.dates = [...new Set(allDates)];
-
+    
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',
