@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SupersetClient } from '@superset-ui/core';
 import { AjaxVisualizationProps } from './types';
 
-export default function AjaxVisualization(props: AjaxVisualizationProps) {
+export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
   const {
     url,
     url_parameter_value,

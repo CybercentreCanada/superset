@@ -43,7 +43,7 @@ export default class AjaxVisualizationChartPlugin extends ChartPlugin {
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../AjaxVisualization'),
+      loadChart: () => import('../PluginChartAjaxView'),
       metadata,
       transformProps,
     });
