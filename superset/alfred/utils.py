@@ -241,7 +241,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         else:
             raise Exception("No field 'email_ids' found in request")
         if dates:
-            logger.info(f'Found dates: "{ids_string}" in arguments')
+            logger.info(f'Found dates: "{dates}" in arguments')
             for date in dates:
                 try:
                     datetimes.append(datetime.strptime(date, "%Y-%m-%d"))
@@ -280,9 +280,9 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
     FROM  hogwarts_pb.harmonized.eml_metadata
     WHERE id IN ('{ids_string}')
     """
-        if dates:
+        if datetimes:
             sql += " AND "
-            for i in range(len(dates)):
+            for i in range(len(datetimes)):
                 if i > 0:
                     sql += " OR "
                 sql += f"(time > TIMESTAMP '{datetimes[i].strftime('%Y-%m-%d')}' AND time < TIMESTAMP '{(datetimes[i] + timedelta(days=1)).strftime('%Y-%m-%d')}')"
