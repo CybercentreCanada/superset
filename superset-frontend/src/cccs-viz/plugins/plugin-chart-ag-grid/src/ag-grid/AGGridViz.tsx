@@ -366,7 +366,7 @@ export default function AGGridViz({
           label="Retain EML Record To ALFRED"
           key="retain-eml"
           data={{
-            email_ids: selectedData.typeData.harmonized_email_id,
+            email_ids: Array.from(new Set(selectedData.typeData.harmonized_email_id)),
             dates: [
               ...(Object.entries(selectedData.typeData).filter((k) => k[0].includes('TIME')).map((v) => v[1])).flat(),
               ...(selectedData.typeData.DATE || []),
@@ -375,7 +375,7 @@ export default function AGGridViz({
           }}
           disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
           tooltip={
-            selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT
+            new Set(selectedData.typeData.harmonized_email_id).size > RETENTION_LIMIT
               ? `Cannot retain more than ${RETENTION_LIMIT} harmonized email IDs.`
               : undefined
           }
