@@ -281,11 +281,12 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
     WHERE id IN ('{ids_string}')
     """
         if datetimes:
-            sql += " AND "
+            sql += " AND ("
             for i in range(len(datetimes)):
                 if i > 0:
                     sql += " OR "
                 sql += f"(time > TIMESTAMP '{datetimes[i].strftime('%Y-%m-%d')}' AND time < TIMESTAMP '{(datetimes[i] + timedelta(days=1)).strftime('%Y-%m-%d')}')"
+            sql += ")"
         logger.info(f"Querying EML Data from trino at {trino_host}...")
         cur = conn.cursor()
         logger.info(f"Created Connection {cur.query_id}")
