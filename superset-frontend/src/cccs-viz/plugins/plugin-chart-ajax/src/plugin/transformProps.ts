@@ -66,14 +66,6 @@ export default function transformProps(chartProps: ChartProps) {
     errorMessage = 'The query returned no rows.';
   }
 
-  if (
-    url.includes('fission.hogwarts') &&
-    (navigator.userAgent.includes('Edg/') ||
-      navigator.userAgent.includes('Chrome/'))
-  ) {
-    errorMessage = 'fission-incompat';
-  }
-
   if (Array.isArray(data) && data.length === 1) {
     value = data[0][groupby] || '';
   }
