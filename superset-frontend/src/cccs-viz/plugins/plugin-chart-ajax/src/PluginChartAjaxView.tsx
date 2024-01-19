@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { SupersetClient } from '@superset-ui/core';
-import React, { useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+//import { SupersetClient } from '@superset-ui/core';
 import { AjaxVisualizationProps } from './types';
 
 export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
