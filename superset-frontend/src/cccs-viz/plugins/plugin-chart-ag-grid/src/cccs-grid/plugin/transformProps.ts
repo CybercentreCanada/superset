@@ -39,9 +39,9 @@ const calcMetricColumnDefs = (
     const metricsColumnDefs = metrics.map((metric: any) => {
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
-        : metric;
+        : metric.label;
       return {
-        field: metric,
+        field: metric.label,
         headerName: metricHeader,
         sortable: true,
         enableRowGroup: true,
@@ -54,9 +54,9 @@ const calcMetricColumnDefs = (
     const percentMetricsColumnDefs = percent_metrics.map((metric: any) => {
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
-        : metric;
+        : metric.label;
       return {
-        field: `%${metric}`,
+        field: `%${metric.label}`,
         headerName: `%${metricHeader}`,
         sortable: true,
         valueFormatter: percentMetricValueFormatter,
