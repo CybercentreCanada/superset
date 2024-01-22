@@ -27,10 +27,12 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
     [parameter_name, parameter_prefix, url, url_parameter_value],
   );
 
+  const rawUrl:string = `${url}?${parameter_name}=${url_parameter_value}`
+
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const { json } = await SupersetClient.get({ endpoint: encodedUrl,
+        const { json } = await SupersetClient.get({ endpoint: rawUrl,
         timeout: QUERY_TIMEOUT_LIMIT });
 
        // if (!json || !json.image) {
@@ -68,6 +70,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         overflow: 'auto',
       }}
     >
+    <div>{`EncodedUrl: ${encodedUrl}`}</div>
     <div>{`Response: ${imageUrl}`}</div>
     </div>
   );
