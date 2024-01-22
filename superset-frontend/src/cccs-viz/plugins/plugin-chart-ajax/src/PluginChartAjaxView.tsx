@@ -15,7 +15,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
+  //const [imageError, setImageError] = useState(false);
 
     // We encode the parameter value (including its prefix)
   // so the Fission proxy doesn't break on parameters that contain, for example, URLs.
@@ -40,7 +40,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         setImageUrl(JSON.stringify(json));  // json.image is a base64 data URL
       } catch (error) {
         console.error('Fetch error:', error);
-        setImageUrl(null);
+        setImageUrl(JSON.stringify(error));
       } finally {
         setLoading(false);
       }
@@ -68,18 +68,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         overflow: 'auto',
       }}
     >
-      <div>
-      {imageUrl && !imageError ? (
-        <img 
-          src={imageUrl} 
-          alt="Ajax Email Render Visualization" 
-          style={{ width: '100%', height: 'auto' }} 
-          onError={() => setImageError(true)}
-        />
-      ) : (
-        <div>{imageError ? `Failed to load image with response: ${imageUrl}` : 'Image not available!'}</div>
-      )}
-    </div>
+    <div>{`Response: ${imageUrl}`}</div>
     </div>
   );
 }
