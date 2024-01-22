@@ -13,8 +13,9 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
     errorMessage,
   } = props;
 
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
     // We encode the parameter value (including its prefix)
   // so the Fission proxy doesn't break on parameters that contain, for example, URLs.
@@ -32,11 +33,11 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         const { json } = await SupersetClient.get({ endpoint: encodedUrl,
         timeout: QUERY_TIMEOUT_LIMIT });
 
-        if (!json || !json.image) {
-          throw new Error('No image in response');
-        }
+       // if (!json || !json.image) {
+       //   throw new Error('No image in response');
+       // }
 
-        setImageUrl(json.image);  // json.image is a base64 data URL
+        setImageUrl(JSON.stringify(json));  // json.image is a base64 data URL
       } catch (error) {
         console.error('Fetch error:', error);
         setImageUrl(null);
@@ -67,7 +68,18 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         overflow: 'auto',
       }}
     >
-      {imageUrl ? <img src={imageUrl} alt="Ajax Email Render Visualization" style={{ width: '100%', height: 'auto' }} /> : <div>Image not available!</div>}
+      <div>
+      {imageUrl && !imageError ? (
+        <img 
+          src={imageUrl} 
+          alt="Ajax Email Render Visualization" 
+          style={{ width: '100%', height: 'auto' }} 
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <div>{imageError ? `Failed to load image with response: ${imageUrl}` : 'Image not available!'}</div>
+      )}
+    </div>
     </div>
   );
 }
