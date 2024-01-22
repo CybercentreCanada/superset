@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-//import { SupersetClient } from '@superset-ui/core';
+import { SupersetClient } from '@superset-ui/core';
 import { AjaxVisualizationProps } from './types';
+
+const QUERY_TIMEOUT_LIMIT = 10000;
 
 export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
   const {
@@ -11,12 +13,12 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
     errorMessage,
   } = props;
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
     // We encode the parameter value (including its prefix)
   // so the Fission proxy doesn't break on parameters that contain, for example, URLs.
-  const encodedUrl = useMemo(
+  const encodedUrl:string = useMemo(
     () =>
       `${url}?${parameter_name}=${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
@@ -27,14 +29,14 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(encodedUrl);
+        const { json } = await SupersetClient.get({ endpoint: encodedUrl,
+        timeout: QUERY_TIMEOUT_LIMIT });
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        if (!json || !json.image) {
+          throw new Error('No image in response');
         }
 
-        const blob = await response.blob();
-        setImageUrl(URL.createObjectURL(blob));
+        setImageUrl(json.image);  // json.image is a base64 data URL
       } catch (error) {
         console.error('Fetch error:', error);
         setImageUrl(null);
@@ -65,7 +67,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         overflow: 'auto',
       }}
     >
-      {imageUrl ? <img src={imageUrl} alt="Ajax Email Render Visualization" style={{ width: '100%', height: 'auto' }} /> : <div>Image not available</div>}
+      {imageUrl ? <img src={imageUrl} alt="Ajax Email Render Visualization" style={{ width: '100%', height: 'auto' }} /> : <div>Image not available!</div>}
     </div>
   );
 }
