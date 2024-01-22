@@ -276,7 +276,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         )
 
         sql = f"""
-    SELECT id, urls, "from", to, message_id, reply_to, stream_id, subject, eml_path, bcc, cc, ministerial_authorization, classification, time
+    SELECT *
     FROM  hogwarts_pb.harmonized.eml_metadata
     WHERE id IN ('{ids_string}')
     """
