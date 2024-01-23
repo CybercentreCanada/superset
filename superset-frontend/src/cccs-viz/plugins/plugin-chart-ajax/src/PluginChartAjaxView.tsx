@@ -37,7 +37,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
     const fetchImage = async () => {
       let attempts = 0;
 
-      while (attempts < 4) {
+      while (attempts < 5) {
         try {
           const { json } = await SupersetClient.get({ endpoint: apiUrl, timeout: QUERY_TIMEOUT_LIMIT });
 
@@ -52,10 +52,12 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
           setImageError(error.message || 'Fission function trouble fetching image, retry in process.');
           attempts++;
         } finally {
-          setLoading(attempts >= 4);
+          setLoading(attempts >= 5);
         }
       }
-      setImageError('Image cannot be fetched at this time due to network issues.');
+      if (attempts >= 5) {
+        setImageError('Image cannot be fetched at this time due to network issues.');
+      }
     };
     fetchImage();
   }, [apiUrl]);
@@ -71,7 +73,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
   if (errorMessage) {
     return (
       <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
-        <span style={{ fontSize: '12px', color: 'red' }}>
+        <span style={{ fontSize: '14px', color: 'red' }}>
           <strong>Error:</strong> {errorMessage}
         </span>
       </div>
@@ -81,7 +83,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
   if (imageError) {
     return (
       <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
-        <span style={{ fontSize: '12px', color: 'red' }}>
+        <span style={{ fontSize: '16px', color: 'red' }}>
           <strong>Error:</strong> {imageError}
         </span>
         <p style={{ marginTop: '15px', fontSize: '14px' }}>
