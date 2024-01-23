@@ -28,24 +28,29 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
 
   useEffect(() => {
     const fetchImage = async () => {
-      try {
-        const { json } = await SupersetClient.get({ endpoint: encodedUrl, timeout: QUERY_TIMEOUT_LIMIT });
+      let attempts = 0;
 
-        setResponse(JSON.stringify(json));
+      while (attempts < 4) {
+        try {
+          const { json } = await SupersetClient.get({ endpoint: encodedUrl, timeout: QUERY_TIMEOUT_LIMIT });
+          setResponse(JSON.stringify(json));
 
-        if (!json || !json.result.image) {
-          setImageError("Error: Superset Fission Function Retrieval Failed");
-          throw new Error('No image in response');
+          if (!json || !json.result.image) {
+            throw new Error('No image in response');
+          }
+
+          setImageUrl(json.result.image); // json.result.image is a base64 data URL
+          setImageError(null);
+          break; // Break the loop on success
+        } catch (error) {
+          setResponse(JSON.stringify(error));
+          setImageError(error.message || 'Fission Function Trouble Fetching Image');
+          attempts++;
+        } finally {
+          setLoading(attempts >= 4);
         }
-        setImageUrl(json.result.image);  // json.result.image is a base64 data URL
-      } catch (error) {
-        setResponse(JSON.stringify(error));
-        setImageError(error.message || 'Error: Fission Function Trouble Fetching Image');
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchImage();
   }, [encodedUrl]);
 
@@ -70,7 +75,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         position: 'absolute',
         left: 0,
         top: '50px',
-        width: '95%',
+        width: '98%',
         height: '100%',
         overflow: 'auto',
       }}
