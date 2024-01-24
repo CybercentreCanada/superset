@@ -301,7 +301,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             processed_rows.append(sanitize_results(row))
 
         json_rows = pd.DataFrame.from_records(processed_rows, columns=columns).to_json(
-            orient="records", date_unit='us'
+            orient="records", date_unit="us"
         )
         data_to_map = json.loads(json_rows)
 
