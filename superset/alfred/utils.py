@@ -1,3 +1,4 @@
+from decimal import Decimal
 from marshmallow.validate import ValidationError
 import pandas as pd
 import traceback
@@ -31,6 +32,11 @@ from datetime import datetime
 from datetime import timedelta
 from typing import Optional, Union
 import json
+from numpy import datetime64, ndarray
+
+JS_MAX_SAFE_INTEGER = 9007199254740991
+
+JS_MIN_SAFE_INTEGER = -9007199254740991
 
 
 logger = logging.getLogger(__name__)
@@ -214,17 +220,30 @@ def create_retention(
 
     return retention_url
 
-
-def sanitize_results(data):
+def sanitize_results(data, warnings=None, safe_js_ints=False):
     result = dict()
-    if isinstance(data, list):
+
+    if isinstance(data, dict):
+        for key, value in data.items():
+            result[key] = sanitize_results(value, warnings, safe_js_ints)
+    elif isinstance(data, (list, ndarray)):
         json_array = []
         for v in data:
-            json_array.append(sanitize_results(v))
+            json_array.append(sanitize_results(v, warnings, safe_js_ints))
         return json_array
+    elif isinstance(data, datetime64):
+        return pd.Timestamp(data)
+    elif isinstance(data, (bytearray, bytes)):
+        return data.hex(" ").upper().split().__str__()
+    elif safe_js_ints and isinstance(data, (int, Decimal)):
+        if data <= JS_MAX_SAFE_INTEGER and data >= JS_MIN_SAFE_INTEGER:
+            return data
+        else:
+            warnings.append(f"int {data} was cast to string to avoid loss of precision.")
+            return str(data)
     elif isinstance(data, NamedRowTuple):
         for key, value in zip(data._names, data):
-            result[key] = sanitize_results(value)
+            result[key] = sanitize_results(value, warnings, safe_js_ints)
     else:
         return data
     return result
