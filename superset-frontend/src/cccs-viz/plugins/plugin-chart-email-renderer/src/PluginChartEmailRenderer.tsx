@@ -1,12 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { SupersetClient } from '@superset-ui/core';
-import { AjaxVisualizationProps } from './types';
+import { EmailRendererProps } from './types';
 
-const QUERY_TIMEOUT_LIMIT = 180000; // Example timeout limit in milliseconds
+const QUERY_TIMEOUT_LIMIT = 180000; // Timeout limit in milliseconds
 
-export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
+export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
-    url,
     url_parameter_value,
     parameter_name,
     parameter_prefix,
@@ -22,15 +21,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
       `/api/v1/fission/emailpreview?${parameter_name}=${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
       }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url, url_parameter_value],
-  );
-
-  const encodedUrl = useMemo(
-    () =>
-      `${url}?${parameter_name}=${
-        parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-      }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url, url_parameter_value],
+    [parameter_name, parameter_prefix, url_parameter_value],
   );
 
   useEffect(() => {
@@ -88,7 +79,7 @@ export default function PluginChartAjaxView(props: AjaxVisualizationProps) {
         </span>
         <p style={{ marginTop: '15px', fontSize: '14px' }}>
           Please click on the following{' '}
-          <a href={encodedUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+          <a href={apiUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
             link
           </a>{' '}
           to view the visualization in a new window.

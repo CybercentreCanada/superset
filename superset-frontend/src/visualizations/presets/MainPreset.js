@@ -83,7 +83,7 @@ import {
   GwwkChartsChartPlugin,
   GwwkDashboardsChartPlugin,
   GwwkDatasetsChartPlugin,
-  AjaxVisualizationChartPlugin,
+  EmailRendererChartPlugin,
   IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
 } from 'src/cccs-viz/plugins/';
@@ -123,7 +123,7 @@ export default class MainPreset extends Preset {
         new AtAGlanceChartIpPlugin().configure({ key: 'at_a_glance_ip' }),
         new AtAGlanceChartDnsPlugin().configure({ key: 'at_a_glance_dns' }),
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
-        new AjaxVisualizationChartPlugin().configure({ key: 'ajax' }),
+        new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
         new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
         new GwwkChartsChartPlugin().configure({ key: 'gwwk_charts' }),

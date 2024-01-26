@@ -69,12 +69,6 @@ class FissionRestApi(BaseApi):
                                                                           os.environ.get('FISSION_SCOPE'),
                                                                           'superset',
                                                                           cache_result=True)
-        alfred_instance = os.environ.get('ALFRED_ENV')
-        if alfred_instance:
-           request_url = request.url + f'&alfred_instance={alfred_instance}'
-           logger.info(request_url)
-        else:
-           logger.info('ALFRED_ENV environment variable not set')
         
         logger.info('Args is %s', request.args)
         headers = {
@@ -90,7 +84,7 @@ class FissionRestApi(BaseApi):
             data            = request.get_data(),
             allow_redirects = False,
             headers         = headers,
-            timeout         = 30
+            timeout         = 180
         )
 
         if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image

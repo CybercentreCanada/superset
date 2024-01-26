@@ -24,7 +24,6 @@ under the License.
 
 # Creating a custom viz
 
-
 Modified instructions from
 https://superset.apache.org/docs/installation/building-custom-viz-plugins
 

@@ -22,7 +22,7 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 
-export default class AjaxVisualizationChartPlugin extends ChartPlugin {
+export default class EmailRendererChartPlugin extends ChartPlugin {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library
@@ -35,15 +35,15 @@ export default class AjaxVisualizationChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'Ajax Chart Visualization',
-      name: t('Ajax Chart Visualization'),
+      description: 'Email Renderer Visualization Chart',
+      name: t('Email Renderer Chart Visualization'),
       thumbnail,
     });
 
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../PluginChartAjaxView'),
+      loadChart: () => import('../PluginChartEmailRenderer'),
       metadata,
       transformProps,
     });
