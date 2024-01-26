@@ -33,10 +33,6 @@ import { buildQueryContext, QueryFormData } from '@superset-ui/core';
  * if a viz needs multiple different result sets.
  */
 export default function buildQuery(formData: QueryFormData) {
-  /*
-    We receive an ip as a filter, our job is to find everthing there is to know about that ip
-    We fire multiple queries to multiple data sets and collect the results here.
-    */
 
   const formDataCopy = {
     ...formData,

@@ -108,31 +108,6 @@ const config: ControlPanelConfig = {
         ['adhoc_filters'],
         [
           {
-            name: 'url',
-            config: {
-              type: 'TextControl',
-              label: t('URL'),
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const originalMapStateToProps =
-                  sharedControls?.groupby?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = controlState.value
-                  ? []
-                  : ['Please add a value for URL.'];
-                return newState;
-              },
-              renderTrigger: true,
-              default: '',
-              description: t('The Base URL for the Ajax visualization.'),
-            },
-          },
-        ],
-        [
-          {
             name: 'groupby',
             override: {
               label: t('Parameter Column Name'),

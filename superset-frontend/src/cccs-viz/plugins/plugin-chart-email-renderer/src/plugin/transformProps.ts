@@ -50,7 +50,7 @@ export default function transformProps(chartProps: ChartProps) {
    */
   const { formData, queriesData } = chartProps;
 
-  const { url, parameterName, parameterPrefix, groupby } = formData;
+  const { parameterName, parameterPrefix, groupby } = formData;
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
 
@@ -73,7 +73,6 @@ export default function transformProps(chartProps: ChartProps) {
   return {
     url_parameter_value: value,
     parameter_name: parameterName,
-    url,
     parameter_prefix: parameterPrefix,
     errorMessage,
   };
