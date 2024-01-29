@@ -38,13 +38,10 @@ import { DndItemType } from 'src/explore/components/DndItemType';
 import ColumnSelectPopoverTrigger from './ColumnSelectPopoverTrigger';
 import { DndControlProps } from './types';
 import SelectControl from '../SelectControl';
-import { useKeyDown } from 'src/hooks/useKeyDown';
 
 export type DndColumnSelectProps = DndControlProps<QueryFormColumn> & {
   options: ColumnMeta[];
   isTemporal?: boolean;
-} & {
-  selectAllOnClick?: () => void; // CCCS Prop
 };
 
 function DndColumnSelect(props: DndColumnSelectProps) {
@@ -191,27 +188,6 @@ function DndColumnSelect(props: DndColumnSelectProps) {
       ),
     [ghostButtonText, multi],
   );
-
-  // ========================== CCCS Code START ==========================
-
-  const selectAllOnClick = () => {
-    const opts = Object.keys(optionSelector.options)
-    onChange(opts);
-  }
-
-  useKeyDown((event: { ctrlKey: boolean; key: string; }) => {
-    if (event.ctrlKey === false) {
-      return;
-    }
-    if (event.key === 'a') {
-      selectAllOnClick();
-    }
-  });
-
-  props = {...props, selectAllOnClick}
-
-  // ========================== CCCS Code END ============================
-
 
   return (
     <div>
