@@ -43,10 +43,11 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           setImageError(error.message || 'Fission function trouble fetching image, retry in process.');
           attempts++;
         } finally {
-          setLoading(attempts >= 5);
+          setLoading(attempts <= 5);
         }
       }
       if (attempts >= 5) {
+        setLoading(false)
         setImageError('Image cannot be fetched at this time due to network issues.');
       }
     };
