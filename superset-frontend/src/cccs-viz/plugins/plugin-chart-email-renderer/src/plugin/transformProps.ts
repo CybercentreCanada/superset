@@ -58,8 +58,7 @@ export default function transformProps(chartProps: ChartProps) {
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {
-    errorMessage =
-      'The query returned too many rows when only one was expected.';
+    value = data[0][groupby] || '';
   }
 
   if (Array.isArray(data) && data.length === 0) {
