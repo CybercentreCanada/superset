@@ -24,13 +24,15 @@ from trino.client import NamedRowTuple
 from alfred_client import AlfredService
 from alfred_client.instance import InstanceUtil
 from alfred_client import RetentionInstance
+from alfred_client.model.retention import DataSetMapper
 from alfred_client.instance.AbstractInstance import AbstractInstance
+from alfred_client.model.retention.DTOContractData import DataSetEntry
 
 import logging
 import os.path
 from datetime import datetime
 from datetime import timedelta
-from typing import Optional, Union
+from typing import List, Optional, Union
 import json
 from numpy import datetime64, ndarray
 
@@ -197,25 +199,28 @@ def create_retention(
 
       
     # Create Retention and Stage it
-    logger.info(f"Creating Retention...")
-    retention = RetentionInstance(
-        alfred,
-        f"Fission Retention - {datetime.now()}",
-        data_set,
-        metadata_system,
-        server_side_mapping_name="hogwarts.harmonized.eml_metadata",
-    )
-    ready = retention.stage()
+    logger.info("Creating Retention...")
+    
+    # retention = RetentionInstance(
+    #     alfred,
+    #     f"Fission Retention - {datetime.now()}",
+    #     data_set,
+    #     metadata_system,
+    #     server_side_mapping_name="hogwarts.harmonized.eml_metadata",
+    # )
+    # Not using retention class due to synchronous behavior. creating async workflow
+    out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
+    retention = alfred.create_retention(f"Fission Retention - {datetime.now()}")
+    retention = alfred.add_retention_dataset(retention.uri, out_data_set, metadata_system, mapping_name="hogwarts.harmonized.eml_metadata")
 
     # logger.info the result
-    logger.info(f"Retention Ready: {ready}.")
     logger.info(f"Retention Messages: {retention.retention.message_summary}.")
 
     # Return the URL
     retention_url = (
         InstanceUtil.build_url(alfred_instance)
         .replace(":9488", "")
-        .replace("/rest", f"/ui/{retention.retention.uri}")
+        .replace("/rest", f"/ui/{retention.uri}")
     )
 
     return retention_url
