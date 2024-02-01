@@ -556,6 +556,7 @@ export default function AGGridViz({
           cacheQuickFilter
           suppressRowClickSelection
           suppressContextMenu
+          suppressFieldDotNotation
           modules={[
             ClientSideRowModelModule,
             RangeSelectionModule,
