@@ -214,7 +214,7 @@ def create_retention(
     retention = alfred.add_retention_dataset(retention.uri, out_data_set, metadata_system, mapping_name="hogwarts.harmonized.eml_metadata")
 
     # logger.info the result
-    logger.info(f"Retention Messages: {retention.retention.message_summary}.")
+    # logger.info(f"Retention Messages: {retention.message_summary}.")
 
     # Return the URL
     retention_url = (
