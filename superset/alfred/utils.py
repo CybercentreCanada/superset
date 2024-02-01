@@ -197,24 +197,23 @@ def create_retention(
                 # Set the Event ID
                 log["new event id"] = f"LS-<{event_type}_{dept_map[dept]}>"
 
-      
     # Create Retention and Stage it
     logger.info("Creating Retention...")
-    
-    # retention = RetentionInstance(
-    #     alfred,
-    #     f"Fission Retention - {datetime.now()}",
-    #     data_set,
-    #     metadata_system,
-    #     server_side_mapping_name="hogwarts.harmonized.eml_metadata",
-    # )
-    # Not using retention class due to synchronous behavior. creating async workflow
-    out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
-    retention = alfred.create_retention(f"Fission Retention - {datetime.now()}")
-    retention = alfred.add_retention_dataset(retention.uri, out_data_set, metadata_system, mapping_name="hogwarts.harmonized.eml_metadata")
 
-    # logger.info the result
-    # logger.info(f"Retention Messages: {retention.message_summary}.")
+    # These lines were copied from the stage function in the RetentionInstance
+    # class in the alfred_client library, but does not block and wait for the
+    # retention to be in the 'ready' state. This async case will hopefully be 
+    # added to the library in the future and this code can be replaced.
+    out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
+    retention = alfred.create_retention(
+            f"Harmonized Email Dashboard Retention - {datetime.now()}"
+        )
+    retention = alfred.add_retention_dataset(
+            retention.uri,
+            out_data_set,
+            metadata_system,
+            mapping_name="hogwarts.harmonized.eml_metadata"
+        )
 
     # Return the URL
     retention_url = (
@@ -299,7 +298,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             catalog="hogwarts_pb",
         )
 
-        # excluding v6 due to utf encoding errors
+        # excluding v6 columns due to utf encoding errors
         columns = ['bcc', 'body', 'cc', 'classification', 'content_type', 'cpoints', 'department', 'direction', 'eml_path', 'files', "'from'", 'id', 'length', 'md5', 'message_id', 'ministerial_authorization', 'parent_id', 'reply_to', 'root_id', 'sensor', 'sha1', 'sha256', 'source_id', 'stream_id', 'subject', 'subparts', 'tag', 'time', 'to', 'urls', 'timeperiod_loadedby', 'raw_source', 'stream_name', 'stream_description', 'src_port', 'dst_port', 'src_ip_asn', 'dst_ip_asn', 'src_ip_country_code', 'dst_ip_local', 'src_ip_local', 'dst_ip_department', 'src_ip_department', 'zone', 'helo', 'mail_from', 'rcpt_to', 'in_reply_to', 'references', 'xmailer', 'received', 'dest_ip_country_code', 'zone_str', 'xoriginating_ip_v4', 'xoriginating_ip_department', 'xoriginating_ip_country_code', 'last_received_ip_v4', 'last_received_ip_department', 'last_received_ip_country_code', 'src_ip_v4', 'dst_ip_v4']
         columns_string = ', '.join(columns)
         sql = f'''
@@ -307,6 +306,8 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         FROM  hogwarts_pb.harmonized.eml_metadata
         WHERE id in ('{ids_string}')
         '''
+        # Adding this where clause is intended to optimize the query. It is assumed that all the EMLs will be under the same date or close to the 
+        # same date so they are added in a separate where clause
         if datetimes:
             sql += " AND ("
             for i in range(len(datetimes)):
