@@ -6,6 +6,7 @@ const QUERY_TIMEOUT_LIMIT = 180000; // Timeout limit in milliseconds
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
+    url,
     url_parameter_value,
     parameter_name,
     parameter_prefix,
@@ -80,7 +81,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
         </span>
         <p style={{ marginTop: '15px', fontSize: '14px' }}>
           Please click on the following{' '}
-          <a href={apiUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+          <a href={url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
             link
           </a>{' '}
           to view the visualization in a new window.

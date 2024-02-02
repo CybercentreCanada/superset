@@ -84,7 +84,7 @@ class FissionRestApi(BaseApi):
             data            = request.get_data(),
             allow_redirects = False,
             headers         = headers,
-            timeout         = 180
+            timeout         = 30
         )
 
         if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image
