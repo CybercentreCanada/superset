@@ -58,7 +58,7 @@ export default function transformProps(chartProps: ChartProps) {
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {
-    value = data[0][groupby] || '';
+    errorMessage = 'The query returned too many rows.  Right click and select [Emit Principal Column Filters(s)] to select only one row for rendering.';
   }
 
   if (Array.isArray(data) && data.length === 0) {

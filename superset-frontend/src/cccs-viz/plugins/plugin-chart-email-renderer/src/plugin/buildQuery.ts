@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { buildQueryContext, QueryFormData } from '@superset-ui/core';
 
 /**
  * The buildQuery function is used to create an instance of QueryContext that's
@@ -32,21 +31,22 @@ import { buildQueryContext, QueryFormData } from '@superset-ui/core';
  * it is possible to define post processing operations in the QueryObject, or multiple queries
  * if a viz needs multiple different result sets.
  */
-export default function buildQuery(formData: QueryFormData) {
+// Example of modifying the buildQuery function to include a unique identifier
+import { buildQueryContext, QueryContext, QueryFormData } from '@superset-ui/core';
 
-  const formDataCopy = {
+export default function buildQuery(formData: QueryFormData): QueryContext {
+  // Clone formData to avoid directly mutating the original object
+  const modifiedFormData = {
     ...formData,
-    result_type: 'post_processed',
+    // Append a unique identifier, like a timestamp, to the formData
+    // This ensures the query is always considered unique
+    refresh_timestamp: new Date().getTime(),
   };
 
-  return buildQueryContext(formDataCopy, baseQueryObject => {
-    // RAW mode (not aggregated)
-    // eslint-disable-next-line no-param-reassign
-    return [
-      {
-        ...baseQueryObject,
-        row_limit: 10,
-      },
-    ];
-  });
+  return buildQueryContext(modifiedFormData, (baseQueryObject) => [
+    {
+      ...baseQueryObject,
+      row_limit: 10,
+    },
+  ]);
 }
