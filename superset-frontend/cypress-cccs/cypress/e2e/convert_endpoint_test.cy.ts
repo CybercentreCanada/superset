@@ -21,7 +21,7 @@ beforeEach(() => {
   cy.cccsLogin()
 });
 
-describe('Test /convert endpoi5nt', () => {
+describe('Test /convert endpoint', () => {
 
   const CONVERT_ADVANCED_DATA_TYPE_URL = '/api/v1/advanced_data_type/convert?q='
 
