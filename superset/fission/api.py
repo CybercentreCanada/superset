@@ -18,6 +18,7 @@ import logging
 import os
 from typing import Any
 
+import base64
 import requests  # pip package requests
 from flask import current_app as app, request, Response
 from flask.wrappers import Response
@@ -93,9 +94,12 @@ class FissionRestApi(BaseApi):
             headers         = headers,
             timeout         = 180 # extending timeout for fission loading times
         )
-        try:
-            result = res.json()
-        except requests.JSONDecodeError as e:
-            logger.error('response does not contain valid json: %s', e)
-            result = str(res.text)
+        if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image
+            encoded_image = base64.b64encode(res.content).decode('utf-8')  # Encode the image in base64
+            result = {'image': f'data:image/png;base64,{encoded_image}'}  # Store in a JSON-friendly format
+        else:
+            try:
+                result = res.json()
+            except:
+                result = str(res.text)
         return self.response(res.status_code, result=result)
