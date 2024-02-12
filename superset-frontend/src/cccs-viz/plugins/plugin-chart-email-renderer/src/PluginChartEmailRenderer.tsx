@@ -19,10 +19,10 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   const apiUrl = useMemo(
     () =>
-      `/api/v1/fission/emailpreview?${parameter_name}=${
+      `${url}?${parameter_name}=${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
       }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url_parameter_value],
+    [parameter_name, parameter_prefix, url, url_parameter_value],
   );
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
         </span>
         <p style={{ marginTop: '15px', fontSize: '14px' }}>
           Please click on the following{' '}
-          <a href={url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+          <a href={apiUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
             link
           </a>{' '}
           to view the visualization in a new window.
