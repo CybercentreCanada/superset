@@ -76,9 +76,7 @@ class FissionRestApi(BaseApi):
         }
 
         path_to_replace = ""
-        if "api/v1/me" in request.host_url:
-            path_to_replace = "api/v1/me/"
-        elif "api/v1/fission" in request.host_url:
+        if "api/v1/fission" in request.host_url:
             path_to_replace = "api/v1/fission/"
 
         # Check if a path was set for replacement
