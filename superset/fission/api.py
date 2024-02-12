@@ -74,14 +74,24 @@ class FissionRestApi(BaseApi):
             "X-Auth-Request-Access-Token": token,
         }
 
-        url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
+        path_to_replace = ""
+        if "api/v1/me" in request.host_url:
+            path_to_replace = "api/v1/me/"
+        elif "api/v1/fission" in request.host_url:
+            path_to_replace = "api/v1/fission/"
+
+        # Check if a path was set for replacement
+        if path_to_replace:
+            # Replace the relevant part of the URL with the API_HOST
+            url = request.url.replace(f"{request.host_url}{path_to_replace}", f"{API_HOST}/")
+
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
             url             = url,
             data            = request.get_data(),
             allow_redirects = False,
             headers         = headers,
-            timeout         = 30
+            timeout         = 180 # extending timeout for fission loading times
         )
         try:
             result = res.json()
