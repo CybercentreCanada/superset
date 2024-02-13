@@ -32,7 +32,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
     const fetchImage = async () => {
       let attempts = 0;
 
-      while (attempts < 5) {
+      while (attempts < 10) {
         try {
           const { json } = await SupersetClient.get({ endpoint: apiUrl, timeout: QUERY_TIMEOUT_LIMIT });
 
@@ -50,7 +50,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           setLoading(attempts >= 5);
         }
       }
-      if (attempts >= 5) {
+      if (attempts >= 10) {
         setLoading(false)
         setImageError('Image cannot be fetched at this time due to network issues.');
       }
