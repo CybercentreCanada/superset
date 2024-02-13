@@ -6,7 +6,6 @@ const QUERY_TIMEOUT_LIMIT = 180000; // Timeout limit in milliseconds
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
-    url,
     url_parameter_value,
     parameter_name,
     parameter_prefix,
@@ -22,8 +21,12 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       `/api/v1/fission/emailpreview?${parameter_name}=${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
       }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url, url_parameter_value],
+    [parameter_name, parameter_prefix, url_parameter_value],
   );
+
+  const linkUrl = `https://fission.hogwarts.pb.azure.chimera.cyber.gc.ca/emailpreview?${parameter_name}=${
+    parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
+  }${encodeURIComponent(url_parameter_value)}`
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -49,7 +52,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       }
       if (attempts >= 5) {
         setLoading(false)
-        setImageError('Image cannot be fetched at this time due to network issues!');
+        setImageError('Image cannot be fetched at this time due to network issues.');
       }
     };
     fetchImage();
@@ -81,7 +84,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
         </span>
         <p style={{ marginTop: '15px', fontSize: '14px' }}>
           Please click on the following{' '}
-          <a href={apiUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
+          <a href={linkUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'blue' }}>
             link
           </a>{' '}
           to view the visualization in a new window.
