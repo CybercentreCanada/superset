@@ -62,6 +62,8 @@ const DEFAULT_COL_DEF = {
   enableRowGroup: true,
 };
 
+const RETENTION_LIMIT = 100;
+
 const headerStyles = css`
   display: flex;
   flex-direction: row;
@@ -102,7 +104,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
-    advancedTypeData: {},
+    typeData: {},
     jumpToData: {},
   });
   const [menuItems, setMenuItems] = useState<JSX.Element[]>([]);
@@ -185,7 +187,7 @@ export default function AGGridViz({
 
     const newSelectedData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
-    const advancedTypeData: { [key: string]: string[] } = {};
+    const typeData: { [key: string]: string[] } = {};
     const jumpToData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
@@ -212,7 +214,7 @@ export default function AGGridViz({
                     colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
                   )
                 : [value];
-            const advancedType: string = colDef?.advancedDataType
+            const dataType: string = colDef?.advancedDataType
               ? String(colDef.advancedDataType)
               : colDef?.type
               ? String(colDef.type)
@@ -222,10 +224,10 @@ export default function AGGridViz({
               if (!newSelectedData[col].includes(value)) {
                 newSelectedData[col].push(value);
               }
-              jumpToData[advancedType] = jumpToData[advancedType] || [];
+              jumpToData[dataType] = jumpToData[dataType] || [];
               formattedValue.forEach(v => {
-                if (v && !jumpToData[advancedType].includes(v)) {
-                  jumpToData[advancedType].push(v);
+                if (v && !jumpToData[dataType].includes(v)) {
+                  jumpToData[dataType].push(v);
                 }
               });
             }
@@ -235,11 +237,10 @@ export default function AGGridViz({
                 newPrincipalData[col].push(value);
               }
             }
-            advancedTypeData[advancedType] =
-              advancedTypeData[advancedType] || [];
+            typeData[dataType] = typeData[dataType] || [];
             formattedValue.forEach(v => {
-              if (v && !advancedTypeData[advancedType].includes(v)) {
-                advancedTypeData[advancedType].push(v);
+              if (v && !typeData[dataType].includes(v)) {
+                typeData[dataType].push(v);
               }
             });
           });
@@ -249,7 +250,7 @@ export default function AGGridViz({
     setSelectedData({
       highlightedData: newSelectedData,
       principalData: newPrincipalData,
-      advancedTypeData,
+      typeData,
       jumpToData,
     });
   }, [principalColumns]);
@@ -355,8 +356,8 @@ export default function AGGridViz({
     let specialMenuItems: JSX.Element[] = [];
     if (
       enableAlfred &&
-      selectedData.advancedTypeData.harmonized_email_id &&
-      selectedData.advancedTypeData.harmonized_email_id.length > 0
+      selectedData.typeData.harmonized_email_id &&
+      selectedData.typeData.harmonized_email_id.length > 0
     ) {
       specialMenuItems = [
         ...specialMenuItems,
@@ -364,13 +365,18 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label="Retain EML Record To ALFRED"
           key="retain-eml"
-          data={selectedData.advancedTypeData.harmonized_email_id}
-          disabled={
-            selectedData.advancedTypeData.harmonized_email_id.length > 30
-          }
+          data={{
+            email_ids: Array.from(new Set(selectedData.typeData.harmonized_email_id)),
+            dates: [
+              ...(Object.entries(selectedData.typeData).filter((k) => k[0].includes('TIME')).map((v) => v[1])).flat(),
+              ...(selectedData.typeData.DATE || []),
+              ...(selectedData.typeData.DATETIME || []),
+            ],
+          }}
+          disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
           tooltip={
-            selectedData.advancedTypeData.harmonized_email_id.length > 30
-              ? 'Cannot retain more than 30 EML IDs.'
+            new Set(selectedData.typeData.harmonized_email_id).size > RETENTION_LIMIT
+              ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
               : undefined
           }
         />,
@@ -378,8 +384,8 @@ export default function AGGridViz({
     }
     if (
       assemblyLineUrl &&
-      selectedData.advancedTypeData.file_sha256 &&
-      selectedData.advancedTypeData.file_sha256.length > 0
+      selectedData.typeData.file_sha256 &&
+      selectedData.typeData.file_sha256.length > 0
     ) {
       specialMenuItems = [
         ...specialMenuItems,
@@ -387,7 +393,7 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label="Open in ASSEMBLYLINE"
           key="open-file-in-assembly-line"
-          data={selectedData.advancedTypeData.file_sha256}
+          data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
         />,
       ];
@@ -556,6 +562,7 @@ export default function AGGridViz({
           cacheQuickFilter
           suppressRowClickSelection
           suppressContextMenu
+          suppressFieldDotNotation
           modules={[
             ClientSideRowModelModule,
             RangeSelectionModule,
