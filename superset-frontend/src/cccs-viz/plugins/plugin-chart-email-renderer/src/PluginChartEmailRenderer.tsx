@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { SupersetClient } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
 
-const QUERY_TIMEOUT_LIMIT = 180000; // Timeout limit in milliseconds
+const QUERY_TIMEOUT_LIMIT = 180000;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
