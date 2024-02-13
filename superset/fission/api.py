@@ -75,6 +75,8 @@ class FissionRestApi(BaseApi):
             "X-Auth-Request-Access-Token": token,
         }
 
+        API_HOST="https://fission.hogwarts.pb.azure.chimera.cyber.gc.ca/"
+
         url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/") 
 
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616

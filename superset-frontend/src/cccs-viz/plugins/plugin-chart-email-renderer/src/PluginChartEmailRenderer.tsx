@@ -19,10 +19,10 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   const apiUrl = useMemo(
     () =>
-      `${url}?${parameter_name}=${
+      `/api/v1/fission/emailpreview?${parameter_name}=${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
       }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url, url_parameter_value],
+    [parameter_name, parameter_prefix, url_parameter_value],
   );
 
   useEffect(() => {
