@@ -49,7 +49,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       }
       if (attempts >= 5) {
         setLoading(false)
-        setImageError('Image cannot be fetched at this time due to network issues.');
+        setImageError('Image cannot be fetched at this time due to network issues!');
       }
     };
     fetchImage();
