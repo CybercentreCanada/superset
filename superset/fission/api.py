@@ -75,7 +75,7 @@ class FissionRestApi(BaseApi):
             "X-Auth-Request-Access-Token": token,
         }
 
-        url = request.url.replace(f"{request.url}api/v1/fission/", f"{API_HOST}/") 
+        url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/") 
 
         res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
             method          = request.method,
