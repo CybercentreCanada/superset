@@ -3,3 +3,7 @@ cypress/screenshots
 cypress/videos
 src/temp
 node_modules/
+cccs-build/superset/Dockerfile
+jsconfig.json
+superset-frontend/packages/generator-superset/package-lock.json
+superset-frontend/packages/generator-superset/package.json
