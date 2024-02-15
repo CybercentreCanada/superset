@@ -110,3 +110,6 @@ messages.mo
 docker/requirements-local.txt
 
 cache/
+
+package-lock.json
+package.json
