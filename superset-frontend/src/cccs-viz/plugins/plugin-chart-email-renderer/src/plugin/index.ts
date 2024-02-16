@@ -35,8 +35,8 @@ export default class EmailRendererChartPlugin extends ChartPlugin {
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'Email Renderer Visualization Chart',
-      name: t('Email Renderer Chart Visualization'),
+      description: 'This chart calls a Fission function to retrieve an image of an email and then renders that image.',
+      name: t('Email Renderering Chart Visualization'),
       thumbnail,
     });
 
