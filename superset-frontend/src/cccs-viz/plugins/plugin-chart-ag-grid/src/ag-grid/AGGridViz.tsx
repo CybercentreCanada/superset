@@ -400,8 +400,8 @@ export default function AGGridViz({
       ];
     }
     if (
-      selectedData.advancedTypeData.eml_path &&
-      selectedData.advancedTypeData.eml_path.length > 0
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
     ) {
       specialMenuItems = [
         ...specialMenuItems,
@@ -409,7 +409,7 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label="Download Email"
           key="download-email"
-          data={selectedData.advancedTypeData.eml_path}
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }
