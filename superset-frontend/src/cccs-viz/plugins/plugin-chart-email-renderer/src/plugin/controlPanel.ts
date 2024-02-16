@@ -108,6 +108,30 @@ const config: ControlPanelConfig = {
         ['adhoc_filters'],
         [
           {
+            name: 'parameter_name',
+            config: {
+              type: 'TextControl',
+              label: t('Parameter Name'),
+              mapStateToProps: (
+                state: ControlPanelState,
+                controlState: ControlState,
+              ) => {
+                const originalMapStateToProps =
+                  sharedControls?.groupby?.mapStateToProps;
+                const newState =
+                  originalMapStateToProps?.(state, controlState) ?? {};
+                newState.externalValidationErrors = controlState.value
+                  ? []
+                  : ['Please add a value for Parameter Name.'];
+                return newState;
+              },
+              default: '',
+              description: t('The name for the URL parameter.'),
+            },
+          },
+        ],
+        [
+          {
             name: 'groupby',
             override: {
               label: t('Parameter Column Name'),
@@ -131,30 +155,6 @@ const config: ControlPanelConfig = {
                     : ['Please add a value for Parameter Column Name.'];
                 return newState;
               },
-            },
-          },
-        ],
-        [
-          {
-            name: 'parameter_name',
-            config: {
-              type: 'TextControl',
-              label: t('Parameter Name'),
-              mapStateToProps: (
-                state: ControlPanelState,
-                controlState: ControlState,
-              ) => {
-                const originalMapStateToProps =
-                  sharedControls?.groupby?.mapStateToProps;
-                const newState =
-                  originalMapStateToProps?.(state, controlState) ?? {};
-                newState.externalValidationErrors = controlState.value
-                  ? []
-                  : ['Please add a value for Parameter Name.'];
-                return newState;
-              },
-              default: '',
-              description: t('The name for the URL parameter.'),
             },
           },
         ],

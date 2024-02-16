@@ -47,12 +47,12 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           setImageError(error.message || 'Fission function trouble fetching image, retry in process.');
           attempts++;
         } finally {
-          setLoading(attempts >= 5);
+          setLoading(attempts >= 10);
         }
       }
       if (attempts >= 10) {
         setLoading(false)
-        setImageError('Image cannot be fetched at this time due to network issues.');
+        setImageError('An unexpected error has occured.  The image cannot be fetched at this time.');
       }
     };
     fetchImage();
@@ -104,7 +104,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
         overflow: 'auto',
       }}
     >
-      {imageUrl ? <img src={imageUrl} alt="Email Visualization" style={{ width: '100%', height: 'auto' }} /> : <div>Image not available...</div>}
+      {imageUrl ? <img src={imageUrl} alt="Email Visualization" style={{ width: '100%', height: 'auto' }} /> : <div>Image not available.</div>}
     </div>
   );
 }
