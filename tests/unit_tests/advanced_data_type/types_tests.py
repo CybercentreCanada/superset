@@ -27,6 +27,8 @@ from superset.utils.core import FilterOperator, FilterStringOperators
 
 from superset.advanced_data_type.plugins.internet_address import internet_address
 from superset.advanced_data_type.plugins.internet_port import internet_port as port
+from superset.advanced_data_type.plugins.advanced_data_types import STREAM_DICT, stream_id_func, ipv6_func, domain_func
+import unittest
 
 
 # To run the unit tests below, use the following command in the root Superset folder:
@@ -514,9 +516,6 @@ def test_port_translate_filter_func_not_in_double():
         port_translate_filter_response
     )
 
-from superset.advanced_data_type import STREAM_DICT, stream_id_func, ipv6_func, domain_func
-import unittest
-
 class TestTypes(unittest.TestCase):
 
     """
@@ -540,7 +539,7 @@ class TestTypes(unittest.TestCase):
         }
         test_key:AdvancedDataTypeResponse = stream_id_func(key_req)
         test_val:AdvancedDataTypeResponse = stream_id_func(val_req)
-        self.assertEqual(test_key["error_message"], "")
+        assert(test_key["error_message"], "")
         self.assertEqual(test_val["error_message"], "")
         invalid_val_req: AdvancedDataTypeRequest = {
         "values": ["fail"]
