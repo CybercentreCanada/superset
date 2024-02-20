@@ -102,9 +102,6 @@ def create_retention(
     data_set,
     alfred_instance,
     metadata_system="Analytical Platform",
-    rationale=None,
-    event_type="GENERIC_EVENT",
-    markup="PB//CND",
     token: str = None,
 ) -> list:
     """
@@ -114,9 +111,6 @@ def create_retention(
         data_set: Input logs from the original datasource
         alfred_instance: The Alfred instance to which to retain. Specified in alfred_client.instance.InstanceUtil (ALFRED_STG_PB, ALFRED_PRD_PB, ALFRED_REPORTS_PB)
         metadata_system: The system the metadata was retrieved from.
-        rationale: One of Malicious Activity, Situational Awareness, Capability Development
-        event_type: One of BEACON, BROWSER_BASED_EXPLOITATION, DOS, EMAIL, EXFILTRATION, GENERIC_EVENT, IMPROPER_USAGE, MALWARE_ARTIFACTS,
-                        MALWARE_DOWNLOAD, PHISHING, REMOTE_ACCESS, REMOTE_EXPLOITATION, SCAN, SCRAPING, TRAFFIC_INTERCEPTION
         markup: Defaults to PB//CND,
     output:
         retention_id
@@ -129,73 +123,6 @@ def create_retention(
     logger.info(
         f"Connected to Alfred {alfred_instance} version {alfred.fetch_version()}."
     )
-
-    # Variables
-    dept_map = {}
-    info_map = {}
-    event_count = 1
-
-    # Add in the extra values, plus do department splitting
-    for log in data_set:
-        # Add Constants if not already set
-        if "event type" not in log:
-            log["event type"] = event_type
-        if "new incident id" not in log:
-            log["new incident id"] = "LS-<INCIDENT_1>"
-        if "rationale" not in log:
-            log["rationale"] = rationale
-
-        # Preform org/comm grouping
-        if "new event id" not in log and "event description" not in log:
-                # Group Comms by the department
-                dept = (
-                    log["Event Organization"]
-                    if "Event Organization" in log
-                    else "Unknown Department"
-                )
-                if dept not in dept_map:
-                    dept_map[dept] = event_count
-                    event_count += 1
-
-                # Set the description per event.
-                # If logs supply 'Event Info' it will be grabbed from all the logs, uniqued and sorted into the description
-                if dept not in info_map:
-                    info_map[dept] = "\n".join(
-                        sorted(
-                            list(
-                                set(
-                                    [
-                                        d["Event Info"]
-                                        for d in data_set
-                                        if "Event Info" in d
-                                        and (
-                                            (
-                                                dept != "Unknown Department"
-                                                and "Event Organization" in d
-                                                and dept == d["Event Organization"]
-                                            )
-                                            or (
-                                                dept == "Unknown Department"
-                                                and "Event Organization" not in d
-                                            )
-                                        )
-                                    ]
-                                )
-                            )
-                        )
-                    )
-                    log["event description"] = (
-                        "{" + markup + "}" + f"{dept}\n{info_map[dept]}".strip()
-                    )
-                elif dept in info_map:
-                    log["event description"] = (
-                        "{" + markup + "}" + f"{dept}\n{info_map[dept]}".strip()
-                    )
-                else:
-                    log["event description"] = "{" + markup + "}" + f"{dept}".strip()
-
-                # Set the Event ID
-                log["new event id"] = f"LS-<{event_type}_{dept_map[dept]}>"
 
     # Create Retention and Stage it
     logger.info("Creating Retention...")
@@ -333,15 +260,10 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         )
         data_to_map = json.loads(json_rows)
 
-        rationale = "Malicious Activity"
-        classification = "PB//CND"
-
         logger.info("Creating Retention...")
         retention_url = create_retention(
             data_to_map,
             alfred_env,
-            rationale=rationale,
-            markup=classification,
             token=access_token,
         )
         logger.info("Completed Retention.")
