@@ -19,7 +19,7 @@ import os
 from typing import Any
 
 import requests  # pip package requests
-from flask import current_app, current_app as app, request, Response
+from flask import current_app as app, request, Response
 from flask.wrappers import Response
 from flask_appbuilder.api import BaseApi, expose, permission_name, protect, safe
 from flask_babel import lazy_gettext as _
@@ -28,7 +28,6 @@ from flask_login import current_user
 from superset.advanced_data_type.schemas import (
     AdvancedDataTypeSchema,
 )
-from superset.advanced_data_type.types import AdvancedDataTypeResponse
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
 
@@ -68,12 +67,6 @@ class FissionRestApi(BaseApi):
             "superset",
             cache_result=True,
         )
-        alfred_instance = os.environ.get("ALFRED_ENV")
-        if alfred_instance:
-            request_url = request.url + f"&alfred_instance={alfred_instance}"
-            logger.info(f"ALFRED_ENV: {request_url}")
-        else:
-            logger.info("ALFRED_ENV environment variable not set")
 
         logger.info("Args is %s", request.args)
         headers = {
@@ -141,6 +134,7 @@ class FissionRestApi(BaseApi):
         )
         try:
             result = res.json()
-        except:
+        except requests.JSONDecodeError as e:
+            logger.error('response does not contain valid json: %s', e)
             result = str(res.text)
         return self.response(res.status_code, result=result)
