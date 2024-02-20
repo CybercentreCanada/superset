@@ -74,63 +74,14 @@ class FissionRestApi(BaseApi):
             "X-Auth-Request-Access-Token": token,
         }
 
-        url = request_url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
-        res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
-            method=request.method,
-            url=url,
-            data=request.get_data(),
-            allow_redirects=False,
-            headers=headers,
-            timeout=30,
-        )
-        try:
-            result = res.json()
-        except:
-            result = str(res.text)
-        return self.response(res.status_code, result=result)
-
-    @protect()
-    @safe
-    @expose("/<path>", methods=["POST"])
-    @permission_name("read")
-    @event_logger.log_this_with_context(
-        action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
-        log_to_statsd=False,  # pylint: disable-arguments-renamed
-    )
-    def post(self, path, **kwargs: Any) -> Response:
-        """Proxy to hogwarts fission"""
-
-        request_payload = request.json
-        alfred_env = os.environ.get("ALFRED_ENV")
-        if alfred_env:
-            request_payload["alfred_env"] = alfred_env
-            logger.info(f"ALFRED_ENV: {alfred_env}")
-        else:
-            logger.info("ALFRED_ENV environment variable not set")
-
-        logger.info("Payload is %s", request_payload)
         url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
-        logger.info(f"Sending to {url}")
-        user = current_user
-        token = security_manager.get_on_behalf_of_access_token_with_cache(
-            user.username,
-            os.environ.get("FISSION_SCOPE"),
-            "superset",
-            cache_result=True,
-        )
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "X-Auth-Request-Access-Token": token,
-            "Content-Type": "application/json",
-        }
-
-        url = request.url.replace(f'{request.host_url}api/v1/fission', f'{API_HOST}/')
-        res = requests.post(  # ref. https://stackoverflow.com/a/36601467/248616
-            url=url,
-            json=request_payload,
-            allow_redirects=False,
-            headers=headers,
-            timeout=180000,  # 3 minutes
+        res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
+            method          = request.method,
+            url             = url,
+            data            = request.get_data(),
+            allow_redirects = False,
+            headers         = headers,
+            timeout         = 180 # extending timeout for fission loading times
         )
         try:
             result = res.json()

@@ -225,7 +225,6 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             catalog="hogwarts_pb",
         )
 
-
         # strict list of columns to avoid unforseen errors with new columns added
         columns = ['bcc', 'body', 'cc', 'classification', 'content_type', 'cpoints', 'department', 'direction', 'eml_path', 'files', "'from'", 'id', 'length', 'md5', 'message_id', 'ministerial_authorization', 'parent_id', 'reply_to', 'root_id', 'sensor', 'sha1', 'sha256', 'source_id', 'stream_id', 'subject', 'subparts', 'tag', 'time', 'to', 'urls', 'timeperiod_loadedby', 'raw_source', 'stream_name', 'stream_description', 'src_port', 'dst_port', 'src_ip_asn', 'dst_ip_asn', 'src_ip_country_code', 'dst_ip_local', 'src_ip_local', 'dst_ip_department', 'src_ip_department', 'zone', 'helo', 'mail_from', 'rcpt_to', 'in_reply_to', 'references', 'xmailer', 'received', 'dest_ip_country_code', 'zone_str', 'xoriginating_ip_v4', 'xoriginating_ip_department', 'xoriginating_ip_country_code', 'last_received_ip_v4', 'last_received_ip_department', 'last_received_ip_country_code', 'src_ip_v4', 'dst_ip_v4']
         columns_string = ', '.join(columns)
