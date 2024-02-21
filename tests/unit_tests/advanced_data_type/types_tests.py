@@ -19,6 +19,7 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer
+from superset.advanced_data_type.plugins.cpoints import cpoints_func
 from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
 from superset.advanced_data_type.plugins.stream_id import STREAM_DICT, stream_id_func
 from superset.advanced_data_type.types import (
@@ -567,3 +568,21 @@ def test_ipv6_address():
     test_invalid_ipv6:AdvancedDataTypeResponse = ipv6_func(invalid_ipv6_req)
     assert test_invalid_ipv6['error_message'] == f"'{invalid_ipv6_req['values'][0]}' is not a valid IPv6 address."
     print("IPv6 passed!\n")
+
+def test_cpoints():
+    print("Testing CPOINTs...\n")
+    valid_req: AdvancedDataTypeRequest = {
+        "values": ['["11:11"]', '11:11'],
+        "error_message": "",
+        "display_value": "",
+    }
+    test_valid:AdvancedDataTypeResponse = cpoints_func(valid_req)
+    assert test_valid["error_message"] == ""
+    invalid_req: AdvancedDataTypeRequest = {
+        "values": ["Invalid"],
+        "error_message": "",
+        "display_value": "",
+    }
+    test_invalid:AdvancedDataTypeResponse = cpoints_func(invalid_req)
+    assert test_invalid['error_message'] != ""
+    print("CPOINTs passed!\n")
