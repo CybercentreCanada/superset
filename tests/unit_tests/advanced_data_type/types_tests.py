@@ -19,6 +19,8 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer
+from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
+from superset.advanced_data_type.plugins.stream_id import STREAM_DICT, stream_id_func
 from superset.advanced_data_type.types import (
     AdvancedDataTypeRequest,
     AdvancedDataTypeResponse,
@@ -27,8 +29,7 @@ from superset.utils.core import FilterOperator, FilterStringOperators
 
 from superset.advanced_data_type.plugins.internet_address import internet_address
 from superset.advanced_data_type.plugins.internet_port import internet_port as port
-from superset.advanced_data_type.plugins.advanced_data_types import STREAM_DICT, stream_id_func, ipv6_func, domain_func
-import unittest
+
 
 
 # To run the unit tests below, use the following command in the root Superset folder:
@@ -549,7 +550,7 @@ def test_stream_id():
     assert test_invalid_key['error_message'] == f"'{invalid_key_req['values'][0]}' is not a valid Stream ID. Did not match a known Stream ID or name."
     print("Stream ID passed!\n")
 
-def test_ipv6_adddress():
+def test_ipv6_address():
     print("Testing IPv6 Address...\n")
     valid_ipv6_req: AdvancedDataTypeRequest = {
         "values": ["2001:0db8:85a3:0000:0000:8a2e:0370:7334"],
