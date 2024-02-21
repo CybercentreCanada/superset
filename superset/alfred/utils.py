@@ -129,8 +129,7 @@ def create_retention(
 
     # These lines were copied from the stage function in the RetentionInstance
     # class in the alfred_client library, but does not block and wait for the
-    # retention to be in the 'ready' state. This async case will hopefully be 
-    # added to the library in the future and this code can be replaced.
+    # retention to be in the 'ready' state.
     out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
     retention = alfred.create_retention(
             f"Retention initiated from Superset - {datetime.now()}"
