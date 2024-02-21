@@ -133,7 +133,7 @@ def create_retention(
     # added to the library in the future and this code can be replaced.
     out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
     retention = alfred.create_retention(
-            f"Retention Initiated from Superset - {datetime.now()}"
+            f"Retention initiated from Superset - {datetime.now()}"
         )
     retention = alfred.add_retention_dataset(
             retention.uri,
