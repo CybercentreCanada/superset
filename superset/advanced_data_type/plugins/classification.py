@@ -19,22 +19,16 @@ def classification_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespons
     elif req["values"] == [""]:
         resp["error_message"] = "Classification must not be empty"
         return resp
-    elif req["operator"] in ['LIKE', 'ILIKE']:
+    elif req["operator"] == 'LIKE':
         for val in req["values"]:
             resp["values"].append(str(val))
         return resp
     else:
         for val in req["values"]:
-            string_value = str(val)
-            if re.search("^PB//CND$|^U$", string_value, re.IGNORECASE):
-                resp["values"].append(string_value)
-            else:
-                resp["error_message"] = f"'{ val }' is not a valid classification. Expected either 'PB//CND' or 'U'."
+                resp["values"].append(val)
                 return resp
-
         resp["display_value"] = ", ".join(resp["values"])
         return resp
-
 
 classification: AdvancedDataType = AdvancedDataType(
     verbose_name="Classification",
