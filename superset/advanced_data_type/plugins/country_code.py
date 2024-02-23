@@ -20,14 +20,14 @@ def country_code_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         string_value = str(val)
         #Can match the three ISO-3166-1 country codes (2/3 Letters or 3 Numbers)
         #https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
-        if re.search("^[A-Z]{2,3}$|^[0-9]{3}$", string_value):
+        if re.search("^[a-zA-Z]{2,3}$|^[0-9]{3}$", string_value):
             resp["values"].append(string_value)
         else:
             if (len(string_value) < 2 or len(string_value) > 3):
-                resp["error_message"] = f"'{ val }' is not a valid country code. Expected 2-3 uppercase letters or 3 numbers. Received {len(string_value)}."
+                resp["error_message"] = f"'{ val }' is not a valid country code. Expected 2-3 letters or 3 numbers. Received {len(string_value)}."
                 return resp
             else:
-                resp["error_message"] = f"'{ val }' is not a valid country code. Must be 2-3 uppercase letters or 3 numbers."
+                resp["error_message"] = f"'{ val }' is not a valid country code. Must be 2-3 letters or 3 numbers."
                 return resp
 
     resp["display_value"] = ", ".join(resp["values"])
