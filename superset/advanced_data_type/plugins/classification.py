@@ -19,7 +19,7 @@ def classification_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespons
     elif req["values"] == [""]:
         resp["error_message"] = "Classification must not be empty"
         return resp
-    elif req["operator"] in ['LIKE', 'ILIKE']:
+    elif req["operator"] in ['ILIKE']:
         for val in req["values"]:
             resp["values"].append(str(val))
         return resp
