@@ -19,6 +19,10 @@ def user_agent_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     elif req["values"] == [""]:
         resp["error_message"] = "User Agent must not be empty"
         return resp
+    elif req["operator"] in ['LIKE', 'ILIKE']:
+        for val in req["values"]:
+            resp["values"].append(str(val))
+        return resp
     else:
         for val in req["values"]:
             resp["values"].append(str(val))
