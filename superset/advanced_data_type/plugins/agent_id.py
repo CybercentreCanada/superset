@@ -21,7 +21,7 @@ def agent_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     elif req["values"] == [""]:
         resp["error_message"] = "Agent ID must not be empty"
         return resp
-    elif req["operator"] in ['LIKE', 'ILIKE']:
+    elif req["operator"] in ['ILIKE']:
         for val in req["values"]:
             resp["values"].append(str(val))
         return resp
