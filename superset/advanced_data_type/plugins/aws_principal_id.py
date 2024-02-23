@@ -29,7 +29,7 @@ def aws_principal_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespo
             the "Principal" : {} structure.
             https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#Principal_specifying
             """
-            if re.search("^\"Principal\"\s*:\s*\{.*\}", string_value, re.DOTALL):
+            if re.search("^\"Principal\"\s*:\s*\{.*\}$", string_value, re.DOTALL):
                 if (is_json("{" + string_value + "}")):
                     resp["values"].append(string_value)
                 else:
