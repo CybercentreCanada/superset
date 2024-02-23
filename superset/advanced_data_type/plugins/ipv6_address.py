@@ -1,6 +1,4 @@
 import ipaddress
-import re
-from superset.advanced_data_type.plugins import translate_filter_func
 from superset.advanced_data_type.plugins.internet_address import cidr_translate_filter_func
 from superset.advanced_data_type.plugins.operator_sets import CIDR_OPERATOR_SET
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse

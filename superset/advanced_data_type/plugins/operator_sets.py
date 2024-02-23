@@ -1,4 +1,3 @@
-# Operator Sets
 from superset.utils.core import FilterStringOperators
 
 

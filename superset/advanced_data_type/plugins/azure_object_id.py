@@ -1,6 +1,4 @@
-import re
 from superset.advanced_data_type.plugins import translate_filter_func
-from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
 from superset.advanced_data_type.plugins.utils.validate_azure_id import validate_azure_id
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse
 
