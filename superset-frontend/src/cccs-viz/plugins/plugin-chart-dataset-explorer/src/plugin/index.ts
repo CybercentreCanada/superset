@@ -59,7 +59,7 @@ export default class CccsDataSetExplorerPlugin extends ChartPlugin<
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../../../plugin-chart-cccs-grid/src/CccsGrid'),
+      loadChart: () => import('../../../plugin-chart-ag-grid/src/ag-grid/AGGridViz'),
       metadata,
       transformProps,
     });

@@ -398,9 +398,9 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (jumpActionConfigs) {
+    if (jumpActionConfigs?.length) {
       const disabled =
-        jumpActionConfigs.filter(j =>
+        jumpActionConfigs?.filter(j =>
           Object.keys(selectedData.jumpToData).includes(j.advancedDataType),
         ).length <= 0;
       specialMenuItems = [
