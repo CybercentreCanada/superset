@@ -1,4 +1,3 @@
-import re
 from superset.advanced_data_type.plugins import translate_filter_func
 from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse
@@ -18,9 +17,8 @@ def tcp_sequence_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         return resp
     else:
         for val in req["values"]:
-            string_value = str(val)
-            if re.search("^[a-zA-Z]*.[a-zA-Z]*?(.[a-zA-Z0-9]+)*$", string_value):
-                resp["values"].append(string_value)
+            if ((-2 ** 31) <= val <= (2**31 -1)):
+                resp["values"].append(str(val))
             else:
                 resp["error_message"] = f"'{ val }' is not a valid TCP sequence. Must be a 32-bit signed integer."
                 return resp
