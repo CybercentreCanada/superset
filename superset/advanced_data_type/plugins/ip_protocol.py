@@ -17,10 +17,9 @@ def ip_protocol_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         return resp
     for val in req["values"]:
         if (0 <= val <= 255):
-            string_value = str(val)
-            resp["values"].append(string_value)
+            resp["values"].append(str(val))
         else:
-            resp["error_message"] = f"'{ val }' is not a valid IP protocol. Must be 0-3 digits."
+            resp["error_message"] = f"'{ val }' is not a valid IP protocol.  Must be a value between 0 and 255."
             return resp
 
     resp["display_value"] = ", ".join(resp["values"])
