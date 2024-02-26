@@ -6,7 +6,7 @@ from superset.advanced_data_type.types import AdvancedDataTypeRequest, AdvancedD
 def is_json(string_value) -> bool:
     try:
         json.loads(string_value)
-    except ValueError as e:
+    except ValueError:
         return False
     return True
 
