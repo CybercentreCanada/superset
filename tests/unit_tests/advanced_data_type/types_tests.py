@@ -553,13 +553,28 @@ def test_stream_id():
 
 def test_ipv6_address():
     print("Testing IPv6 Address...\n")
-    valid_ipv6_req: AdvancedDataTypeRequest = {
+    valid_ipv6_req_0: AdvancedDataTypeRequest = {
         "values": ["2001:0db8:85a3:0000:0000:8a2e:0370:7334"],
         "error_message": "",
         "display_value": "",
     }
-    test_ipv6:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req)
-    assert test_ipv6["error_message"] == ""
+    #Test compact notation
+    valid_ipv6_req_1: AdvancedDataTypeRequest = {
+        "values": ["::ffff:abcd:1234"],
+        "error_message": "",
+        "display_value": "",
+    }
+    valid_ipv6_req_2: AdvancedDataTypeRequest = {
+        "values": ["2001::0370:7334"],
+        "error_message": "",
+        "display_value": "",
+    }
+    test_ipv6_0:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_0)
+    test_ipv6_1:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_1)
+    test_ipv6_2:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_2)
+    assert test_ipv6_0["error_message"] == ""
+    assert test_ipv6_1["error_message"] == ""
+    assert test_ipv6_2["error_message"] == ""
     invalid_ipv6_req: AdvancedDataTypeRequest = {
         "values": [11111111],
         "error_message": "",
