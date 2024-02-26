@@ -19,11 +19,35 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer
+from superset.advanced_data_type.plugins.agent_id import agent_id_func
 from superset.advanced_data_type.plugins.asn import asn_func
+from superset.advanced_data_type.plugins.aws_access_key_id import aws_access_key_id_func
+from superset.advanced_data_type.plugins.aws_account_id import aws_account_id_func
+from superset.advanced_data_type.plugins.aws_arn import aws_arn_func
+from superset.advanced_data_type.plugins.aws_organization_id import aws_organization_id_func
+from superset.advanced_data_type.plugins.aws_principal_id import aws_principal_id_func
+from superset.advanced_data_type.plugins.azure_application_id import azure_application_id_func
+from superset.advanced_data_type.plugins.azure_object_id import azure_object_id_func
+from superset.advanced_data_type.plugins.cbs_id import cbs_id_func
+from superset.advanced_data_type.plugins.cbs_workload import cbs_workload_func
+from superset.advanced_data_type.plugins.classification import classification_func
+from superset.advanced_data_type.plugins.country_code import country_code_func
 from superset.advanced_data_type.plugins.cpoints import cpoints_func
+from superset.advanced_data_type.plugins.department import department_func
+from superset.advanced_data_type.plugins.domain import domain_func
+from superset.advanced_data_type.plugins.email_address import email_address_func
+from superset.advanced_data_type.plugins.file_md5 import file_md5_func
+from superset.advanced_data_type.plugins.file_sha256 import file_sha256_func
+from superset.advanced_data_type.plugins.harmonized_email_id import harmonized_email_id_func
+from superset.advanced_data_type.plugins.ip_protocol import ip_protocol_func
 from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
+from superset.advanced_data_type.plugins.oid_tag import oid_tag_func
 from superset.advanced_data_type.plugins.stream_id import STREAM_DICT, stream_id_func
+from superset.advanced_data_type.plugins.tcp_sequence import tcp_sequence_func
+from superset.advanced_data_type.plugins.uri import uri_func
 from superset.advanced_data_type.plugins.url import url_func
+from superset.advanced_data_type.plugins.user_agent import user_agent_func
+from superset.advanced_data_type.plugins.zone import zone_func
 from superset.advanced_data_type.types import (
     AdvancedDataType,
     AdvancedDataTypeRequest,
@@ -521,131 +545,180 @@ def test_port_translate_filter_func_not_in_double():
         port_translate_filter_response
     )
 
-
-def test_stream_id():
-    print("Testing stream ID...\n")
-    known_key = 11
-    known_key_2 = 129
-    known_value = "IIS_EXT"
-    known_value_2 = "MT-ASSEMBLYLINE-U-PROD"
-    assert list(STREAM_DICT.keys())[list(STREAM_DICT.values()).index(known_value)] == known_key
-    assert list(STREAM_DICT.keys())[list(STREAM_DICT.values()).index(known_value_2)] == known_key_2
-    assert list(STREAM_DICT.keys())[list(STREAM_DICT.values()).index(known_value)] != known_key_2
-    assert list(STREAM_DICT.keys())[list(STREAM_DICT.values()).index(known_value)] != known_key_2
-    val_req: AdvancedDataTypeRequest = {
-    "values": ["IIS_EXT"]
-    }
-    key_req: AdvancedDataTypeRequest = {
-    "values": [11]
-    }
-    test_key:AdvancedDataTypeResponse = stream_id_func(key_req)
-    test_val:AdvancedDataTypeResponse = stream_id_func(val_req)
-    assert test_key["error_message"] == ""
-    assert test_val["error_message"] == ""
-    invalid_val_req: AdvancedDataTypeRequest = {
-    "values": ["fail"]
-    }
-    invalid_key_req: AdvancedDataTypeRequest = {
-    "values": [0]
-    }
-    test_invalid_key:AdvancedDataTypeResponse = stream_id_func(invalid_key_req)
-    test_invalid_val:AdvancedDataTypeResponse = stream_id_func(invalid_val_req)
-    assert test_invalid_val['error_message'] == f"'{invalid_val_req['values'][0]}' is not a valid Stream ID. Did not match a known Stream ID or name."
-    assert test_invalid_key['error_message'] == f"'{invalid_key_req['values'][0]}' is not a valid Stream ID. Did not match a known Stream ID or name."
-    print("Stream ID passed!\n")
-
-def test_ipv6_address():
-    print("Testing IPv6 Address...\n")
-    valid_ipv6_req_0: AdvancedDataTypeRequest = {
-        "values": ["2001:0db8:85a3:0000:0000:8a2e:0370:7334"],
-        "error_message": "",
-        "display_value": "",
-    }
-    #Test compact notation
-    valid_ipv6_req_1: AdvancedDataTypeRequest = {
-        "values": ["::ffff:abcd:1234"],
-        "error_message": "",
-        "display_value": "",
-    }
-    valid_ipv6_req_2: AdvancedDataTypeRequest = {
-        "values": ["2001::0370:7334"],
-        "error_message": "",
-        "display_value": "",
-    }
-    test_ipv6_0:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_0)
-    test_ipv6_1:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_1)
-    test_ipv6_2:AdvancedDataTypeResponse = ipv6_func(valid_ipv6_req_2)
-    assert test_ipv6_0["error_message"] == ""
-    assert test_ipv6_1["error_message"] == ""
-    assert test_ipv6_2["error_message"] == ""
-    invalid_ipv6_req: AdvancedDataTypeRequest = {
-        "values": [11111111],
-        "error_message": "",
-        "display_value": "",
-    }
-    test_invalid_ipv6:AdvancedDataTypeResponse = ipv6_func(invalid_ipv6_req)
-    assert test_invalid_ipv6['error_message'] == f"'{invalid_ipv6_req['values'][0]}' is not a valid IPv6 address."
-    print("IPv6 passed!\n")
-
-def test_cpoints():
-    print("Testing CPOINTs...\n")
-    valid_req: AdvancedDataTypeRequest = {
-        "values": ['["11:11"]', '11:11'],
-        "error_message": "",
-        "display_value": "",
-    }
-    test_valid:AdvancedDataTypeResponse = cpoints_func(valid_req)
-    assert test_valid["error_message"] == ""
-    invalid_req: AdvancedDataTypeRequest = {
-        "values": ["Invalid"],
-        "error_message": "",
-        "display_value": "",
-    }
-    test_invalid:AdvancedDataTypeResponse = cpoints_func(invalid_req)
-    assert test_invalid['error_message'] != ""
-    print("CPOINTs passed!\n")
-
-def test_advanced_data_type(advanced_data_type_func, valid_values: list, invalid_values: list, valid_operators: list):
+def test_advanced_data_type_equals_operator(advanced_data_type_func, input_column, valid_value):
     """
-    Unit test for any given superset advanced data type.
-
-    Args:
-        advanced_data_type_func (function): The function to be tested.
-        valid_values (list): A list of valid values for the advanced data type.
-        invalid_values (list): A list of invalid values for the advanced data type.
-        valid_operators (list): A list of valid operators for the advanced data type.
-
+    Test to see if the advanced_data_type_func behaves as expected when the EQUALS operator is used.
     """
-    name = " ".join(advanced_data_type_func.__name__.split("_")[:-1])
-    print(f"Testing {name}...\n")
-    for value in valid_values:
-        for operator in valid_operators:
-            req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
-            }
-            res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-            assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+    input_operation = FilterStringOperators.EQUALS
+    input_values = [valid_value]
 
-    # Test invalid values
-    for value in invalid_values:
-        for operator in valid_operators:
-            req = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
-            }
-            res = advanced_data_type_func(req)
-            assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column == input_values[0]
+    )
 
-    print(f"{name} passed!\n")
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
 
+def test_advanced_data_type_greater_than_or_equal_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the GREATER_THAN_OR_EQUAL operator is used.
+    """
+    input_operation = FilterStringOperators.GREATER_THAN_OR_EQUAL
+    input_values = [valid_value]
 
-test_advanced_data_type(asn_func, [111, 4294967295], ["1111"], EQUAL_NULLABLE_OPERATOR_SET)
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column >= input_values[0]
+    )
 
-test_advanced_data_type(cpoints_func, ['["11:11"]', '11:11'], ["invalid"], EQUAL_NULLABLE_OPERATOR_SET)
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
 
-test_advanced_data_type(url_func, ["hello.com"], [""], [EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET])
+def test_advanced_data_type_greater_than_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the GREATER_THAN operator is used.
+    """
+    input_operation = FilterStringOperators.GREATER_THAN
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column > input_values[0]
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_in_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the IN operator is used.
+    """
+    input_operation = FilterStringOperators.IN
+    input_values = [[valid_value]]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column.in_(input_values[0])
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_less_than_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN operator is used.
+    """
+    input_operation = FilterStringOperators.LESS_THAN
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column < input_values[0]
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_less_than_or_equal_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN_OR_EQUAL operator is used.
+    """
+    input_operation = FilterStringOperators.LESS_THAN_OR_EQUAL
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column <= input_values[0]
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_not_equals_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the NOT_EQUALS operator is used.
+    """
+    input_operation = FilterStringOperators.NOT_EQUALS
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column != input_values[0]
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_not_in_operator(advanced_data_type_func, input_column, valid_value):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the NOT_IN operator is used.
+    """
+    input_operation = FilterStringOperators.NOT_IN
+    input_values = [[valid_value]]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = ~(
+        input_column.in_(input_values[0])
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_is_not_null_operator(advanced_data_type_func, input_column):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the IS_NOT_NULL operator is used.
+    """
+    input_operation = FilterStringOperators.IS_NOT_NULL
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column.isnot(None)
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, []).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_is_null_operator(advanced_data_type_func, input_column):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the IS_NULL operator is used.
+    """
+    input_operation = FilterStringOperators.IS_NULL
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column.is_(None)
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, []).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_like_operator(advanced_data_type_func, valid_value, input_column):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the LIKE operator is used.
+    """
+    input_operation = FilterStringOperators.LIKE
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column.like(input_values[0])
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
+
+def test_advanced_data_type_ilike_operator(advanced_data_type_func, valid_value, input_column):
+    """
+    Test to see if the advanced_data_type_func behaves as expected when the ILIKE operator is used.
+    """
+    input_operation = FilterStringOperators.ILIKE
+    input_values = [valid_value]
+
+    advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
+        input_column.ilike(input_values[0])
+    )
+
+    assert advanced_data_type_func(input_column, input_operation, input_values).compare(
+        advanced_data_type_response
+    )
