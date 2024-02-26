@@ -586,5 +586,3 @@ def test_cpoints():
     test_invalid:AdvancedDataTypeResponse = cpoints_func(invalid_req)
     assert test_invalid['error_message'] != ""
     print("CPOINTs passed!\n")
-
-test_cpoints()
