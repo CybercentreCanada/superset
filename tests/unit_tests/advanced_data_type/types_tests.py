@@ -545,13 +545,13 @@ def test_port_translate_filter_func_not_in_double():
         port_translate_filter_response
     )
 
-def test_advanced_data_type_equals_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_equals_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the EQUALS operator is used.
     """
     input_operation = FilterStringOperators.EQUALS
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column == input_values[0]
     )
@@ -560,13 +560,13 @@ def test_advanced_data_type_equals_operator(advanced_data_type_func, input_colum
         advanced_data_type_response
     )
 
-def test_advanced_data_type_greater_than_or_equal_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_greater_than_or_equal_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the GREATER_THAN_OR_EQUAL operator is used.
     """
     input_operation = FilterStringOperators.GREATER_THAN_OR_EQUAL
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column >= input_values[0]
     )
@@ -575,13 +575,13 @@ def test_advanced_data_type_greater_than_or_equal_operator(advanced_data_type_fu
         advanced_data_type_response
     )
 
-def test_advanced_data_type_greater_than_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_greater_than_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the GREATER_THAN operator is used.
     """
     input_operation = FilterStringOperators.GREATER_THAN
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column > input_values[0]
     )
@@ -590,13 +590,13 @@ def test_advanced_data_type_greater_than_operator(advanced_data_type_func, input
         advanced_data_type_response
     )
 
-def test_advanced_data_type_in_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_in_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IN operator is used.
     """
     input_operation = FilterStringOperators.IN
     input_values = [[valid_value]]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column.in_(input_values[0])
     )
@@ -605,13 +605,13 @@ def test_advanced_data_type_in_operator(advanced_data_type_func, input_column, v
         advanced_data_type_response
     )
 
-def test_advanced_data_type_less_than_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_less_than_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN operator is used.
     """
     input_operation = FilterStringOperators.LESS_THAN
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column < input_values[0]
     )
@@ -620,13 +620,13 @@ def test_advanced_data_type_less_than_operator(advanced_data_type_func, input_co
         advanced_data_type_response
     )
 
-def test_advanced_data_type_less_than_or_equal_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_less_than_or_equal_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN_OR_EQUAL operator is used.
     """
     input_operation = FilterStringOperators.LESS_THAN_OR_EQUAL
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column <= input_values[0]
     )
@@ -635,13 +635,13 @@ def test_advanced_data_type_less_than_or_equal_operator(advanced_data_type_func,
         advanced_data_type_response
     )
 
-def test_advanced_data_type_not_equals_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_not_equals_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the NOT_EQUALS operator is used.
     """
     input_operation = FilterStringOperators.NOT_EQUALS
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column != input_values[0]
     )
@@ -650,13 +650,13 @@ def test_advanced_data_type_not_equals_operator(advanced_data_type_func, input_c
         advanced_data_type_response
     )
 
-def test_advanced_data_type_not_in_operator(advanced_data_type_func, input_column, valid_value):
+def test_advanced_data_type_not_in_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the NOT_IN operator is used.
     """
     input_operation = FilterStringOperators.NOT_IN
     input_values = [[valid_value]]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = ~(
         input_column.in_(input_values[0])
     )
@@ -665,12 +665,12 @@ def test_advanced_data_type_not_in_operator(advanced_data_type_func, input_colum
         advanced_data_type_response
     )
 
-def test_advanced_data_type_is_not_null_operator(advanced_data_type_func, input_column):
+def test_advanced_data_type_is_not_null_operator(advanced_data_type_func, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IS_NOT_NULL operator is used.
     """
     input_operation = FilterStringOperators.IS_NOT_NULL
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column.isnot(None)
     )
@@ -679,12 +679,12 @@ def test_advanced_data_type_is_not_null_operator(advanced_data_type_func, input_
         advanced_data_type_response
     )
 
-def test_advanced_data_type_is_null_operator(advanced_data_type_func, input_column):
+def test_advanced_data_type_is_null_operator(advanced_data_type_func, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IS_NULL operator is used.
     """
     input_operation = FilterStringOperators.IS_NULL
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column.is_(None)
     )
@@ -693,10 +693,11 @@ def test_advanced_data_type_is_null_operator(advanced_data_type_func, input_colu
         advanced_data_type_response
     )
 
-def test_advanced_data_type_like_operator(advanced_data_type_func, valid_value, input_column):
+def test_advanced_data_type_like_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LIKE operator is used.
     """
+    input_column = Column(advanced_data_type_name, valid_data_type)
     input_operation = FilterStringOperators.LIKE
     input_values = [valid_value]
 
@@ -708,13 +709,13 @@ def test_advanced_data_type_like_operator(advanced_data_type_func, valid_value, 
         advanced_data_type_response
     )
 
-def test_advanced_data_type_ilike_operator(advanced_data_type_func, valid_value, input_column):
+def test_advanced_data_type_ilike_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
     """
     Test to see if the advanced_data_type_func behaves as expected when the ILIKE operator is used.
     """
     input_operation = FilterStringOperators.ILIKE
     input_values = [valid_value]
-
+    input_column = Column(advanced_data_type_name, valid_data_type)
     advanced_data_type_response: sqlalchemy.sql.expression.BinaryExpression = (
         input_column.ilike(input_values[0])
     )
