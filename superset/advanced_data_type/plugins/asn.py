@@ -22,7 +22,7 @@ def asn_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
             else:
                 resp["error_message"] = f"'{ val }' is not a valid ASN. Expected a number between 0 and 4294967295. Received {str(val)}."
                 return resp
-        except ValueError:
+        except TypeError:
                 resp["error_message"] = f"'{ val }' is not a valid ASN. Must be a number "
                 return resp
 

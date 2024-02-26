@@ -19,15 +19,18 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer
+from superset.advanced_data_type.plugins.asn import asn_func
 from superset.advanced_data_type.plugins.cpoints import cpoints_func
 from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
 from superset.advanced_data_type.plugins.stream_id import STREAM_DICT, stream_id_func
+from superset.advanced_data_type.plugins.url import url_func
 from superset.advanced_data_type.types import (
+    AdvancedDataType,
     AdvancedDataTypeRequest,
     AdvancedDataTypeResponse,
 )
 from superset.utils.core import FilterOperator, FilterStringOperators
-
+from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
 from superset.advanced_data_type.plugins.internet_address import internet_address
 from superset.advanced_data_type.plugins.internet_port import internet_port as port
 
@@ -601,3 +604,48 @@ def test_cpoints():
     test_invalid:AdvancedDataTypeResponse = cpoints_func(invalid_req)
     assert test_invalid['error_message'] != ""
     print("CPOINTs passed!\n")
+
+def test_advanced_data_type(advanced_data_type_func, valid_values: list, invalid_values: list, valid_operators: list):
+    """
+    Unit test for any given superset advanced data type.
+
+    Args:
+        advanced_data_type_func (function): The function to be tested.
+        valid_values (list): A list of valid values for the advanced data type.
+        invalid_values (list): A list of invalid values for the advanced data type.
+        valid_operators (list): A list of valid operators for the advanced data type.
+
+    """
+    name = " ".join(advanced_data_type_func.__name__.split("_")[:-1])
+    print(f"Testing {name}...\n")
+    for value in valid_values:
+        for operator in valid_operators:
+            req: AdvancedDataTypeRequest = {
+                "values": [value],
+                "operator": operator,
+                "error_message": "",
+                "display_value": "",
+            }
+            res: AdvancedDataTypeResponse = advanced_data_type_func(req)
+            assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+
+    # Test invalid values
+    for value in invalid_values:
+        for operator in valid_operators:
+            req = {
+                "values": [value],
+                "operator": operator,
+                "error_message": "",
+                "display_value": "",
+            }
+            res = advanced_data_type_func(req)
+            assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+
+    print(f"{name} passed!\n")
+
+
+test_advanced_data_type(asn_func, [111, 4294967295], ["1111"], EQUAL_NULLABLE_OPERATOR_SET)
+
+test_advanced_data_type(cpoints_func, ['["11:11"]', '11:11'], ["invalid"], EQUAL_NULLABLE_OPERATOR_SET)
+
+test_advanced_data_type(url_func, ["hello.com"], [""], [EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET])
