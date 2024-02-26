@@ -6,10 +6,8 @@ const QUERY_TIMEOUT_LIMIT = 180000;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
-    url_parameter_value,
-    parameter_name,
-    parameter_prefix,
-    errorMessage,
+    formData,
+    fissionUrl
   } = props;
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -18,15 +16,15 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   const apiUrl = useMemo(
     () =>
-      `/api/v1/fission/emailpreview?${parameter_name}=${
-        parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-      }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url_parameter_value],
+      `/api/v1/fission/emailpreview?${formData.parameter_name}=${
+        formData.parameter_prefix ? encodeURIComponent(formData.parameter_prefix) : ''
+      }${encodeURIComponent(formData.url_parameter_value)}`,
+    [formData.parameter_name, formData.parameter_prefix, formData.url_parameter_value],
   );
 
-  const linkUrl = `https://fission.hogwarts.pb.azure.chimera.cyber.gc.ca/emailpreview?${parameter_name}=${
-    parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-  }${encodeURIComponent(url_parameter_value)}`
+  const linkUrl = `${fissionUrl}/emailpreview?${formData.parameter_name}=${
+    formData.parameter_prefix ? encodeURIComponent(formData.parameter_prefix) : ''
+  }${encodeURIComponent(formData.url_parameter_value)}`
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -66,11 +64,11 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
     );
   }
   
-  if (errorMessage) {
+  if (formData.errorMessage) {
     return (
       <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
         <span style={{ fontSize: '14px', color: 'red' }}>
-          <strong>Error:</strong> {errorMessage}
+          <strong>Error:</strong> {formData.errorMessage}
         </span>
       </div>
     );

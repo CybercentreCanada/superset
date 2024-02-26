@@ -349,6 +349,7 @@ post_processors = {
 
 rawPostProcess = [
     "cccs_grid",
+    "fission_render",
     "at_a_glance_user_id",
     "at_a_glance_ip",
     "at_a_glance_dns",
