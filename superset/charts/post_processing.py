@@ -301,6 +301,14 @@ post_processors = {
     "table": table,
 }
 
+rawPostProcess = [
+    "cccs_grid",
+    "fission_render",
+    "at_a_glance_user_id",
+    "at_a_glance_ip",
+    "at_a_glance_dns",
+    "at_a_glance_user_id_sas",
+]
 
 def apply_post_process(
     result: dict[Any, Any],
