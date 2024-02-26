@@ -18,19 +18,27 @@ def cpoints_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         resp["error_message"] = "CPOINTs must not be empty"
         return resp
     else:
-        item_regex = '^"?[0-9]{2}:[a-fA-F0-9]{2}(?::[0-9]{1,4})?"?$'
-        array_regex = r'^\[\s*"[0-9]{2}:[a-fA-F0-9]{2}(?::[0-9]{1,4})?"(\s*,\s*"[0-9]{2}:[a-fA-F0-9]{2}(?::[0-9]{1,4})?")*\s*\]$'
+        item_regex = r'^"?[0-9]{2}:[a-fA-F0-9]{2}(?::[0-9]{1,4})?"?$'
+        array_regex = r'^\[\s*.*\s*\]$'
         for val in req["values"]:
-            if re.search(array_regex, str(val)):
-                resp["values"].append(val)
-            elif re.search(item_regex, str(val)):
-                resp["values"].append(val)
+            string_value = str(val)
+            if re.search(array_regex, string_value):
+                items = string_value[1:-1].split(',')
+                for item in items:
+                    item = item.strip()
+                    if re.search(item_regex, item):
+                        resp["values"].append(item)
+                    else:
+                        resp["error_message"] = f"'{item}' is not a valid format:\nSingle CPOINT '{item_regex}'."
+                        return resp
+            elif re.search(item_regex, string_value):
+                resp["values"].append(string_value)
             else:
-                resp["error_message"] = f"'{val}' is not a valid format:\nSinge CPOINT '{item_regex}' \nor Array '{array_regex}'."
+                resp["error_message"] = f"'{string_value}' is not a valid format:\nSingle CPOINT '{item_regex}' \nor Array '{array_regex}'."
                 return resp
 
-    resp["display_value"] = ", ".join(resp["values"])
-    return resp
+            resp["display_value"] = ", ".join(resp["values"])
+            return resp
 
 
 cpoints: AdvancedDataType = AdvancedDataType(
