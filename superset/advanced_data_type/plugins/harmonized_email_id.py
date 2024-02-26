@@ -22,11 +22,11 @@ def harmonized_email_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRe
     else:
         for val in req["values"]:
             string_value = str(val)
-            if re.search("^(CBS|NBS)_EMAIL_[a-fA-F0-9]+$", string_value):
+            match = re.match(r"^(CBS|NBS)_(EMAIL)_([a-fA-F0-9]+)$", string_value)
+            if match:
                 resp["values"].append(string_value)
             else:
-                character_blocks = string_value.split("_")
-
+                character_blocks = match.groups()
                 if (len(character_blocks) != 3):
                     resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid format. Accepted format: <SENSOR>_EMAIL_<hex_string>"
                     return resp
@@ -35,6 +35,9 @@ def harmonized_email_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRe
                     return resp
                 elif (character_blocks[1] != 'EMAIL'):
                     resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid second block. Accepted format: <SENSOR>_EMAIL_<hex_string>"
+                    return resp
+                elif len(character_blocks[2]) < 0:
+                    resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid third block. Accepted format: <SENSOR>_EMAIL_<hex_string>, where hex_string has 1 or more characters."
                     return resp
                 else:
                     resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid hex string characters. Accepted characters: a-f, A-F, 0-9"
