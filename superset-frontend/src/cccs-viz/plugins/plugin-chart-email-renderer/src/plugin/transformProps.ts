@@ -73,7 +73,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
   }
 
   return {
-    url_parameter_value: parameterValue,
+    url_parameter_value: value,
     parameter_name: parameterName,
     parameter_prefix: parameterPrefix,
     errorMessage,
