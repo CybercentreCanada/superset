@@ -1,9 +1,7 @@
 import json
 import re
 from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET
-
 from superset.advanced_data_type.types import AdvancedDataTypeRequest, AdvancedDataTypeResponse
-
 
 def is_json(string_value) -> bool:
     try:
@@ -11,12 +9,6 @@ def is_json(string_value) -> bool:
     except ValueError as e:
         return False
     return True
-
-def safely_get_int_value(string_number):
-    try:
-        return int(string_number)
-    except ValueError:
-        return -1
 
 def validate_azure_id(name: str, req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     """

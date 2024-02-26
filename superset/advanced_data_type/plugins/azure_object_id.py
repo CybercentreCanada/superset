@@ -1,5 +1,5 @@
 from superset.advanced_data_type.plugins import translate_filter_func
-from superset.advanced_data_type.plugins.utils.validate_azure_id import validate_azure_id
+from superset.advanced_data_type.plugins.utils import validate_azure_id
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse
 
 def azure_object_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
