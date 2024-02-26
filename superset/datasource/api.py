@@ -50,7 +50,7 @@ class DatasourceRestApi(BaseSupersetApi):
     def get_column_values(
         self, datasource_type: str, datasource_id: int, column_name: str
     ) -> FlaskResponse:
-        """Get possible values for a datasource column
+        """Get possible values for a datasource column.
         ---
         get:
           summary: Get possible values for a datasource column
@@ -120,6 +120,10 @@ class DatasourceRestApi(BaseSupersetApi):
                 column_name=column_name, limit=row_limit
             )
             return self.response(200, result=payload)
+        except KeyError:
+            return self.response(
+                400, message=f"Column name {column_name} does not exist"
+            )
         except NotImplementedError:
             return self.response(
                 400,

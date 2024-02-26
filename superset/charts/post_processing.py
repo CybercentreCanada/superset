@@ -41,7 +41,7 @@ from superset.utils.core import (
 )
 
 if TYPE_CHECKING:
-    from superset.connectors.base.models import BaseDatasource
+    from superset.connectors.sqla.models import BaseDatasource
     from superset.models.sql_lab import Query
 
 logger = logging.getLogger(__name__)
@@ -314,7 +314,9 @@ def apply_post_process(
 
     for query in result["queries"]:
         if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
-            raise Exception(f"Result format {query['result_format']} not supported")
+            raise Exception(  # pylint: disable=broad-exception-raised
+                f"Result format {query['result_format']} not supported"
+            )
 
         data = query["data"]
 

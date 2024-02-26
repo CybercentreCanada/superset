@@ -25,12 +25,12 @@ import {
   DTTM_ALIAS,
   ensureIsArray,
   GenericDataType,
+  LegendState,
+  normalizeTimestamp,
   NumberFormats,
   NumberFormatter,
-  TimeFormatter,
   SupersetTheme,
-  normalizeTimestamp,
-  LegendState,
+  TimeFormatter,
   ValueFormatter,
 } from '@superset-ui/core';
 import { SortSeriesType } from '@superset-ui/chart-controls';
@@ -512,13 +512,16 @@ export function getAxisType(dataType?: GenericDataType): AxisType {
   if (dataType === GenericDataType.TEMPORAL) {
     return AxisType.time;
   }
+  if (dataType === GenericDataType.NUMERIC) {
+    return AxisType.value;
+  }
   return AxisType.category;
 }
 
 export function getOverMaxHiddenFormatter(
   config: {
     max?: number;
-    formatter?: NumberFormatter;
+    formatter?: ValueFormatter;
   } = {},
 ) {
   const { max, formatter } = config;

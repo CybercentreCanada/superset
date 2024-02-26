@@ -17,6 +17,7 @@
  * under the License.
  */
 import {
+  isFeatureEnabled,
   FeatureFlag,
   getExtensionsRegistry,
   styled,
@@ -29,7 +30,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import rison from 'rison';
 import { datahubUrl } from 'src/preamble';
 import {
@@ -58,7 +59,6 @@ import FacePile from 'src/components/FacePile';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import InfoTooltip from 'src/components/InfoTooltip';
 import ImportModelsModal from 'src/components/ImportModal/index';
-import { isFeatureEnabled } from 'src/featureFlags';
 import WarningIconWithTooltip from 'src/components/WarningIconWithTooltip';
 import { isUserAdmin } from 'src/dashboard/util/permissionUtils';
 import { GenericLink } from 'src/components/GenericLink/GenericLink';
@@ -70,6 +70,7 @@ import {
   CONFIRM_OVERWRITE_MESSAGE,
 } from 'src/features/datasets/constants';
 import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
+import { useSelector } from 'react-redux';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -181,6 +182,11 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
     sshTunnelPrivateKeyPasswordFields,
     setSSHTunnelPrivateKeyPasswordFields,
   ] = useState<string[]>([]);
+
+  const PREVENT_UNSAFE_DEFAULT_URLS_ON_DATASET = useSelector<any, boolean>(
+    state =>
+      state.common?.conf?.PREVENT_UNSAFE_DEFAULT_URLS_ON_DATASET || false,
+  );
 
   const openDatasetImportModal = () => {
     showImportModal(true);
@@ -310,11 +316,20 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
             },
           },
         }: any) => {
-          const titleLink = (
-            // exploreUrl can be a link to Explore or an external link
-            // in the first case use SPA routing, else use HTML anchor
-            <GenericLink to={exploreURL}>{datasetTitle}</GenericLink>
-          );
+          let titleLink: JSX.Element;
+          if (PREVENT_UNSAFE_DEFAULT_URLS_ON_DATASET) {
+            titleLink = (
+              <Link data-test="internal-link" to={exploreURL}>
+                {datasetTitle}
+              </Link>
+            );
+          } else {
+            titleLink = (
+              // exploreUrl can be a link to Explore or an external link
+              // in the first case use SPA routing, else use HTML anchor
+              <GenericLink to={exploreURL}>{datasetTitle}</GenericLink>
+            );
+          }
           try {
             const parsedExtra = JSON.parse(extra);
             return (
@@ -536,6 +551,13 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   const filterTypes: Filters = useMemo(
     () => [
       {
+        Header: t('Search'),
+        key: 'search',
+        id: 'table_name',
+        input: 'search',
+        operator: FilterOperator.contains,
+      },
+      {
         Header: t('Owner'),
         key: 'owner',
         id: 'owners',
@@ -611,13 +633,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
           { label: t('Yes'), value: true },
           { label: t('No'), value: false },
         ],
-      },
-      {
-        Header: t('Search'),
-        key: 'search',
-        id: 'table_name',
-        input: 'search',
-        operator: FilterOperator.contains,
       },
     ],
     [user],
@@ -825,6 +840,9 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
               bulkActions={bulkActions}
               bulkSelectEnabled={bulkSelectEnabled}
               disableBulkSelect={toggleBulkSelect}
+              addDangerToast={addDangerToast}
+              addSuccessToast={addSuccessToast}
+              refreshData={refreshData}
               renderBulkSelectCopy={selected => {
                 const { virtualCount, physicalCount } = selected.reduce(
                   (acc, e) => {

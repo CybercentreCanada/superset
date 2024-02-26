@@ -20,11 +20,11 @@ import copy
 import json
 from typing import Any
 
-from alembic import op
 from sqlalchemy import and_, Column, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 
-from superset import conf, db, is_feature_enabled
+from superset import conf, is_feature_enabled
 from superset.constants import TimeGrain
 from superset.migrations.shared.utils import paginated_update, try_load_json
 
@@ -63,6 +63,12 @@ class MigrateViz:
 
         if "viz_type" in self.data:
             self.data["viz_type"] = self.target_viz_type
+
+        # Sometimes visualizations have same keys in the source form_data and rename_keys
+        # We need to remove them from data to allow the migration to work properly with rename_keys
+        for source_key, target_key in self.rename_keys.items():
+            if source_key in self.data and target_key in self.data:
+                self.data.pop(target_key)
 
         rv_data = {}
         for key, value in self.data.items():
@@ -117,7 +123,7 @@ class MigrateViz:
         ]
 
     @classmethod
-    def upgrade_slice(cls, slc: Slice) -> Slice:
+    def upgrade_slice(cls, slc: Slice) -> None:
         clz = cls(slc.params)
         form_data_bak = copy.deepcopy(clz.data)
 
@@ -135,10 +141,9 @@ class MigrateViz:
         if "form_data" in (query_context := try_load_json(slc.query_context)):
             query_context["form_data"] = clz.data
             slc.query_context = json.dumps(query_context)
-        return slc
 
     @classmethod
-    def downgrade_slice(cls, slc: Slice) -> Slice:
+    def downgrade_slice(cls, slc: Slice) -> None:
         form_data = try_load_json(slc.params)
         if "viz_type" in (form_data_bak := form_data.get(FORM_DATA_BAK_FIELD_NAME, {})):
             slc.params = json.dumps(form_data_bak)
@@ -147,26 +152,18 @@ class MigrateViz:
             if "form_data" in query_context:
                 query_context["form_data"] = form_data_bak
                 slc.query_context = json.dumps(query_context)
-        return slc
 
     @classmethod
-    def upgrade(cls) -> None:
-        bind = op.get_bind()
-        session = db.Session(bind=bind)
+    def upgrade(cls, session: Session) -> None:
         slices = session.query(Slice).filter(Slice.viz_type == cls.source_viz_type)
         for slc in paginated_update(
             slices,
-            lambda current, total: print(
-                f"  Updating {current}/{total} charts", end="\r"
-            ),
+            lambda current, total: print(f"Upgraded {current}/{total} charts"),
         ):
-            new_viz = cls.upgrade_slice(slc)
-            session.merge(new_viz)
+            cls.upgrade_slice(slc)
 
     @classmethod
-    def downgrade(cls) -> None:
-        bind = op.get_bind()
-        session = db.Session(bind=bind)
+    def downgrade(cls, session: Session) -> None:
         slices = session.query(Slice).filter(
             and_(
                 Slice.viz_type == cls.target_viz_type,
@@ -175,9 +172,6 @@ class MigrateViz:
         )
         for slc in paginated_update(
             slices,
-            lambda current, total: print(
-                f"  Downgrading {current}/{total} charts", end="\r"
-            ),
+            lambda current, total: print(f"Downgraded {current}/{total} charts"),
         ):
-            new_viz = cls.downgrade_slice(slc)
-            session.merge(new_viz)
+            cls.downgrade_slice(slc)

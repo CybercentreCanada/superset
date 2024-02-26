@@ -215,7 +215,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
               >
                 <Icons.ExclamationCircleOutlined
                   css={css`
-                    ${iconStyles}
+                    ${iconStyles};
                     color: ${labelColor};
                   `}
                 />
