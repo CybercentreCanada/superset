@@ -361,7 +361,6 @@ class ChartDataRestApi(ChartRestApi):
             result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
             result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
             result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
-
         
         result["queries"][0]["fissionUrl"] = config["FISSION_PROXY_URL"]
             
