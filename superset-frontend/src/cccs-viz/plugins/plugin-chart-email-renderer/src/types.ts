@@ -9,6 +9,7 @@ export type EmailRendererFormData = QueryFormData & {
   parameter_name: string;
   parameter_prefix: string;
   errorMessage: string;
+  groupby: any;
 };
 
 export type EmailRenderChartProps = ChartProps & {

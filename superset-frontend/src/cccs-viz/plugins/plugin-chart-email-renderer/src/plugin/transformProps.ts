@@ -51,7 +51,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
    */
   const { formData, queriesData } = chartProps;
 
-  const { parameterValue, parameterName, parameterPrefix } = formData;
+  const { parameterName, parameterPrefix, groupby } = formData;
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
 
@@ -69,7 +69,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
   }
 
   if (Array.isArray(data) && data.length === 1) {
-    value = data[0][parameterValue] || '';
+    value = data[0][groupby] || '';
   }
 
   return {
