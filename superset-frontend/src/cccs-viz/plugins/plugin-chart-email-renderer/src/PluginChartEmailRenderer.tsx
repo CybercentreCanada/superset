@@ -6,7 +6,12 @@ const QUERY_TIMEOUT_LIMIT = 180000;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
-    formData,
+    formData: {
+      url_parameter_value,
+      parameter_name,
+      parameter_prefix,
+      errorMessage
+    },
     fissionUrl
   } = props;
 
@@ -14,17 +19,20 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  const apiUrl = useMemo(
-    () =>
-      `/api/v1/fission/emailpreview?${formData.parameter_name}=${
-        formData.parameter_prefix ? encodeURIComponent(formData.parameter_prefix) : ''
-      }${encodeURIComponent(formData.url_parameter_value)}`,
-    [formData.parameter_name, formData.parameter_prefix, formData.url_parameter_value],
+  // Use destructured formData properties as dependencies
+  const apiUrl = useMemo(() => 
+    `/api/v1/fission/emailpreview?${parameter_name}=${
+      parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
+    }${encodeURIComponent(url_parameter_value)}`,
+    [parameter_name, parameter_prefix, url_parameter_value]
   );
 
-  const linkUrl = `${fissionUrl}/emailpreview?${formData.parameter_name}=${
-    formData.parameter_prefix ? encodeURIComponent(formData.parameter_prefix) : ''
-  }${encodeURIComponent(formData.url_parameter_value)}`
+  const linkUrl = useMemo(() => 
+    `${fissionUrl}/emailpreview?${parameter_name}=${
+      parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
+    }${encodeURIComponent(url_parameter_value)}`,
+    [fissionUrl, parameter_name, parameter_prefix, url_parameter_value]
+  );
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -64,11 +72,11 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
     );
   }
   
-  if (formData.errorMessage) {
+  if (errorMessage) {
     return (
       <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
         <span style={{ fontSize: '14px', color: 'red' }}>
-          <strong>Error:</strong> {formData.errorMessage}
+          <strong>Error:</strong> {errorMessage}
         </span>
       </div>
     );
