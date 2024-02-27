@@ -17,7 +17,6 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  // Use destructured formData properties as dependencies
   const apiUrl = useMemo(() => 
     `/api/v1/fission/emailpreview?${parameter_name}=${
       parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
