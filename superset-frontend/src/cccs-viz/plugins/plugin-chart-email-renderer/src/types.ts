@@ -22,6 +22,9 @@ export interface EmailRendererResponseResult extends ChartDataResponseResult {
 };
 
 export type EmailRendererProps = {
-  formData: EmailRendererFormData;
-  fissionUrl: String;
+  url_parameter_value: string;
+  parameter_name: string;
+  parameter_prefix: string;
+  errorMessage: string;
+  fissionUrl: string;
 }
