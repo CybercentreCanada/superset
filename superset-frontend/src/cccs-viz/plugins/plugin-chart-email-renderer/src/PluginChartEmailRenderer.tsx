@@ -6,12 +6,10 @@ const QUERY_TIMEOUT_LIMIT = 180000;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
-    formData: {
-      url_parameter_value,
-      parameter_name,
-      parameter_prefix,
-      errorMessage
-    },
+    url_parameter_value,
+    parameter_name,
+    parameter_prefix,
+    errorMessage,
     fissionUrl
   } = props;
 
