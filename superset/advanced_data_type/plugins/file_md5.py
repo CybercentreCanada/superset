@@ -33,7 +33,7 @@ def file_md5_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
 
 
 file_md5: AdvancedDataType = AdvancedDataType(
-    verbose_name="FileMD5",
+    verbose_name="File MD5",
     description="Represents an MD5 hash of a file",
     valid_data_types=["str"],
     translate_filter=translate_filter_func,
