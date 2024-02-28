@@ -3,7 +3,7 @@ import { SupersetClient } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
 
 const QUERY_TIMEOUT_LIMIT = 180000;
-const RETRY_ATTEMPTS = 10;
+const RETRY_ATTEMPTS = 5;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
