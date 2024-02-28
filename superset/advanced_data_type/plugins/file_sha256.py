@@ -33,7 +33,7 @@ def file_sha256_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
 
 
 file_sha256: AdvancedDataType = AdvancedDataType(
-    verbose_name="FileSHA256",
+    verbose_name="File SHA256",
     description="Represents a SHA256 hash of a file",
     valid_data_types=["str"],
     translate_filter=translate_filter_func,
