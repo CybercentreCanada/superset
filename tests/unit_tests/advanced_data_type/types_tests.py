@@ -19,7 +19,6 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String
-from sqlalchemy_bigquery import ARRAY
 from superset.advanced_data_type.plugins.agent_id import agent_id_func
 from superset.advanced_data_type.plugins.asn import asn_func
 from superset.advanced_data_type.plugins.aws_access_key_id import aws_access_key_id_func
@@ -768,7 +767,8 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
         valid_data_types (list): A list of valid SQLAlchemy type (ex. String, Integer).
     """
     name = " ".join(advanced_data_type_func.__name__.split("_")[:-1])
-    print(f"Testing {name}...\n")
+    if (verbose):
+        print(f"Testing {name}...\n")
     for value in valid_values:
         for operator in valid_operators:
             if operator == FilterOperator.IN.value:
@@ -926,7 +926,9 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                 assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
                 test_translate_filter_func_not_equals_operator(name, value, valid_data_types)
 
-    print(f"{name} passed!\n")
+    if (verbose):
+        print(f"{name} passed!\n")
+
 
 advanced_data_type_test_bodies = {
     """
