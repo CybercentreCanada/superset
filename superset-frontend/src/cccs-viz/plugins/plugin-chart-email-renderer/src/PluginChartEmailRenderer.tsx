@@ -3,6 +3,7 @@ import { SupersetClient } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
 
 const QUERY_TIMEOUT_LIMIT = 180000;
+const RETRY_ATTEMPTS = 10;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
@@ -35,7 +36,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
     const fetchImage = async () => {
       let attempts = 0;
 
-      while (attempts < 10) {
+      while (attempts < RETRY_ATTEMPTS) {
         try {
           const { json } = await SupersetClient.get({ endpoint: apiUrl, timeout: QUERY_TIMEOUT_LIMIT });
 
@@ -50,10 +51,10 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           setImageError(error.message || 'Fission function trouble fetching image, retry in process.');
           attempts++;
         } finally {
-          setLoading(attempts >= 10);
+          setLoading(attempts >= RETRY_ATTEMPTS);
         }
       }
-      if (attempts >= 10) {
+      if (attempts >= RETRY_ATTEMPTS) {
         setLoading(false)
         setImageError('An unexpected error has occurred.  The image cannot be fetched at this time.');
       }
