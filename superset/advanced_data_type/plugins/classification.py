@@ -22,7 +22,7 @@ def classification_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespons
     elif req["operator"] in ['ILIKE']:
         for val in req["values"]:
             resp["values"].append(str(val))
-        return resp
+            return resp
     else:
         for val in req["values"]:
                 resp["values"].append(val)

@@ -30,6 +30,7 @@ def agent_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
             string_value = str(val)
             if re.search("^[a-fA-F0-9]{1,4}\.[a-fA-F0-9]{1,2}\.[a-fA-F0-9]{1,8}\.[a-fA-F0-9]{2}$", string_value):
                 resp["values"].append(string_value)
+                return resp
             else:
                 resp["error_message"] = f"'{ val }' is not a valid Agent ID. Must be four strings separated by periods, and of lengths [1-4].[1-2].[1-8].[2]"
                 return resp
