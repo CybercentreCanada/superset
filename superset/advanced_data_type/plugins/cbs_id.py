@@ -24,12 +24,12 @@ def cbs_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
             if re.search("^[A-Fa-f0-9]{8}\-[A-Fa-f0-9]{4}\-[A-Fa-f0-9]{4}\-[A-Fa-f0-9]{4}\-[A-Fa-f0-9]{12}$", string_value):
                 resp["values"].append(string_value)
             else:
-                character_blocks = [len(x) for x in string_value.split("-")]
+                character_block_lengths = [len(block) for block in string_value.split("-")]
 
                 if (len(string_value) != 36):
                     resp["error_message"] = f"'{ val }' is not a valid CBS ID. Expected 36 characters. Received {len(string_value)}."
                     return resp
-                elif (character_blocks != [8,4,4,4,12]):
+                elif (character_block_lengths != [8,4,4,4,12]):
                     resp["error_message"] = f"'{ val }' is not a valid CBS ID. Invalid format."
                     return resp
                 else:
