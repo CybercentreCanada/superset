@@ -1,5 +1,5 @@
 from superset.advanced_data_type.plugins import translate_filter_func
-from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET
+from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse
 import re
 
@@ -11,10 +11,14 @@ def harmonized_email_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRe
         "values": [],
         "error_message": "",
         "display_value": "",
-        "valid_filter_operators": EQUAL_NULLABLE_OPERATOR_SET,
+        "valid_filter_operators": EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
     }
 
     if req["operator"] in ['IS NULL', 'IS NOT NULL']:
+        return resp
+    elif req["operator"] in ['ILIKE']:
+        for val in req["values"]:
+            resp["values"].append(str(val))
         return resp
     elif req["values"] == [""]:
         resp["error_message"] = "Harmonized Email ID must not be empty"
