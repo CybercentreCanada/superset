@@ -55,7 +55,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       }
       if (attempts >= 10) {
         setLoading(false)
-        setImageError('An unexpected error has occured.  The image cannot be fetched at this time.');
+        setImageError('An unexpected error has occurred.  The image cannot be fetched at this time.');
       }
     };
     fetchImage();
