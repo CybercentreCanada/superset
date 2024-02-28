@@ -14,7 +14,7 @@ def file_sha256_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         "valid_filter_operators": EQUAL_NULLABLE_OPERATOR_SET,
     }
     if req["values"] == [""]:
-        resp["error_message"] = "FileSHA256 must not be empty"
+        resp["error_message"] = "SHA256 must not be empty"
         return resp
     for val in req["values"]:
         string_value = str(val)
@@ -22,10 +22,10 @@ def file_sha256_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
             resp["values"].append(string_value)
         else:
             if (len(string_value) != 64):
-                resp["error_message"] = f"'{ val }' is not a valid FileSHA256. Expected 64 characters. Received {len(string_value)}."
+                resp["error_message"] = f"'{ val }' is not a valid SHA256. Expected 64 characters. Received {len(string_value)}."
                 return resp
             else:
-                resp["error_message"] = f"'{ val }' is not a valid FileSHA256. Invalid hex string characters. Accepted characters: a-f, A-F, 0-9"
+                resp["error_message"] = f"'{ val }' is not a valid SHA256. Invalid hex string characters. Accepted characters: a-f, A-F, 0-9"
                 return resp
 
     resp["display_value"] = ", ".join(resp["values"])
