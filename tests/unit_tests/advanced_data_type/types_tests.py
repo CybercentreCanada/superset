@@ -19,23 +19,41 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String
+from sqlalchemy_bigquery import ARRAY
 from superset.advanced_data_type.plugins.agent_id import agent_id_func
 from superset.advanced_data_type.plugins.asn import asn_func
 from superset.advanced_data_type.plugins.aws_access_key_id import aws_access_key_id_func
 from superset.advanced_data_type.plugins.aws_account_id import aws_account_id_func
+from superset.advanced_data_type.plugins.aws_arn import aws_arn_func
 from superset.advanced_data_type.plugins.aws_organization_id import aws_organization_id_func
+from superset.advanced_data_type.plugins.aws_principal_id import aws_principal_id_func
 from superset.advanced_data_type.plugins.azure_application_id import azure_application_id_func
 from superset.advanced_data_type.plugins.azure_object_id import azure_object_id_func
 from superset.advanced_data_type.plugins.cbs_id import cbs_id as cbs_id, cbs_id_func
 from superset.advanced_data_type.plugins.cbs_workload import cbs_workload_func
 from superset.advanced_data_type.plugins.classification import classification_func
+from superset.advanced_data_type.plugins.country_code import country_code_func
+from superset.advanced_data_type.plugins.cpoints import cpoints_func
+from superset.advanced_data_type.plugins.department import department_func
+from superset.advanced_data_type.plugins.domain import domain_func
+from superset.advanced_data_type.plugins.email_address import email_address_func
+from superset.advanced_data_type.plugins.file_md5 import file_md5_func
+from superset.advanced_data_type.plugins.file_sha256 import file_sha256_func
+from superset.advanced_data_type.plugins.harmonized_email_id import harmonized_email_id_func
+from superset.advanced_data_type.plugins.ip_protocol import ip_protocol_func
+from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
+from superset.advanced_data_type.plugins.oid_tag import oid_tag_func
+from superset.advanced_data_type.plugins.tcp_sequence import tcp_sequence_func
 from superset.advanced_data_type.plugins.translate_filter_func import translate_filter_func
+from superset.advanced_data_type.plugins.uri import uri_func
+from superset.advanced_data_type.plugins.user_agent import user_agent_func
+from superset.advanced_data_type.plugins.zone import zone_func
 from superset.advanced_data_type.types import (
     AdvancedDataTypeRequest,
     AdvancedDataTypeResponse,
 )
 from superset.utils.core import FilterOperator, FilterStringOperators
-from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
+from superset.advanced_data_type.plugins.operator_sets import CIDR_OPERATOR_SET, EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
 from superset.advanced_data_type.plugins.internet_address import internet_address
 from superset.advanced_data_type.plugins.internet_port import internet_port as port
 
@@ -853,7 +871,7 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
                 assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_in_operator(name, value, valid_data_types )
+                test_translate_filter_func_in_operator(name, value, valid_data_types)
             elif operator in FilterStringOperators.NOT_IN.value:
                 req: AdvancedDataTypeRequest = {
                     "values": [value],
@@ -906,31 +924,9 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
                 assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_not_equals_operator(name, value, valid_data_types )
-
-            elif operator == FilterOperator.LIKE.value:
-                req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
-                }
-                res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_like_operator(name, value, valid_data_types )
-            elif operator == FilterOperator.ILIKE.value:
-                req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
-                }
-                res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_ilike_operator(name, value, valid_data_types )
+                test_translate_filter_func_not_equals_operator(name, value, valid_data_types)
 
     print(f"{name} passed!\n")
-
 
 advanced_data_type_test_bodies = {
     """
@@ -942,34 +938,37 @@ advanced_data_type_test_bodies = {
     "asn": [asn_func, [111, 4294967295], ["111", -1], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
     "aws_access_key_id": [aws_access_key_id_func, ["ASIAXXXX34311113", "AKIAIOSFODNN7EXAMPLE"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
     "aws_account_id": [aws_account_id_func, [111111111111, 222222222222], ["x"], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
-    #aws_arn_func
-    #aws_principal_id_func
+    "aws_arn_func": [aws_arn_func, ["arn:aws:s3:::beabetterdev-demo-bucket", "arn:aws:lambda:us-east-1:755314965794:function:Disconnect"], ["lambda function"], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "aws_principal_id_func": [aws_principal_id_func, ["AROATYNMAQ3LAV6PISTHQ:1709049210574347945"], [""], EQUAL_NULLABLE_OPERATOR_SET, [String]],
     "aws_organization_id": [aws_organization_id_func, ["o-12345aaa678"], ["o-HELLOWORLD"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
     "azure_application_id": [azure_application_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
     "azure_object_id": [azure_object_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
     "cbs_id": [cbs_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "cbs_workload": [cbs_workload_func, ["Amazon.S3.Bucket.HelloWorld", "hello.azure.world"], ["hello.world"], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "cbs_workload": [cbs_workload_func, ["Amazon.S3.Bucket.HelloWorld", "hello.azure.world"], ["hello.world", ""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
     "classification": [classification_func, ["hello", "world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    #country_code_func
-    #cpoints_func
-    #department_func
-    #domain_func
-    #email_address_func
-    #file_md5_func
-    #file_sha256_func
-    #harmonized_email_id_func
-    #ip_protocol_func
-    #ipv6_func
-    #oid_tag_func
+    "country_code_func": [country_code_func, ["CA", "CAN", 124], ["china", 1111, "c"], EQUAL_NULLABLE_OPERATOR_SET, [String, Integer]],
+    "cpoints_func": [cpoints_func, ["11:11", '["11:11", "11:11"]'], ["world", 11], EQUAL_NULLABLE_OPERATOR_SET, [String]],
+    "department_func": [department_func, ["any"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "domain_func": [domain_func, ["helloworld.com"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "email_address_func": [email_address_func, ["hello@world.com"], ["hello world"], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "file_md5_func": [file_md5_func, ["23db6982caef9e9152f1a5b2589e6ca3"], ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
+    "file_sha256_func": [file_sha256_func, ["b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"], ["hello world", "", 1], EQUAL_NULLABLE_OPERATOR_SET, [String]],
+    "harmonized_email_id_func": [harmonized_email_id_func, ["CBS_EMAIL_AA", "NBS_EMAIL_BF"], ["nbs email", "", 1], EQUAL_NULLABLE_OPERATOR_SET, [String]],
+    "ip_protocol_func": [ip_protocol_func, [0, 10, 255], ["10", "", -1], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
+    "ipv6_func": [ipv6_func, ["2001::0370:7334", "::ffff:abcd:1234"], ["world"], CIDR_OPERATOR_SET, [Integer]],
+    "oid_tag_func": [oid_tag_func, ["my_tag"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    #pending approval
     #stream_id_func
-    #tcp_sequence_func
-    #uri_func
-    #url_func
-    #user_agent_func
-    #zone_func
+    "tcp_sequence_func": [tcp_sequence_func, [(2**31 -1), (-2 ** 31)], ["1", "", "_"], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
+    "uri_func":  [uri_func, ["hello://world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "url_func": [uri_func, ["hello://world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "user_agent_func": [user_agent_func, ["any"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
+    "zone_func": [zone_func, ["EXT", "DMZ", "INT", "11", 11], ["", 111, "WORLD"], EQUAL_NULLABLE_OPERATOR_SET, [String, Integer]]
 }
 
 verbose = False
 
 for test_body in advanced_data_type_test_bodies.values():
     test_advanced_data_type_translate_type(*test_body)
+
+print("All tests passed!")

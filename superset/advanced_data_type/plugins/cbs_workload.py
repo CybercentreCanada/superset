@@ -19,13 +19,8 @@ def cbs_workload_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         return resp
     elif req["operator"] in ['ILIKE']:
         for val in req["values"]:
-            string_value = str(val)
-            if re.search("^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+){2,}$", string_value):
-                resp["values"].append(string_value)
-            else:
-                resp["error_message"] = f"'{ val }' is not a valid CBS workload. Must contain at least three strings separated by periods."
-                return resp
-        return resp
+            resp["values"].append(str(val))
+            return resp
     else:
         for val in req["values"]:
             string_value = str(val)

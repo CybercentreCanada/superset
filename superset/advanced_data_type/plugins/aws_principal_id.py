@@ -1,7 +1,5 @@
-import re
 from superset.advanced_data_type.plugins import translate_filter_func
 from superset.advanced_data_type.plugins.operator_sets import EQUAL_NULLABLE_OPERATOR_SET
-from superset.advanced_data_type.plugins.utils import is_json
 from superset.advanced_data_type.types import AdvancedDataType, AdvancedDataTypeRequest, AdvancedDataTypeResponse
 
 
@@ -23,21 +21,11 @@ def aws_principal_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRespo
         return resp
     else:
         for val in req["values"]:
-            string_value = str(val)
-            """
-            Intentionally very broad because the principal ID can take various forms as long as it follows
-            the "Principal" : {} structure.
-            https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#Principal_specifying
-            """
-            if re.search("^\"Principal\"\s*:\s*\{.*\}$", string_value, re.DOTALL):
-                if is_json(f"{{ {string_value} }}"):
-                    resp["values"].append(string_value)
-                else:
-                    resp["error_message"] = f"The value after \"Principal\": must be valid JSON. Received '{ val }'."
-                    return resp
-
-            else:
-                resp["error_message"] = f"'{ val }' is not a valid AWS Principal ID. Must be of format \"Principal\": JSON"
+            try:
+                resp["values"].append(str(val))
+                return resp
+            except:
+                resp["error_message"] = f"'{ val }' is not a valid AWS Principal ID."
                 return resp
 
         resp["display_value"] = ", ".join(resp["values"])

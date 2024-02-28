@@ -19,10 +19,10 @@ def aws_arn_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     elif req["values"] == [""]:
         resp["error_message"] = "AWS ARN must not be empty"
         return resp
-    elif req["operator"] in ['LIKE', 'ILIKE']:
+    elif req["operator"] in ['LIKE']:
         for val in req["values"]:
             resp["values"].append(str(val))
-        return resp
+            return resp
     else:
         for val in req["values"]:
             string_value = str(val)

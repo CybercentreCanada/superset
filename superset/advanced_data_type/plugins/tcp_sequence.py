@@ -16,12 +16,16 @@ def tcp_sequence_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         resp["error_message"] = "TCP sequence must not be empty"
         return resp
     else:
-        for val in req["values"]:
-            if ((-2 ** 31) <= val <= (2**31 -1)):
-                resp["values"].append(str(val))
-            else:
-                resp["error_message"] = f"'{ val }' is not a valid TCP sequence. Must be a 32-bit signed integer."
-                return resp
+        try:
+            for val in req["values"]:
+                if ((-2 ** 31) <= val <= (2**31 -1)):
+                    resp["values"].append(str(val))
+                else:
+                    resp["error_message"] = f"'{ val }' is not a valid TCP sequence. Must be a 32-bit signed integer."
+                    return resp
+        except:
+            resp["error_message"] = f"'{ val }' is not a valid TCP sequence. Must be a 32-bit signed integer."
+            return resp
 
         resp["display_value"] = ", ".join(resp["values"])
         return resp

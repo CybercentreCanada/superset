@@ -30,20 +30,24 @@ def harmonized_email_id_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeRe
             if match:
                 resp["values"].append(string_value)
             else:
-                character_blocks = match.groups()
-                if (len(character_blocks) != 3):
-                    resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid format. Accepted format: <SENSOR>_EMAIL_<hex_string>"
-                    return resp
-                elif (character_blocks[0] != 'CBS' and character_blocks[0] != 'NBS'):
-                    resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid sensor type. Accepted types: CBS, NBS"
-                    return resp
-                elif (character_blocks[1] != 'EMAIL'):
-                    resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid second block. Accepted format: <SENSOR>_EMAIL_<hex_string>"
-                    return resp
-                elif len(character_blocks[2]) < 0:
-                    resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid third block. Accepted format: <SENSOR>_EMAIL_<hex_string>, where hex_string has 1 or more characters."
-                    return resp
-                else:
+                try:
+                    character_blocks = match.groups()
+                    if (len(character_blocks) != 3):
+                        resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid format. Accepted format: <SENSOR>_EMAIL_<hex_string>"
+                        return resp
+                    elif (character_blocks[0] != 'CBS' and character_blocks[0] != 'NBS'):
+                        resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid sensor type. Accepted types: CBS, NBS"
+                        return resp
+                    elif (character_blocks[1] != 'EMAIL'):
+                        resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid second block. Accepted format: <SENSOR>_EMAIL_<hex_string>"
+                        return resp
+                    elif len(character_blocks[2]) < 0:
+                        resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid third block. Accepted format: <SENSOR>_EMAIL_<hex_string>, where hex_string has 1 or more characters."
+                        return resp
+                    else:
+                        resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid hex string characters. Accepted characters: a-f, A-F, 0-9"
+                        return resp
+                except:
                     resp["error_message"] = f"'{ val }' is not a valid Harmonized Email ID. Invalid hex string characters. Accepted characters: a-f, A-F, 0-9"
                     return resp
 

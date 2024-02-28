@@ -44,7 +44,7 @@ def cpoints_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
 cpoints: AdvancedDataType = AdvancedDataType(
     verbose_name="CPOINTs",
     description="Represents an array of CPOINTs",
-    valid_data_types=["array"],
+    valid_data_types=["str"],
     translate_filter=translate_filter_func,
     translate_type=cpoints_func,
 )
