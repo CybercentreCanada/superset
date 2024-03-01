@@ -110,9 +110,9 @@ const config: ControlPanelConfig = {
           {
             name: 'groupby',
             override: {
-              label: t('Parameter Column Name'),
+              label: t('Column'),
               description:
-                'The name of the column that will populate the url parameter value.',
+                'The column that contains the eml filename.',
               multi: false,
               allowAll: false,
               default: [],
@@ -139,10 +139,10 @@ const config: ControlPanelConfig = {
             name: 'parameter_prefix',
             config: {
               type: 'TextControl',
-              label: t('Parameter Prefix'),
+              label: t('Prefix'),
               default: '',
               description: t(
-                'A value that will be prefix the parameter value.',
+                'A value that will prefix the value from the column.',
               ),
             },
           },

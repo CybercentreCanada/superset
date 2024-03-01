@@ -65,7 +65,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
   }
 
   if (Array.isArray(data) && data.length === 0) {
-    errorMessage = 'The query returned no rows.';
+    errorMessage = 'No results were returned for this query.';
   }
 
   if (Array.isArray(data) && data.length === 1) {
