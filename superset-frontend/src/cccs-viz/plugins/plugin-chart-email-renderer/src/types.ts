@@ -6,7 +6,6 @@ import {
 
 export type EmailRendererFormData = QueryFormData & {
   url_parameter_value: string;
-  parameter_name: string;
   parameter_prefix: string;
   errorMessage: string;
   groupby: any;
@@ -23,7 +22,6 @@ export interface EmailRendererResponseResult extends ChartDataResponseResult {
 
 export type EmailRendererProps = {
   url_parameter_value: string;
-  parameter_name: string;
   parameter_prefix: string;
   errorMessage: string;
   fissionUrl: string;
