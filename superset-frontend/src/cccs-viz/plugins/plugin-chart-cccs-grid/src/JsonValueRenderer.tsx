@@ -1,4 +1,4 @@
-import { GroupCellRenderer } from '@ag-grid-enterprise/all-modules';
+import { GroupCellRenderer } from 'ag-grid-community';
 import React, { Component } from 'react';
 import { JSONTree } from 'react-json-tree';
 

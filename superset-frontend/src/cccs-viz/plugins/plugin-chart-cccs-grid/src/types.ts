@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ColumnState } from '@ag-grid-enterprise/all-modules';
+import { ColumnState } from '@ag-grid-community/core';
 import {
   ChartDataResponseResult,
   ChartProps,
@@ -32,7 +32,7 @@ export type CccsGridQueryFormData = QueryFormData & {
   headerText?: string;
   setDataMask?: SetDataMaskHook;
   selectedValues?: Record<number, string>;
-  emitFilter: boolean;
+  emitCrossFilters: boolean;
   include_search: boolean;
   page_length: number;
   enable_grouping: boolean;
@@ -70,7 +70,7 @@ export interface CccsGridTransformedProps extends CccsGridStylesProps {
   setDataMask: SetDataMaskHook;
   setControlValue: HandlerFunction;
   selectedValues: Record<number, string>;
-  emitFilter: boolean;
+  emitCrossFilters: boolean;
   principalColumns: any;
   data: TimeseriesDataRecord[];
   columnDefs: any;

@@ -78,6 +78,7 @@ export type DashboardState = {
     chartId: number;
     column: string;
   };
+  focusedChart?: number;
   overwriteConfirmMetadata?: {
     updatedAt: string;
     updatedBy: string;

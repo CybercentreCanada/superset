@@ -27,14 +27,23 @@ const INITIAL_ADVANCED_DATA_TYPES_STATE: AdvancedDataTypesState = {
   advancedDataTypeOperatorList: [],
   errorMessage: '',
   useDefaultOperators: false,
+  values: [],
 };
 
-const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
+const useAdvancedDataTypes = (
+  validHandler: (isValid: boolean) => void,
+  selectedAdvancedDataTypeOperator: string | undefined,
+  default_state: AdvancedDataTypesState = INITIAL_ADVANCED_DATA_TYPES_STATE,
+) => {
   const [advancedDataTypesState, setAdvancedDataTypesState] =
-    useState<AdvancedDataTypesState>(INITIAL_ADVANCED_DATA_TYPES_STATE);
+    useState<AdvancedDataTypesState>(default_state);
   const [subjectAdvancedDataType, setSubjectAdvancedDataType] = useState<
     string | undefined
   >();
+  const selectedOperator =
+    selectedAdvancedDataTypeOperator === undefined
+      ? ''
+      : selectedAdvancedDataTypeOperator;
 
   const fetchAdvancedDataTypeValueCallback = useCallback(
     (
@@ -52,6 +61,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
         const queryParams = rison.encode({
           type: subjectAdvancedDataType,
           values,
+          operator: selectedOperator,
         });
         const endpoint = `/api/v1/advanced_data_type/convert?q=${queryParams}`;
         SupersetClient.get({ endpoint })
@@ -61,6 +71,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
               advancedDataTypeOperatorList: json.result.valid_filter_operators,
               errorMessage: json.result.error_message,
               useDefaultOperators: false,
+              values: json.result.values,
             });
             // Changed due to removal of status field
             validHandler(!json.result.error_message);
@@ -72,12 +83,13 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
                 advancedDataTypesState.advancedDataTypeOperatorList,
               errorMessage: t('Failed to retrieve advanced type'),
               useDefaultOperators: true,
+              values: [],
             });
             validHandler(true);
           });
       }, 600)();
     },
-    [validHandler],
+    [validHandler, selectedOperator],
   );
 
   const fetchSubjectAdvancedDataType = (props: Props) => {

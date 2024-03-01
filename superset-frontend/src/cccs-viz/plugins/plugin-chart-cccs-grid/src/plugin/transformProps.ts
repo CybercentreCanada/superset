@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ValueFormatterParams } from '@ag-grid-enterprise/all-modules';
+import { ValueFormatterParams } from 'ag-grid-community';
 import {
   Column,
   getMetricLabel,
@@ -32,6 +32,8 @@ import {
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
+
+import { rendererMap, formatIpv4 } from '../utils/advancedDataTypes';
 
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
@@ -70,12 +72,12 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     height,
     rawFormData: formData,
     queriesData,
+    emitCrossFilters,
   } = chartProps;
   const {
     boldText,
     headerFontSize,
     headerText,
-    emitFilter,
     principalColumns,
     page_length,
     query_mode,
@@ -176,28 +178,13 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   },
   sortingColumnMap);
 
-  // Key is column advanced type, value is renderer name
-  const rendererMap = {
-    IPV4: 'ipv4ValueRenderer',
-    IPV6: 'ipv6ValueRenderer',
-    DOMAIN: 'domainValueRenderer',
-    COUNTRY: 'countryValueRenderer',
-    JSON: 'jsonValueRenderer',
-  };
-
-  const formatIpV4 = (v: any) => {
-    const converted = `${(v >> 24) & 0xff}.${(v >> 16) & 0xff}.${
-      (v >> 8) & 0xff
-    }.${v & 0xff}`;
-    return converted;
-  };
-
+ 
   const valueFormatter = (params: any) => {
     if (
       params.value != null &&
       params.colDef.cellRenderer === 'ipv4ValueRenderer'
     ) {
-      return formatIpV4(params.value.toString());
+      return formatIpv4(params.value.toString());
     }
     return params.value != null ? params.value.toString() : '';
   };
@@ -235,9 +222,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
       const autoHeight = true;
-      const rowGroupIndex = default_group_by.findIndex((element: any) => {
-        return element === column;
-      });
+      const rowGroupIndex = default_group_by.findIndex(
+        (element: any) => element === column,
+      );
       const rowGroup = rowGroupIndex >= 0;
       const hide = rowGroup;
       return {
@@ -250,7 +237,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         enableRowGroup,
         rowGroup,
         hide,
-        rowGroupIndex,
+        rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
         getQuickFilterText: (params: any) => valueFormatter(params),
         headerTooltip: columnDescription,
         autoHeight,
@@ -287,8 +274,9 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           sortable: isSortable,
           enableRowGroup,
           rowGroup,
-          rowGroupIndex,
-          initialRowGroupIndex,
+          rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+          initialRowGroupIndex:
+            initialRowGroupIndex === -1 ? null : initialRowGroupIndex,
           hide,
           getQuickFilterText: (params: any) => valueFormatter(params),
           headerTooltip: columnDescription,
@@ -389,7 +377,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     boldText,
     headerFontSize,
     headerText,
-    emitFilter,
+    emitCrossFilters,
     principalColumns,
     include_search,
     page_length,
