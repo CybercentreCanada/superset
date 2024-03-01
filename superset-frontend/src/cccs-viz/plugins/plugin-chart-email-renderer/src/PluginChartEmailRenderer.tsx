@@ -8,7 +8,6 @@ const RETRY_ATTEMPTS = 5;
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
     url_parameter_value,
-    parameter_name,
     parameter_prefix,
     errorMessage,
     fissionUrl
@@ -19,17 +18,17 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const [imageError, setImageError] = useState<string | null>(null);
 
   const apiUrl = useMemo(() => 
-    `/api/v1/fission/emailpreview?${parameter_name}=${
+    `/api/v1/fission/emailpreview?eml=${
       parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
     }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url_parameter_value]
+    [parameter_prefix, url_parameter_value]
   );
 
   const linkUrl = useMemo(() => 
-    `${fissionUrl}/emailpreview?${parameter_name}=${
+    `${fissionUrl}/emailpreview?eml=${
       parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
     }${encodeURIComponent(url_parameter_value)}`,
-    [fissionUrl, parameter_name, parameter_prefix, url_parameter_value]
+    [fissionUrl, parameter_prefix, url_parameter_value]
   );
 
   useEffect(() => {
@@ -72,13 +71,13 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   
   if (errorMessage) {
     return (
-      <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
-        <span style={{ fontSize: '14px', color: 'red' }}>
-          <strong>Error:</strong> {errorMessage}
+      <div style={{ padding: '20px', border: '1px solid orange', borderRadius: '8px', backgroundColor: '#ffcc99', margin: '20px', textAlign: 'center' }}>
+        <span style={{ fontSize: '14px', color: 'orange' }}>
+          <strong>Alert:</strong> {errorMessage}
         </span>
       </div>
     );
-  }
+}
 
   if (imageError) {
     return (
@@ -102,7 +101,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       style={{
         position: 'absolute',
         left: 0,
-        top: '50px',
+        top: '10px',
         width: '98%',
         height: '100%',
         overflow: 'auto',

@@ -51,7 +51,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
    */
   const { formData, queriesData } = chartProps;
 
-  const { parameterName, parameterPrefix, groupby } = formData;
+  const { parameterPrefix, groupby } = formData;
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
 
@@ -75,7 +75,6 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
   return {
     formData: chartProps.formData,
     url_parameter_value: value,
-    parameter_name: parameterName,
     parameter_prefix: parameterPrefix,
     errorMessage,
     fissionUrl
