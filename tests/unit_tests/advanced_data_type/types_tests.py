@@ -24,9 +24,13 @@ from superset.advanced_data_type.plugins.asn import asn_func
 from superset.advanced_data_type.plugins.aws_access_key_id import aws_access_key_id_func
 from superset.advanced_data_type.plugins.aws_account_id import aws_account_id_func
 from superset.advanced_data_type.plugins.aws_arn import aws_arn_func
-from superset.advanced_data_type.plugins.aws_organization_id import aws_organization_id_func
+from superset.advanced_data_type.plugins.aws_organization_id import (
+    aws_organization_id_func,
+)
 from superset.advanced_data_type.plugins.aws_principal_id import aws_principal_id_func
-from superset.advanced_data_type.plugins.azure_application_id import azure_application_id_func
+from superset.advanced_data_type.plugins.azure_application_id import (
+    azure_application_id_func,
+)
 from superset.advanced_data_type.plugins.azure_object_id import azure_object_id_func
 from superset.advanced_data_type.plugins.cbs_id import cbs_id as cbs_id, cbs_id_func
 from superset.advanced_data_type.plugins.cbs_workload import cbs_workload_func
@@ -38,12 +42,16 @@ from superset.advanced_data_type.plugins.domain import domain_func
 from superset.advanced_data_type.plugins.email_address import email_address_func
 from superset.advanced_data_type.plugins.file_md5 import file_md5_func
 from superset.advanced_data_type.plugins.file_sha256 import file_sha256_func
-from superset.advanced_data_type.plugins.harmonized_email_id import harmonized_email_id_func
+from superset.advanced_data_type.plugins.harmonized_email_id import (
+    harmonized_email_id_func,
+)
 from superset.advanced_data_type.plugins.ip_protocol import ip_protocol_func
 from superset.advanced_data_type.plugins.ipv6_address import ipv6_func
 from superset.advanced_data_type.plugins.oid_tag import oid_tag_func
 from superset.advanced_data_type.plugins.tcp_sequence import tcp_sequence_func
-from superset.advanced_data_type.plugins.translate_filter_func import translate_filter_func
+from superset.advanced_data_type.plugins.translate_filter_func import (
+    translate_filter_func,
+)
 from superset.advanced_data_type.plugins.uri import uri_func
 from superset.advanced_data_type.plugins.user_agent import user_agent_func
 from superset.advanced_data_type.plugins.zone import zone_func
@@ -52,7 +60,11 @@ from superset.advanced_data_type.types import (
     AdvancedDataTypeResponse,
 )
 from superset.utils.core import FilterOperator, FilterStringOperators
-from superset.advanced_data_type.plugins.operator_sets import CIDR_OPERATOR_SET, EQUAL_NULLABLE_OPERATOR_SET, PATTERN_MATCHING_OPERATOR_SET
+from superset.advanced_data_type.plugins.operator_sets import (
+    CIDR_OPERATOR_SET,
+    EQUAL_NULLABLE_OPERATOR_SET,
+    PATTERN_MATCHING_OPERATOR_SET,
+)
 from superset.advanced_data_type.plugins.internet_address import internet_address
 from superset.advanced_data_type.plugins.internet_port import internet_port as port
 
@@ -542,8 +554,11 @@ def test_port_translate_filter_func_not_in_double():
         port_translate_filter_response
     )
 
-#Tests for translate_filter_func with various FilterOperator values
-def test_translate_filter_func_equals_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+# Tests for translate_filter_func with various FilterOperator values
+def test_translate_filter_func_equals_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the EQUALS operator is used.
     """
@@ -555,13 +570,16 @@ def test_translate_filter_func_equals_operator(advanced_data_type_name, valid_va
             input_column == input_values[0]
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_greater_than_or_equal_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_greater_than_or_equal_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the GREATER THAN OR EQUAL operator is used.
     """
@@ -573,13 +591,16 @@ def test_translate_filter_func_greater_than_or_equal_operator(advanced_data_type
             input_column >= input_values[0]
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_greater_than_operator(advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type):
+
+def test_translate_filter_func_greater_than_operator(
+    advanced_data_type_func, valid_value, advanced_data_type_name, valid_data_type
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the GREATER_THAN operator is used.
     """
@@ -596,7 +617,10 @@ def test_translate_filter_func_greater_than_operator(advanced_data_type_func, va
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_in_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_in_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IN operator is used.
     """
@@ -608,13 +632,16 @@ def test_translate_filter_func_in_operator(advanced_data_type_name, valid_value,
             input_column.in_(input_values)
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_less_than_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_less_than_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN operator is used.
     """
@@ -626,13 +653,16 @@ def test_translate_filter_func_less_than_operator(advanced_data_type_name, valid
             input_column < input_values[0]
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_less_than_or_equal_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_less_than_or_equal_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LESS_THAN_OR_EQUAL operator is used.
     """
@@ -644,13 +674,16 @@ def test_translate_filter_func_less_than_or_equal_operator(advanced_data_type_na
             input_column <= input_values[0]
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_not_equals_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_not_equals_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the NOT_EQUALS operator is used.
     """
@@ -662,13 +695,16 @@ def test_translate_filter_func_not_equals_operator(advanced_data_type_name, vali
             input_column != input_values[0]
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_not_in_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_not_in_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the NOT_IN operator is used.
     """
@@ -680,13 +716,16 @@ def test_translate_filter_func_not_in_operator(advanced_data_type_name, valid_va
             input_column.in_(input_values)
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_is_not_null_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_is_not_null_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IS_NOT_NULL operator is used.
     """
@@ -703,7 +742,10 @@ def test_translate_filter_func_is_not_null_operator(advanced_data_type_name, val
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_is_null_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_is_null_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the IS_NULL operator is used.
     """
@@ -720,7 +762,10 @@ def test_translate_filter_func_is_null_operator(advanced_data_type_name, valid_v
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_like_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_like_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the LIKE operator is used.
     """
@@ -732,13 +777,16 @@ def test_translate_filter_func_like_operator(advanced_data_type_name, valid_valu
             input_column.like(input_values[0])
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_translate_filter_func_ilike_operator(advanced_data_type_name, valid_value, valid_data_types: list):
+
+def test_translate_filter_func_ilike_operator(
+    advanced_data_type_name, valid_value, valid_data_types: list
+):
     """
     Test to see if the advanced_data_type_func behaves as expected when the ILIKE operator is used.
     """
@@ -750,13 +798,20 @@ def test_translate_filter_func_ilike_operator(advanced_data_type_name, valid_val
             input_column.ilike(input_values[0])
         )
 
-        assert translate_filter_func(input_column, input_operation, input_values).compare(
-            advanced_data_type_response
-        )
+        assert translate_filter_func(
+            input_column, input_operation, input_values
+        ).compare(advanced_data_type_response)
     if verbose:
         print(f"{valid_value} passed {input_operation.value}!")
 
-def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values: list, invalid_values: list, valid_operators: list, valid_data_types: list):
+
+def test_advanced_data_type_translate_type(
+    advanced_data_type_func,
+    valid_values: list,
+    invalid_values: list,
+    valid_operators: list,
+    valid_data_types: list,
+):
     """
     Unit test for any given superset advanced data type.
     Args:
@@ -767,19 +822,21 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
         valid_data_types (list): A list of valid SQLAlchemy type (ex. String, Integer).
     """
     name = " ".join(advanced_data_type_func.__name__.split("_")[:-1])
-    if (verbose):
+    if verbose:
         print(f"Testing {name}...\n")
     for value in valid_values:
         for operator in valid_operators:
             if operator == FilterOperator.IN.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
                 test_translate_filter_func_in_operator(name, value, valid_data_types)
 
             elif operator in FilterStringOperators.NOT_IN.value:
@@ -788,21 +845,29 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                     "operator": operator,
                     "error_message": "",
                     "display_value": "",
-                    }
+                }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_not_in_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_not_in_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.IS_NULL.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_is_null_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_is_null_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.IS_NOT_NULL.value:
                 req: AdvancedDataTypeRequest = {
@@ -810,53 +875,69 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                     "operator": operator,
                     "error_message": "",
                     "display_value": "",
-                    }
+                }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_is_not_null_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_is_not_null_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.EQUALS.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_equals_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_equals_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.NOT_EQUALS.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_not_equals_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_not_equals_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterOperator.LIKE.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
                 test_translate_filter_func_like_operator(name, value, valid_data_types)
 
             elif operator == FilterOperator.ILIKE.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] == "", f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
+                assert (
+                    res["error_message"] == ""
+                ), f"Expected no error message for value {value} with operator {operator}, but got {res['error_message']}"
                 test_translate_filter_func_ilike_operator(name, value, valid_data_types)
 
     # Test invalid values
@@ -864,13 +945,15 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
         for operator in valid_operators:
             if operator == FilterOperator.IN.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
                 test_translate_filter_func_in_operator(name, value, valid_data_types)
             elif operator in FilterStringOperators.NOT_IN.value:
                 req: AdvancedDataTypeRequest = {
@@ -878,20 +961,28 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                     "operator": operator,
                     "error_message": "",
                     "display_value": "",
-                    }
-                res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_not_in_operator(name, value, valid_data_types )
-            elif operator == FilterStringOperators.IS_NULL.value:
-                req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_is_null_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_not_in_operator(
+                    name, value, valid_data_types
+                )
+            elif operator == FilterStringOperators.IS_NULL.value:
+                req: AdvancedDataTypeRequest = {
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
+                }
+                res: AdvancedDataTypeResponse = advanced_data_type_func(req)
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_is_null_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.IS_NOT_NULL.value:
                 req: AdvancedDataTypeRequest = {
@@ -899,34 +990,46 @@ def test_advanced_data_type_translate_type(advanced_data_type_func, valid_values
                     "operator": operator,
                     "error_message": "",
                     "display_value": "",
-                    }
+                }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_is_not_null_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_is_not_null_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.EQUALS.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_equals_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_equals_operator(
+                    name, value, valid_data_types
+                )
 
             elif operator == FilterStringOperators.NOT_EQUALS.value:
                 req: AdvancedDataTypeRequest = {
-                "values": [value],
-                "operator": operator,
-                "error_message": "",
-                "display_value": "",
+                    "values": [value],
+                    "operator": operator,
+                    "error_message": "",
+                    "display_value": "",
                 }
                 res: AdvancedDataTypeResponse = advanced_data_type_func(req)
-                assert res["error_message"] != "", f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
-                test_translate_filter_func_not_equals_operator(name, value, valid_data_types)
+                assert (
+                    res["error_message"] != ""
+                ), f"Expected an error message for value {value} with operator {operator}, but got {res['error_message']}"
+                test_translate_filter_func_not_equals_operator(
+                    name, value, valid_data_types
+                )
 
-    if (verbose):
+    if verbose:
         print(f"{name} passed!\n")
 
 
@@ -934,38 +1037,222 @@ advanced_data_type_test_bodies = {
     """
     Dictionary to store test data to be used with test_advanced_data_type_translate_type()
     Format:
-    [{advanced_data_type_func}, {valid_values: list}, {invalid_values: list}, {valid_operators: list}, {valid_data_types: list}]
+    [{advanced_data_type_func},
+    {valid_values: list},
+    {invalid_values: list},
+    {valid_operators: list},
+    {valid_data_types: list}]
     """
-    "agent_id": [agent_id_func, ["ff.ff.ff.ff", "FFFF.FF.FFFFFFFF.FF"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "asn": [asn_func, [111, 4294967295], ["111", -1], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
-    "aws_access_key_id": [aws_access_key_id_func, ["ASIAXXXX34311113", "AKIAIOSFODNN7EXAMPLE"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "aws_account_id": [aws_account_id_func, [111111111111, 222222222222], ["x"], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
-    "aws_arn_func": [aws_arn_func, ["arn:aws:s3:::beabetterdev-demo-bucket", "arn:aws:lambda:us-east-1:755314965794:function:Disconnect"], ["lambda function"], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "aws_principal_id_func": [aws_principal_id_func, ["AROATYNMAQ3LAV6PISTHQ:1709049210574347945"], [""], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "aws_organization_id": [aws_organization_id_func, ["o-12345aaa678"], ["o-HELLOWORLD"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "azure_application_id": [azure_application_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "azure_object_id": [azure_object_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "cbs_id": [cbs_id_func, ["123e4567-e89b-12d3-a456-426655440000", "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c"], ["111"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "cbs_workload": [cbs_workload_func, ["Amazon.S3.Bucket.HelloWorld", "hello.azure.world"], ["hello.world", ""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "classification": [classification_func, ["hello", "world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "country_code_func": [country_code_func, ["CA", "CAN", 124], ["china", 1111, "c"], EQUAL_NULLABLE_OPERATOR_SET, [String, Integer]],
-    "cpoints_func": [cpoints_func, ["11:11", '["11:11", "11:11"]'], ["world", 11], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "department_func": [department_func, ["any"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "domain_func": [domain_func, ["helloworld.com"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "email_address_func": [email_address_func, ["hello@world.com"], ["hello world"], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "file_md5_func": [file_md5_func, ["23db6982caef9e9152f1a5b2589e6ca3"], ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "file_sha256_func": [file_sha256_func, ["b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"], ["hello world", "", 1], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "harmonized_email_id_func": [harmonized_email_id_func, ["CBS_EMAIL_AA", "NBS_EMAIL_BF"], ["nbs email", "", 1], EQUAL_NULLABLE_OPERATOR_SET, [String]],
-    "ip_protocol_func": [ip_protocol_func, [0, 10, 255], ["10", "", -1], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
-    "ipv6_func": [ipv6_func, ["2001::0370:7334", "::ffff:abcd:1234"], ["world"], CIDR_OPERATOR_SET, [Integer]],
-    "oid_tag_func": [oid_tag_func, ["my_tag"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    #pending approval
-    #stream_id_func
-    "tcp_sequence_func": [tcp_sequence_func, [(2**31 -1), (-2 ** 31)], ["1", "", "_"], EQUAL_NULLABLE_OPERATOR_SET, [Integer]],
-    "uri_func":  [uri_func, ["hello://world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "url_func": [uri_func, ["hello://world"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "user_agent_func": [user_agent_func, ["any"], [""], EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET, [String]],
-    "zone_func": [zone_func, ["EXT", "DMZ", "INT", "11", 11], ["", 111, "WORLD"], EQUAL_NULLABLE_OPERATOR_SET, [String, Integer]]
+    "agent_id": [
+        agent_id_func,
+        ["ff.ff.ff.ff", "FFFF.FF.FFFFFFFF.FF"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "asn": [
+        asn_func,
+        [111, 4294967295],
+        ["111", -1],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [Integer],
+    ],
+    "aws_access_key_id": [
+        aws_access_key_id_func,
+        ["ASIAXXXX34311113", "AKIAIOSFODNN7EXAMPLE"],
+        ["111"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "aws_account_id": [
+        aws_account_id_func,
+        [111111111111, 222222222222],
+        ["x"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [Integer],
+    ],
+    "aws_arn_func": [
+        aws_arn_func,
+        [
+            "arn:aws:s3:::beabetterdev-demo-bucket",
+            "arn:aws:lambda:us-east-1:755314965794:function:Disconnect",
+        ],
+        ["lambda function"],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "aws_principal_id_func": [
+        aws_principal_id_func,
+        ["AROATYNMAQ3LAV6PISTHQ:1709049210574347945"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "aws_organization_id": [
+        aws_organization_id_func,
+        ["o-12345aaa678"],
+        ["o-HELLOWORLD"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "azure_application_id": [
+        azure_application_id_func,
+        [
+            "123e4567-e89b-12d3-a456-426655440000",
+            "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c",
+        ],
+        ["111"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "azure_object_id": [
+        azure_object_id_func,
+        [
+            "123e4567-e89b-12d3-a456-426655440000",
+            "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c",
+        ],
+        ["111"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "cbs_id": [
+        cbs_id_func,
+        [
+            "123e4567-e89b-12d3-a456-426655440000",
+            "ba6eb330-4f7f-11eb-a2fb-67c34e9ac07c",
+        ],
+        ["111"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "cbs_workload": [
+        cbs_workload_func,
+        ["Amazon.S3.Bucket.HelloWorld", "hello.azure.world"],
+        ["hello.world", ""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "classification": [
+        classification_func,
+        ["hello", "world"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "country_code_func": [
+        country_code_func,
+        ["CA", "CAN", 124],
+        ["china", 1111, "c"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String, Integer],
+    ],
+    "cpoints_func": [
+        cpoints_func,
+        ["11:11", '["11:11", "11:11"]'],
+        ["world", 11],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "department_func": [
+        department_func,
+        ["any"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "domain_func": [
+        domain_func,
+        ["helloworld.com"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "email_address_func": [
+        email_address_func,
+        ["hello@world.com"],
+        ["hello world"],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "file_md5_func": [
+        file_md5_func,
+        ["23db6982caef9e9152f1a5b2589e6ca3"],
+        ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "file_sha256_func": [
+        file_sha256_func,
+        ["b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"],
+        ["hello world", "", 1],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "harmonized_email_id_func": [
+        harmonized_email_id_func,
+        ["CBS_EMAIL_AA", "NBS_EMAIL_BF"],
+        ["nbs email", "", 1],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String],
+    ],
+    "ip_protocol_func": [
+        ip_protocol_func,
+        [0, 10, 255],
+        ["10", "", -1],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [Integer],
+    ],
+    "ipv6_func": [
+        ipv6_func,
+        ["2001::0370:7334", "::ffff:abcd:1234"],
+        ["world"],
+        CIDR_OPERATOR_SET,
+        [Integer],
+    ],
+    "oid_tag_func": [
+        oid_tag_func,
+        ["my_tag"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    # pending approval
+    # stream_id_func
+    "tcp_sequence_func": [
+        tcp_sequence_func,
+        [(2**31 - 1), (-(2**31))],
+        ["1", "", "_"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [Integer],
+    ],
+    "uri_func": [
+        uri_func,
+        ["hello://world"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "url_func": [
+        uri_func,
+        ["hello://world"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "user_agent_func": [
+        user_agent_func,
+        ["any"],
+        [""],
+        EQUAL_NULLABLE_OPERATOR_SET + PATTERN_MATCHING_OPERATOR_SET,
+        [String],
+    ],
+    "zone_func": [
+        zone_func,
+        ["EXT", "DMZ", "INT", "11", 11],
+        ["", 111, "WORLD"],
+        EQUAL_NULLABLE_OPERATOR_SET,
+        [String, Integer],
+    ]
 }
 
 verbose = False
