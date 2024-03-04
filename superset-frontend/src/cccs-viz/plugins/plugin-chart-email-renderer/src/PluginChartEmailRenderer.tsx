@@ -71,8 +71,8 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   
   if (errorMessage) {
     return (
-      <div style={{ padding: '20px', border: '1px solid orange', borderRadius: '8px', backgroundColor: '#ffcc99', margin: '20px', textAlign: 'center' }}>
-        <span style={{ fontSize: '14px', color: 'black' }}>
+      <div style={{ padding: '20px', border: '1px solid #007bff', borderRadius: '8px', backgroundColor: '#cce5ff', margin: '20px', textAlign: 'center' }}>
+        <span style={{ fontSize: '14px', color: '#004085' }}>
           <strong>Info:</strong> {errorMessage}
         </span>
       </div>
