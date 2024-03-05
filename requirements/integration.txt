@@ -34,6 +34,8 @@ packaging==23.1
     #   build
     #   pyproject-api
     #   tox
+pep517==0.11.0
+    # via build
 pip-compile-multi==2.6.3
     # via -r integration.in
 pip-tools==6.13.0
