@@ -20,7 +20,6 @@ import { ValueFormatterParams } from 'ag-grid-enterprise';
 import {
   Column,
   GenericDataType,
-  getMetricLabel,
   getNumberFormatter,
   Metric,
   NumberFormats,
@@ -155,12 +154,6 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       return formatIpv4(params.value.toString());
     }
     return params.value != null ? params.value.toString() : '';
-  };
-
-  const percentMetricValueFormatter = function (params: ValueFormatterParams) {
-    return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
-      params.value,
-    );
   };
 
   let columnDefs: Column[] = [];
