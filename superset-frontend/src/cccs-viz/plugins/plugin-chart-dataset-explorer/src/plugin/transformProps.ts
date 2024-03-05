@@ -19,6 +19,7 @@
 import { ValueFormatterParams } from 'ag-grid-enterprise';
 import {
   Column,
+  GenericDataType,
   getMetricLabel,
   getNumberFormatter,
   Metric,
@@ -164,19 +165,37 @@ export default function transformProps(chartProps: CccsGridChartProps) {
 
   let columnDefs: Column[] = [];
 
+  const columnDataMap = columns.reduce(
+    (columnMap, column: Column) => ({
+      ...columnMap,
+      [column.column_name]: {
+        type: column.type,
+        is_dttm: column.is_dttm,
+        type_generic: column.type_generic,
+        advanced_data_type: (column.advanced_data_type as string) ?? '',
+        verbose_name: column.verbose_name,
+        description: column.description,
+      },
+    }),
+    {} as { [index: string]: Partial<Column> },
+  );
+
+
   if (query_mode === QueryMode.raw) {
     columnDefs = formData.columns.map((column: any) => {
-      const columnType = columnTypeMap[column];
-      const columnAdvancedType = columnAdvancedTypeMap[column];
-      const columnHeader = columnVerboseNameMap[column]
-        ? columnVerboseNameMap[column]
+      const columnType = columnDataMap[column]?.type || '';
+      const isDate = !!columnDataMap[column]?.is_dttm;
+      const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
+      const columnAdvancedType = columnDataMap[column]?.advanced_data_type || '';
+      const columnHeader = columnDataMap[column]?.verbose_name
+        ? columnDataMap[column]?.verbose_name
         : column;
       const cellRenderer =
-        columnAdvancedType in rendererMap
-          ? rendererMap[columnAdvancedType]
-          : columnType in rendererMap
-          ? rendererMap[columnType]
-          : undefined;
+        isDate || columnTypeGeneric === GenericDataType.TEMPORAL
+          ? rendererMap.DATE
+          : rendererMap[columnAdvancedType.toUpperCase()] ??
+            rendererMap[columnType] ??
+            undefined;
       const isSortable = true;
       const enableRowGroup = true;
       const columnDescription = columnDescriptionMap[column];
@@ -242,37 +261,41 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       columnDefs = columnDefs.concat(groupByColumnDefs);
     }
 
-    if (formData.metrics) {
-      const metricsColumnDefs = formData.metrics
-        .map(getMetricLabel)
-        .map((metric: any) => {
-          const metricHeader = metricVerboseNameMap[metric]
-            ? metricVerboseNameMap[metric]
-            : metric;
-          return {
-            field: metric,
-            headerName: metricHeader,
-            sortable: true,
-            enableRowGroup: true,
-          };
-        });
+    const percentMetricValueFormatter = function (params: ValueFormatterParams) {
+      return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
+        params.value,
+      );
+    };
+  
+    if (metrics) {
+      const metricsColumnDefs = formData.metrics.map((metric: any) => {
+        const metricLabel = metric.label ? metric.label : metric
+        const metricHeader = metricVerboseNameMap[metric]
+          ? metricVerboseNameMap[metric]
+          : metricLabel;
+        return {
+          field: metricLabel,
+          headerName: metricHeader,
+          sortable: true,
+          enableRowGroup: true,
+        };
+      });
       columnDefs = columnDefs.concat(metricsColumnDefs);
     }
-
+  
     if (formData.percent_metrics) {
-      const percentMetricsColumnDefs = formData.percent_metrics
-        .map(getMetricLabel)
-        .map((metric: any) => {
-          const metricHeader = metricVerboseNameMap[metric]
-            ? metricVerboseNameMap[metric]
-            : metric;
-          return {
-            field: `%${metric}`,
-            headerName: `%${metricHeader}`,
-            sortable: true,
-            valueFormatter: percentMetricValueFormatter,
-          };
-        });
+      const percentMetricsColumnDefs = formData.percent_metrics.map((metric: any) => {
+        const metricLabel = metric.label ? metric.label : metric
+        const metricHeader = metricVerboseNameMap[metric]
+          ? metricVerboseNameMap[metric]
+          : metricLabel;
+        return {
+          field: `%${metricLabel}`,
+          headerName: `%${metricHeader}`,
+          sortable: true,
+          valueFormatter: percentMetricValueFormatter,
+        };
+      });
       columnDefs = columnDefs.concat(percentMetricsColumnDefs);
     }
   }
