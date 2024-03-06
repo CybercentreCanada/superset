@@ -40,7 +40,7 @@ export default class CccsDataSetExplorerPlugin extends ChartPlugin<
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: t('Dataset Explorer: An AG Grid control for Hogwarts data.'),
+      description: t('Dataset Explorer: An AG Grid control for adhoc data exploration.'),
       name: t('Dataset Explorer'),
       category: t('Table'),
       tags: [
