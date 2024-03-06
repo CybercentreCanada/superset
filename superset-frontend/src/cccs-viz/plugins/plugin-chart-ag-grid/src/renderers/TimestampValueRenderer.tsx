@@ -15,20 +15,20 @@ const HARDCODED_FORMATS = {
 const TimestampValueRenderer: React.FC<{
   [index: string]: any;
 }> = memo(data => {
-  const date = moment(data.value);
+  const date = moment.utc(data.value); // show all dates in UTC
 
   if (!date.isValid()) {
     return <>{data.value}</>;
   }
 
-  const timezone = date.format('zz');
+  const timezone = date.format('z');
 
   return (
     <>
       {date.format(
         HARDCODED_FORMATS[data.colDef?.field?.toLowerCase()] ??
-          'YYYY-MM-DD HH:mm:ss.SS',
-      ) + (timezone ? `(${timezone})` : '')}
+          'YYYY-MM-DD HH:mm:ss.SSS',
+      ) + (timezone ? ` ${timezone}` : '')}
     </>
   );
 });
