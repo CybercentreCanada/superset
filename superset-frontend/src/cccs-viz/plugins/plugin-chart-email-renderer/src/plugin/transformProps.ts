@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, TimeseriesDataRecord } from '@superset-ui/core';
+import { TimeseriesDataRecord } from '@superset-ui/core';
+import { EmailRenderChartProps } from '../types';
 
-export default function transformProps(chartProps: ChartProps) {
+export default function transformProps(chartProps: EmailRenderChartProps) {
   /**
    * This function is called after a successful response has been
    * received from the chart data endpoint, and is used to transform
@@ -50,19 +51,21 @@ export default function transformProps(chartProps: ChartProps) {
    */
   const { formData, queriesData } = chartProps;
 
-  const { parameterName, parameterPrefix, groupby } = formData;
+  const { parameterPrefix, groupby } = formData;
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
+
+  const fissionUrl = queriesData[0].fissionUrl as String;
 
   let value: string | number | true | Date = '';
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {
-    errorMessage = 'Narrow your search by adding filters so the query result is one record.';
+    errorMessage = 'This chart can render only one email at a time. Narrow your search by adding filters so the query result is one record.';
   }
 
   if (Array.isArray(data) && data.length === 0) {
-    errorMessage = 'The query returned no rows.';
+    errorMessage = 'No results were returned for this query.';
   }
 
   if (Array.isArray(data) && data.length === 1) {
@@ -70,9 +73,10 @@ export default function transformProps(chartProps: ChartProps) {
   }
 
   return {
+    formData: chartProps.formData,
     url_parameter_value: value,
-    parameter_name: parameterName,
     parameter_prefix: parameterPrefix,
     errorMessage,
+    fissionUrl
   };
 }

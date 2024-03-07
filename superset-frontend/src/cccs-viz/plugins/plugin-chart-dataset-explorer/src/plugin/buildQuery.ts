@@ -147,7 +147,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
             ...range.map(r => `${curr} BETWEEN ${r.start} AND ${r.end}`),
           ];
           return simple.length > 0
-            ? new_arr.concat(`${curr} IN (${simple.map((s: any) => `${s}`)})`)
+            ? new_arr.concat(`${curr} IN ('${simple.map((s: any) => `${s}`)}')`)
             : new_arr;
         },
         [],

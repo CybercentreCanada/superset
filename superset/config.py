@@ -843,6 +843,7 @@ MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
 # Set this license key to validate Ag Grid visualizations
 AG_GRID_LICENSE_KEY = os.environ.get("AG_GRID_LICENSE_KEY", "")
 ASSEMBLY_LINE_URL = os.environ.get("ASSEMBLY_LINE_URL", "")
+FISSION_PROXY_URL = os.environ.get("FISSION_PROXY_URL", "")
 ENABLE_ALFRED = os.environ.get("ENABLE_ALFRED", "")
 
 # Maximum number of rows returned from a database

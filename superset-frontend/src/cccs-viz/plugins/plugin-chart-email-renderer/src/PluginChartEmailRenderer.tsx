@@ -3,36 +3,39 @@ import { SupersetClient } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
 
 const QUERY_TIMEOUT_LIMIT = 180000;
+const RETRY_ATTEMPTS = 5;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const {
     url_parameter_value,
-    parameter_name,
     parameter_prefix,
     errorMessage,
+    fissionUrl
   } = props;
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  const apiUrl = useMemo(
-    () =>
-      `/api/v1/fission/emailpreview?${parameter_name}=${
-        parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-      }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_name, parameter_prefix, url_parameter_value],
+  const apiUrl = useMemo(() => 
+    `/api/v1/fission/emailpreview?eml=${
+      parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
+    }${encodeURIComponent(url_parameter_value)}`,
+    [parameter_prefix, url_parameter_value]
   );
 
-  const linkUrl = `https://fission.hogwarts.pb.azure.chimera.cyber.gc.ca/emailpreview?${parameter_name}=${
-    parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-  }${encodeURIComponent(url_parameter_value)}`
+  const linkUrl = useMemo(() => 
+    `${fissionUrl}/emailpreview?eml=${
+      parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
+    }${encodeURIComponent(url_parameter_value)}`,
+    [fissionUrl, parameter_prefix, url_parameter_value]
+  );
 
   useEffect(() => {
     const fetchImage = async () => {
       let attempts = 0;
 
-      while (attempts < 10) {
+      while (attempts < RETRY_ATTEMPTS) {
         try {
           const { json } = await SupersetClient.get({ endpoint: apiUrl, timeout: QUERY_TIMEOUT_LIMIT });
 
@@ -47,12 +50,12 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           setImageError(error.message || 'Fission function trouble fetching image, retry in process.');
           attempts++;
         } finally {
-          setLoading(attempts >= 10);
+          setLoading(attempts >= RETRY_ATTEMPTS);
         }
       }
-      if (attempts >= 10) {
+      if (attempts >= RETRY_ATTEMPTS) {
         setLoading(false)
-        setImageError('An unexpected error has occured.  The image cannot be fetched at this time.');
+        setImageError('An unexpected error has occurred.  The image cannot be fetched at this time.');
       }
     };
     fetchImage();
@@ -68,13 +71,13 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   
   if (errorMessage) {
     return (
-      <div style={{ padding: '20px', border: '1px solid red', borderRadius: '8px', backgroundColor: '#ffcccc', margin: '20px', textAlign: 'center' }}>
-        <span style={{ fontSize: '14px', color: 'red' }}>
-          <strong>Error:</strong> {errorMessage}
+      <div style={{ padding: '20px', border: '1px solid #007bff', borderRadius: '8px', backgroundColor: '#cce5ff', margin: '20px', textAlign: 'center' }}>
+        <span style={{ fontSize: '14px', color: '#004085' }}>
+          <strong>Info:</strong> {errorMessage}
         </span>
       </div>
     );
-  }
+}
 
   if (imageError) {
     return (
@@ -98,7 +101,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
       style={{
         position: 'absolute',
         left: 0,
-        top: '50px',
+        top: '10px',
         width: '98%',
         height: '100%',
         overflow: 'auto',
