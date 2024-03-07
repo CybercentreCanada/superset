@@ -29,4 +29,5 @@ export { default as GwwkChartsChartPlugin } from './plugin-chart-gwwk-charts/src
 export { default as GwwkDashboardsChartPlugin } from './plugin-chart-gwwk-charts/src/Dashboards';
 export { default as GwwkDatasetsChartPlugin } from './plugin-chart-gwwk-charts/src/Datasets';
 export { default as IFrameVisualizationChartPlugin } from './plugin-chart-iframe/src/plugin';
+export { default as EmailRendererChartPlugin } from './plugin-chart-email-renderer/src/plugin';
 export { default as JSONViewChartPlugin } from './plugin-chart-json-view/plugin';
