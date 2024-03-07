@@ -399,10 +399,10 @@ export default function AGGridViz({
         />,
       ];
     }
-    if (
-      selectedData.typeData.eml_path &&
-      selectedData.typeData.eml_path.length > 0
-    ) {
+   // if (
+    //  selectedData.typeData.eml_path &&
+    //  selectedData.typeData.eml_path.length > 0
+   // ) {
       specialMenuItems = [
         ...specialMenuItems,
         <DownloadEmailMenuItem
@@ -412,7 +412,7 @@ export default function AGGridViz({
           data={selectedData.typeData.eml_path[0]}
         />,
       ];
-    }
+  //  }
     if (jumpActionConfigs?.length) {
       const disabled =
         jumpActionConfigs.filter(j =>
