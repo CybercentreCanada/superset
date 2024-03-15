@@ -59,6 +59,7 @@ class FissionRestApi(BaseApi):
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get",
         log_to_statsd=False,  # pylint: disable-arguments-renamed
     )
+
     def get(self, path, **kwargs: Any) -> Response:
         """Proxy to hogwarts fission"""
         user = current_user
@@ -75,22 +76,32 @@ class FissionRestApi(BaseApi):
             "X-Auth-Request-Access-Token": token,
         }
 
-        url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/") 
+        url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
 
-        res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
-            method          = request.method,
-            url             = url,
-            data            = request.get_data(),
-            allow_redirects = False,
-            headers         = headers,
-            timeout         = 180 # extending timeout for fission loading times
+        res = requests.request(
+            method=request.method,
+            url=url,
+            data=request.get_data(),
+            allow_redirects=False,
+            headers=headers,
+            timeout=180  # extending timeout for fission loading times
         )
-        if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image
-            encoded_image = base64.b64encode(res.content).decode('utf-8')  # Encode the image in base64
-            result = {'image': f'data:image/png;base64,{encoded_image}'}  # Store in a JSON-friendly format
+
+        content_type = res.headers.get('Content-Type', '')
+        is_binary_content = any(ct in content_type for ct in ['image/', 'application/pdf', 'application/octet-stream'])
+
+        if is_binary_content:
+            # Handle binary content types (images, PDFs, etc.)
+            encoded_content = base64.b64encode(res.content).decode('utf-8')
+            content_type_prefix = content_type.split(';')[0]  # Handle types with charset, e.g., "application/json; charset=utf-8"
+            result = {'content': f'data:{content_type_prefix};base64,{encoded_content}'}
         else:
+            # Handle text-based content types (JSON, HTML, etc.)
             try:
                 result = res.json()
-            except:
-                result = str(res.text)
+            except ValueError:
+                # If response is not JSON, return as plain text
+                result = res.text
+
         return self.response(res.status_code, result=result)
+
