@@ -29,38 +29,17 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
 
     SupersetClient.get({ endpoint, timeout })
       .then(({ json }) => {
-        let blob;
-        let fileName = 'download'; // Default file name base
+        if (json.result && json.result.content) {
+          const contentParts = json.result.content.split(',');
+          if (contentParts[0].indexOf('base64') !== -1) {
+            const b64Data = contentParts[1];
+            const contentType = 'message/rfc822'; // MIME type for .eml files
+            const blob = b64ToBlob(b64Data, contentType);
+            const fileName = 'email.eml';
 
-        if (json.content && json.content.startsWith('data:')) {
-          const contentParts = json.content.split(',');
-          const contentType = contentParts[0].split(':')[1].split(';')[0];
-          const b64Data = contentParts[1];
-          const byteCharacters = atob(b64Data);
-          const byteArrays = [];
-
-          for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-              byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
+            saveAs(blob, fileName); // Uses FileSaver to save the blob as an .eml file
           }
-
-          blob = new Blob(byteArrays, { type: contentType });
-          
-          // Attempt to determine a more specific extension, default to '.bin' for 'application/octet-stream'
-          const extension = contentType === 'application/octet-stream' ? 'bin' : contentType.split('/')[1].split(';')[0];
-          fileName += `.${extension}`;
-        } else {
-          // For text-based content types, directly create a blob from the JSON response
-          blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
-          fileName += '.json';
         }
-
-        saveAs(blob, fileName); // Uses FileSaver to save the blob with the determined file name
       })
       .catch(error => {
         dispatch(addDangerToast('Download failed.'));
@@ -83,4 +62,25 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
       {props.label}
     </Menu.Item>
   );
+}
+
+// Helper function to convert base64 data to a Blob
+function b64ToBlob(b64Data: string, contentType='', sliceSize=512) {
+  const byteCharacters = atob(b64Data);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  const blob = new Blob(byteArrays, {type: contentType});
+  return blob;
 }
