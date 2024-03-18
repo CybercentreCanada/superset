@@ -8,7 +8,7 @@ import {
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
 import Icon from '@ant-design/icons';
-import AlSvg from '../../../cccs-grid/images/al.svg';
+import EmailSvg from '../../../cccs-grid/images/email.svg';
 
 interface DownloadEmailMenuItemProps {
   label: string;
@@ -22,6 +22,7 @@ interface DownloadEmailMenuItemProps {
 
 export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps) {
   const dispatch = useDispatch();
+  
   const onClick = () => {
     const endpoint = `/api/v1/fission/get-eml?file=${props.data}`;
     const timeout = 180000; // 3 minutes
@@ -31,14 +32,22 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
       .then(({ json }) => {
         if (json.result && json.result.content) {
           const contentParts = json.result.content.split(',');
+          // Check for base64 encoding
           if (contentParts[0].indexOf('base64') !== -1) {
             const b64Data = contentParts[1];
-            const contentType = 'message/rfc822'; // MIME type for .eml files
+            const contentType = 'application/octet-stream'; // MIME type for generic binary data
             const blob = b64ToBlob(b64Data, contentType);
-            const fileName = 'email.eml';
 
-            saveAs(blob, fileName); // Uses FileSaver to save the blob as an .eml file
+            // Assume the unique title is available in json.result.title
+            const uniqueTitle = json.result.title || 'default_download';
+            const fileName = `${uniqueTitle}.cart`; // Use the unique title for the filename
+
+            saveAs(blob, fileName); // Uses FileSaver to save the blob with the unique title as filename
+          } else {
+            dispatch(addDangerToast('Invalid file format.'));
           }
+        } else {
+          dispatch(addDangerToast('No content to download.'));
         }
       })
       .catch(error => {
@@ -57,15 +66,16 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<Icon component={AlSvg} />}
+      // Ensure you have the correct icon component or replace it accordingly
+      icon={<Icon component={EmailSvg} />}
     >
       {props.label}
     </Menu.Item>
   );
 }
 
-// Helper function to convert base64 data to a Blob
-function b64ToBlob(b64Data: string, contentType='', sliceSize=512) {
+// The helper function to convert base64 data to a Blob remains unchanged
+function b64ToBlob(b64Data: string, contentType = '', sliceSize = 512) {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
 
@@ -81,6 +91,6 @@ function b64ToBlob(b64Data: string, contentType='', sliceSize=512) {
     byteArrays.push(byteArray);
   }
 
-  const blob = new Blob(byteArrays, {type: contentType});
+  const blob = new Blob(byteArrays, { type: contentType });
   return blob;
 }

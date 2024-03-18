@@ -88,7 +88,7 @@ class FissionRestApi(BaseApi):
         )
 
         content_type = res.headers.get('Content-Type', '')
-        is_binary_content = any(ct in content_type for ct in ['image/', 'application/pdf', 'application/octet-stream'])
+        is_binary_content = any(ct in content_type for ct in ['image/png', 'application/pdf', 'application/octet-stream'])
 
         if is_binary_content:
             # Handle binary content types (images, PDFs, etc.)
