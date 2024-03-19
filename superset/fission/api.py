@@ -78,30 +78,33 @@ class FissionRestApi(BaseApi):
 
         url = request.url.replace(f"{request.host_url}api/v1/fission/", f"{API_HOST}/")
 
-        res = requests.request(
-            method=request.method,
-            url=url,
-            data=request.get_data(),
-            allow_redirects=False,
-            headers=headers,
-            timeout=180  # extending timeout for fission loading times
+        res = requests.request(  # ref. https://stackoverflow.com/a/36601467/248616
+            method          = request.method,
+            url             = url,
+            data            = request.get_data(),
+            allow_redirects = False,
+            headers         = headers,
+            timeout         = 180 # extending timeout for fission loading times
         )
-
-        content_type = res.headers.get('Content-Type', '')
-        is_binary_content = any(ct in content_type for ct in ['image/png', 'application/pdf', 'application/octet-stream'])
-
-        if is_binary_content:
-            # Handle binary content types (images, PDFs, etc.)
-            encoded_content = base64.b64encode(res.content).decode('utf-8')
-            content_type_prefix = content_type.split(';')[0]  # Handle types with charset, e.g., "application/json; charset=utf-8"
-            result = {'content': f'data:{content_type_prefix};base64,{encoded_content}'}
+        
+        # Directly handling binary data for non-JSON responses
+        if "application/octet-stream" in res.headers.get("Content-Type", ""):
+            # Assuming binary data; could adjust for specific types or use a more generic approach
+            return self.response(
+                res.status_code,
+                result=res.content,  # Return binary data directly
+                headers={
+                    "Content-Type": "application/octet-stream",
+                        "Content-Disposition": res.headers.get("Content-Disposition", "")}
+            )
+        elif res.headers.get("Content-Type") == "image/png":  # Special handling for images
+            encoded_image = base64.b64encode(res.content).decode('utf-8')
+            result = {'image': f'data:image/png;base64,{encoded_image}'}
         else:
-            # Handle text-based content types (JSON, HTML, etc.)
             try:
                 result = res.json()
             except ValueError:
-                # If response is not JSON, return as plain text
-                result = res.text
+                result = str(res.text)  # Fallback to plain text if not JSON
 
         return self.response(res.status_code, result=result)
 

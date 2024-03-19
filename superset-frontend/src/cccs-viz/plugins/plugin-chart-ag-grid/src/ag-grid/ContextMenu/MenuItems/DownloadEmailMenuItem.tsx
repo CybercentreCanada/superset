@@ -25,24 +25,24 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
   
   const onClick = () => {
     const endpoint = `/api/v1/fission/get-eml?file=${props.data}`;
-    const timeout = 180000; // 3 minutes
     dispatch(addInfoToast('Download started'));
 
-    SupersetClient.get({ endpoint, timeout })
+    SupersetClient.get({ endpoint, timeout: 180000 }) // 3 minutes
       .then(({ json }) => {
         if (json.result && json.result.content) {
-          const contentParts = json.result.content.split(',');
           // Check for base64 encoding
-          if (contentParts[0].indexOf('base64') !== -1) {
-            const b64Data = contentParts[1];
-            const contentType = 'application/octet-stream'; // MIME type for generic binary data
+          if (json.result.content.indexOf('base64') !== -1) {
+            const b64Data = json.result.content.split(',')[1];
+            const contentType = 'message/rfc822'; // Correct MIME type for EML files
+            
+            // Convert base64 data to a blob with the appropriate MIME type
             const blob = b64ToBlob(b64Data, contentType);
-
-            // Assume the unique title is available in json.result.title
-            const uniqueTitle = json.result.title || 'default_download';
-            const fileName = `${uniqueTitle}.cart`; // Use the unique title for the filename
-
-            saveAs(blob, fileName); // Uses FileSaver to save the blob with the unique title as filename
+            
+            // Derive file name from the title or use a default name, ensuring it ends with .eml
+            const uniqueTitle = json.result.title ? `${json.result.title}.eml` : 'default_download.eml';
+            
+            // Use FileSaver or a similar library to trigger the file download
+            saveAs(blob, uniqueTitle);
           } else {
             dispatch(addDangerToast('Invalid file format.'));
           }
@@ -66,7 +66,6 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      // Ensure you have the correct icon component or replace it accordingly
       icon={<Icon component={EmailSvg} />}
     >
       {props.label}
@@ -74,7 +73,6 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
   );
 }
 
-// The helper function to convert base64 data to a Blob remains unchanged
 function b64ToBlob(b64Data: string, contentType = '', sliceSize = 512) {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
