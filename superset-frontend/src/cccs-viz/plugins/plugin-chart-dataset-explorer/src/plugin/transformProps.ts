@@ -261,7 +261,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     };
   
     if (metrics) {
-      const metricsColumnDefs = formData.metrics.map((metric: any) => {
+      const metricsColumnDefs = formData.metrics?.map((metric: any) => {
         const metricLabel = metric.label ? metric.label : metric
         const metricHeader = metricVerboseNameMap[metric]
           ? metricVerboseNameMap[metric]
@@ -273,7 +273,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           enableRowGroup: true,
         };
       });
-      columnDefs = columnDefs.concat(metricsColumnDefs);
+      columnDefs = columnDefs.concat(metricsColumnDefs || []);
     }
   
     if (formData.percent_metrics) {
