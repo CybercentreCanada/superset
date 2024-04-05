@@ -23,8 +23,6 @@ export type SelectOptionType = {
 
 export type FrameType =
   | 'Common'
-  | 'Today'
-  | 'Yesterday'
   | 'Calendar'
   | 'Custom'
   | 'Advanced'
@@ -52,12 +50,7 @@ export type CustomRangeKey =
   | 'anchorMode'
   | 'anchorValue';
 
-export type DateTimeModeType =
-  | 'specific'
-  | 'relative'
-  | 'now'
-  | 'today'
-  | 'tomorrow';
+export type DateTimeModeType = 'specific' | 'relative' | 'now' | 'today';
 
 export type CustomRangeType = {
   sinceMode: DateTimeModeType;

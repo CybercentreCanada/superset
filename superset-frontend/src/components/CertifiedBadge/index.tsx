@@ -17,12 +17,12 @@
  * under the License.
  */
 import React from 'react';
-import { ensureIsArray, t, useTheme } from '@superset-ui/core';
+import { t, useTheme } from '@superset-ui/core';
 import Icons, { IconType } from 'src/components/Icons';
 import { Tooltip } from 'src/components/Tooltip';
 
 export interface CertifiedBadgeProps {
-  certifiedBy?: string | string[];
+  certifiedBy?: string;
   details?: string;
   size?: IconType['iconSize'];
 }
@@ -41,9 +41,7 @@ function CertifiedBadge({
         <>
           {certifiedBy && (
             <div>
-              <strong>
-                {t('Certified by %s', ensureIsArray(certifiedBy).join(', '))}
-              </strong>
+              <strong>{t('Certified by %s', certifiedBy)}</strong>
             </div>
           )}
           <div>{details}</div>

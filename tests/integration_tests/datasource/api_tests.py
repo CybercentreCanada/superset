@@ -21,7 +21,7 @@ import pytest
 
 from superset import db, security_manager
 from superset.connectors.sqla.models import SqlaTable
-from superset.dao.exceptions import DatasourceTypeNotSupportedError
+from superset.daos.exceptions import DatasourceTypeNotSupportedError
 from tests.integration_tests.base_tests import SupersetTestCase
 
 
@@ -71,6 +71,16 @@ class TestDatasourceApi(SupersetTestCase):
         self.assertEqual(rv.status_code, 200)
         response = json.loads(rv.data.decode("utf-8"))
         self.assertEqual(response["result"], [None])
+
+    @pytest.mark.usefixtures("app_context", "virtual_dataset")
+    def test_get_column_values_integers_with_nulls(self):
+        self.login(username="admin")
+        table = self.get_virtual_dataset()
+        rv = self.client.get(f"api/v1/datasource/table/{table.id}/column/col6/values/")
+        self.assertEqual(rv.status_code, 200)
+        response = json.loads(rv.data.decode("utf-8"))
+        for val in [1, None, 3, 4, 5, 6, 7, 8, 9, 10]:
+            assert val in response["result"]
 
     @pytest.mark.usefixtures("app_context", "virtual_dataset")
     def test_get_column_values_invalid_datasource_type(self):

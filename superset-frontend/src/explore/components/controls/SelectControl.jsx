@@ -31,11 +31,14 @@ const propTypes = {
   disabled: PropTypes.bool,
   freeForm: PropTypes.bool,
   isLoading: PropTypes.bool,
+  mode: PropTypes.string,
   multi: PropTypes.bool,
   isMulti: PropTypes.bool,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
+  onSelect: PropTypes.func,
+  onDeselect: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -143,7 +146,6 @@ export default class SelectControl extends React.PureComponent {
     if (typeof val === 'object' && val?.[valueKey] !== undefined) {
       onChangeVal = val[valueKey];
     }
-
     this.props.onChange(onChangeVal, []);
   }
 
@@ -223,12 +225,14 @@ export default class SelectControl extends React.PureComponent {
       label,
       multi,
       name,
-      placeholder,
-      onFocus,
-      showHeader,
-      value,
-      tokenSeparators,
       notFoundContent,
+      onFocus,
+      onSelect,
+      onDeselect,
+      placeholder,
+      showHeader,
+      tokenSeparators,
+      value,
       // ControlHeader props
       description,
       renderTrigger,
@@ -243,21 +247,6 @@ export default class SelectControl extends React.PureComponent {
       canCopy,
       canSelectAll,
     } = this.props;
-
-    const getValue = () => {
-      const currentValue =
-        value ||
-        (this.props.default !== undefined ? this.props.default : undefined);
-
-      // safety check - the value is intended to be undefined but null was used
-      if (
-        currentValue === null &&
-        !this.state.options.find(o => o.value === null)
-      ) {
-        return undefined;
-      }
-      return currentValue;
-    };
 
     const headerProps = {
       name,
@@ -282,6 +271,21 @@ export default class SelectControl extends React.PureComponent {
       },
     };
 
+    const getValue = () => {
+      const currentValue =
+        value ??
+        (this.props.default !== undefined ? this.props.default : undefined);
+
+      // safety check - the value is intended to be undefined but null was used
+      if (
+        currentValue === null &&
+        !this.state.options.find(o => o.value === null)
+      ) {
+        return undefined;
+      }
+      return currentValue;
+    };
+
     const selectProps = {
       allowNewOptions: freeForm,
       autoFocus,
@@ -295,10 +299,12 @@ export default class SelectControl extends React.PureComponent {
           : true,
       header: showHeader && <ControlHeader {...headerProps} />,
       loading: isLoading,
-      mode: isMulti || multi ? 'multiple' : 'single',
+      mode: this.props.mode || (isMulti || multi ? 'multiple' : 'single'),
       name: `select-${name}`,
       onChange: this.onChange,
       onFocus,
+      onSelect,
+      onDeselect,
       options: this.state.options,
       placeholder,
       sortComparator: this.props.sortComparator,

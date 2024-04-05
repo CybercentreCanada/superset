@@ -21,9 +21,9 @@ import pytest
 from flask_appbuilder.security.sqla.models import User
 from sqlalchemy.orm import Session
 
+from superset.commands.explore.form_data.state import TemporaryExploreState
 from superset.connectors.sqla.models import SqlaTable
 from superset.explore.exceptions import DatasetAccessDeniedError
-from superset.explore.form_data.commands.state import TemporaryExploreState
 from superset.extensions import cache_manager
 from superset.models.slice import Slice
 from tests.integration_tests.fixtures.world_bank_dashboard import (
@@ -199,7 +199,7 @@ def test_get_from_permalink_unknown_key(test_client, login_as_admin):
 
 
 @patch("superset.security.SupersetSecurityManager.can_access_datasource")
-def test_get_dataset_access_denied(
+def test_get_dataset_access_denied_with_form_data_key(
     mock_can_access_datasource, test_client, login_as_admin, dataset
 ):
     message = "Dataset access denied"
@@ -216,7 +216,25 @@ def test_get_dataset_access_denied(
     assert data["message"] == message
 
 
-@patch("superset.datasource.dao.DatasourceDAO.get_datasource")
+@patch("superset.security.SupersetSecurityManager.can_access_datasource")
+def test_get_dataset_access_denied(
+    mock_can_access_datasource, test_client, login_as_admin, dataset
+):
+    message = "Dataset access denied"
+    mock_can_access_datasource.side_effect = DatasetAccessDeniedError(
+        message=message, datasource_id=dataset.id, datasource_type=dataset.type
+    )
+    resp = test_client.get(
+        f"api/v1/explore/?datasource_id={dataset.id}&datasource_type={dataset.type}"
+    )
+    data = json.loads(resp.data.decode("utf-8"))
+    assert resp.status_code == 403
+    assert data["datasource_id"] == dataset.id
+    assert data["datasource_type"] == dataset.type
+    assert data["message"] == message
+
+
+@patch("superset.daos.datasource.DatasourceDAO.get_datasource")
 def test_wrong_endpoint(mock_get_datasource, test_client, login_as_admin, dataset):
     dataset.default_endpoint = "another_endpoint"
     mock_get_datasource.return_value = dataset

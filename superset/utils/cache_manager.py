@@ -49,11 +49,6 @@ class ExploreFormDataCache(Cache):
         return cache
 
 
-logger = logging.getLogger(__name__)
-
-CACHE_IMPORT_PATH = "superset.extensions.metastore_cache.SupersetMetastoreCache"
-
-
 class CacheManager:
     def __init__(self) -> None:
         super().__init__()
