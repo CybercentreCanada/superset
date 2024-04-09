@@ -64,31 +64,17 @@ import {
   EchartsTimeseriesSmoothLineChartPlugin,
   EchartsTimeseriesStepChartPlugin,
   EchartsTreeChartPlugin,
-  EchartsSunburstChartPlugin,
   EchartsBubbleChartPlugin,
   EchartsWaterfallChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
-import {
-  AdhocFilterPlugin,
-  SelectFilterPlugin,
-  RangeFilterPlugin,
-  TimeFilterPlugin,
-  TimeColumnFilterPlugin,
-  TimeGrainFilterPlugin,
-  GroupByFilterPlugin,
-} from 'src/filters/components';
-import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
-import TableChartPlugin from '@superset-ui/plugin-chart-table';
-import { WordCloudChartPlugin } from '@superset-ui/plugin-chart-word-cloud';
 import {
   ApplicationLinksChartPlugin,
   AtAGlanceChartDnsPlugin,
   AtAGlanceChartIpPlugin,
   AtAGlanceUserIDSasChartPlugin,
   AtAGlanceUserIdChartPlugin,
-  BigNumberChartPlugin,
   CccsTableChartPlugin,
   DatasetExplorerChartPlugin,
   GwwkChartsChartPlugin,

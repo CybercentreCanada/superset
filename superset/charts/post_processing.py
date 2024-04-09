@@ -26,12 +26,14 @@ In order to do that, we reproduce the post-processing in Python
 for these chart types.
 """
 
+import logging
 from io import StringIO
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union
 
 import pandas as pd
 from flask_babel import gettext as __
 
+from superset import app
 from superset.common.chart_data import ChartDataResultFormat
 from superset.utils.core import (
     extract_dataframe_dtypes,
@@ -42,6 +44,10 @@ from superset.utils.core import (
 if TYPE_CHECKING:
     from superset.connectors.sqla.models import BaseDatasource
     from superset.models.sql_lab import Query
+
+
+logger = logging.getLogger(__name__)
+config = app.config
 
 
 def get_column_key(label: tuple[str, ...], metrics: list[str]) -> tuple[Any, ...]:
