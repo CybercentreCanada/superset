@@ -64,6 +64,7 @@ import {
   EchartsTimeseriesSmoothLineChartPlugin,
   EchartsTimeseriesStepChartPlugin,
   EchartsTreeChartPlugin,
+  EchartsTreemapChartPlugin,
   EchartsBubbleChartPlugin,
   EchartsWaterfallChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';

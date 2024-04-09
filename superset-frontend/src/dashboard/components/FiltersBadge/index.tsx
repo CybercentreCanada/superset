@@ -134,7 +134,7 @@ export const FiltersBadge = ({ chartId }: FiltersBadgeProps) => {
     (path: string[]) => {
       dispatch(setDirectPathToChild(path));
     },
-    [dashboardInfo, dispatch],
+    [dispatch],
   );
 
   const prevChart = usePrevious(chart);

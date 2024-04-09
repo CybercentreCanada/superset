@@ -49,38 +49,8 @@ import {
   Dataset,
   isTemporalColumn,
 } from '@superset-ui/chart-controls';
-import {
-  SupersetClient,
-  SupersetTheme,
-  css,
-  hasGenericChartAxes,
-  isDefined,
-  styled,
-  t,
-} from '@superset-ui/core';
-import React, { useEffect, useState } from 'react';
-import { Select } from 'src/components';
-import FormItem from 'src/components/Form/FormItem';
-import { Input } from 'src/components/Input';
-import { Tooltip } from 'src/components/Tooltip';
-import AdhocFilter, {
-  CLAUSES,
-  EXPRESSION_TYPES,
-} from 'src/explore/components/controls/FilterControl/AdhocFilter';
-import FilterDefinitionOption from 'src/explore/components/controls/MetricControl/FilterDefinitionOption';
-import {
-  AGGREGATES,
-  CUSTOM_OPERATORS,
-  DISABLE_INPUT_OPERATORS,
-  HAVING_OPERATORS,
-  MULTI_OPERATORS,
-  OPERATORS_OPTIONS,
-  OPERATOR_ENUM_TO_OPERATOR_TYPE,
-  OPERATOR_TOOLTIP_MAP,
-  Operators,
-} from 'src/explore/constants';
-import { FeatureFlag, isFeatureEnabled } from 'src/featureFlags';
-import { optionLabel } from 'src/utils/common';
+import useAdvancedDataTypes from './useAdvancedDataTypes';
+import { useDatePickerInAdhocFilter } from '../utils';
 import { useDefaultTimeFilter } from '../../DateFilterControl/utils';
 import { CLAUSES, EXPRESSION_TYPES } from '../types';
 
@@ -101,16 +71,6 @@ const SelectWithLabel = styled(Select)<{ labelText: string }>`
     white-space: nowrap;
     color: ${({ theme }) => theme.colors.grayscale.light1};
     width: max-content;
-  }
-`;
-
-const iconStyles = css`
-  &.anticon {
-    font-size: unset;
-    .anticon {
-      line-height: unset;
-      vertical-align: unset;
-    }
   }
 `;
 
@@ -330,7 +290,7 @@ const AdhocFilterEditPopoverSimpleTabContent: React.FC<Props> = props => {
     subjectAdvancedDataType,
     fetchAdvancedDataTypeValueCallback,
     fetchSubjectAdvancedDataType,
-  } = useAdvancedDataTypes(props.validHandler, props.adhocFilter.operator);
+  } = useAdvancedDataTypes(props.validHandler);
   // TODO: This does not need to exist, just use the advancedTypeOperatorList list
   const isOperatorRelevantWrapper = (operator: Operators, subject: string) =>
     subjectAdvancedDataType
@@ -524,20 +484,18 @@ const AdhocFilterEditPopoverSimpleTabContent: React.FC<Props> = props => {
 
   const operatorsAndOperandComponent = (
     <>
-      <Tooltip title={OPERATOR_TOOLTIP_MAP[operatorId]} css={iconStyles}>
-        <Select
-          css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
-          options={(props.operators ?? OPERATORS_OPTIONS)
-            .filter(op => isOperatorRelevantWrapper(op, subject))
-            .map((option, index) => ({
-              value: option,
-              label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
-              key: option,
-              order: index,
-            }))}
-          {...operatorSelectProps}
-        />
-      </Tooltip>
+      <Select
+        css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
+        options={(props.operators ?? OPERATORS_OPTIONS)
+          .filter(op => isOperatorRelevantWrapper(op, subject))
+          .map((option, index) => ({
+            value: option,
+            label: OPERATOR_ENUM_TO_OPERATOR_TYPE[option].display,
+            key: option,
+            order: index,
+          }))}
+        {...operatorSelectProps}
+      />
       {MULTI_OPERATORS.has(operatorId) || suggestions.length > 0 ? (
         <Tooltip
           title={
