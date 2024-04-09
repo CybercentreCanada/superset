@@ -557,15 +557,15 @@ const DashboardBuilder: FC<DashboardBuilderProps> = () => {
       </div>
     ),
     [
-      hideDashboardHeader,
-      showFilterBar,
+      nativeFiltersEnabled,
       filterBarOrientation,
+      editMode,
+      handleChangeTab,
+      handleDeleteTopLevelTabs,
+      hideDashboardHeader,
       isReport,
       topLevelTabs,
       uiConfig.hideNav,
-      handleDeleteTopLevelTabs,
-      editMode,
-      handleChangeTab,
     ],
   );
 

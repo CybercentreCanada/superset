@@ -50,6 +50,7 @@ import ListView, {
 } from 'src/components/ListView';
 import Loading from 'src/components/Loading';
 import SubMenu, { SubMenuProps, ButtonProps } from 'src/features/home/SubMenu';
+import { datahubUrl } from 'src/preamble';
 import Owner from 'src/types/Owner';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { Tooltip } from 'src/components/Tooltip';
@@ -358,6 +359,34 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Name'),
         accessor: 'table_name',
+      },
+      {
+        Cell: ({
+          row: {
+            original: { extra },
+          },
+        }: any) => {
+          try {
+            const parsedExtra = JSON.parse(extra);
+            if (parsedExtra?.urn) {
+              return (
+                <a
+                  href={`${datahubUrl}dataset/${parsedExtra?.urn}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Icons.Datahub viewBox="0 0 180 180" />
+                </a>
+              );
+            }
+          } catch {
+            // This should never be reached. Only needed for tests.
+          }
+          return null;
+        },
+        accessor: 'datahub_link',
+        disableSortBy: true,
+        size: 'xs',
       },
       {
         Cell: ({

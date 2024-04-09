@@ -16,9 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { DataMaskStateWithId, Filters } from '@superset-ui/core';
-import cx from 'classnames';
-import { uniqWith } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uniqWith } from 'lodash';
