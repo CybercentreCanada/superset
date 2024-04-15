@@ -192,6 +192,7 @@ export default class MainPreset extends Preset {
         new EchartsWaterfallChartPlugin().configure({
           key: 'waterfall',
         }),
+        new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
         new SelectFilterPlugin().configure({ key: 'filter_select' }),
         new RangeFilterPlugin().configure({ key: 'filter_range' }),
         new TimeFilterPlugin().configure({ key: 'filter_time' }),

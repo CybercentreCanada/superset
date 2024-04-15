@@ -38,6 +38,10 @@ export type ControlHeaderProps = {
   tooltipOnClick?: () => void;
   warning?: string;
   danger?: string;
+  canCopy?: boolean;
+  copyOnClick?: () => void;
+  canSelectAll?: boolean;
+  selectAllOnClick?: () => void;
 };
 
 const iconStyles = css`
@@ -63,6 +67,10 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   tooltipOnClick = () => {},
   warning,
   danger,
+  canCopy,
+  copyOnClick,
+  canSelectAll,
+  selectAllOnClick,
 }) => {
   const { gridUnit, colors } = useTheme();
   const hasHadNoErrors = useRef(false);
