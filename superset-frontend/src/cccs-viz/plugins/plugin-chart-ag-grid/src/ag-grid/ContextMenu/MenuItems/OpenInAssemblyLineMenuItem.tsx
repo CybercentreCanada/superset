@@ -26,6 +26,7 @@ export default function OpenInAssemblyLineMenuItem(
 
   return (
     <Menu.Item
+      {...props}
       onClick={onClick}
       className={
         props.disabled

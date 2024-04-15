@@ -71,16 +71,8 @@ import {
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import {
-  ApplicationLinksChartPlugin,
-  AtAGlanceChartDnsPlugin,
-  AtAGlanceChartIpPlugin,
-  AtAGlanceUserIDSasChartPlugin,
-  AtAGlanceUserIdChartPlugin,
   CccsTableChartPlugin,
   DatasetExplorerChartPlugin,
-  GwwkChartsChartPlugin,
-  GwwkDashboardsChartPlugin,
-  GwwkDatasetsChartPlugin,
   EmailRendererChartPlugin,
   IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
@@ -109,24 +101,10 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
-        new AtAGlanceUserIdChartPlugin().configure({
-          key: 'at_a_glance_user_id',
-        }),
-        new AtAGlanceUserIDSasChartPlugin().configure({
-          key: 'at_a_glance_user_id_sas',
-        }),
-        new ApplicationLinksChartPlugin().configure({
-          key: 'application_links',
-        }),
-        new AtAGlanceChartIpPlugin().configure({ key: 'at_a_glance_ip' }),
-        new AtAGlanceChartDnsPlugin().configure({ key: 'at_a_glance_dns' }),
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
         new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
-        new GwwkChartsChartPlugin().configure({ key: 'gwwk_charts' }),
-        new GwwkDatasetsChartPlugin().configure({ key: 'gwwk_datasets' }),
-        new GwwkDashboardsChartPlugin().configure({ key: 'gwwk_dashboards' }),
         new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),

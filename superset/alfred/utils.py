@@ -19,7 +19,7 @@ from hogwarts.auth.vault.vault_client import VaultClient
 
 import datetime
 
-from trino.client import NamedRowTuple
+from trino.types import NamedRowTuple
 
 from alfred_client import AlfredService
 from alfred_client.instance import InstanceUtil

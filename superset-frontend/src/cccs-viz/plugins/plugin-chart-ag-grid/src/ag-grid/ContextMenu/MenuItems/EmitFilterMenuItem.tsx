@@ -22,6 +22,7 @@ export default function EmitFilterMenuItem(props: EmitFilterMenuItemProps) {
 
   return (
     <Menu.Item
+      {...props}
       onClick={() => onClick()}
       className={
         props.disabled

@@ -69,6 +69,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
 
   return (
     <Menu.Item
+      {...props}
       onItemHover={() => {}}
       onClick={() => onClick()}
       className={

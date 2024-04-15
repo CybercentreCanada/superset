@@ -38,12 +38,14 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
 
   return (
     <Menu.SubMenu
+      {...props}
       icon={<DownloadOutlined />}
       title="Export"
       key="export-submenu"
       {...{ ...props, api: undefined }}
     >
       <Menu.Item
+        {...props}
         onClick={() => exportData('csv')}
         className="ant-dropdown-menu-item"
         key="export-csv-submenu-item"
@@ -52,6 +54,7 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
         CSV Export
       </Menu.Item>
       <Menu.Item
+        {...props}
         onClick={() => exportData('excel')}
         className="ant-dropdown-menu-item"
         key="export-excel-submenu-item"

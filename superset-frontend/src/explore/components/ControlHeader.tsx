@@ -137,6 +137,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
       </span>
     );
   };
+
   const renderOptionalActionIcons = () => (
     <span
       css={() => css`

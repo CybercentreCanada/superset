@@ -100,11 +100,13 @@ const ChartContextMenu = (
     <Dropdown
       overlay={
         <Menu>
-          {menuItems.length ? (
-            [...menuItems]
-          ) : (
-            <Menu.Item disabled>No actions</Menu.Item>
-          )}
+          {menuItems.length
+            ? [...menuItems]
+            : (props: any) => (
+                <Menu.Item {...props} disabled>
+                  No actions
+                </Menu.Item>
+              )}
         </Menu>
       }
       trigger={['click']}

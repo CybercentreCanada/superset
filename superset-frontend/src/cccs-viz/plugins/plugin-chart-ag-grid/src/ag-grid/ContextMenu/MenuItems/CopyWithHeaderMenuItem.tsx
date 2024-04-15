@@ -12,6 +12,7 @@ interface CopyMenuItemProps {
 export default function CopyMenuItem(props: CopyMenuItemProps) {
   return (
     <Menu.Item
+      {...props}
       onClick={props.onClick}
       key="copy-with-headers-menu-item"
       className="ant-dropdown-menu-item"
