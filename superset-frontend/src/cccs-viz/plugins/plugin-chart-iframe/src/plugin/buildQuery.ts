@@ -43,14 +43,14 @@ export default function buildQuery(formData: QueryFormData) {
     result_type: 'post_processed',
   };
 
-  return buildQueryContext(formDataCopy, baseQueryObject => {
+  return buildQueryContext(formDataCopy, baseQueryObject =>
     // RAW mode (not aggregated)
     // eslint-disable-next-line no-param-reassign
-    return [
+    [
       {
         ...baseQueryObject,
         row_limit: 10,
       },
-    ];
-  });
+    ],
+  );
 }

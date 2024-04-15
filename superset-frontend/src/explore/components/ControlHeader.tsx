@@ -219,6 +219,9 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           {renderOptionalIcons()}
         </FormLabel>
       </div>
+      {!rightNode && (
+        <div className="pull-right">{renderOptionalActionIcons()}</div>
+      )}
       {rightNode && <div className="pull-right">{rightNode}</div>}
       <div className="clearfix" />
     </div>

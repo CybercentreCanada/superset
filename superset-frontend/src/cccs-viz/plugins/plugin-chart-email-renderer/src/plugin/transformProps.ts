@@ -61,7 +61,8 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {
-    errorMessage = 'This chart can render only one email at a time. Narrow your search by adding filters so the query result is one record.';
+    errorMessage =
+      'This chart can render only one email at a time. Narrow your search by adding filters so the query result is one record.';
   }
 
   if (Array.isArray(data) && data.length === 0) {
@@ -77,6 +78,6 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
     url_parameter_value: value,
     parameter_prefix: parameterPrefix,
     errorMessage,
-    fissionUrl
+    fissionUrl,
   };
 }

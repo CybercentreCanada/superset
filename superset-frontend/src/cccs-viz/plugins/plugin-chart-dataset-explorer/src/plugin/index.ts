@@ -40,7 +40,9 @@ export default class CccsDataSetExplorerPlugin extends ChartPlugin<
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: t('Dataset Explorer: An AG Grid control for adhoc data exploration.'),
+      description: t(
+        'Dataset Explorer: An AG Grid control for adhoc data exploration.',
+      ),
       name: t('Dataset Explorer'),
       category: t('Table'),
       tags: [
@@ -59,7 +61,8 @@ export default class CccsDataSetExplorerPlugin extends ChartPlugin<
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../../../plugin-chart-ag-grid/src/ag-grid/AGGridViz'),
+      loadChart: () =>
+        import('../../../plugin-chart-ag-grid/src/ag-grid/AGGridViz'),
       metadata,
       transformProps,
     });

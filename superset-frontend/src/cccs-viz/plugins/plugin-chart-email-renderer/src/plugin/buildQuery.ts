@@ -32,7 +32,11 @@
  * if a viz needs multiple different result sets.
  */
 // Example of modifying the buildQuery function to include a unique identifier
-import { buildQueryContext, QueryContext, QueryFormData } from '@superset-ui/core';
+import {
+  buildQueryContext,
+  QueryContext,
+  QueryFormData,
+} from '@superset-ui/core';
 
 export default function buildQuery(formData: QueryFormData): QueryContext {
   // Clone formData to avoid directly mutating the original object
@@ -43,10 +47,10 @@ export default function buildQuery(formData: QueryFormData): QueryContext {
     refresh_timestamp: new Date().getTime(),
   };
 
-  return buildQueryContext(modifiedFormData, (baseQueryObject) => [
+  return buildQueryContext(modifiedFormData, baseQueryObject => [
     {
       ...baseQueryObject,
-      row_limit: 2,  // Only 1 row is permitted for email rendering
+      row_limit: 2, // Only 1 row is permitted for email rendering
     },
   ]);
 }

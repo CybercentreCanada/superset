@@ -27,11 +27,15 @@ import {
   TimeseriesDataRecord,
 } from '@superset-ui/core';
 import {
+  formatIpv4,
+  rendererMap,
+} from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
+import {
   CccsGridChartProps,
   CccsGridQueryFormData,
   DEFAULT_FORM_DATA,
 } from '../types';
-import { formatIpv4, rendererMap } from 'src/cccs-viz/plugins/plugin-chart-ag-grid/src/types/advancedDataTypes';
+
 export default function transformProps(chartProps: CccsGridChartProps) {
   /**
    * This function is called after a successful response has been
@@ -82,14 +86,13 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
 
   const default_group_by: any[] = [];
-  const enable_row_numbers: boolean = true;
-  const jump_action_configs: string[] = []
-  const enable_json_expand: boolean = false 
+  const enable_row_numbers = true;
+  const jump_action_configs: string[] = [];
+  const enable_json_expand = false;
 
-  const include_search: boolean = true;
-  const page_length: number = 50;
-  const enable_grouping: boolean = true;
-
+  const include_search = true;
+  const page_length = 50;
+  const enable_grouping = true;
 
   const { setDataMask = () => {}, setControlValue } = hooks;
   const columns = datasource?.columns as Column[];
@@ -97,53 +100,56 @@ export default function transformProps(chartProps: CccsGridChartProps) {
 
   const columnTypeMap = new Map<string, string>();
   columns.reduce(function (columnMap, column: Column) {
+    const newColumnMap = { ...columnMap };
     // @ts-ignore
     const name = column.column_name;
     // @ts-ignore
-    columnMap[name] = column.type;
-    return columnMap;
+    newColumnMap[name] = column.type;
+    return newColumnMap;
   }, columnTypeMap);
 
   // Map of column advanced types, key is column name, value is column type
   const columnAdvancedTypeMap = new Map<string, string>();
   columns.reduce(function (columnMap, column: Column) {
+    const newColumnMap = { ...columnMap };
     // @ts-ignore
     const name = column.column_name;
     // @ts-ignore
-    columnMap[name] = (
+    newColumnMap[name] = (
       (column.advanced_data_type as string) ?? ''
     ).toUpperCase();
-    return columnMap;
+    return newColumnMap;
   }, columnAdvancedTypeMap);
 
   // Map of verbose names, key is column name, value is verbose name
   const columnVerboseNameMap = new Map<string, string>();
   columns.reduce(function (columnMap, column: Column) {
+    const newColumnMap = { ...columnMap };
     // @ts-ignore
     const name = column.column_name;
     // @ts-ignore
-    columnMap[name] = column.verbose_name;
-    return columnMap;
+    newColumnMap[name] = column.verbose_name;
+    return newColumnMap;
   }, columnVerboseNameMap);
 
   // Map of column descriptions, key is column name, value is the description
   const columnDescriptionMap = new Map<string, string>();
   columns.reduce(function (columnMap, column: Column) {
-    // @ts-ignore
+    const newColumnMap = { ...columnMap };
     const name = column.column_name;
-    // @ts-ignore
-    columnMap[name] = column.description;
-    return columnMap;
+    newColumnMap[name] = column.description;
+    return newColumnMap;
   }, columnDescriptionMap);
 
   // Map of verbose names, key is metric name, value is verbose name
   const metricVerboseNameMap = new Map<string, string>();
   metrics.reduce(function (metricMap, metric: Metric) {
+    const newMetricMap = { ...metricMap };
     // @ts-ignore
     const name = metric.metric_name;
     // @ts-ignore
-    metricMap[name] = metric.verbose_name;
-    return metricMap;
+    newMetricMap[name] = metric.verbose_name;
+    return newMetricMap;
   }, metricVerboseNameMap);
 
   const valueFormatter = (params: any) => {
@@ -173,13 +179,13 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     {} as { [index: string]: Partial<Column> },
   );
 
-
   if (query_mode === QueryMode.raw) {
     columnDefs = formData.columns.map((column: any) => {
       const columnType = columnDataMap[column]?.type || '';
       const isDate = !!columnDataMap[column]?.is_dttm;
       const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
-      const columnAdvancedType = columnDataMap[column]?.advanced_data_type || '';
+      const columnAdvancedType =
+        columnDataMap[column]?.advanced_data_type || '';
       const columnHeader = columnDataMap[column]?.verbose_name
         ? columnDataMap[column]?.verbose_name
         : column;
@@ -254,15 +260,17 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       columnDefs = columnDefs.concat(groupByColumnDefs);
     }
 
-    const percentMetricValueFormatter = function (params: ValueFormatterParams) {
+    const percentMetricValueFormatter = function (
+      params: ValueFormatterParams,
+    ) {
       return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
         params.value,
       );
     };
-  
+
     if (metrics) {
       const metricsColumnDefs = formData.metrics?.map((metric: any) => {
-        const metricLabel = metric.label ? metric.label : metric
+        const metricLabel = metric.label ? metric.label : metric;
         const metricHeader = metricVerboseNameMap[metric]
           ? metricVerboseNameMap[metric]
           : metricLabel;
@@ -275,20 +283,22 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       });
       columnDefs = columnDefs.concat(metricsColumnDefs || []);
     }
-  
+
     if (formData.percent_metrics) {
-      const percentMetricsColumnDefs = formData.percent_metrics.map((metric: any) => {
-        const metricLabel = metric.label ? metric.label : metric
-        const metricHeader = metricVerboseNameMap[metric]
-          ? metricVerboseNameMap[metric]
-          : metricLabel;
-        return {
-          field: `%${metricLabel}`,
-          headerName: `%${metricHeader}`,
-          sortable: true,
-          valueFormatter: percentMetricValueFormatter,
-        };
-      });
+      const percentMetricsColumnDefs = formData.percent_metrics.map(
+        (metric: any) => {
+          const metricLabel = metric.label ? metric.label : metric;
+          const metricHeader = metricVerboseNameMap[metric]
+            ? metricVerboseNameMap[metric]
+            : metricLabel;
+          return {
+            field: `%${metricLabel}`,
+            headerName: `%${metricHeader}`,
+            sortable: true,
+            valueFormatter: percentMetricValueFormatter,
+          };
+        },
+      );
       columnDefs = columnDefs.concat(percentMetricsColumnDefs);
     }
   }

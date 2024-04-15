@@ -111,8 +111,7 @@ const config: ControlPanelConfig = {
             name: 'groupby',
             override: {
               label: t('Column'),
-              description:
-                'The column that contains the eml filename.',
+              description: 'The column that contains the eml filename.',
               multi: false,
               allowAll: false,
               default: [],

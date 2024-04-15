@@ -57,6 +57,7 @@ export const getJumpToDashboardContextMenuItems = (
 
     if (Object.keys(nativeFilterUrls).length !== 0) {
       const action = () => {
+        // eslint-disable-next-line no-restricted-globals
         const baseUrl = `${location.protocol}//${location.host}`;
         const url = `${baseUrl}/superset/dashboard/${
           advancedDataTypeNativeFilters.dashboardID

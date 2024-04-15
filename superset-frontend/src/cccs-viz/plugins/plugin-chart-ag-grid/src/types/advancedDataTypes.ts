@@ -1,8 +1,8 @@
-import CountryValueRenderer from "../renderers/CountryValueRenderer";
-import DomainValueRenderer from "../renderers/DomainValueRenderer";
-import Ipv6ValueRenderer from "../renderers/Ipv6ValueRenderer";
-import JsonValueRenderer from "../renderers/JsonValueRenderer";
-import TimestampValueRenderer from "../renderers/TimestampValueRenderer";
+import CountryValueRenderer from '../renderers/CountryValueRenderer';
+import DomainValueRenderer from '../renderers/DomainValueRenderer';
+import Ipv6ValueRenderer from '../renderers/Ipv6ValueRenderer';
+import JsonValueRenderer from '../renderers/JsonValueRenderer';
+import TimestampValueRenderer from '../renderers/TimestampValueRenderer';
 
 // Key is column advanced type, value is renderer
 export const rendererMap = {

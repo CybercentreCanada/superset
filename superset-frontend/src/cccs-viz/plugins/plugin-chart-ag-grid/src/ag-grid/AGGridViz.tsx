@@ -363,19 +363,31 @@ export default function AGGridViz({
         ...specialMenuItems,
         <RetainEmlMenuItem
           onSelection={handleContextMenu}
-          label={selectedData.typeData.harmonized_email_id.length > 1 ? "Retain EML Records To ALFRED" : "Retain EML Record To ALFRED" }
+          label={
+            selectedData.typeData.harmonized_email_id.length > 1
+              ? 'Retain EML Records To ALFRED'
+              : 'Retain EML Record To ALFRED'
+          }
           key="retain-eml"
           data={{
-            email_ids: Array.from(new Set(selectedData.typeData.harmonized_email_id)),
+            email_ids: Array.from(
+              new Set(selectedData.typeData.harmonized_email_id),
+            ),
             dates: [
-              ...(Object.entries(selectedData.typeData).filter((k) => k[0].includes('TIME')).map((v) => v[1])).flat(),
+              ...Object.entries(selectedData.typeData)
+                .filter(k => k[0].includes('TIME'))
+                .map(v => v[1])
+                .flat(),
               ...(selectedData.typeData.DATE || []),
               ...(selectedData.typeData.DATETIME || []),
             ],
           }}
-          disabled={selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT}
+          disabled={
+            selectedData.typeData.harmonized_email_id.length > RETENTION_LIMIT
+          }
           tooltip={
-            new Set(selectedData.typeData.harmonized_email_id).size > RETENTION_LIMIT
+            new Set(selectedData.typeData.harmonized_email_id).size >
+            RETENTION_LIMIT
               ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
               : undefined
           }

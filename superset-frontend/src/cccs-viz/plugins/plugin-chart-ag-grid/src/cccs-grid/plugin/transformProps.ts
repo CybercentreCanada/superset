@@ -37,7 +37,7 @@ const calcMetricColumnDefs = (
 
   if (metrics) {
     const metricsColumnDefs = metrics.map((metric: any) => {
-      const metricLabel = metric.label ? metric.label : metric
+      const metricLabel = metric.label ? metric.label : metric;
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
         : metricLabel;
@@ -53,7 +53,7 @@ const calcMetricColumnDefs = (
 
   if (percent_metrics) {
     const percentMetricsColumnDefs = percent_metrics.map((metric: any) => {
-      const metricLabel = metric.label ? metric.label : metric
+      const metricLabel = metric.label ? metric.label : metric;
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
         : metricLabel;

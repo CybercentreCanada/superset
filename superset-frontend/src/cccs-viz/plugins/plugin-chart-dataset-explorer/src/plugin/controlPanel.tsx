@@ -41,9 +41,9 @@ import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import { bootstrapData } from 'src/preamble';
 import AdhocFilterControl from 'src/explore/components/controls/FilterControl/AdhocFilterControl';
-import ChangeDataSourceButton from '../../../plugin-chart-cccs-grid/src/components/controls/changeDatasourceButton';
-import AdvancedDataTypeValue from '../../../plugin-chart-cccs-grid/src/components/controls/advancedDataTypeValueControl';
-import DateTimeControl from '../../../plugin-chart-cccs-grid/src/components/controls/datetimeControl';
+import ChangeDataSourceButton from '../components/controls/changeDatasourceButton';
+import AdvancedDataTypeValue from '../components/controls/advancedDataTypeValueControl';
+import DateTimeControl from '../components/controls/datetimeControl';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
   [0, t('page_size.all')],

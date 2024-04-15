@@ -28,7 +28,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
     const jsonPayload = props.data;
     const timeout = 180000; // 3 minutes
     // format dates into datestrings that look like Y-m-d
-    let allDates = []
+    let allDates = [];
     try {
       allDates = props.data.dates.map((d: string) => {
         let date = new Date(Date.parse(d));
@@ -36,17 +36,17 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
           date = new Date(d);
         }
         const day = date.getDate();
-        const month = date.getMonth() + 1 // months are labelled 0-11;
+        const month = date.getMonth() + 1; // months are labelled 0-11;
         const year = date.getFullYear();
         return `${year}-${month}-${day}`;
       });
     } catch (error) {
-      console.error(`Error parsing dates, ignoring date columns: ${error}`)
+      console.error(`Error parsing dates, ignoring date columns: ${error}`);
       allDates = [];
     }
 
     jsonPayload.dates = [...new Set(allDates)];
-    
+
     dispatch(
       addInfoToast(
         'Retention started. A new tab will open upon successful retention.',

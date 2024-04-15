@@ -18,11 +18,11 @@ export type EmailRenderChartProps = ChartProps & {
 
 export interface EmailRendererResponseResult extends ChartDataResponseResult {
   fissionUrl: string;
-};
+}
 
 export type EmailRendererProps = {
   url_parameter_value: string;
   parameter_prefix: string;
   errorMessage: string;
   fissionUrl: string;
-}
+};
