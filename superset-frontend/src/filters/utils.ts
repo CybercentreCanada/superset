@@ -23,12 +23,33 @@ import {
   QueryObjectFilterClause,
   TimeFormatter,
   ExtraFormData,
+  AdhocFilter,
 } from '@superset-ui/core';
 import { FALSE_STRING, NULL_STRING, TRUE_STRING } from 'src/utils/common';
 import {
   CLAUSES,
   EXPRESSION_TYPES,
 } from '../explore/components/controls/FilterControl/types';
+
+export const getAdhocExtraFormData = (
+  adhoc_filters: AdhocFilter[] = [],
+  emptyFilter = false,
+  inverseSelection = false,
+): ExtraFormData => {
+  const extra: ExtraFormData = {};
+  if (emptyFilter) {
+    extra.adhoc_filters = [
+      {
+        expressionType: 'SQL',
+        clause: 'WHERE',
+        sqlExpression: '1 = 0',
+      },
+    ];
+  } else {
+    extra.adhoc_filters = adhoc_filters;
+  }
+  return extra;
+};
 
 export const getSelectExtraFormData = (
   col: string,
