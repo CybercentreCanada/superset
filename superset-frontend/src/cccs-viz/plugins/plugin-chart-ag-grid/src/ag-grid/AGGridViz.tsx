@@ -231,7 +231,7 @@ export default function AGGridViz({
                 }
               });
             }
-            if (principalColumns.includes(col)) {
+            if (principalColumns?.includes(col)) {
               newPrincipalData[col] = newPrincipalData[col] || [];
               if (!newPrincipalData[col].includes(value)) {
                 newPrincipalData[col].push(value);
