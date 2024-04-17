@@ -54,7 +54,7 @@ import { datahubUrl } from 'src/preamble';
 import Owner from 'src/types/Owner';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { Tooltip } from 'src/components/Tooltip';
-import Icons from 'src/components/Icons';
+import Icons, { IconType } from 'src/components/Icons';
 import FacePile from 'src/components/FacePile';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import InfoTooltip from 'src/components/InfoTooltip';
@@ -73,6 +73,7 @@ import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
 import { useSelector } from 'react-redux';
 import { ModifiedInfo } from 'src/components/AuditInfo';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
+import logger from 'packages/superset-ui-core/src/utils/logging';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -367,7 +368,8 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
           },
         }: any) => {
           try {
-            const parsedExtra = JSON.parse(extra);
+            // const parsedExtra = JSON.parse(extra);
+            const parsedExtra = JSON.parse('{"urn": "hello"}');
             if (parsedExtra?.urn) {
               return (
                 <a
@@ -375,12 +377,18 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <Icons.Datahub viewBox="0 0 180 180" />
+                  {typeof Icons.Datahub ===
+                  typeof ((_props: IconType) => JSX.Element) ? (
+                    <Icons.Datahub viewBox="0 0 180 180" />
+                  ) : (
+                    <></>
+                  )}
                 </a>
               );
             }
           } catch {
-            // This should never be reached. Only needed for tests.
+            logger.warn('Error rendering Datahub Link');
+            return <></>;
           }
           return null;
         },
