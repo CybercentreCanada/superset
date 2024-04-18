@@ -85,12 +85,20 @@ class FissionRestApi(BaseApi):
             headers         = headers,
             timeout         = 180 # extending timeout for fission loading times
         )
-        if res.headers.get('Content-Type') == 'image/png':  # Check if the response is an image
-            encoded_image = base64.b64encode(res.content).decode('utf-8')  # Encode the image in base64
-            result = {'image': f'data:image/png;base64,{encoded_image}'}  # Store in a JSON-friendly format
+        
+        content_type = res.headers.get("Content-Type", "")
+
+        # Handling binary data for non-JSON responses
+        if content_type in ["application/octet-stream", "message/rfc822", "image/png"]:
+            encoded_content = base64.b64encode(res.content).decode('utf-8')
+            data_type = "image" if content_type == "image/png" else "content"
+            result = {data_type: f'data:{content_type};base64,{encoded_content}'}
         else:
+            # Attempt to return as JSON, fallback to plain text
             try:
                 result = res.json()
             except:
-                result = str(res.text)
+                result = {'Error': str(res.text)}
+                
         return self.response(res.status_code, result=result)
+

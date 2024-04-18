@@ -3,3 +3,6 @@ cypress/screenshots
 cypress/videos
 src/temp
 node_modules/
+
+package-lock.json
+package.json

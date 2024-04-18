@@ -46,6 +46,7 @@ import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
+import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -407,6 +408,20 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <SubmitToAssemblyLineMenuItem
+          onSelection={handleContextMenu}
+          label="Submit to ASSEMBLYLINE"
+          key="submit-file-to-assembly-line"
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }
