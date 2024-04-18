@@ -23,9 +23,13 @@ import {
   QueryObjectFilterClause,
   TimeFormatter,
   ExtraFormData,
+  AdhocFilter,
 } from '@superset-ui/core';
-import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
 import { FALSE_STRING, NULL_STRING, TRUE_STRING } from 'src/utils/common';
+import {
+  CLAUSES,
+  EXPRESSION_TYPES,
+} from '../explore/components/controls/FilterControl/types';
 
 export const getAdhocExtraFormData = (
   adhoc_filters: AdhocFilter[] = [],
@@ -57,8 +61,8 @@ export const getSelectExtraFormData = (
   if (emptyFilter) {
     extra.adhoc_filters = [
       {
-        expressionType: 'SQL',
-        clause: 'WHERE',
+        expressionType: EXPRESSION_TYPES.SQL,
+        clause: CLAUSES.WHERE,
         sqlExpression: '1 = 0',
       },
     ];

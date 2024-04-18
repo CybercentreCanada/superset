@@ -127,7 +127,7 @@ describe('Markdown', () => {
     expect(wrapper.find(SafeMarkdown)).not.toExist();
   });
 
-  it('should render a SafeMarkdown when focused and editMode=true and editorMode=preview', () => {
+  it('should render a ReactMarkdown when focused and editMode=true and editorMode=preview', () => {
     const wrapper = setup({ editMode: true });
     wrapper.find(WithPopoverMenu).simulate('click'); // focus + edit
     expect(wrapper.find(MarkdownEditor)).toExist();

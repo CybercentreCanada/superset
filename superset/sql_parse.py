@@ -14,15 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
+# pylint: disable=too-many-lines
+from __future__ import annotations
+
 import logging
 import re
+import urllib.parse
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, cast, Iterator, List, Optional, Set, Tuple
-from urllib import parse
+from typing import Any, cast, TYPE_CHECKING
 
 import sqlparse
+from flask_babel import gettext as __
+from jinja2 import nodes
 from sqlalchemy import and_
+from sqlglot import exp, parse, parse_one
+from sqlglot.dialects import Dialects
+from sqlglot.errors import SqlglotError
+from sqlglot.optimizer.scope import Scope, ScopeType, traverse_scope
+from sqlparse import keywords
+from sqlparse.lexer import Lexer
 from sqlparse.sql import (
     Identifier,
     IdentifierList,
@@ -42,15 +54,24 @@ from sqlparse.tokens import (
     Punctuation,
     String,
     Whitespace,
+    Wildcard,
 )
 from sqlparse.utils import imt
 
-from superset.exceptions import QueryClauseValidationException
+from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
+from superset.exceptions import (
+    QueryClauseValidationException,
+    SupersetSecurityException,
+)
+from superset.utils.backports import StrEnum
 
 try:
     from sqloxide import parse_sql as sqloxide_parse
-except:  # pylint: disable=bare-except
+except (ImportError, ModuleNotFoundError):
     sqloxide_parse = None
+
+if TYPE_CHECKING:
+    from superset.models.core import Database
 
 RESULT_OPERATIONS = {"UNION", "INTERSECT", "EXCEPT", "SELECT"}
 ON_KEYWORD = "ON"
@@ -59,23 +80,74 @@ CTE_PREFIX = "CTE__"
 
 logger = logging.getLogger(__name__)
 
-
 # TODO: Workaround for https://github.com/andialbrecht/sqlparse/issues/652.
-sqlparse.keywords.SQL_REGEX.insert(
-    0,
-    (
-        re.compile(r"'(''|\\\\|\\|[^'])*'", sqlparse.keywords.FLAGS).match,
-        sqlparse.tokens.String.Single,
-    ),
-)
+# configure the Lexer to extend sqlparse
+# reference: https://sqlparse.readthedocs.io/en/stable/extending/
+lex = Lexer.get_default_instance()
+sqlparser_sql_regex = keywords.SQL_REGEX
+sqlparser_sql_regex.insert(25, (r"'(''|\\\\|\\|[^'])*'", sqlparse.tokens.String.Single))
+lex.set_SQL_REGEX(sqlparser_sql_regex)
 
 
-class CtasMethod(str, Enum):
+# mapping between DB engine specs and sqlglot dialects
+SQLGLOT_DIALECTS = {
+    "ascend": Dialects.HIVE,
+    "awsathena": Dialects.PRESTO,
+    "bigquery": Dialects.BIGQUERY,
+    "clickhouse": Dialects.CLICKHOUSE,
+    "clickhousedb": Dialects.CLICKHOUSE,
+    "cockroachdb": Dialects.POSTGRES,
+    # "crate": ???
+    # "databend": ???
+    "databricks": Dialects.DATABRICKS,
+    # "db2": ???
+    # "dremio": ???
+    "drill": Dialects.DRILL,
+    # "druid": ???
+    "duckdb": Dialects.DUCKDB,
+    # "dynamodb": ???
+    # "elasticsearch": ???
+    # "exa": ???
+    # "firebird": ???
+    # "firebolt": ???
+    "gsheets": Dialects.SQLITE,
+    "hana": Dialects.POSTGRES,
+    "hive": Dialects.HIVE,
+    # "ibmi": ???
+    # "impala": ???
+    # "kustokql": ???
+    # "kylin": ???
+    "mssql": Dialects.TSQL,
+    "mysql": Dialects.MYSQL,
+    "netezza": Dialects.POSTGRES,
+    # "ocient": ???
+    # "odelasticsearch": ???
+    "oracle": Dialects.ORACLE,
+    # "pinot": ???
+    "postgresql": Dialects.POSTGRES,
+    "presto": Dialects.PRESTO,
+    "pydoris": Dialects.DORIS,
+    "redshift": Dialects.REDSHIFT,
+    # "risingwave": ???
+    # "rockset": ???
+    "shillelagh": Dialects.SQLITE,
+    "snowflake": Dialects.SNOWFLAKE,
+    # "solr": ???
+    "sqlite": Dialects.SQLITE,
+    "starrocks": Dialects.STARROCKS,
+    "superset": Dialects.SQLITE,
+    "teradatasql": Dialects.TERADATA,
+    "trino": Dialects.TRINO,
+    "vertica": Dialects.POSTGRES,
+}
+
+
+class CtasMethod(StrEnum):
     TABLE = "TABLE"
     VIEW = "VIEW"
 
 
-def _extract_limit_from_query(statement: TokenList) -> Optional[int]:
+def _extract_limit_from_query(statement: TokenList) -> int | None:
     """
     Extract limit clause from SQL statement.
 
@@ -96,9 +168,7 @@ def _extract_limit_from_query(statement: TokenList) -> Optional[int]:
     return None
 
 
-def extract_top_from_query(
-    statement: TokenList, top_keywords: Set[str]
-) -> Optional[int]:
+def extract_top_from_query(statement: TokenList, top_keywords: set[str]) -> int | None:
     """
     Extract top clause value from SQL statement.
 
@@ -112,8 +182,8 @@ def extract_top_from_query(
     token = str_statement.rstrip().split(" ")
     token = [part for part in token if part]
     top = None
-    for i, _ in enumerate(token):
-        if token[i].upper() in top_keywords and len(token) - 1 > i:
+    for i, part in enumerate(token):
+        if part.upper() in top_keywords and len(token) - 1 > i:
             try:
                 top = int(token[i + 1])
             except ValueError:
@@ -122,7 +192,7 @@ def extract_top_from_query(
     return top
 
 
-def get_cte_remainder_query(sql: str) -> Tuple[Optional[str], str]:
+def get_cte_remainder_query(sql: str) -> tuple[str | None, str]:
     """
     parse the SQL and return the CTE and rest of the block to the caller
 
@@ -130,7 +200,7 @@ def get_cte_remainder_query(sql: str) -> Tuple[Optional[str], str]:
     :return: CTE and remainder block to the caller
 
     """
-    cte: Optional[str] = None
+    cte: str | None = None
     remainder = sql
     stmt = sqlparse.parse(sql)[0]
 
@@ -148,7 +218,7 @@ def get_cte_remainder_query(sql: str) -> Tuple[Optional[str], str]:
     return cte, remainder
 
 
-def strip_comments_from_sql(statement: str) -> str:
+def strip_comments_from_sql(statement: str, engine: str | None = None) -> str:
     """
     Strips comments from a SQL statement, does a simple test first
     to avoid always instantiating the expensive ParsedQuery constructor
@@ -158,7 +228,11 @@ def strip_comments_from_sql(statement: str) -> str:
     :param statement: A string with the SQL statement
     :return: SQL statement without comments
     """
-    return ParsedQuery(statement).strip_comments() if "--" in statement else statement
+    return (
+        ParsedQuery(statement, engine=engine).strip_comments()
+        if "--" in statement
+        else statement
+    )
 
 
 @dataclass(eq=True, frozen=True)
@@ -168,8 +242,8 @@ class Table:
     """
 
     table: str
-    schema: Optional[str] = None
-    catalog: Optional[str] = None
+    schema: str | None = None
+    catalog: str | None = None
 
     def __str__(self) -> str:
         """
@@ -177,7 +251,7 @@ class Table:
         """
 
         return ".".join(
-            parse.quote(part, safe="").replace(".", "%2E")
+            urllib.parse.quote(part, safe="").replace(".", "%2E")
             for part in [self.catalog, self.schema, self.table]
             if part
         )
@@ -187,14 +261,20 @@ class Table:
 
 
 class ParsedQuery:
-    def __init__(self, sql_statement: str, strip_comments: bool = False):
+    def __init__(
+        self,
+        sql_statement: str,
+        strip_comments: bool = False,
+        engine: str | None = None,
+    ):
         if strip_comments:
             sql_statement = sqlparse.format(sql_statement, strip_comments=True)
 
         self.sql: str = sql_statement
-        self._tables: Set[Table] = set()
-        self._alias_names: Set[str] = set()
-        self._limit: Optional[int] = None
+        self._dialect = SQLGLOT_DIALECTS.get(engine) if engine else None
+        self._tables: set[Table] = set()
+        self._alias_names: set[str] = set()
+        self._limit: int | None = None
 
         logger.debug("Parsing with sqlparse statement: %s", self.sql)
         self._parsed = sqlparse.parse(self.stripped())
@@ -202,43 +282,200 @@ class ParsedQuery:
             self._limit = _extract_limit_from_query(statement)
 
     @property
-    def tables(self) -> Set[Table]:
+    def tables(self) -> set[Table]:
         if not self._tables:
-            for statement in self._parsed:
-                self._extract_from_token(statement)
-
-            self._tables = {
-                table for table in self._tables if str(table) not in self._alias_names
-            }
+            self._tables = self._extract_tables_from_sql()
         return self._tables
 
+    def _extract_tables_from_sql(self) -> set[Table]:
+        """
+        Extract all table references in a query.
+
+        Note: this uses sqlglot, since it's better at catching more edge cases.
+        """
+        try:
+            statements = parse(self.stripped(), dialect=self._dialect)
+        except SqlglotError as ex:
+            logger.warning("Unable to parse SQL (%s): %s", self._dialect, self.sql)
+            dialect = self._dialect or "generic"
+            raise SupersetSecurityException(
+                SupersetError(
+                    error_type=SupersetErrorType.QUERY_SECURITY_ACCESS_ERROR,
+                    message=__(f"Unable to parse SQL ({dialect}): {self.sql}"),
+                    level=ErrorLevel.ERROR,
+                )
+            ) from ex
+
+        return {
+            table
+            for statement in statements
+            for table in self._extract_tables_from_statement(statement)
+            if statement
+        }
+
+    def _extract_tables_from_statement(self, statement: exp.Expression) -> set[Table]:
+        """
+        Extract all table references in a single statement.
+
+        Please not that this is not trivial; consider the following queries:
+
+            DESCRIBE some_table;
+            SHOW PARTITIONS FROM some_table;
+            WITH masked_name AS (SELECT * FROM some_table) SELECT * FROM masked_name;
+
+        See the unit tests for other tricky cases.
+        """
+        sources: Iterable[exp.Table]
+
+        if isinstance(statement, exp.Describe):
+            # A `DESCRIBE` query has no sources in sqlglot, so we need to explicitly
+            # query for all tables.
+            sources = statement.find_all(exp.Table)
+        elif isinstance(statement, exp.Command):
+            # Commands, like `SHOW COLUMNS FROM foo`, have to be converted into a
+            # `SELECT` statetement in order to extract tables.
+            if not (literal := statement.find(exp.Literal)):
+                return set()
+
+            try:
+                pseudo_query = parse_one(
+                    f"SELECT {literal.this}",
+                    dialect=self._dialect,
+                )
+                sources = pseudo_query.find_all(exp.Table)
+            except SqlglotError:
+                return set()
+        else:
+            sources = [
+                source
+                for scope in traverse_scope(statement)
+                for source in scope.sources.values()
+                if isinstance(source, exp.Table) and not self._is_cte(source, scope)
+            ]
+
+        return {
+            Table(
+                source.name,
+                source.db if source.db != "" else None,
+                source.catalog if source.catalog != "" else None,
+            )
+            for source in sources
+        }
+
+    def _is_cte(self, source: exp.Table, scope: Scope) -> bool:
+        """
+        Is the source a CTE?
+
+        CTEs in the parent scope look like tables (and are represented by
+        exp.Table objects), but should not be considered as such;
+        otherwise a user with access to table `foo` could access any table
+        with a query like this:
+
+            WITH foo AS (SELECT * FROM target_table) SELECT * FROM foo
+
+        """
+        parent_sources = scope.parent.sources if scope.parent else {}
+        ctes_in_scope = {
+            name
+            for name, parent_scope in parent_sources.items()
+            if isinstance(parent_scope, Scope)
+            and parent_scope.scope_type == ScopeType.CTE
+        }
+
+        return source.name in ctes_in_scope
+
     @property
-    def limit(self) -> Optional[int]:
+    def limit(self) -> int | None:
         return self._limit
 
+    def _get_cte_tables(self, parsed: dict[str, Any]) -> list[dict[str, Any]]:
+        if "with" not in parsed:
+            return []
+        return parsed["with"].get("cte_tables", [])
+
+    def _check_cte_is_select(self, oxide_parse: list[dict[str, Any]]) -> bool:
+        """
+        Check if a oxide parsed CTE contains only SELECT statements
+
+        :param oxide_parse: parsed CTE
+        :return: True if CTE is a SELECT statement
+        """
+
+        def is_body_select(body: dict[str, Any]) -> bool:
+            if op := body.get("SetOperation"):
+                return is_body_select(op["left"]) and is_body_select(op["right"])
+            return all(key == "Select" for key in body.keys())
+
+        for query in oxide_parse:
+            parsed_query = query["Query"]
+            cte_tables = self._get_cte_tables(parsed_query)
+            for cte_table in cte_tables:
+                is_select = is_body_select(cte_table["query"]["body"])
+                if not is_select:
+                    return False
+        return True
+
     def is_select(self) -> bool:
-        # make sure we strip comments; prevents a bug with coments in the CTE
+        # make sure we strip comments; prevents a bug with comments in the CTE
         parsed = sqlparse.parse(self.strip_comments())
-        if parsed[0].get_type() == "SELECT":
-            return True
 
-        if parsed[0].get_type() != "UNKNOWN":
-            return False
+        for statement in parsed:
+            # Check if this is a CTE
+            if statement.is_group and statement[0].ttype == Keyword.CTE:
+                if sqloxide_parse is not None:
+                    try:
+                        if not self._check_cte_is_select(
+                            sqloxide_parse(self.strip_comments(), dialect="ansi")
+                        ):
+                            return False
+                    except ValueError:
+                        # sqloxide was not able to parse the query, so let's continue with
+                        # sqlparse
+                        pass
+                inner_cte = self.get_inner_cte_expression(statement.tokens) or []
+                # Check if the inner CTE is a not a SELECT
+                if any(token.ttype == DDL for token in inner_cte) or any(
+                    token.ttype == DML and token.normalized != "SELECT"
+                    for token in inner_cte
+                ):
+                    return False
 
-        # for `UNKNOWN`, check all DDL/DML explicitly: only `SELECT` DML is allowed,
-        # and no DDL is allowed
-        if any(token.ttype == DDL for token in parsed[0]) or any(
-            token.ttype == DML and token.value != "SELECT" for token in parsed[0]
-        ):
-            return False
+            if statement.get_type() == "SELECT":
+                continue
 
-        # return false on `EXPLAIN`, `SET`, `SHOW`, etc.
-        if parsed[0][0].ttype == Keyword:
-            return False
+            if statement.get_type() != "UNKNOWN":
+                return False
 
-        return any(
-            token.ttype == DML and token.value == "SELECT" for token in parsed[0]
-        )
+            # for `UNKNOWN`, check all DDL/DML explicitly: only `SELECT` DML is allowed,
+            # and no DDL is allowed
+            if any(token.ttype == DDL for token in statement) or any(
+                token.ttype == DML and token.normalized != "SELECT"
+                for token in statement
+            ):
+                return False
+
+            # return false on `EXPLAIN`, `SET`, `SHOW`, etc.
+            if statement[0].ttype == Keyword:
+                return False
+
+            if not any(
+                token.ttype == DML and token.normalized == "SELECT"
+                for token in statement
+            ):
+                return False
+
+        return True
+
+    def get_inner_cte_expression(self, tokens: TokenList) -> TokenList | None:
+        for token in tokens:
+            if self._is_identifier(token):
+                for identifier_token in token.tokens:
+                    if (
+                        isinstance(identifier_token, Parenthesis)
+                        and identifier_token.is_group
+                    ):
+                        return identifier_token.tokens
+        return None
 
     def is_valid_ctas(self) -> bool:
         parsed = sqlparse.parse(self.strip_comments())
@@ -277,12 +514,12 @@ class ParsedQuery:
         return self._parsed[0].get_type() == "UNKNOWN"
 
     def stripped(self) -> str:
-        return self.sql.strip(" \t\n;")
+        return self.sql.strip(" \t\r\n;")
 
     def strip_comments(self) -> str:
         return sqlparse.format(self.stripped(), strip_comments=True)
 
-    def get_statements(self) -> List[str]:
+    def get_statements(self) -> list[str]:
         """Returns a list of SQL statements as strings, stripped"""
         statements = []
         for statement in self._parsed:
@@ -293,7 +530,7 @@ class ParsedQuery:
         return statements
 
     @staticmethod
-    def get_table(tlist: TokenList) -> Optional[Table]:
+    def get_table(tlist: TokenList) -> Table | None:
         """
         Return the table if valid, i.e., conforms to the [[catalog.]schema.]table
         construct.
@@ -326,32 +563,10 @@ class ParsedQuery:
     def _is_identifier(token: Token) -> bool:
         return isinstance(token, (IdentifierList, Identifier))
 
-    def _process_tokenlist(self, token_list: TokenList) -> None:
-        """
-        Add table names to table set
-
-        :param token_list: TokenList to be processed
-        """
-        # exclude subselects
-        if "(" not in str(token_list):
-            table = self.get_table(token_list)
-            if table and not table.table.startswith(CTE_PREFIX):
-                self._tables.add(table)
-            return
-
-        # store aliases
-        if token_list.has_alias():
-            self._alias_names.add(token_list.get_alias())
-
-        # some aliases are not parsed properly
-        if token_list.tokens[0].ttype == Name:
-            self._alias_names.add(token_list.tokens[0].value)
-        self._extract_from_token(token_list)
-
     def as_create_table(
         self,
         table_name: str,
-        schema_name: Optional[str] = None,
+        schema_name: str | None = None,
         overwrite: bool = False,
         method: CtasMethod = CtasMethod.TABLE,
     ) -> str:
@@ -373,50 +588,6 @@ class ParsedQuery:
             exec_sql = f"DROP {method} IF EXISTS {full_table_name};\n"
         exec_sql += f"CREATE {method} {full_table_name} AS \n{sql}"
         return exec_sql
-
-    def _extract_from_token(self, token: Token) -> None:
-        """
-        <Identifier> store a list of subtokens and <IdentifierList> store lists of
-        subtoken list.
-
-        It extracts <IdentifierList> and <Identifier> from :param token: and loops
-        through all subtokens recursively. It finds table_name_preceding_token and
-        passes <IdentifierList> and <Identifier> to self._process_tokenlist to populate
-        self._tables.
-
-        :param token: instance of Token or child class, e.g. TokenList, to be processed
-        """
-        if not hasattr(token, "tokens"):
-            return
-
-        table_name_preceding_token = False
-
-        for item in token.tokens:
-            if item.is_group and (
-                not self._is_identifier(item) or isinstance(item.tokens[0], Parenthesis)
-            ):
-                self._extract_from_token(item)
-
-            if item.ttype in Keyword and (
-                item.normalized in PRECEDES_TABLE_NAME
-                or item.normalized.endswith(" JOIN")
-            ):
-                table_name_preceding_token = True
-                continue
-
-            if item.ttype in Keyword:
-                table_name_preceding_token = False
-                continue
-            if table_name_preceding_token:
-                if isinstance(item, Identifier):
-                    self._process_tokenlist(item)
-                elif isinstance(item, IdentifierList):
-                    for token2 in item.get_identifiers():
-                        if isinstance(token2, TokenList):
-                            self._process_tokenlist(token2)
-            elif isinstance(item, IdentifierList):
-                if any(not self._is_identifier(token2) for token2 in item.tokens):
-                    self._extract_from_token(item)
 
     def set_or_update_query_limit(self, new_limit: int, force: bool = False) -> str:
         """Returns the query with the specified limit.
@@ -482,7 +653,7 @@ def sanitize_clause(clause: str) -> str:
     return clause
 
 
-class InsertRLSState(str, Enum):
+class InsertRLSState(StrEnum):
     """
     State machine that scans for WHERE and ON clauses referencing tables.
     """
@@ -509,6 +680,9 @@ def has_table_query(token_list: TokenList) -> bool:
     """
     state = InsertRLSState.SCANNING
     for token in token_list.tokens:
+        # Ignore comments
+        if isinstance(token, sqlparse.sql.Comment):
+            continue
 
         # Recurse into child token list
         if isinstance(token, TokenList) and has_table_query(token):
@@ -552,8 +726,8 @@ def add_table_name(rls: TokenList, table: str) -> None:
 def get_rls_for_table(
     candidate: Token,
     database_id: int,
-    default_schema: Optional[str],
-) -> Optional[TokenList]:
+    default_schema: str | None,
+) -> TokenList | None:
     """
     Given a table name, return any associated RLS predicates.
     """
@@ -591,27 +765,128 @@ def get_rls_for_table(
         return None
 
     rls = sqlparse.parse(predicate)[0]
-    add_table_name(rls, str(dataset))
+    add_table_name(rls, table.table)
 
     return rls
 
 
-def insert_rls(
+def insert_rls_as_subquery(
     token_list: TokenList,
     database_id: int,
-    default_schema: Optional[str],
+    default_schema: str | None,
 ) -> TokenList:
     """
     Update a statement inplace applying any associated RLS predicates.
+
+    The RLS predicate is applied as subquery replacing the original table:
+
+        before: SELECT * FROM some_table WHERE 1=1
+        after:  SELECT * FROM (
+                  SELECT * FROM some_table WHERE some_table.id=42
+                ) AS some_table
+                WHERE 1=1
+
+    This method is safer than ``insert_rls_in_predicate``, but doesn't work in all
+    databases.
     """
-    rls: Optional[TokenList] = None
+    rls: TokenList | None = None
     state = InsertRLSState.SCANNING
     for token in token_list.tokens:
-
         # Recurse into child token list
         if isinstance(token, TokenList):
             i = token_list.tokens.index(token)
-            token_list.tokens[i] = insert_rls(token, database_id, default_schema)
+            token_list.tokens[i] = insert_rls_as_subquery(
+                token,
+                database_id,
+                default_schema,
+            )
+
+        # Found a source keyword (FROM/JOIN)
+        if imt(token, m=[(Keyword, "FROM"), (Keyword, "JOIN")]):
+            state = InsertRLSState.SEEN_SOURCE
+
+        # Found identifier/keyword after FROM/JOIN, test for table
+        elif state == InsertRLSState.SEEN_SOURCE and (
+            isinstance(token, Identifier) or token.ttype == Keyword
+        ):
+            rls = get_rls_for_table(token, database_id, default_schema)
+            if rls:
+                # replace table with subquery
+                subquery_alias = (
+                    token.tokens[-1].value
+                    if isinstance(token, Identifier)
+                    else token.value
+                )
+                i = token_list.tokens.index(token)
+
+                # strip alias from table name
+                if isinstance(token, Identifier) and token.has_alias():
+                    whitespace_index = token.token_next_by(t=Whitespace)[0]
+                    token.tokens = token.tokens[:whitespace_index]
+
+                token_list.tokens[i] = Identifier(
+                    [
+                        Parenthesis(
+                            [
+                                Token(Punctuation, "("),
+                                Token(DML, "SELECT"),
+                                Token(Whitespace, " "),
+                                Token(Wildcard, "*"),
+                                Token(Whitespace, " "),
+                                Token(Keyword, "FROM"),
+                                Token(Whitespace, " "),
+                                token,
+                                Token(Whitespace, " "),
+                                Where(
+                                    [
+                                        Token(Keyword, "WHERE"),
+                                        Token(Whitespace, " "),
+                                        rls,
+                                    ]
+                                ),
+                                Token(Punctuation, ")"),
+                            ]
+                        ),
+                        Token(Whitespace, " "),
+                        Token(Keyword, "AS"),
+                        Token(Whitespace, " "),
+                        Identifier([Token(Name, subquery_alias)]),
+                    ]
+                )
+                state = InsertRLSState.SCANNING
+
+        # Found nothing, leaving source
+        elif state == InsertRLSState.SEEN_SOURCE and token.ttype != Whitespace:
+            state = InsertRLSState.SCANNING
+
+    return token_list
+
+
+def insert_rls_in_predicate(
+    token_list: TokenList,
+    database_id: int,
+    default_schema: str | None,
+) -> TokenList:
+    """
+    Update a statement inplace applying any associated RLS predicates.
+
+    The RLS predicate is ``AND``ed to any existing predicates:
+
+        before: SELECT * FROM some_table WHERE 1=1
+        after:  SELECT * FROM some_table WHERE ( 1=1) AND some_table.id=42
+
+    """
+    rls: TokenList | None = None
+    state = InsertRLSState.SCANNING
+    for token in token_list.tokens:
+        # Recurse into child token list
+        if isinstance(token, TokenList):
+            i = token_list.tokens.index(token)
+            token_list.tokens[i] = insert_rls_in_predicate(
+                token,
+                database_id,
+                default_schema,
+            )
 
         # Found a source keyword (FROM/JOIN)
         if imt(token, m=[(Keyword, "FROM"), (Keyword, "JOIN")]):
@@ -710,7 +985,7 @@ def insert_rls(
 
 
 # mapping between sqloxide and SQLAlchemy dialects
-SQLOXITE_DIALECTS = {
+SQLOXIDE_DIALECTS = {
     "ansi": {"trino", "trinonative", "presto"},
     "hive": {"hive", "databricks"},
     "ms": {"mssql"},
@@ -735,7 +1010,7 @@ RE_JINJA_BLOCK = re.compile(r"\{[%#][^\{\}%#]+[%#]\}")
 
 def extract_table_references(
     sql_text: str, sqla_dialect: str, show_warning: bool = True
-) -> Set["Table"]:
+) -> set[Table]:
     """
     Return all the dependencies from a SQL sql_text.
     """
@@ -743,7 +1018,7 @@ def extract_table_references(
     tree = None
 
     if sqloxide_parse:
-        for dialect, sqla_dialects in SQLOXITE_DIALECTS.items():
+        for dialect, sqla_dialects in SQLOXIDE_DIALECTS.items():
             if sqla_dialect in sqla_dialects:
                 break
         sql_text = RE_JINJA_BLOCK.sub(" ", sql_text)
@@ -779,3 +1054,61 @@ def extract_table_references(
         Table(*[part["value"] for part in table["name"][::-1]])
         for table in find_nodes_by_key(tree, "Table")
     }
+
+
+def extract_tables_from_jinja_sql(sql: str, database: Database) -> set[Table]:
+    """
+    Extract all table references in the Jinjafied SQL statement.
+
+    Due to Jinja templating, a multiphase approach is necessary as the Jinjafied SQL
+    statement may represent invalid SQL which is non-parsable by SQLGlot.
+
+    Firstly, we extract any tables referenced within the confines of specific Jinja
+    macros. Secondly, we replace these non-SQL Jinja calls with a pseudo-benign SQL
+    expression to help ensure that the resulting SQL statements are parsable by
+    SQLGlot.
+
+    :param sql: The Jinjafied SQL statement
+    :param database: The database associated with the SQL statement
+    :returns: The set of tables referenced in the SQL statement
+    :raises SupersetSecurityException: If SQLGlot is unable to parse the SQL statement
+    :raises jinja2.exceptions.TemplateError: If the Jinjafied SQL could not be rendered
+    """
+
+    from superset.jinja_context import (  # pylint: disable=import-outside-toplevel
+        get_template_processor,
+    )
+
+    processor = get_template_processor(database)
+    template = processor.env.parse(sql)
+
+    tables = set()
+
+    for node in template.find_all(nodes.Call):
+        if isinstance(node.node, nodes.Getattr) and node.node.attr in (
+            "latest_partition",
+            "latest_sub_partition",
+        ):
+            # Extract the table referenced in the macro.
+            tables.add(
+                Table(
+                    *[
+                        remove_quotes(part)
+                        for part in node.args[0].value.split(".")[::-1]
+                        if len(node.args) == 1
+                    ]
+                )
+            )
+
+            # Replace the potentially problematic Jinja macro with some benign SQL.
+            node.__class__ = nodes.TemplateData
+            node.fields = nodes.TemplateData.fields
+            node.data = "NULL"
+
+    return (
+        tables
+        | ParsedQuery(
+            sql_statement=processor.process_template(template),
+            engine=database.db_engine_spec.engine,
+        ).tables
+    )

@@ -97,6 +97,101 @@ export default function exploreReducer(state = {}, action) {
         controlsTransferred,
       };
     },
+    [actions.UPDATE_CCCS_FORM_DATA_BY_DATASOURCE]() {
+      const newFormData = { ...state.form_data };
+      const { prevDatasource, newDatasource } = action;
+      const controls = { ...state.controls };
+      const controlsTransferred = [];
+
+      if (
+        prevDatasource.id !== newDatasource.id ||
+        prevDatasource.type !== newDatasource.type
+      ) {
+        newFormData.datasource = newDatasource.uid;
+      }
+      // reset control values for column/metric related controls
+      Object.entries(controls).forEach(([controlName, controlState]) => {
+        if (
+          // for direct column select controls
+          controlState.valueKey === 'column_name' ||
+          // for all other controls
+          'savedMetrics' in controlState ||
+          'columns' in controlState ||
+          ('options' in controlState && !Array.isArray(controlState.options))
+        ) {
+          newFormData[controlName] = getControlValuesCompatibleWithDatasource(
+            newDatasource,
+            controlState,
+            controlState.value,
+          );
+          if (
+            ensureIsArray(newFormData[controlName]).length > 0 &&
+            newFormData[controlName] !== controls[controlName].default
+          ) {
+            controlsTransferred.push(controlName);
+          }
+        }
+      });
+
+      const newState = {
+        ...state,
+        controls,
+        datasource: action.newDatasource,
+      };
+      const newControls = getControlsState(newState, newFormData);
+
+      if (newControls.advanced_data_type_selection) {
+        // filter out incompatible Advanced Data Types in the new Datasource
+        const advancedDataTypeSelectionControl =
+          newControls.advanced_data_type_selection;
+        newFormData.advanced_data_type_selection = newDatasource.columns.some(
+          c => c.advanced_data_type === advancedDataTypeSelectionControl.value,
+        )
+          ? advancedDataTypeSelectionControl.value
+          : [];
+        newControls.advanced_data_type_selection.value =
+          newFormData.advanced_data_type_selection;
+        // check if the new datasource has any columns with the same Advanced Data Type
+        if (
+          ensureIsArray(newFormData.advanced_data_type_selection).length > 0
+        ) {
+          // transfer the control to use the new columns
+          newControls.advanced_data_type_value.value[0].columns =
+            newDatasource.columns
+              .filter(
+                c =>
+                  c.advanced_data_type ===
+                  advancedDataTypeSelectionControl.value,
+              )
+              .map(c => c.column_name);
+          controlsTransferred.push('advanced_data_type_selection');
+          controlsTransferred.push('advanced_data_type_value');
+        } else {
+          // if there are no compatible columns, clear the controls and disable the value control
+          newControls.advanced_data_type_value.value = [
+            { columns: [], data: [], rawData: [] },
+          ];
+          newControls.advanced_data_type_value.disabled = true;
+          newControls.advanced_data_type_value.advancedDataType = [];
+          newFormData.advanced_data_type_value =
+            newControls.advanced_data_type_value.value;
+        }
+      }
+      // check if date column is compatible with new datasource
+      if (!newDatasource.columns.includes(newFormData.granularity_sqla)) {
+        // set the time column to the new default time column
+        newControls.granularity_sqla.value = newDatasource.main_dttm_col;
+        newFormData.granularity_sqla = newDatasource.main_dttm_col;
+        // disable the time range if there is no default
+        newControls.time_range.disabled = !newDatasource.main_dttm_col;
+      }
+      return {
+        ...newState,
+        form_data: newFormData,
+        controls: newControls,
+        controlsTransferred,
+      };
+    },
     [actions.FETCH_DATASOURCES_STARTED]() {
       return {
         ...state,
@@ -112,10 +207,15 @@ export default function exploreReducer(state = {}, action) {
       const vizType = new_form_data.viz_type;
 
       // if the controlName is metrics, and the metric column name is updated,
-      // need to update column config as well to keep the previou config.
+      // need to update column config as well to keep the previous config.
       if (controlName === 'metrics' && old_metrics_data && new_column_config) {
         value.forEach((item, index) => {
+          const itemExist = old_metrics_data.some(
+            oldItem => oldItem?.label === item?.label,
+          );
+
           if (
+            !itemExist &&
             item?.label !== old_metrics_data[index]?.label &&
             !!new_column_config[old_metrics_data[index]?.label]
           ) {
@@ -129,11 +229,11 @@ export default function exploreReducer(state = {}, action) {
       }
 
       // Use the processed control config (with overrides and everything)
-      // if `controlName` does not existing in current controls,
+      // if `controlName` does not exist in current controls,
       const controlConfig =
         state.controls[action.controlName] ||
         getControlConfig(action.controlName, vizType) ||
-        {};
+        null;
 
       // will call validators again
       const control = {
@@ -149,7 +249,7 @@ export default function exploreReducer(state = {}, action) {
         ...state,
         controls: {
           ...state.controls,
-          [controlName]: control,
+          ...(controlConfig && { [controlName]: control }),
           ...(controlName === 'metrics' && { column_config }),
         },
       };
@@ -196,10 +296,12 @@ export default function exploreReducer(state = {}, action) {
         triggerRender: control.renderTrigger && !hasErrors,
         controls: {
           ...currentControlsState,
-          [action.controlName]: {
-            ...control,
-            validationErrors: errors,
-          },
+          ...(controlConfig && {
+            [action.controlName]: {
+              ...control,
+              validationErrors: errors,
+            },
+          }),
           ...rerenderedControls,
         },
       };

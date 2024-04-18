@@ -1,10 +1,10 @@
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
-# regarding coperatoryright ownership.  The ASF licenses this file
+# regarding copyright ownership.  The ASF licenses this file
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
-# with the License.  You may obtain a coperatory of the License at
+# with the License.  You may obtain a copy of the License at
 #
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import ipaddress
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy import Column
 
@@ -37,15 +37,17 @@ def cidr_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         "display_value": "",
         "valid_filter_operators": [
             FilterStringOperators.EQUALS,
+            FilterStringOperators.NOT_EQUALS,
             FilterStringOperators.GREATER_THAN_OR_EQUAL,
             FilterStringOperators.GREATER_THAN,
             FilterStringOperators.IN,
+            FilterStringOperators.NOT_IN,
             FilterStringOperators.LESS_THAN,
             FilterStringOperators.LESS_THAN_OR_EQUAL,
         ],
     }
     if req["values"] == [""]:
-        resp["values"].append("")
+        resp["error_message"] = "IPv4 address or CIDR must not be empty"
         return resp
     for val in req["values"]:
         string_value = str(val)
@@ -77,7 +79,7 @@ def cidr_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
 
 # Make this return a single clause
 def cidr_translate_filter_func(
-    col: Column, operator: FilterOperator, values: List[Any]
+    col: Column, operator: FilterOperator, values: list[Any]
 ) -> Any:
     """
     Convert a passed in column, FilterOperator and

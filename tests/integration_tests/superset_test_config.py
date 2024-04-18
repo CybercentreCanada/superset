@@ -36,7 +36,6 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
     DATA_DIR, "unittests.integration_tests.db"
 )
 DEBUG = False
-SUPERSET_WEBSERVER_PORT = 8081
 SILENCE_FAB = False
 # Allowing SQLALCHEMY_DATABASE_URI and SQLALCHEMY_EXAMPLES_URI to be defined as an env vars for
 # continuous integration
@@ -60,8 +59,8 @@ if "sqlite" in SQLALCHEMY_DATABASE_URI:
 PRESTO_POLL_INTERVAL = 0.1
 HIVE_POLL_INTERVAL = 0.1
 
-SQL_MAX_ROW = 10000
-SQLLAB_CTAS_NO_LIMIT = True  # SQL_MAX_ROW will not take affect for the CTA queries
+SQL_MAX_ROW = 50000
+SQLLAB_CTAS_NO_LIMIT = True  # SQL_MAX_ROW will not take effect for the CTA queries
 FEATURE_FLAGS = {
     **FEATURE_FLAGS,
     "foo": "bar",
@@ -71,6 +70,7 @@ FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
     "DASHBOARD_NATIVE_FILTERS": True,
     "DRILL_TO_DETAIL": True,
+    "DRILL_BY": True,
     "HORIZONTAL_FILTER_BAR": True,
 }
 
@@ -95,6 +95,8 @@ REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
 REDIS_CELERY_DB = os.environ.get("REDIS_CELERY_DB", 2)
 REDIS_RESULTS_DB = os.environ.get("REDIS_RESULTS_DB", 3)
 REDIS_CACHE_DB = os.environ.get("REDIS_CACHE_DB", 4)
+
+RATELIMIT_ENABLED = False
 
 
 CACHE_CONFIG = {
@@ -129,12 +131,11 @@ ALERT_REPORTS_WORKING_TIME_OUT_KILL = True
 ALERT_REPORTS_QUERY_EXECUTION_MAX_TRIES = 3
 
 
-class CeleryConfig(object):
-    BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
-    CELERY_IMPORTS = ("superset.sql_lab",)
-    CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
-    CELERY_ANNOTATIONS = {"sql_lab.add": {"rate_limit": "10/s"}}
-    CONCURRENCY = 1
+class CeleryConfig:
+    broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
+    imports = ("superset.sql_lab",)
+    result_backend = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
+    concurrency = 1
 
 
 CELERY_CONFIG = CeleryConfig

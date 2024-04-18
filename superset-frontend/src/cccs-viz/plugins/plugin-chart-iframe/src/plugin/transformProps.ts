@@ -48,8 +48,7 @@ export default function transformProps(chartProps: ChartProps) {
    * function during development with hot reloading, changes won't
    * be seen until restarting the development server.
    */
-  const formData = chartProps.formData;
-  const queriesData = chartProps.queriesData;
+  const { formData, queriesData } = chartProps;
 
   const { url, parameterName, parameterPrefix, groupby } = formData;
 
@@ -65,6 +64,14 @@ export default function transformProps(chartProps: ChartProps) {
 
   if (Array.isArray(data) && data.length === 0) {
     errorMessage = 'The query returned no rows.';
+  }
+
+  if (
+    url.includes('fission.hogwarts') &&
+    (navigator.userAgent.includes('Edg/') ||
+      navigator.userAgent.includes('Chrome/'))
+  ) {
+    errorMessage = 'fission-incompat';
   }
 
   if (Array.isArray(data) && data.length === 1) {

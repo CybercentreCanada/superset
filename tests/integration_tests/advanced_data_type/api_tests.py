@@ -24,7 +24,7 @@ from superset.utils.core import get_example_default_schema
 from tests.integration_tests.utils.get_dashboards import get_dashboards_ids
 from unittest import mock
 from sqlalchemy import Column
-from typing import Any, List
+from typing import Any
 from superset.advanced_data_type.types import (
     AdvancedDataType,
     AdvancedDataTypeRequest,
@@ -52,7 +52,7 @@ def translation_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     return target_resp
 
 
-def translate_filter_func(col: Column, op: FilterOperator, values: List[Any]):
+def translate_filter_func(col: Column, op: FilterOperator, values: list[Any]):
     pass
 
 
@@ -83,21 +83,11 @@ def test_types_type_request(test_client, login_as_admin):
     assert data == {"result": ["type"]}
 
 
-def test_types_convert_bad_request_no_vals(test_client, login_as_admin):
-    """
-    Advanced Data Type API: Test request to see if it behaves as expected when no values are passed
-    """
-    arguments = {"type": "type", "values": []}
-    uri = f"api/v1/advanced_data_type/convert?q={prison.dumps(arguments)}"
-    response_value = test_client.get(uri)
-    assert response_value.status_code == 400
-
-
 def test_types_convert_bad_request_no_type(test_client, login_as_admin):
     """
     Advanced Data Type API: Test request to see if it behaves as expected when no type is passed
     """
-    arguments = {"type": "", "values": [1]}
+    arguments = {"type": "", "values": [1], "operator": "TEST_OPERATOR"}
     uri = f"api/v1/advanced_data_type/convert?q={prison.dumps(arguments)}"
     response_value = test_client.get(uri)
     assert response_value.status_code == 400
@@ -112,7 +102,7 @@ def test_types_convert_bad_request_type_not_found(test_client, login_as_admin):
     Advanced Data Type API: Test request to see if it behaves as expected when passed in type is
     not found/not valid
     """
-    arguments = {"type": "not_found", "values": [1]}
+    arguments = {"type": "not_found", "values": [1], "operator": "TEST_OPERATOR"}
     uri = f"api/v1/advanced_data_type/convert?q={prison.dumps(arguments)}"
     response_value = test_client.get(uri)
     assert response_value.status_code == 400
@@ -127,7 +117,7 @@ def test_types_convert_request(test_client, login_as_admin):
     Advanced Data Type API: Test request to see if it behaves as expected when a valid type
     and valid values are passed in
     """
-    arguments = {"type": "type", "values": [1]}
+    arguments = {"type": "type", "values": [1], "operator": "TEST_OPERATOR"}
     uri = f"api/v1/advanced_data_type/convert?q={prison.dumps(arguments)}"
     response_value = test_client.get(uri)
     assert response_value.status_code == 200

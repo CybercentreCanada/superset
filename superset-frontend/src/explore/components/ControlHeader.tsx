@@ -137,6 +137,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
       </span>
     );
   };
+
   const renderOptionalActionIcons = () => (
     <span
       css={() => css`
@@ -169,21 +170,13 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   );
 
   return (
-    <div
-      className="ControlHeader"
-      data-test={`${name}-header`}
-      css={() => css`
-        width: 100%;
-      `}
-    >
+    <div className="ControlHeader" data-test={`${name}-header`}>
       <div className="pull-left">
         <FormLabel
-          css={(theme: SupersetTheme) =>
-            css`
-              margin-bottom: ${theme.gridUnit * 0.5}px;
-              position: relative;
-            `
-          }
+          css={(theme: SupersetTheme) => css`
+            margin-bottom: ${theme.gridUnit * 0.5}px;
+            position: relative;
+          `}
         >
           {leftNode && <span>{leftNode}</span>}
           <span
@@ -217,7 +210,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
               >
                 <Icons.ExclamationCircleOutlined
                   css={css`
-                    ${iconStyles}
+                    ${iconStyles};
                     color: ${labelColor};
                   `}
                 />
@@ -227,11 +220,9 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           {renderOptionalIcons()}
         </FormLabel>
       </div>
-
       {!rightNode && (
         <div className="pull-right">{renderOptionalActionIcons()}</div>
       )}
-
       {rightNode && <div className="pull-right">{rightNode}</div>}
       <div className="clearfix" />
     </div>

@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 # isort:skip_file
+import json
 import inspect
 import time
 import unittest
@@ -29,7 +30,7 @@ import pytest
 
 from flask import current_app
 from flask_appbuilder.security.sqla.models import Role
-from superset.datasource.dao import DatasourceDAO
+from superset.daos.datasource import DatasourceDAO
 from superset.models.dashboard import Dashboard
 from superset import app, appbuilder, db, security_manager, viz
 from superset.connectors.sqla.models import SqlaTable
@@ -42,12 +43,13 @@ from superset.utils.core import (
     DatasourceType,
     backend,
     get_example_default_schema,
+    override_user,
 )
 from superset.utils.database import get_example_database
 from superset.utils.urls import get_url_host
-from superset.views.access_requests import AccessRequestsModelView
 
 from .base_tests import SupersetTestCase
+from tests.integration_tests.conftest import with_feature_flags
 from tests.integration_tests.fixtures.public_role import (
     public_role_like_gamma,
     public_role_like_test_role,
@@ -1191,37 +1193,31 @@ class TestRolePermission(SupersetTestCase):
             self.assertEqual(schemas, ["1"])
         delete_schema_perm("[examples].[1]")
 
-    @patch("superset.utils.core.g")
-    @patch("superset.security.manager.g")
-    def test_schemas_accessible_by_user_datasource_access(self, mock_sm_g, mock_g):
+    def test_schemas_accessible_by_user_datasource_access(self):
         # User has schema access to the datasource temp_schema.wb_health_population in examples DB.
-        mock_g.user = mock_sm_g.user = security_manager.find_user("gamma")
+        database = get_example_database()
         with self.client.application.test_request_context():
-            database = get_example_database()
-            schemas = security_manager.get_schemas_accessible_by_user(
-                database, ["temp_schema", "2", "3"]
-            )
-            self.assertEqual(schemas, ["temp_schema"])
+            with override_user(security_manager.find_user("gamma")):
+                schemas = security_manager.get_schemas_accessible_by_user(
+                    database, ["temp_schema", "2", "3"]
+                )
+                self.assertEqual(schemas, ["temp_schema"])
 
-    @patch("superset.utils.core.g")
-    @patch("superset.security.manager.g")
-    def test_schemas_accessible_by_user_datasource_and_schema_access(
-        self, mock_sm_g, mock_g
-    ):
+    def test_schemas_accessible_by_user_datasource_and_schema_access(self):
         # User has schema access to the datasource temp_schema.wb_health_population in examples DB.
         create_schema_perm("[examples].[2]")
-        mock_g.user = mock_sm_g.user = security_manager.find_user("gamma")
         with self.client.application.test_request_context():
             database = get_example_database()
-            schemas = security_manager.get_schemas_accessible_by_user(
-                database, ["temp_schema", "2", "3"]
-            )
-            self.assertEqual(schemas, ["temp_schema", "2"])
-        vm = security_manager.find_permission_view_menu(
-            "schema_access", "[examples].[2]"
-        )
-        self.assertIsNotNone(vm)
-        delete_schema_perm("[examples].[2]")
+            with override_user(security_manager.find_user("gamma")):
+                schemas = security_manager.get_schemas_accessible_by_user(
+                    database, ["temp_schema", "2", "3"]
+                )
+                self.assertEqual(schemas, ["temp_schema", "2"])
+                vm = security_manager.find_permission_view_menu(
+                    "schema_access", "[examples].[2]"
+                )
+                self.assertIsNotNone(vm)
+                delete_schema_perm("[examples].[2]")
 
     @pytest.mark.usefixtures("load_world_bank_dashboard_with_slices")
     def test_gamma_user_schema_access_to_dashboards(self):
@@ -1332,8 +1328,11 @@ class TestRolePermission(SupersetTestCase):
         self.assertNotIn(("menu_access", view_menu), permissions_set)
 
     def assert_cannot_gamma(self, perm_set):
+        self.assert_cannot_write("Annotation", perm_set)
         self.assert_cannot_write("CssTemplate", perm_set)
+        self.assert_cannot_menu("SQL Lab", perm_set)
         self.assert_cannot_menu("CSS Templates", perm_set)
+        self.assert_cannot_menu("Annotation Layers", perm_set)
         self.assert_cannot_menu("Manage", perm_set)
         self.assert_cannot_menu("Queries", perm_set)
         self.assert_cannot_menu("Import dashboards", perm_set)
@@ -1342,26 +1341,17 @@ class TestRolePermission(SupersetTestCase):
         self.assert_cannot_menu("Alerts & Report", perm_set)
 
     def assert_can_gamma(self, perm_set):
-        self.assert_can_read("CssTemplate", perm_set)
         self.assert_can_read("Dataset", perm_set)
 
         # make sure that user can create slices and dashboards
         self.assert_can_all("Dashboard", perm_set)
         self.assert_can_all("Chart", perm_set)
-        self.assertIn(("can_add_slices", "Superset"), perm_set)
-        self.assertIn(("can_copy_dash", "Superset"), perm_set)
-        self.assertIn(("can_created_dashboards", "Superset"), perm_set)
-        self.assertIn(("can_created_slices", "Superset"), perm_set)
         self.assertIn(("can_csv", "Superset"), perm_set)
         self.assertIn(("can_dashboard", "Superset"), perm_set)
         self.assertIn(("can_explore", "Superset"), perm_set)
         self.assertIn(("can_share_chart", "Superset"), perm_set)
         self.assertIn(("can_share_dashboard", "Superset"), perm_set)
         self.assertIn(("can_explore_json", "Superset"), perm_set)
-        self.assertIn(("can_fave_dashboards", "Superset"), perm_set)
-        self.assertIn(("can_fave_slices", "Superset"), perm_set)
-        self.assertIn(("can_save_dash", "Superset"), perm_set)
-        self.assertIn(("can_slice", "Superset"), perm_set)
         self.assertIn(("can_explore_json", "Superset"), perm_set)
         self.assertIn(("can_userinfo", "UserDBModelView"), perm_set)
         self.assert_can_menu("Databases", perm_set)
@@ -1374,7 +1364,6 @@ class TestRolePermission(SupersetTestCase):
         self.assert_can_all("Annotation", perm_set)
         self.assert_can_all("CssTemplate", perm_set)
         self.assert_can_all("Dataset", perm_set)
-        self.assert_can_read("Query", perm_set)
         self.assert_can_read("Database", perm_set)
         self.assertIn(("can_import_dashboards", "Superset"), perm_set)
         self.assertIn(("can_this_form_post", "CsvToDatabaseView"), perm_set)
@@ -1385,9 +1374,6 @@ class TestRolePermission(SupersetTestCase):
         self.assertIn(("all_datasource_access", "all_datasource_access"), perm_set)
 
     def assert_cannot_alpha(self, perm_set):
-        if app.config["ENABLE_ACCESS_REQUEST"]:
-            self.assert_cannot_write("AccessRequestsModelView", perm_set)
-            self.assert_can_all("AccessRequestsModelView", perm_set)
         self.assert_cannot_write("Queries", perm_set)
         self.assert_cannot_write("RoleModelView", perm_set)
         self.assert_cannot_write("UserDBModelView", perm_set)
@@ -1397,12 +1383,7 @@ class TestRolePermission(SupersetTestCase):
         self.assert_can_all("Database", perm_set)
         self.assert_can_all("RoleModelView", perm_set)
         self.assert_can_all("UserDBModelView", perm_set)
-
         self.assertIn(("all_database_access", "all_database_access"), perm_set)
-        self.assertIn(("can_override_role_permissions", "Superset"), perm_set)
-        self.assertIn(("can_override_role_permissions", "Superset"), perm_set)
-        self.assertIn(("can_approve", "Superset"), perm_set)
-
         self.assert_can_menu("Security", perm_set)
         self.assert_can_menu("List Users", perm_set)
         self.assert_can_menu("List Roles", perm_set)
@@ -1429,24 +1410,11 @@ class TestRolePermission(SupersetTestCase):
                 )
             )
 
-        if app.config["ENABLE_ACCESS_REQUEST"]:
-            self.assertTrue(
-                security_manager._is_admin_only(
-                    security_manager.find_permission_view_menu(
-                        "can_list", "AccessRequestsModelView"
-                    )
-                )
-            )
         self.assertTrue(
             security_manager._is_admin_only(
                 security_manager.find_permission_view_menu(
                     "can_edit", "UserDBModelView"
                 )
-            )
-        )
-        self.assertTrue(
-            security_manager._is_admin_only(
-                security_manager.find_permission_view_menu("can_approve", "Superset")
             )
         )
 
@@ -1504,6 +1472,8 @@ class TestRolePermission(SupersetTestCase):
         self.assert_can_gamma(alpha_perm_tuples)
         self.assert_can_alpha(alpha_perm_tuples)
         self.assert_cannot_alpha(alpha_perm_tuples)
+        self.assertNotIn(("can_this_form_get", "UserInfoEditView"), alpha_perm_tuples)
+        self.assertNotIn(("can_this_form_post", "UserInfoEditView"), alpha_perm_tuples)
 
     @pytest.mark.usefixtures("load_world_bank_dashboard_with_slices")
     def test_admin_permissions(self):
@@ -1519,9 +1489,6 @@ class TestRolePermission(SupersetTestCase):
         self.assertIn(("can_csv", "Superset"), sql_lab_set)
         self.assertIn(("can_read", "Database"), sql_lab_set)
         self.assertIn(("can_read", "SavedQuery"), sql_lab_set)
-        self.assertIn(("can_sql_json", "Superset"), sql_lab_set)
-        self.assertIn(("can_sqllab_viz", "Superset"), sql_lab_set)
-        self.assertIn(("can_sqllab_table_viz", "Superset"), sql_lab_set)
         self.assertIn(("can_sqllab", "Superset"), sql_lab_set)
 
         self.assertIn(("menu_access", "SQL Lab"), sql_lab_set)
@@ -1530,13 +1497,6 @@ class TestRolePermission(SupersetTestCase):
         self.assertIn(("menu_access", "Query Search"), sql_lab_set)
 
         self.assert_cannot_alpha(sql_lab_set)
-
-    def test_granter_permissions(self):
-        granter_set = get_perm_tuples("granter")
-        self.assertIn(("can_override_role_permissions", "Superset"), granter_set)
-        self.assertIn(("can_approve", "Superset"), granter_set)
-
-        self.assert_cannot_alpha(granter_set)
 
     def test_gamma_permissions(self):
         gamma_perm_set = set()
@@ -1555,20 +1515,12 @@ class TestRolePermission(SupersetTestCase):
         self.assert_cannot_write("UserDBModelView", gamma_perm_set)
         self.assert_cannot_write("RoleModelView", gamma_perm_set)
 
-        self.assertIn(("can_add_slices", "Superset"), gamma_perm_set)
-        self.assertIn(("can_copy_dash", "Superset"), gamma_perm_set)
-        self.assertIn(("can_created_dashboards", "Superset"), gamma_perm_set)
-        self.assertIn(("can_created_slices", "Superset"), gamma_perm_set)
         self.assertIn(("can_csv", "Superset"), gamma_perm_set)
         self.assertIn(("can_dashboard", "Superset"), gamma_perm_set)
         self.assertIn(("can_explore", "Superset"), gamma_perm_set)
         self.assertIn(("can_share_chart", "Superset"), gamma_perm_set)
         self.assertIn(("can_share_dashboard", "Superset"), gamma_perm_set)
         self.assertIn(("can_explore_json", "Superset"), gamma_perm_set)
-        self.assertIn(("can_fave_dashboards", "Superset"), gamma_perm_set)
-        self.assertIn(("can_fave_slices", "Superset"), gamma_perm_set)
-        self.assertIn(("can_save_dash", "Superset"), gamma_perm_set)
-        self.assertIn(("can_slice", "Superset"), gamma_perm_set)
         self.assertIn(("can_userinfo", "UserDBModelView"), gamma_perm_set)
 
     def test_views_are_secured(self):
@@ -1685,13 +1637,32 @@ class TestSecurityManager(SupersetTestCase):
         with self.assertRaises(SupersetSecurityException):
             security_manager.raise_for_access(query=query)
 
+    def test_raise_for_access_sql_fails(self):
+        with override_user(security_manager.find_user("gamma")):
+            with self.assertRaises(SupersetSecurityException):
+                security_manager.raise_for_access(
+                    database=get_example_database(),
+                    schema="bar",
+                    sql="SELECT * FROM foo",
+                )
+
+    @patch("superset.security.SupersetSecurityManager.is_owner")
+    @patch("superset.security.SupersetSecurityManager.can_access")
+    def test_raise_for_access_sql(self, mock_can_access, mock_is_owner):
+        mock_can_access.return_value = True
+        mock_is_owner.return_value = True
+        with override_user(security_manager.find_user("gamma")):
+            security_manager.raise_for_access(
+                database=get_example_database(), schema="bar", sql="SELECT * FROM foo"
+            )
+
     @patch("superset.security.SupersetSecurityManager.is_owner")
     @patch("superset.security.SupersetSecurityManager.can_access")
     @patch("superset.security.SupersetSecurityManager.can_access_schema")
     def test_raise_for_access_query_context(
         self, mock_can_access_schema, mock_can_access, mock_is_owner
     ):
-        query_context = Mock(datasource=self.get_datasource_mock())
+        query_context = Mock(datasource=self.get_datasource_mock(), form_data={})
 
         mock_can_access_schema.return_value = True
         security_manager.raise_for_access(query_context=query_context)
@@ -1699,9 +1670,9 @@ class TestSecurityManager(SupersetTestCase):
         mock_can_access.return_value = False
         mock_can_access_schema.return_value = False
         mock_is_owner.return_value = False
-
-        with self.assertRaises(SupersetSecurityException):
-            security_manager.raise_for_access(query_context=query_context)
+        with override_user(security_manager.find_user("gamma")):
+            with self.assertRaises(SupersetSecurityException):
+                security_manager.raise_for_access(query_context=query_context)
 
     @patch("superset.security.SupersetSecurityManager.can_access")
     def test_raise_for_access_table(self, mock_can_access):
@@ -1722,7 +1693,7 @@ class TestSecurityManager(SupersetTestCase):
     def test_raise_for_access_viz(
         self, mock_can_access_schema, mock_can_access, mock_is_owner
     ):
-        test_viz = viz.TableViz(self.get_datasource_mock(), form_data={})
+        test_viz = viz.TimeTableViz(self.get_datasource_mock(), form_data={})
 
         mock_can_access_schema.return_value = True
         security_manager.raise_for_access(viz=test_viz)
@@ -1730,49 +1701,194 @@ class TestSecurityManager(SupersetTestCase):
         mock_can_access.return_value = False
         mock_can_access_schema.return_value = False
         mock_is_owner.return_value = False
+        with override_user(security_manager.find_user("gamma")):
+            with self.assertRaises(SupersetSecurityException):
+                security_manager.raise_for_access(viz=test_viz)
 
-        with self.assertRaises(SupersetSecurityException):
-            security_manager.raise_for_access(viz=test_viz)
+    @pytest.mark.usefixtures("load_birth_names_dashboard_with_slices")
+    @pytest.mark.usefixtures("load_world_bank_dashboard_with_slices")
+    @with_feature_flags(DASHBOARD_RBAC=True)
+    @patch("superset.security.SupersetSecurityManager.is_owner")
+    @patch("superset.security.SupersetSecurityManager.can_access")
+    @patch("superset.security.SupersetSecurityManager.can_access_schema")
+    def test_raise_for_access_rbac(
+        self,
+        mock_can_access_schema,
+        mock_can_access,
+        mock_is_owner,
+    ):
+        births = self.get_dash_by_slug("births")
+        girls = self.get_slice("Girls", db.session, expunge_from_session=False)
+        birth_names = girls.datasource
 
-    @patch("superset.security.manager.g")
-    def test_get_user_roles(self, mock_g):
+        world_health = self.get_dash_by_slug("world_health")
+        treemap = self.get_slice("Treemap", db.session, expunge_from_session=False)
+
+        births.json_metadata = json.dumps(
+            {
+                "native_filter_configuration": [
+                    {
+                        "id": "NATIVE_FILTER-ABCDEFGH",
+                        "targets": [{"datasetId": birth_names.id}],
+                    },
+                    {
+                        "id": "NATIVE_FILTER-IJKLMNOP",
+                        "targets": [{"datasetId": treemap.id}],
+                    },
+                ]
+            }
+        )
+
+        mock_is_owner.return_value = False
+        mock_can_access.return_value = False
+        mock_can_access_schema.return_value = False
+        with override_user(security_manager.find_user("gamma")):
+            for kwarg in ["query_context", "viz"]:
+                births.roles = []
+
+                # No dashboard roles.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={
+                                    "dashboardId": births.id,
+                                    "slice_id": girls.id,
+                                },
+                            )
+                        }
+                    )
+
+                births.roles = [self.get_role("Gamma")]
+
+                # Undefined dashboard.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={},
+                            )
+                        }
+                    )
+
+                # Undefined dashboard chart.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={"dashboardId": births.id},
+                            )
+                        }
+                    )
+
+                # Ill-defined dashboard chart.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={
+                                    "dashboardId": births.id,
+                                    "slice_id": treemap.id,
+                                },
+                            )
+                        }
+                    )
+
+                # Dashboard chart not associated with said datasource.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={
+                                    "dashboardId": world_health.id,
+                                    "slice_id": treemap.id,
+                                },
+                            )
+                        }
+                    )
+
+                # Dashboard chart associated with said datasource.
+                security_manager.raise_for_access(
+                    **{
+                        kwarg: Mock(
+                            datasource=birth_names,
+                            form_data={
+                                "dashboardId": births.id,
+                                "slice_id": girls.id,
+                            },
+                        )
+                    }
+                )
+
+                # Ill-defined native filter.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={
+                                    "dashboardId": births.id,
+                                    "type": "NATIVE_FILTER",
+                                },
+                            )
+                        }
+                    )
+
+                # Native filter not associated with said datasource.
+                with self.assertRaises(SupersetSecurityException):
+                    security_manager.raise_for_access(
+                        **{
+                            kwarg: Mock(
+                                datasource=birth_names,
+                                form_data={
+                                    "dashboardId": births.id,
+                                    "native_filter_id": "NATIVE_FILTER-IJKLMNOP",
+                                    "type": "NATIVE_FILTER",
+                                },
+                            )
+                        }
+                    )
+
+                # Native filter associated with said datasource.
+                security_manager.raise_for_access(
+                    **{
+                        kwarg: Mock(
+                            datasource=birth_names,
+                            form_data={
+                                "dashboardId": births.id,
+                                "native_filter_id": "NATIVE_FILTER-ABCDEFGH",
+                                "type": "NATIVE_FILTER",
+                            },
+                        )
+                    }
+                )
+
+            db.session.expunge_all()
+
+    def test_get_user_roles(self):
         admin = security_manager.find_user("admin")
-        mock_g.user = admin
-        roles = security_manager.get_user_roles()
-        self.assertEqual(admin.roles, roles)
+        with override_user(admin):
+            roles = security_manager.get_user_roles()
+            self.assertEqual(admin.roles, roles)
 
-    @patch("superset.security.manager.g")
-    def test_get_anonymous_roles(self, mock_g):
-        mock_g.user = security_manager.get_anonymous_user()
-        roles = security_manager.get_user_roles()
-        self.assertEqual([security_manager.get_public_role()], roles)
-
-
-class TestAccessRequestEndpoints(SupersetTestCase):
-    def test_access_request_disabled(self):
-        with patch.object(AccessRequestsModelView, "is_enabled", return_value=False):
-            self.login("admin")
-            uri = "/accessrequestsmodelview/list/"
-            rv = self.client.get(uri)
-            self.assertEqual(rv.status_code, 404)
-
-    def test_access_request_enabled(self):
-        with patch.object(AccessRequestsModelView, "is_enabled", return_value=True):
-            self.login("admin")
-            uri = "/accessrequestsmodelview/list/"
-            rv = self.client.get(uri)
-            self.assertLess(rv.status_code, 400)
+    def test_get_anonymous_roles(self):
+        with override_user(security_manager.get_anonymous_user()):
+            roles = security_manager.get_user_roles()
+            self.assertEqual([security_manager.get_public_role()], roles)
 
 
 class TestDatasources(SupersetTestCase):
-    @patch("superset.security.manager.g")
     @patch("superset.security.SupersetSecurityManager.can_access_database")
     @patch("superset.security.SupersetSecurityManager.get_session")
     def test_get_user_datasources_admin(
-        self, mock_get_session, mock_can_access_database, mock_g
+        self, mock_get_session, mock_can_access_database
     ):
         Datasource = namedtuple("Datasource", ["database", "schema", "name"])
-        mock_g.user = security_manager.find_user("admin")
         mock_can_access_database.return_value = True
         mock_get_session.query.return_value.filter.return_value.all.return_value = []
 
@@ -1784,23 +1900,20 @@ class TestDatasources(SupersetTestCase):
                 Datasource("database1", "schema1", "table2"),
                 Datasource("database2", None, "table1"),
             ]
+            with override_user(security_manager.find_user("admin")):
+                datasources = security_manager.get_user_datasources()
+                assert sorted(datasources) == [
+                    Datasource("database1", "schema1", "table1"),
+                    Datasource("database1", "schema1", "table2"),
+                    Datasource("database2", None, "table1"),
+                ]
 
-            datasources = security_manager.get_user_datasources()
-
-        assert sorted(datasources) == [
-            Datasource("database1", "schema1", "table1"),
-            Datasource("database1", "schema1", "table2"),
-            Datasource("database2", None, "table1"),
-        ]
-
-    @patch("superset.security.manager.g")
     @patch("superset.security.SupersetSecurityManager.can_access_database")
     @patch("superset.security.SupersetSecurityManager.get_session")
     def test_get_user_datasources_gamma(
-        self, mock_get_session, mock_can_access_database, mock_g
+        self, mock_get_session, mock_can_access_database
     ):
         Datasource = namedtuple("Datasource", ["database", "schema", "name"])
-        mock_g.user = security_manager.find_user("gamma")
         mock_can_access_database.return_value = False
         mock_get_session.query.return_value.filter.return_value.all.return_value = []
 
@@ -1812,19 +1925,16 @@ class TestDatasources(SupersetTestCase):
                 Datasource("database1", "schema1", "table2"),
                 Datasource("database2", None, "table1"),
             ]
+            with override_user(security_manager.find_user("gamma")):
+                datasources = security_manager.get_user_datasources()
+                assert datasources == []
 
-            datasources = security_manager.get_user_datasources()
-
-        assert datasources == []
-
-    @patch("superset.security.manager.g")
     @patch("superset.security.SupersetSecurityManager.can_access_database")
     @patch("superset.security.SupersetSecurityManager.get_session")
     def test_get_user_datasources_gamma_with_schema(
-        self, mock_get_session, mock_can_access_database, mock_g
+        self, mock_get_session, mock_can_access_database
     ):
         Datasource = namedtuple("Datasource", ["database", "schema", "name"])
-        mock_g.user = security_manager.find_user("gamma")
         mock_can_access_database.return_value = False
 
         mock_get_session.query.return_value.filter.return_value.all.return_value = [
@@ -1840,13 +1950,12 @@ class TestDatasources(SupersetTestCase):
                 Datasource("database1", "schema1", "table2"),
                 Datasource("database2", None, "table1"),
             ]
-
-            datasources = security_manager.get_user_datasources()
-
-        assert sorted(datasources) == [
-            Datasource("database1", "schema1", "table1"),
-            Datasource("database1", "schema1", "table2"),
-        ]
+            with override_user(security_manager.find_user("gamma")):
+                datasources = security_manager.get_user_datasources()
+                assert sorted(datasources) == [
+                    Datasource("database1", "schema1", "table1"),
+                    Datasource("database1", "schema1", "table2"),
+                ]
 
 
 class FakeRequest:

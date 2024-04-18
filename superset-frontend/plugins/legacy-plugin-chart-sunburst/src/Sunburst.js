@@ -82,7 +82,8 @@ function buildHierarchy(rows) {
     let currentNode = root;
     for (let level = 0; level < levels.length; level += 1) {
       const children = currentNode.children || [];
-      const nodeName = levels[level].toString();
+      const node = levels[level];
+      const nodeName = node ? node.toString() : t('N/A');
       // If the next node has the name '0', it will
       const isLeafNode = level >= levels.length - 1 || levels[level + 1] === 0;
       let childNode;
@@ -493,7 +494,7 @@ function Sunburst(element, props) {
     // For efficiency, filter nodes to keep only those large enough to see.
     const nodes = partition.nodes(root).filter(d => d.dx > 0.005); // 0.005 radians = 0.29 degrees
 
-    if (metrics[0] !== metrics[1] && metrics[1] && !colorScheme) {
+    if (metrics[0] !== metrics[1] && metrics[1]) {
       colorByCategory = false;
       const ext = d3.extent(nodes, d => d.m2 / d.m1);
       linearColorScale = getSequentialSchemeRegistry()

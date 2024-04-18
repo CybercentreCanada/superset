@@ -26,7 +26,7 @@ const INITIAL_ADVANCED_DATA_TYPES_STATE: AdvancedDataTypesState = {
   parsedAdvancedDataType: '',
   advancedDataTypeOperatorList: [],
   errorMessage: '',
-  useDefaultOperators: false,
+  values: [],
 };
 
 const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
@@ -47,7 +47,6 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
         setAdvancedDataTypesState(INITIAL_ADVANCED_DATA_TYPES_STATE);
         return;
       }
-      validHandler(false);
       debounce(() => {
         const queryParams = rison.encode({
           type: subjectAdvancedDataType,
@@ -60,7 +59,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
               parsedAdvancedDataType: json.result.display_value,
               advancedDataTypeOperatorList: json.result.valid_filter_operators,
               errorMessage: json.result.error_message,
-              useDefaultOperators: false,
+              values: json.result.values,
             });
             // Changed due to removal of status field
             validHandler(!json.result.error_message);
@@ -71,9 +70,9 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
               advancedDataTypeOperatorList:
                 advancedDataTypesState.advancedDataTypeOperatorList,
               errorMessage: t('Failed to retrieve advanced type'),
-              useDefaultOperators: true,
+              values: [],
             });
-            validHandler(true);
+            validHandler(false);
           });
       }, 600)();
     },

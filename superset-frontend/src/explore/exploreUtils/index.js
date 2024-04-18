@@ -27,7 +27,6 @@ import {
   getChartMetadataRegistry,
   SupersetClient,
 } from '@superset-ui/core';
-import { omit } from 'lodash';
 import { availableDomains } from 'src/utils/hostNamesConfig';
 import { safeStringify } from 'src/utils/safeStringify';
 import { optionLabel } from 'src/utils/common';
@@ -195,9 +194,12 @@ export function getExploreUrl({
   return uri.search(search).directory(directory).toString();
 }
 
-export const shouldUseLegacyApi = formData => {
+export const getQuerySettings = formData => {
   const vizMetadata = getChartMetadataRegistry().get(formData.viz_type);
-  return vizMetadata ? vizMetadata.useLegacyApi : false;
+  return [
+    vizMetadata?.useLegacyApi ?? false,
+    vizMetadata?.parseMethod ?? 'json-bigint',
+  ];
 };
 
 export const buildV1ChartDataPayload = ({
@@ -216,7 +218,7 @@ export const buildV1ChartDataPayload = ({
           ...baseQueryObject,
         },
       ]));
-  const payload = buildQuery(
+  return buildQuery(
     {
       ...formData,
       force,
@@ -230,13 +232,6 @@ export const buildV1ChartDataPayload = ({
       },
     },
   );
-  if (resultType === 'samples') {
-    // remove row limit and offset to fall back to defaults
-    payload.queries = payload.queries.map(query =>
-      omit(query, ['row_limit', 'row_offset']),
-    );
-  }
-  return payload;
 };
 
 export const getLegacyEndpointType = ({ resultType, resultFormat }) =>
@@ -251,7 +246,8 @@ export const exportChart = ({
 }) => {
   let url;
   let payload;
-  if (shouldUseLegacyApi(formData)) {
+  const [useLegacyApi, parseMethod] = getQuerySettings(formData);
+  if (useLegacyApi) {
     const endpointType = getLegacyEndpointType({ resultFormat, resultType });
     url = getExploreUrl({
       formData,
@@ -267,6 +263,7 @@ export const exportChart = ({
       resultFormat,
       resultType,
       ownState,
+      parseMethod,
     });
   }
 
@@ -303,7 +300,9 @@ export const getSimpleSQLExpression = (subject, operator, comparator) => {
     [...MULTI_OPERATORS]
       .map(op => OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation)
       .indexOf(operator) >= 0;
-  let expression = subject ?? '';
+  // If returned value is an object after changing dataset
+  let expression =
+    typeof subject === 'object' ? subject?.column_name ?? '' : subject ?? '';
   if (subject && operator) {
     expression += ` ${operator}`;
     const firstValue =

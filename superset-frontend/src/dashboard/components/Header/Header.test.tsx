@@ -73,7 +73,6 @@ const createProps = () => ({
   fetchFaveStar: jest.fn(),
   fetchCharts: jest.fn(),
   onRefresh: jest.fn(),
-  fetchUISpecificReport: jest.fn(),
   saveFaveStar: jest.fn(),
   savePublished: jest.fn(),
   isPublished: false,
@@ -96,6 +95,7 @@ const createProps = () => ({
   maxUndoHistoryToast: jest.fn(),
   dashboardInfoChanged: jest.fn(),
   dashboardTitleChanged: jest.fn(),
+  showMenuDropdown: true,
 });
 const props = createProps();
 const editableProps = {
@@ -348,10 +348,4 @@ test('should render an extension component if one is supplied', () => {
   expect(
     screen.getByText('dashboard.nav.right extension component'),
   ).toBeInTheDocument();
-});
-
-test('should show datahub link', async () => {
-  const mockedProps = createProps();
-  setup(mockedProps);
-  expect(screen.getByTestId('datahub_link')).toBeInTheDocument();
 });

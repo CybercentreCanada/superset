@@ -26,10 +26,11 @@ advanced_data_type_convert_schema = {
         "values": {
             "type": "array",
             "items": {"default": "http"},
-            "minItems": 0,
+            "minItems": 1,
         },
+        "operator": {"type": "string", "default": "=="},
     },
-    "required": ["type", "values"],
+    "required": ["type", "values", "operator"],
 }
 
 
@@ -39,8 +40,10 @@ class AdvancedDataTypeSchema(Schema):
     """
 
     error_message = fields.String()
-    values = fields.List(fields.String(description="parsed value (can be any value)"))
+    values = fields.List(
+        fields.String(metadata={"description": "parsed value (can be any value)"})
+    )
     display_value = fields.String(
-        description="The string representation of the parsed values"
+        metadata={"description": "The string representation of the parsed values"}
     )
     valid_filter_operators = fields.List(fields.String())

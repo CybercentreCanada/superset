@@ -18,7 +18,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 from zipfile import is_zipfile, ZipFile
 
 import click
@@ -29,11 +29,13 @@ from flask.cli import with_appcontext
 from superset import security_manager
 from superset.cli.lib import feature_flags
 from superset.extensions import db
+from superset.utils.core import override_user
 
 logger = logging.getLogger(__name__)
 
 
 @click.command()
+@with_appcontext
 @click.argument("directory")
 @click.option(
     "--overwrite",
@@ -71,10 +73,9 @@ if feature_flags.get("VERSIONED_EXPORT"):
     def export_dashboards(dashboard_file: Optional[str] = None) -> None:
         """Export dashboards to ZIP file"""
         # pylint: disable=import-outside-toplevel
-        from superset.dashboards.commands.export import ExportDashboardsCommand
+        from superset.commands.dashboard.export import ExportDashboardsCommand
         from superset.models.dashboard import Dashboard
 
-        # pylint: disable=assigning-non-slot
         g.user = security_manager.find_user(username="admin")
 
         dashboard_ids = [id_ for (id_,) in db.session.query(Dashboard.id).all()]
@@ -106,10 +107,9 @@ if feature_flags.get("VERSIONED_EXPORT"):
     def export_datasources(datasource_file: Optional[str] = None) -> None:
         """Export datasources to ZIP file"""
         # pylint: disable=import-outside-toplevel
+        from superset.commands.dataset.export import ExportDatasetsCommand
         from superset.connectors.sqla.models import SqlaTable
-        from superset.datasets.commands.export import ExportDatasetsCommand
 
-        # pylint: disable=assigning-non-slot
         g.user = security_manager.find_user(username="admin")
 
         dataset_ids = [id_ for (id_,) in db.session.query(SqlaTable.id).all()]
@@ -134,24 +134,24 @@ if feature_flags.get("VERSIONED_EXPORT"):
     @click.option(
         "--path",
         "-p",
+        required=True,
         help="Path to a single ZIP file",
     )
     @click.option(
         "--username",
         "-u",
-        default=None,
+        required=True,
         help="Specify the user name to assign dashboards to",
     )
     def import_dashboards(path: str, username: Optional[str]) -> None:
         """Import dashboards from ZIP file"""
         # pylint: disable=import-outside-toplevel
-        from superset.commands.importers.v1.utils import get_contents_from_bundle
-        from superset.dashboards.commands.importers.dispatcher import (
+        from superset.commands.dashboard.importers.dispatcher import (
             ImportDashboardsCommand,
         )
+        from superset.commands.importers.v1.utils import get_contents_from_bundle
 
         if username is not None:
-            # pylint: disable=assigning-non-slot
             g.user = security_manager.find_user(username=username)
         if is_zipfile(path):
             with ZipFile(path) as bundle:
@@ -175,28 +175,34 @@ if feature_flags.get("VERSIONED_EXPORT"):
         "-p",
         help="Path to a single ZIP file",
     )
-    def import_datasources(path: str) -> None:
+    @click.option(
+        "--username",
+        "-u",
+        required=False,
+        default="admin",
+        help="Specify the user name to assign datasources to",
+    )
+    def import_datasources(path: str, username: Optional[str] = "admin") -> None:
         """Import datasources from ZIP file"""
         # pylint: disable=import-outside-toplevel
+        from superset.commands.dataset.importers.dispatcher import ImportDatasetsCommand
         from superset.commands.importers.v1.utils import get_contents_from_bundle
-        from superset.datasets.commands.importers.dispatcher import (
-            ImportDatasetsCommand,
-        )
 
-        if is_zipfile(path):
-            with ZipFile(path) as bundle:
-                contents = get_contents_from_bundle(bundle)
-        else:
-            with open(path) as file:
-                contents = {path: file.read()}
-        try:
-            ImportDatasetsCommand(contents, overwrite=True).run()
-        except Exception:  # pylint: disable=broad-except
-            logger.exception(
-                "There was an error when importing the dataset(s), please check the "
-                "exception traceback in the log"
-            )
-            sys.exit(1)
+        with override_user(user=security_manager.find_user(username=username)):
+            if is_zipfile(path):
+                with ZipFile(path) as bundle:
+                    contents = get_contents_from_bundle(bundle)
+            else:
+                with open(path) as file:
+                    contents = {path: file.read()}
+            try:
+                ImportDatasetsCommand(contents, overwrite=True).run()
+            except Exception:  # pylint: disable=broad-except
+                logger.exception(
+                    "There was an error when importing the dataset(s), please check the "
+                    "exception traceback in the log"
+                )
+                sys.exit(1)
 
 else:
 
@@ -306,10 +312,10 @@ else:
     def import_dashboards(path: str, recursive: bool, username: str) -> None:
         """Import dashboards from JSON file"""
         # pylint: disable=import-outside-toplevel
-        from superset.dashboards.commands.importers.v0 import ImportDashboardsCommand
+        from superset.commands.dashboard.importers.v0 import ImportDashboardsCommand
 
         path_object = Path(path)
-        files: List[Path] = []
+        files: list[Path] = []
         if path_object.is_file():
             files.append(path_object)
         elif path_object.exists() and not recursive:
@@ -317,7 +323,6 @@ else:
         elif path_object.exists() and recursive:
             files.extend(path_object.rglob("*.json"))
         if username is not None:
-            # pylint: disable=assigning-non-slot
             g.user = security_manager.find_user(username=username)
         contents = {}
         for path_ in files:
@@ -342,7 +347,7 @@ else:
         "-s",
         "sync",
         default="",
-        help="comma seperated list of element types to synchronize "
+        help="comma separated list of element types to synchronize "
         'e.g. "metrics,columns" deletes metrics and columns in the DB '
         "that are not specified in the YAML file",
     )
@@ -356,14 +361,14 @@ else:
     def import_datasources(path: str, sync: str, recursive: bool) -> None:
         """Import datasources from YAML"""
         # pylint: disable=import-outside-toplevel
-        from superset.datasets.commands.importers.v0 import ImportDatasetsCommand
+        from superset.commands.dataset.importers.v0 import ImportDatasetsCommand
 
         sync_array = sync.split(",")
         sync_columns = "columns" in sync_array
         sync_metrics = "metrics" in sync_array
 
         path_object = Path(path)
-        files: List[Path] = []
+        files: list[Path] = []
         if path_object.is_file():
             files.append(path_object)
         elif path_object.exists() and not recursive:
