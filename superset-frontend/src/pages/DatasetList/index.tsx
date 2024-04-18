@@ -368,8 +368,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
           },
         }: any) => {
           try {
-            // const parsedExtra = JSON.parse(extra);
-            const parsedExtra = JSON.parse('{"urn": "hello"}');
+            const parsedExtra = JSON.parse(extra);
             if (parsedExtra?.urn) {
               return (
                 <a
@@ -378,7 +377,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
                   rel="noreferrer"
                 >
                   {typeof Icons.Datahub ===
-                  typeof ((_props: IconType) => JSX.Element) ? (
+                  typeof ((_props: IconType) => Element) ? (
                     <Icons.Datahub viewBox="0 0 180 180" />
                   ) : (
                     <></>
