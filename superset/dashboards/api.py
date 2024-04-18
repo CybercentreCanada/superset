@@ -401,10 +401,13 @@ class DashboardRestApi(BaseSupersetModelRestApi):
               $ref: '#/components/responses/404'
         """
         try:
+            logger.error("line 1")
             datasets = DashboardDAO.get_datasets_for_dashboard(id_or_slug)
+            logger.error("line 2")
             result = [
                 self.dashboard_dataset_schema.dump(dataset) for dataset in datasets
             ]
+            logger.error("line 3")
             return self.response(200, result=result)
         except (TypeError, ValueError) as err:
             return self.response_400(

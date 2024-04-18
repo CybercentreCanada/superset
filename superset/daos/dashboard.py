@@ -58,6 +58,7 @@ class DashboardDAO(BaseDAO[Dashboard]):
 
     @classmethod
     def get_by_id_or_slug(cls, id_or_slug: int | str) -> Dashboard:
+        logger.error("line 1.1.1")
         if is_uuid(id_or_slug):
             # just get dashboard if it's uuid
             dashboard = Dashboard.get(id_or_slug)
@@ -73,6 +74,7 @@ class DashboardDAO(BaseDAO[Dashboard]):
                 query, None
             )
             dashboard = query.one_or_none()
+        logger.error("line 1.1.2")
         if not dashboard:
             raise DashboardNotFoundError()
 
@@ -81,12 +83,14 @@ class DashboardDAO(BaseDAO[Dashboard]):
             dashboard.raise_for_access()
         except SupersetSecurityException as ex:
             raise DashboardAccessDeniedError() from ex
-
+        logger.error("line 1.1.3")
         return dashboard
 
     @staticmethod
     def get_datasets_for_dashboard(id_or_slug: str) -> list[Any]:
+        logger.error("line 1.1")
         dashboard = DashboardDAO.get_by_id_or_slug(id_or_slug)
+        logger.error("line 1.2")
         return dashboard.datasets_trimmed_for_slices()
 
     @staticmethod
