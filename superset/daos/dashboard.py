@@ -81,6 +81,7 @@ class DashboardDAO(BaseDAO[Dashboard]):
             dashboard.raise_for_access()
         except SupersetSecurityException as ex:
             raise DashboardAccessDeniedError() from ex
+
         return dashboard
 
     @staticmethod

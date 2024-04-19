@@ -426,23 +426,27 @@ class BaseDatasource(
                         column_ = metric.get("column") or {}
                         if column_name := column_.get("column_name"):
                             column_names.add(column_name)
+
             # Columns used in query filters
             column_names.update(
                 filter_["subject"]
                 for filter_ in form_data.get("adhoc_filters") or []
                 if filter_.get("clause") == "WHERE" and filter_.get("subject")
             )
+
             # columns used by Filter Box
             column_names.update(
                 filter_config["column"]
                 for filter_config in form_data.get("filter_configs") or []
                 if "column" in filter_config
             )
+
             # for legacy dashboard imports which have the wrong query_context in them
             try:
                 query_context = slc.get_query_context()
             except DatasetNotFoundError:
                 query_context = None
+
             # legacy charts don't have query_context charts
             if query_context:
                 column_names.update(
@@ -462,11 +466,13 @@ class BaseDatasource(
                     for column_ in utils.as_list(form_data.get(column_param) or [])
                 ]
                 column_names.update(_columns)
+
         filtered_metrics = [
             metric
             for metric in data["metrics"]
             if metric["metric_name"] in metric_names
         ]
+
         filtered_columns: list[Column] = []
         column_types: set[GenericDataType] = set()
         for column_ in data["columns"]:
@@ -475,6 +481,7 @@ class BaseDatasource(
                 column_types.add(generic_type)
             if column_["column_name"] in column_names:
                 filtered_columns.append(column_)
+
         data["column_types"] = list(column_types)
         del data["description"]
         data.update({"metrics": filtered_metrics})
@@ -494,6 +501,7 @@ class BaseDatasource(
             }
         )
         data["verbose_map"] = verbose_map
+
         return data
 
     @staticmethod

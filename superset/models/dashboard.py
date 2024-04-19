@@ -323,14 +323,17 @@ class Dashboard(Model, AuditMixinNullable, ImportExportMixin):
         slices_by_datasource: dict[
             tuple[type[BaseDatasource], int], set[Slice]
         ] = defaultdict(set)
+
         for slc in self.slices:
             slices_by_datasource[(slc.cls_model, slc.datasource_id)].add(slc)
+
         result: list[dict[str, Any]] = []
 
         for (cls_model, datasource_id), slices in slices_by_datasource.items():
             datasource = (
                 db.session.query(cls_model).filter_by(id=datasource_id).one_or_none()
             )
+
             if datasource:
                 # Filter out unneeded fields from the datasource payload
                 result.append(datasource.data_for_slices(slices))
