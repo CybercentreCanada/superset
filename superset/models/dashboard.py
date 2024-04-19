@@ -320,25 +320,20 @@ class Dashboard(Model, AuditMixinNullable, ImportExportMixin):
     )
     def datasets_trimmed_for_slices(self) -> list[dict[str, Any]]:
         # Verbose but efficient database enumeration of dashboard datasources.
-        logger.error('line 1.2.1')
         slices_by_datasource: dict[
             tuple[type[BaseDatasource], int], set[Slice]
         ] = defaultdict(set)
-        logger.error('line 1.2.2')
         for slc in self.slices:
             slices_by_datasource[(slc.cls_model, slc.datasource_id)].add(slc)
-        logger.error('line 1.2.3')
         result: list[dict[str, Any]] = []
 
         for (cls_model, datasource_id), slices in slices_by_datasource.items():
             datasource = (
                 db.session.query(cls_model).filter_by(id=datasource_id).one_or_none()
             )
-            logger.error(f'line 1.2.4 {datasource_id}')
             if datasource:
                 # Filter out unneeded fields from the datasource payload
                 result.append(datasource.data_for_slices(slices))
-            logger.error(f'line 1.2.5 {datasource_id}')
 
         return result
 

@@ -288,8 +288,6 @@ class Slice(  # pylint: disable=too-many-public-methods
 
     def get_query_context(self) -> QueryContext | None:
         if self.query_context:
-            logger.error('i am pretty sure it is here')
-            logger.error(str(self.query_context))
             try:
                 return self.get_query_context_factory().create(
                     **json.loads(self.query_context)

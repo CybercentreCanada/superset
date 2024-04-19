@@ -416,11 +416,9 @@ class BaseDatasource(
         data = self.data
         metric_names = set()
         column_names = set()
-        logger.error("line 1.2.4.1")
         for slc in slices:
             form_data = slc.form_data
             # pull out all required metrics from the form_data
-            logger.error(f'line 1.2.4.1.1 {slc.id}')
             for metric_param in METRIC_FORM_DATA_PARAMS:
                 for metric in utils.as_list(form_data.get(metric_param) or []):
                     metric_names.add(utils.get_metric_name(metric))
@@ -428,30 +426,25 @@ class BaseDatasource(
                         column_ = metric.get("column") or {}
                         if column_name := column_.get("column_name"):
                             column_names.add(column_name)
-            logger.error(f'line 1.2.4.1.2 {slc.id}')
             # Columns used in query filters
             column_names.update(
                 filter_["subject"]
                 for filter_ in form_data.get("adhoc_filters") or []
                 if filter_.get("clause") == "WHERE" and filter_.get("subject")
             )
-            logger.error(f'line 1.2.4.1.3 {slc.id}')
             # columns used by Filter Box
             column_names.update(
                 filter_config["column"]
                 for filter_config in form_data.get("filter_configs") or []
                 if "column" in filter_config
             )
-            logger.error(f'line 1.2.4.1.4 {slc.id}')
             # for legacy dashboard imports which have the wrong query_context in them
             try:
                 query_context = slc.get_query_context()
             except DatasetNotFoundError:
                 query_context = None
-            logger.error(f'line 1.2.4.1.5 {slc.id}')
             # legacy charts don't have query_context charts
             if query_context:
-                logger.error(f'line 1.2.4.1.6 {slc.id}')
                 column_names.update(
                     [
                         utils.get_column_name(column_)
@@ -461,7 +454,6 @@ class BaseDatasource(
                     or []
                 )
             else:
-                logger.error(f'line 1.2.4.1.7 {slc.id}')
                 _columns = [
                     utils.get_column_name(column_)
                     if utils.is_adhoc_column(column_)
@@ -470,13 +462,11 @@ class BaseDatasource(
                     for column_ in utils.as_list(form_data.get(column_param) or [])
                 ]
                 column_names.update(_columns)
-        logger.error(f'line 1.2.4.2')
         filtered_metrics = [
             metric
             for metric in data["metrics"]
             if metric["metric_name"] in metric_names
         ]
-        logger.error(f'line 1.2.4.3')
         filtered_columns: list[Column] = []
         column_types: set[GenericDataType] = set()
         for column_ in data["columns"]:
@@ -485,13 +475,10 @@ class BaseDatasource(
                 column_types.add(generic_type)
             if column_["column_name"] in column_names:
                 filtered_columns.append(column_)
-        logger.error(f'line 1.2.4.5')
         data["column_types"] = list(column_types)
         del data["description"]
-        logger.error(f'line 1.2.4.6')
         data.update({"metrics": filtered_metrics})
         data.update({"columns": filtered_columns})
-        logger.error(f'line 1.2.4.7')
         verbose_map = {"__timestamp": "Time"}
         verbose_map.update(
             {
@@ -499,7 +486,6 @@ class BaseDatasource(
                 for metric in filtered_metrics
             }
         )
-        logger.error(f'line 1.2.4.8')
         verbose_map.update(
             {
                 column_["column_name"]: column_["verbose_name"]
@@ -507,7 +493,6 @@ class BaseDatasource(
                 for column_ in filtered_columns
             }
         )
-        logger.error(f'line 1.2.4.9')
         data["verbose_map"] = verbose_map
         return data
 
