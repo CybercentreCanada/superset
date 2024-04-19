@@ -70,6 +70,14 @@
     "test": "cross-env NODE_ENV=test jest",
     "type": "tsc --noEmit"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": "prettier --write"
+  },
   "browserslist": [
     "last 3 chrome versions",
     "last 3 firefox versions",
@@ -332,6 +340,7 @@
     "fetch-mock": "^7.7.3",
     "fork-ts-checker-webpack-plugin": "^6.3.3",
     "history": "^4.10.1",
+    "husky": "^9.0.11",
     "ignore-styles": "^5.0.1",
     "imports-loader": "^3.1.1",
     "jest": "^26.6.3",
@@ -342,6 +351,7 @@
     "lerna": "^6.6.2",
     "less": "^3.12.2",
     "less-loader": "^10.2.0",
+    "lint-staged": "^15.2.2",
     "mini-css-extract-plugin": "^2.7.6",
     "mock-socket": "^9.0.3",
     "node-fetch": "^2.6.7",
