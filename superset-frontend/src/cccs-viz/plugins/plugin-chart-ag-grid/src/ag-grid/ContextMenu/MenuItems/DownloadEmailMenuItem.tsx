@@ -20,7 +20,9 @@ interface DownloadEmailMenuItemProps {
   contextMenuY?: number;
 }
 
-export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps) {
+export default function DownloadEmailMenuItem(
+  props: DownloadEmailMenuItemProps,
+) {
   const dispatch = useDispatch();
 
   const onClick = () => {
@@ -28,33 +30,34 @@ export default function DownloadEmailMenuItem(props: DownloadEmailMenuItemProps)
     dispatch(addInfoToast('Download started'));
 
     SupersetClient.get({ endpoint, timeout: 180000 }) // 3 minutes
-      .then(({ json }) => {
-        if (json.result && json.result.content) {
-          // Check for base64 encoding
-          if (json.result.content.indexOf('base64') !== -1) {
-            const b64Data = json.result.content.split(',')[1];
-            const contentType = 'message/rfc822'; // Correct MIME type for EML files
+    .then(({ json }) => {
+      if (json.result?.content?.indexOf('base64') !== -1) {  // Check for base64 encoding
+        const b64Data = json.result.content.split(',')[1];
+        const contentType = 'message/rfc822'; // Correct MIME type for EML files
 
-            // Convert base64 data to a blob with the appropriate MIME type
-            const blob = b64ToBlob(b64Data, contentType);
+        // Convert base64 data to a blob with the appropriate MIME type
+        const blob = b64ToBlob(b64Data, contentType);
 
-            // Derive file name from the title or use a default name, ensuring it ends with .eml
-            const uniqueTitle = json.result.title ? `${json.result.title}.eml` : 'default_download.eml';
+        // Derive file name from the title or use a default name, ensuring it ends with .eml
+        const uniqueTitle = json.result.title 
+          ? `${json.result.title}.eml` 
+          : 'default_download.eml';
 
-            // Use FileSaver or a similar library to trigger the file download
-            saveAs(blob, uniqueTitle);
-          } else {
-            dispatch(addDangerToast('Invalid file format.'));
-          }
-        } else {
-          dispatch(addDangerToast('No content to download.'));
-        }
-      })
-      .catch(error => {
-        dispatch(addDangerToast('Download failed.'));
-      });
+        // Use FileSaver or a similar library to trigger the file download
+        saveAs(blob, uniqueTitle);
+      } else if (json.result?.content) {
+        dispatch(addDangerToast('Invalid file format.'));
+      } else {
+        dispatch(addDangerToast('No content to download.'));
+      }
+    })
+    .catch(error => {
+      const errorMessage = `Download failed: ${error.message}`;
+      dispatch(addDangerToast(errorMessage));
+    });
 
-    props.onSelection();
+  props.onSelection();
+
   };
 
   return (
@@ -81,7 +84,7 @@ function b64ToBlob(b64Data: string, contentType = '', sliceSize = 512) {
     const slice = byteCharacters.slice(offset, offset + sliceSize);
 
     const byteNumbers = new Array(slice.length);
-    for (let i = 0; i < slice.length; i++) {
+    for (let i = 0; i < slice.length; i += 1) {
       byteNumbers[i] = slice.charCodeAt(i);
     }
 
