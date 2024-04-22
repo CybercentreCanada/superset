@@ -51,7 +51,7 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
         key="export-csv-submenu-item"
         icon={<FileOutlined />}
       >
-        CSV Export
+        CSV export
       </Menu.Item>
       <Menu.Item
         {...props}
@@ -60,7 +60,7 @@ const ExportMenu: React.FC<ExportMenuProps> = props => {
         key="export-excel-submenu-item"
         icon={<FileExcelOutlined />}
       >
-        Excel Export
+        Excel export
       </Menu.Item>
     </Menu.SubMenu>
   );
