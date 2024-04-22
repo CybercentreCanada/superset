@@ -126,6 +126,11 @@ export default function AGGridViz({
     setSearchValue(target.value);
   };
 
+  const safeUnnestValue = (value: any): any[] => {
+    let result = unnestValue(value); // Use the existing unnestValue function
+    return Array.isArray(result) ? result : [result]; // Ensure the output is always an array
+  };
+
   useEffect(() => {
     if (!includeSearch) {
       setSearchValue('');
@@ -192,7 +197,6 @@ export default function AGGridViz({
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
-        // get starting and ending row, remember rowEnd could be before rowStart
         const startRow = Math.min(
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
@@ -210,7 +214,7 @@ export default function AGGridViz({
             const value = api.getValue(column, rowNode);
             const formattedValue: any[] =
               typeof value === 'string'
-                ? unnestValue(value).map(v =>
+                ? safeUnnestValue(value).map(v =>
                     colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
                   )
                 : [value];
