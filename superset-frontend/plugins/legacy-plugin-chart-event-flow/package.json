@@ -2,6 +2,20 @@
   "name": "@superset-ui/legacy-plugin-chart-event-flow",
   "version": "0.18.25",
   "description": "Superset Legacy Chart - Event Flow",
+  "keywords": [
+    "superset"
+  ],
+  "homepage": "https://github.com/apache/superset/tree/master/superset-frontend/plugins/legacy-plugin-chart-event-flow#readme",
+  "bugs": {
+    "url": "https://github.com/apache/superset/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apache/superset.git",
+    "directory": "superset-frontend/plugins/legacy-plugin-chart-event-flow"
+  },
+  "license": "Apache-2.0",
+  "author": "Superset",
   "sideEffects": [
     "*.css"
   ],
@@ -11,30 +25,16 @@
     "esm",
     "lib"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/apache/superset.git",
-    "directory": "superset-frontend/plugins/legacy-plugin-chart-event-flow"
-  },
-  "keywords": [
-    "superset"
-  ],
-  "author": "Superset",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/apache/superset/issues"
-  },
-  "homepage": "https://github.com/apache/superset/tree/master/superset-frontend/plugins/legacy-plugin-chart-event-flow#readme",
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
     "@data-ui/event-flow": "^0.0.84",
     "prop-types": "^15.6.2"
   },
   "peerDependencies": {
-    "react": "^15 || ^16",
     "@superset-ui/chart-controls": "*",
-    "@superset-ui/core": "*"
+    "@superset-ui/core": "*",
+    "react": "^15 || ^16"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
