@@ -296,7 +296,7 @@ const config = {
       vm: require.resolve('vm-browserify'),
       path: false,
     },
-    fullySpecified: false
+    fullySpecified: false,
   },
   context: APP_DIR, // to automatically find tsconfig.json
   module: {

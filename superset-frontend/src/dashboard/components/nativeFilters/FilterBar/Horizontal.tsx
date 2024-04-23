@@ -143,16 +143,17 @@ const HorizontalFilterBar: React.FC<HorizontalBarProps> = ({
         ) : (
           <>
             <FilterBarSettings />
-            {canEdit && isFeatureEnabled(FeatureFlag.DASHBOARD_NATIVE_FILTERS) && (
-              <FiltersLinkContainer hasFilters={hasFilters}>
-                <FilterConfigurationLink
-                  dashboardId={dashboardId}
-                  createNewOnOpen={filterValues.length === 0}
-                >
-                  <Icons.PlusSmall /> {t('Add/Edit Filters')}
-                </FilterConfigurationLink>
-              </FiltersLinkContainer>
-            )}
+            {canEdit &&
+              isFeatureEnabled(FeatureFlag.DASHBOARD_NATIVE_FILTERS) && (
+                <FiltersLinkContainer hasFilters={hasFilters}>
+                  <FilterConfigurationLink
+                    dashboardId={dashboardId}
+                    createNewOnOpen={filterValues.length === 0}
+                  >
+                    <Icons.PlusSmall /> {t('Add/Edit Filters')}
+                  </FilterConfigurationLink>
+                </FiltersLinkContainer>
+              )}
             {!hasFilters && (
               <FilterBarEmptyStateContainer data-test="horizontal-filterbar-empty">
                 {t('No filters are currently added to this dashboard.')}

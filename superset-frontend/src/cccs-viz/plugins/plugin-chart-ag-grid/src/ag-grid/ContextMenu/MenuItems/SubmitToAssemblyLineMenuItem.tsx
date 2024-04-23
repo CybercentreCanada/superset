@@ -29,7 +29,7 @@ export default function SubmitToAssemblyLineMenuItem(
     try {
       dispatch(addInfoToast('Submission started'));
       const response = await SupersetClient.get({ endpoint, timeout: 180000 }); // 3 minutes
-      const json = response.json;
+      const { json } = response;
 
       // Ensure there's JSON data to display
       if (json) {
