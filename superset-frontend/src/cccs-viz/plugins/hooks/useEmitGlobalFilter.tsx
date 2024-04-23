@@ -17,6 +17,7 @@ import {
   CLAUSES,
   EXPRESSION_TYPES,
 } from 'src/explore/components/controls/FilterControl/types';
+import { addWarningToast } from 'src/components/MessageToasts/actions';
 import { safeJsonObjectParse } from '../utils';
 
 const useEmitGlobalFilter = () => {
@@ -32,7 +33,11 @@ const useEmitGlobalFilter = () => {
   );
 
   return useCallback(
-    (sliceId: number, groupBy: [string, any][]) => {
+    (
+      sliceId: number,
+      groupBy: [string, any][],
+      colData?: { [key: string]: any },
+    ) => {
       // Iterate through all the ad hoc filters that have the current chart in scope,
       // and add another ad hoc entry. Note that this may have unintended consequences.
       // User feedback may make it so we want to allow them to choose which adhoc
@@ -56,8 +61,29 @@ const useEmitGlobalFilter = () => {
                   rawValue.flatMap(entry =>
                     ensureIsArray(safeJsonObjectParse(entry) ?? entry),
                   )
-                : // If it's not an array, we just parse the single raw value
-                  safeJsonObjectParse(rawValue) ?? rawValue;
+                : rawValue;
+
+              if (
+                colData?.[col]?.type === 'JSON' ||
+                safeJsonObjectParse(processedValue)
+              ) {
+                // warn when filtering on json columns
+                dispatch(
+                  addWarningToast(
+                    'Filtering on JSON strings may not yield correct results.',
+                  ),
+                );
+              }
+
+              const formattedComparator = Array.isArray(processedValue)
+                ? processedValue.map((c: any) =>
+                    colData?.[col]?.valueFormatter
+                      ? colData?.[col]?.valueFormatter(c)
+                      : c,
+                  )
+                : colData?.[col]?.useValueFormatterForExport
+                ? colData?.[col]?.valueFormatter(processedValue)
+                : processedValue;
 
               const op = Array.isArray(processedValue)
                 ? Operators.IN
@@ -70,7 +96,7 @@ const useEmitGlobalFilter = () => {
                 subject: col,
                 operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
                 operatorId: op,
-                comparator: processedValue,
+                comparator: formattedComparator,
                 clause: CLAUSES.WHERE,
                 sqlExpression: null,
                 isExtra: false,
@@ -86,6 +112,14 @@ const useEmitGlobalFilter = () => {
             .filter(f => {
               const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
                 []) as any[];
+              if (colData?.[f.subject]?.isDateColumn) {
+                dispatch(
+                  addWarningToast(
+                    'Date/Time columns cannot be filtered on selection. Use the filter bar to select a date range',
+                  ),
+                );
+                return false;
+              }
               const res =
                 f.subject !== 'undefined' &&
                 !adhoc_filters.some(
@@ -104,14 +138,10 @@ const useEmitGlobalFilter = () => {
           ];
 
           const newLabel = newFilterList
-            .map(
-              f =>
-                `${f.subject} ${f.operator} ${
-                  Array.isArray(f.comparator)
-                    ? f.comparator.join(', ')
-                    : f.comparator
-                }`,
-            )
+            .map(f => {
+              const displayName = colData?.[f.subject]?.headerName || f.subject;
+              return `${displayName} ${f.operator} ${f.comparator}`;
+            })
             .join(', ');
 
           // This adds the new filter to the data mask. No idea if all these fields are necessary?
@@ -128,6 +158,7 @@ const useEmitGlobalFilter = () => {
             },
             ownState: {},
             __cache: {
+              label: newLabel,
               value: newFilterList,
               filters: newFilterList,
             },

@@ -113,7 +113,7 @@ const calcColumnColumnDefs = (
     const valueFormatter =
       advancedDataType.toUpperCase() in formatterMap
         ? formatterMap[advancedDataType.toUpperCase()]
-        : undefined;
+        : formatterMap[columnType] ?? undefined;
     const useValueFormatterForExport = !!valueFormatter;
     const getQuickFilterText = valueFormatter
       ? (params: any) =>
@@ -150,6 +150,7 @@ const calcColumnColumnDefs = (
       sort,
       sortIndex: sortIndex > -1 ? sortIndex : null,
       type: columnType,
+      isDateColumn: isDate || columnTypeGeneric === GenericDataType.TEMPORAL,
     };
   });
 
