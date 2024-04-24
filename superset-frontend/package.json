@@ -356,7 +356,7 @@
     "mock-socket": "^9.0.3",
     "node-fetch": "^2.6.7",
     "prettier": "^2.8.8",
-    "prettier-plugin-packagejson": "^2.2.15",
+    "prettier-plugin-packagejson": "^2.5.0",
     "process": "^0.11.10",
     "react-resizable": "^3.0.4",
     "react-test-renderer": "^16.9.0",
