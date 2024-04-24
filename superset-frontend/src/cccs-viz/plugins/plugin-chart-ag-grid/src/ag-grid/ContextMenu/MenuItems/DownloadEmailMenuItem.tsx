@@ -42,7 +42,7 @@ export default function DownloadEmailMenuItem(
           // Derive file name from the title or use a default name, ensuring it ends with .eml
           const uniqueTitle = json.result.title
             ? `${json.result.title}.eml`
-            : 'downloaded_eml_file.eml';
+            : 'default_download.eml';
 
           // Use FileSaver or a similar library to trigger the file download
           saveAs(blob, uniqueTitle);
