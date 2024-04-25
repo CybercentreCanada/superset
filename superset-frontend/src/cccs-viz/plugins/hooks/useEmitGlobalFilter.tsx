@@ -17,7 +17,6 @@ import {
   CLAUSES,
   EXPRESSION_TYPES,
 } from 'src/explore/components/controls/FilterControl/types';
-import { addWarningToast } from 'src/components/MessageToasts/actions';
 import { safeJsonObjectParse } from '../utils';
 
 const useEmitGlobalFilter = () => {
@@ -63,18 +62,6 @@ const useEmitGlobalFilter = () => {
                   )
                 : rawValue;
 
-              if (
-                colData?.[col]?.type === 'JSON' ||
-                safeJsonObjectParse(processedValue)
-              ) {
-                // warn when filtering on json columns
-                dispatch(
-                  addWarningToast(
-                    'Filtering on JSON strings may not yield correct results.',
-                  ),
-                );
-              }
-
               const formattedComparator = Array.isArray(processedValue)
                 ? processedValue.map((c: any) =>
                     colData?.[col]?.valueFormatter
@@ -112,14 +99,6 @@ const useEmitGlobalFilter = () => {
             .filter(f => {
               const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
                 []) as any[];
-              if (colData?.[f.subject]?.isDateColumn) {
-                dispatch(
-                  addWarningToast(
-                    'Date/Time columns cannot be filtered on selection. Use the filter bar to select a date range',
-                  ),
-                );
-                return false;
-              }
               const res =
                 f.subject !== 'undefined' &&
                 !adhoc_filters.some(
