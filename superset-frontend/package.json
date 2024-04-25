@@ -150,6 +150,7 @@
     "dom-to-pdf": "^0.3.2",
     "emotion-rgba": "0.0.9",
     "fast-glob": "^3.2.7",
+    "file-saver": "^2.0.5",
     "fontsource-fira-code": "^4.0.0",
     "fs-extra": "^10.0.0",
     "fuse.js": "^6.4.6",

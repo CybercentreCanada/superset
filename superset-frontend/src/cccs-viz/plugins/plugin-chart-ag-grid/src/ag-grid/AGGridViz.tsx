@@ -45,6 +45,7 @@ import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
@@ -407,6 +408,20 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <DownloadEmailMenuItem
+          onSelection={handleContextMenu}
+          label="Download Email"
+          key="download-email"
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }
