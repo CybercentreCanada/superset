@@ -9,6 +9,8 @@ from superset.advanced_data_type.types import (
 )
 from superset.utils.core import FilterOperator, FilterStringOperators
 
+EML_SEARCH_STRING = "^((C|N)BS_EMAIL:\/\/)([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/eml\/(c|n)bs\/).*(\.eml\.cart)$"
+
 # Operator Sets
 
 EQUAL_NULLABLE_OPERATOR_SET = [
@@ -40,12 +42,7 @@ def translate_filter_func(col: Column, operator: FilterOperator, values: List[An
             return_expression = col == value
         if operator == FilterOperator.NOT_EQUALS.value:
             return_expression = col != value
-        if operator == FilterOperator.LIKE.value:
-            return_expression = col.like(value)
-        if operator == FilterOperator.ILIKE.value:
-            return_expression = col.ilike(value)
     return return_expression
-
 
 def eml_path_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
     """
@@ -58,14 +55,14 @@ def eml_path_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         "valid_filter_operators": EQUAL_NULLABLE_OPERATOR_SET,
     }
     if req["values"] == [""]:
-        resp["error_message"] = "EML_path must not be empty"
+        resp["error_message"] = f"{eml_path.verbose_name} must not be empty"
         return resp
     for val in req["values"]:
         string_value = str(val)
-        if re.search("^((C|N)BS_EMAIL:\/\/)([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/eml\/(c|n)bs\/).*(\.eml\.cart)$", string_value):
+        if re.search(EML_SEARCH_STRING, string_value):
             resp["values"].append(string_value)
         else:
-            resp["error_message"] = f"'{ val }' is not a valid EML_path. EML_paths are in the format ^((C|N)BS_EMAIL:\/\/)([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/eml\/(c|n)bs\/).*(\.eml\.cart)$"
+            resp["error_message"] = f"'{ val }' is not a valid {eml_path.verbose_name}. EML_paths are in the format {EML_SEARCH_STRING}"
             return resp
 
     resp["display_value"] = ", ".join(resp["values"])

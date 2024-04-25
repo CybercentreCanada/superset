@@ -10,6 +10,8 @@ import {
 import Icon from '@ant-design/icons';
 import EmailSvg from '../../../cccs-grid/images/email.svg';
 
+const QUERY_TIMEOUT_LIMIT = 180000; // 3 minutes
+
 interface DownloadEmailMenuItemProps {
   label: string;
   data: string;
@@ -29,7 +31,7 @@ export default function DownloadEmailMenuItem(
     const endpoint = `/api/v1/fission/get-eml?file=${props.data}`;
     dispatch(addInfoToast('Download started'));
 
-    SupersetClient.get({ endpoint, timeout: 180000 }) // 3 minutes
+    SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
       .then(({ json }) => {
         if (json.result?.content?.indexOf('base64') !== -1) {
           // Check for base64 encoding
