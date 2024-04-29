@@ -17,7 +17,7 @@ export default function SubmitToAssemblyLineMenuItem(
   props: SubmitToAssemblyLineMenuItemProps,
 ) {
   const onClick = () => {
-    let url = `https://malware-stg.cyber.gc.ca/submit?input=${props.data}&classification=TLP:CLEAR`;
+    const url = `https://malware-stg.cyber.gc.ca/submit?input=${props.data}&classification=TLP:CLEAR`;
     window.open(url);
     props.onSelection();
   };
