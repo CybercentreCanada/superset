@@ -1,11 +1,5 @@
-import { SupersetClient } from '@superset-ui/core';
 import React from 'react';
 import { Menu } from 'src/components/Menu';
-import { useDispatch } from 'react-redux';
-import {
-  addInfoToast,
-  addDangerToast,
-} from 'src/components/MessageToasts/actions';
 import Icon from '@ant-design/icons';
 import AlSvg from '../../../cccs-grid/images/al.svg';
 
@@ -22,39 +16,15 @@ interface SubmitToAssemblyLineMenuItemProps {
 export default function SubmitToAssemblyLineMenuItem(
   props: SubmitToAssemblyLineMenuItemProps,
 ) {
-  const dispatch = useDispatch();
-
-  const fetchDataAndDisplayJson = async () => {
-    const endpoint = `/api/v1/fission/submitassemblyline?file=${props.data}`;
-    try {
-      dispatch(addInfoToast('Submission started'));
-      const response = await SupersetClient.get({ endpoint, timeout: 180000 }); // 3 minutes
-      const { json } = response;
-
-      // Ensure there's JSON data to display
-      if (json) {
-        const jsonBlob = new Blob([JSON.stringify(json, null, 2)], {
-          type: 'application/json',
-        });
-        const jsonDataUrl = window.URL.createObjectURL(jsonBlob);
-        window.open(jsonDataUrl, '_blank');
-      } else {
-        dispatch(addDangerToast('No content to display.'));
-      }
-    } catch (error) {
-      // Log the error or send it to a monitoring service
-      console.error('Failed to submit to AssemblyLine due to: ', error);
-      dispatch(addDangerToast('Failed to submit to AssemblyLine.'));
-    }
-  };
-
   const onClick = () => {
-    fetchDataAndDisplayJson();
+    let url = `https://malware-stg.cyber.gc.ca/submit?input=${props.data}&classification=TLP:CLEAR`;
+    window.open(url);
     props.onSelection();
   };
 
   return (
     <Menu.Item
+      {...props}
       onClick={onClick}
       className={
         props.disabled
