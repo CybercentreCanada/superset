@@ -14,6 +14,7 @@ export const rendererMap = {
   DATETIME: TimestampValueRenderer,
   'TIMESTAMP WITHOUT TIME ZONE': TimestampValueRenderer,
   'TIMESTAMP WITH TIME ZONE': TimestampValueRenderer,
+  DATETIMETZ: TimestampValueRenderer,
 };
 
 export const formatIpv4 = (v: any) => {
@@ -29,4 +30,5 @@ export const formatIpv4 = (v: any) => {
 
 export const formatterMap = {
   IPV4: formatIpv4,
+  INTERNET_ADDRESS: formatIpv4,
 };
