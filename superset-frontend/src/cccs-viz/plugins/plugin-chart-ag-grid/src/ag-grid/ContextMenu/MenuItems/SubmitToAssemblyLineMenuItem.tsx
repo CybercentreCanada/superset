@@ -5,7 +5,7 @@ import AlSvg from '../../../cccs-grid/images/al.svg';
 
 interface SubmitToAssemblyLineMenuItemProps {
   label: string;
-  data: string;
+  data: string[];
   onSelection: () => void;
   key?: string;
   disabled?: boolean;
@@ -16,10 +16,17 @@ interface SubmitToAssemblyLineMenuItemProps {
 export default function SubmitToAssemblyLineMenuItem(
   props: SubmitToAssemblyLineMenuItemProps,
 ) {
+  // Handler for clicking on the item
   const onClick = () => {
-    const url = `https://malware-stg.cyber.gc.ca/submit?input=${props.data}&classification=TLP:CLEAR`;
-    window.open(url);
-    props.onSelection();
+    // Loop through each item in the data array and open a new window for each URL
+    // Using encodeURIComponent to prevents URL injection issues and ensures that special characters in the data strings are correctly interpreted by the URL
+    props.data.forEach(item => {
+      const url = `https://malware-stg.cyber.gc.ca/submit?input=${encodeURIComponent(
+        item,
+      )}&classification=TLP:CLEAR`;
+      window.open(url, '_blank'); // '_blank' to open in a new tab/window
+    });
+    props.onSelection(); // Call the onSelection callback after opening all windows
   };
 
   return (

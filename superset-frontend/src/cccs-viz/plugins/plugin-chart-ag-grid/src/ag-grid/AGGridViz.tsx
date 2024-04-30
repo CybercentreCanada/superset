@@ -447,9 +447,13 @@ export default function AGGridViz({
         ...specialMenuItems,
         <SubmitToAssemblyLineMenuItem
           onSelection={handleContextMenu}
-          label="Submit file to ASSEMBLYLINE"
+          label={
+            selectedData.typeData.eml_path.length > 1
+              ? 'Submit files to ASSEMBLYLINE'
+              : 'Submit file to ASSEMBLYLINE'
+          }
           key="submit-file-to-assembly-line"
-          data={selectedData.typeData.eml_path[0]}
+          data={selectedData.typeData.eml_path}
         />,
       ];
     }
