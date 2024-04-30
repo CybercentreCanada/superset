@@ -448,6 +448,7 @@ export default function AGGridViz({
         <DownloadEmailMenuItem
           onSelection={handleContextMenu}
           label="Download Email"
+          disabled={Object.keys(selectedData.highlightedData).length !== 1}
           key="download-email"
           data={selectedData.typeData.eml_path[0]}
         />,
