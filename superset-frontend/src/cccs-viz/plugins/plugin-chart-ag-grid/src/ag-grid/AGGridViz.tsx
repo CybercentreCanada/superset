@@ -45,6 +45,7 @@ import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemblyLineMenuItem';
 
@@ -318,12 +319,7 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenu}
           label="Filter On Selection"
-          disabled={
-            !adhocFiltersInScope.length ||
-            Object.values(selectedData.selectedColData).every(
-              data => data.isDateColumn,
-            )
-          }
+          disabled={!adhocFiltersInScope.length}
           key="filter-on-selection"
           icon={
             <FilterOutlined
@@ -336,8 +332,6 @@ export default function AGGridViz({
               : Object.values(selectedData.selectedColData).every(
                   data => data.isDateColumn,
                 )
-              ? 'Date/Time columns cannot be filtered on selection. Use the filter bar to select a date range'
-              : adhocFiltersInScope.length > 1
               ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
                   .join(', ')}`
@@ -454,6 +448,21 @@ export default function AGGridViz({
           }
           key="submit-file-to-assembly-line"
           data={selectedData.typeData.eml_path}
+        />,
+      ];
+    }
+    if (
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <DownloadEmailMenuItem
+          onSelection={handleContextMenu}
+          label="Download Email"
+          disabled={Object.keys(selectedData.highlightedData).length !== 1}
+          key="download-email"
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }

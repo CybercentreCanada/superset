@@ -64,7 +64,7 @@ const useEmitGlobalFilter = () => {
 
               const formattedComparator = Array.isArray(processedValue)
                 ? processedValue.map((c: any) =>
-                    colData?.[col]?.valueFormatter
+                    colData?.[col]?.useValueFormatterForExport
                       ? colData?.[col]?.valueFormatter(c)
                       : c,
                   )

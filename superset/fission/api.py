@@ -85,7 +85,7 @@ class FissionRestApi(BaseApi):
             headers         = headers,
             timeout         = 180 # extending timeout for fission loading times
         )
-
+        
         content_type = res.headers.get("Content-Type", "")
 
         # Handling binary data for non-JSON responses
@@ -99,5 +99,5 @@ class FissionRestApi(BaseApi):
                 result = res.json()
             except:
                 result = {'Error': str(res.text)}
-
+                
         return self.response(res.status_code, result=result)
