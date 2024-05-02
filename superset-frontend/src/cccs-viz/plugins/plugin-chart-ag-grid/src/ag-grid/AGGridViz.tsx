@@ -318,12 +318,7 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenu}
           label="Filter On Selection"
-          disabled={
-            !adhocFiltersInScope.length ||
-            Object.values(selectedData.selectedColData).every(
-              data => data.isDateColumn,
-            )
-          }
+          disabled={!adhocFiltersInScope.length}
           key="filter-on-selection"
           icon={
             <FilterOutlined
@@ -336,8 +331,6 @@ export default function AGGridViz({
               : Object.values(selectedData.selectedColData).every(
                   data => data.isDateColumn,
                 )
-              ? 'Date/Time columns cannot be filtered on selection. Use the filter bar to select a date range'
-              : adhocFiltersInScope.length > 1
               ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
                   .join(', ')}`
