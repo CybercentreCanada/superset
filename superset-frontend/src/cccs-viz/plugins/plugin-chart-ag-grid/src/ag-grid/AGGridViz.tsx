@@ -45,6 +45,7 @@ import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
@@ -104,6 +105,7 @@ export default function AGGridViz({
   const [selectedData, setSelectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
+    selectedColData: {},
     typeData: {},
     jumpToData: {},
   });
@@ -133,7 +135,11 @@ export default function AGGridViz({
   }, [includeSearch]);
 
   const emitFilter = useCallback(
-    (data, globally = false) => {
+    (
+      data: DataMap,
+      globally = false,
+      selectedColData?: { [key: string]: any },
+    ) => {
       const groupBy: [string, any][] = Object.entries(data);
 
       // If not global, use the same setup as usual
@@ -162,7 +168,7 @@ export default function AGGridViz({
           },
         });
       } else {
-        emitGlobalFilter(formData.sliceId, groupBy);
+        emitGlobalFilter(formData.sliceId, groupBy, selectedColData);
       }
     },
     [emitGlobalFilter, formData.sliceId, setDataMask],
@@ -188,6 +194,7 @@ export default function AGGridViz({
     const newSelectedData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
     const typeData: { [key: string]: string[] } = {};
+    const selectedColData: { [key: string]: any } = {};
     const jumpToData: { [key: string]: string[] } = {};
 
     if (cellRanges) {
@@ -208,9 +215,10 @@ export default function AGGridViz({
             const colDef = column.getColDef();
             const col = colDef.field;
             const value = api.getValue(column, rowNode);
+            const unnested = ensureIsArray(unnestValue(value));
             const formattedValue: any[] =
-              typeof value === 'string'
-                ? unnestValue(value).map(v =>
+              typeof value === 'string' && unnested?.length
+                ? unnested.map(v =>
                     colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
                   )
                 : [value];
@@ -223,6 +231,9 @@ export default function AGGridViz({
               newSelectedData[col] = newSelectedData[col] || [];
               if (!newSelectedData[col].includes(value)) {
                 newSelectedData[col].push(value);
+              }
+              if (!selectedColData?.[col]) {
+                selectedColData[col] = colDef;
               }
               jumpToData[dataType] = jumpToData[dataType] || [];
               formattedValue.forEach(v => {
@@ -251,13 +262,18 @@ export default function AGGridViz({
       highlightedData: newSelectedData,
       principalData: newPrincipalData,
       typeData,
+      selectedColData,
       jumpToData,
     });
   }, [principalColumns]);
 
   const onClick = useCallback(
-    (data: DataMap, globally = false) => {
-      emitFilter(data, globally);
+    (
+      data: DataMap,
+      globally = false,
+      selectedColData?: { [key: string]: any },
+    ) => {
+      emitFilter(data, globally, selectedColData);
     },
     [emitFilter],
   );
@@ -294,7 +310,11 @@ export default function AGGridViz({
         <Menu.Divider key="filter-on-select-divider" />,
         <EmitFilterMenuItem
           onClick={() => {
-            onClick(selectedData.highlightedData, true);
+            onClick(
+              selectedData.highlightedData,
+              true,
+              selectedData.selectedColData,
+            );
           }}
           onSelection={handleContextMenu}
           label="Filter on selection"
@@ -308,7 +328,9 @@ export default function AGGridViz({
           tooltip={
             !adhocFiltersInScope.length
               ? 'No adhoc filter exists with this chart in scope'
-              : adhocFiltersInScope.length > 1
+              : Object.values(selectedData.selectedColData).every(
+                  data => data.isDateColumn,
+                )
               ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
                   .join(', ')}`
@@ -407,6 +429,21 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <DownloadEmailMenuItem
+          onSelection={handleContextMenu}
+          label="Download Email"
+          disabled={Object.keys(selectedData.highlightedData).length !== 1}
+          key="download-email"
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }

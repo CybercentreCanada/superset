@@ -32,7 +32,11 @@ const useEmitGlobalFilter = () => {
   );
 
   return useCallback(
-    (sliceId: number, groupBy: [string, any][]) => {
+    (
+      sliceId: number,
+      groupBy: [string, any][],
+      colData?: { [key: string]: any },
+    ) => {
       // Iterate through all the ad hoc filters that have the current chart in scope,
       // and add another ad hoc entry. Note that this may have unintended consequences.
       // User feedback may make it so we want to allow them to choose which adhoc
@@ -56,8 +60,17 @@ const useEmitGlobalFilter = () => {
                   rawValue.flatMap(entry =>
                     ensureIsArray(safeJsonObjectParse(entry) ?? entry),
                   )
-                : // If it's not an array, we just parse the single raw value
-                  safeJsonObjectParse(rawValue) ?? rawValue;
+                : rawValue;
+
+              const formattedComparator = Array.isArray(processedValue)
+                ? processedValue.map((c: any) =>
+                    colData?.[col]?.useValueFormatterForExport
+                      ? colData?.[col]?.valueFormatter(c)
+                      : c,
+                  )
+                : colData?.[col]?.useValueFormatterForExport
+                ? colData?.[col]?.valueFormatter(processedValue)
+                : processedValue;
 
               const op = Array.isArray(processedValue)
                 ? Operators.IN
@@ -70,7 +83,7 @@ const useEmitGlobalFilter = () => {
                 subject: col,
                 operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
                 operatorId: op,
-                comparator: processedValue,
+                comparator: formattedComparator,
                 clause: CLAUSES.WHERE,
                 sqlExpression: null,
                 isExtra: false,
@@ -104,14 +117,10 @@ const useEmitGlobalFilter = () => {
           ];
 
           const newLabel = newFilterList
-            .map(
-              f =>
-                `${f.subject} ${f.operator} ${
-                  Array.isArray(f.comparator)
-                    ? f.comparator.join(', ')
-                    : f.comparator
-                }`,
-            )
+            .map(f => {
+              const displayName = colData?.[f.subject]?.headerName || f.subject;
+              return `${displayName} ${f.operator} ${f.comparator}`;
+            })
             .join(', ');
 
           // This adds the new filter to the data mask. No idea if all these fields are necessary?
@@ -128,6 +137,7 @@ const useEmitGlobalFilter = () => {
             },
             ownState: {},
             __cache: {
+              label: newLabel,
               value: newFilterList,
               filters: newFilterList,
             },
