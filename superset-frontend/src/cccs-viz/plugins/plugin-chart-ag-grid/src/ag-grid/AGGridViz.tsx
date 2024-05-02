@@ -65,6 +65,7 @@ const DEFAULT_COL_DEF = {
 };
 
 const RETENTION_LIMIT = 100;
+const SUBMISSION_LIMIT = 10;
 
 const headerStyles = css`
   display: flex;
@@ -448,6 +449,12 @@ export default function AGGridViz({
           }
           key="submit-file-to-assembly-line"
           data={selectedData.typeData.eml_path}
+          disabled={selectedData.typeData.eml_path.length > SUBMISSION_LIMIT}
+          tooltip={
+            new Set(selectedData.typeData.eml_path).size > SUBMISSION_LIMIT
+              ? `A window will open for each row selected. You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
+              : undefined
+          }
         />,
       ];
     }
