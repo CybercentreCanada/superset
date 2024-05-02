@@ -138,7 +138,7 @@ const DrillActionConfigControl: React.FC<Props> = ({
     <ControlPopover
       key={i}
       trigger="click"
-      title={t('Edit Jump Action')}
+      title={t('Edit jump action')}
       css={theme => ({
         '&:hover': {
           cursor: 'pointer',
@@ -172,7 +172,7 @@ const DrillActionConfigControl: React.FC<Props> = ({
           <ControlPopover
             trigger="click"
             content={renderPopover(addLayerPopoverKey, addedDrillActionConfig)}
-            title={t('Add Jump Action')}
+            title={t('Add jump action')}
             visible={visiblePopoverIndex === addLayerPopoverKey}
             destroyTooltipOnHide
             onVisibleChange={visible =>
@@ -184,7 +184,7 @@ const DrillActionConfigControl: React.FC<Props> = ({
                 data-test="add-annotation-layer-button"
                 className="fa fa-plus"
               />{' '}
-              &nbsp; {t('Add Jump Action')}
+              &nbsp; {t('Add jump action')}
             </CustomListItem>
           </ControlPopover>
         </List>
