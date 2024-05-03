@@ -435,6 +435,7 @@ export default function AGGridViz({
       ];
     }
     if (
+      assemblyLineUrl &&
       selectedData.typeData.eml_path &&
       selectedData.typeData.eml_path.length > 0
     ) {
@@ -449,6 +450,7 @@ export default function AGGridViz({
           }
           key="submit-file-to-assembly-line"
           data={selectedData.typeData.eml_path}
+          base_url={assemblyLineUrl}
           disabled={selectedData.typeData.eml_path.length > SUBMISSION_LIMIT}
           tooltip={
             new Set(selectedData.typeData.eml_path).size > SUBMISSION_LIMIT
