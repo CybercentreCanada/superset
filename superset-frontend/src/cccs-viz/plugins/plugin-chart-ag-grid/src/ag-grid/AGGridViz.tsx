@@ -319,7 +319,7 @@ export default function AGGridViz({
             );
           }}
           onSelection={handleContextMenu}
-          label="Filter On Selection"
+          label="Filter on selection"
           disabled={!adhocFiltersInScope.length}
           key="filter-on-selection"
           icon={
@@ -345,7 +345,7 @@ export default function AGGridViz({
             onClick(selectedData.highlightedData);
           }}
           onSelection={handleContextMenu}
-          label="Emit Filter(s)"
+          label="Add cross-filter(s)"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
           key={contextDivID.toString()}
           icon={
@@ -359,7 +359,7 @@ export default function AGGridViz({
             onClick(selectedData.principalData);
           }}
           onSelection={handleContextMenu}
-          label="Emit Principle Column Filter(s)"
+          label="Add principle column cross-filter(s)"
           disabled={Object.keys(selectedData.principalData).length === 0}
           icon={
             <EmitIcon
@@ -370,7 +370,7 @@ export default function AGGridViz({
         <EmitFilterMenuItem
           onSelection={handleContextMenu}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emitted Filter(s)"
+          label="Remove cross-filters(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
@@ -389,8 +389,8 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label={
             selectedData.typeData.harmonized_email_id.length > 1
-              ? 'Retain EML Records To ALFRED'
-              : 'Retain EML Record To ALFRED'
+              ? 'Retain EML records to ALFRED'
+              : 'Retain EML record to ALFRED'
           }
           key="retain-eml"
           data={{

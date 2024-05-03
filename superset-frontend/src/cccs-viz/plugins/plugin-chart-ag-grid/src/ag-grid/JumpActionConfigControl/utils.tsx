@@ -78,7 +78,7 @@ export const getJumpToDashboardContextMenuItems = (
   const menu = (
     <Menu.SubMenu
       icon={<FundOutlined />}
-      title="Jump To Dashboard"
+      title="Jump to dashboard"
       disabled={disableOveride}
       className={disableOveride ? 'ant-dropdown-menu-item-disabled' : undefined}
     >

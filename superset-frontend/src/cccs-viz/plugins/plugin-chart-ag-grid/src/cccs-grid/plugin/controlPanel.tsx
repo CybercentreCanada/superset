@@ -266,9 +266,9 @@ const config: ControlPanelConfig = {
             name: 'principalColumns',
             config: {
               type: 'SelectControl',
-              label: t('Principal Column(s) to Emit'),
+              label: t('Principal column(s) for cross-filtering'),
               description: t(
-                'Preselect a set of principal columns that can easily be emitted from the context menu',
+                'Preselect a set of principal columns that can easily be added as cross-filters from the context menu',
               ),
               multi: true,
               freeForm: true,
@@ -453,7 +453,7 @@ config.controlPanelSections.push({
         name: 'enable_json_expand',
         config: {
           type: 'CheckboxControl',
-          label: t('JSON Row Expand'),
+          label: t('JSON row expand'),
           renderTrigger: true,
           default: false,
           description: t(
@@ -485,7 +485,7 @@ config.controlPanelSections.push({
         config: {
           type: DrillActionConfig,
           renderTrigger: true,
-          label: t('Jump Actions'),
+          label: t('Jump actions'),
           description: t('Configure dashboard jump actions.'),
         },
       },
