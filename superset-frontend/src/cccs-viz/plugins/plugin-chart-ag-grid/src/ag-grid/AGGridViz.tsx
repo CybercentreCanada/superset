@@ -317,7 +317,12 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenu}
           label="Filter On Selection"
-          disabled={!adhocFiltersInScope.length}
+          disabled={
+            !adhocFiltersInScope.length ||
+            Object.values(selectedData.selectedColData).every(
+              data => data.isDateColumn,
+            )
+          }
           key="filter-on-selection"
           icon={
             <FilterOutlined
@@ -328,8 +333,10 @@ export default function AGGridViz({
             !adhocFiltersInScope.length
               ? 'No adhoc filter exists with this chart in scope'
               : Object.values(selectedData.selectedColData).every(
-                  data => data.isDateColumn,
+                  data => data.type === 'JSON',
                 )
+              ? 'JSON columns cannot be filtered on selection.'
+              : adhocFiltersInScope.length > 1
               ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
                   .join(', ')}`

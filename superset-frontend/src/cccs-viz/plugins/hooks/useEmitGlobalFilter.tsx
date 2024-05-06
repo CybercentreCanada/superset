@@ -18,6 +18,7 @@ import {
   EXPRESSION_TYPES,
 } from 'src/explore/components/controls/FilterControl/types';
 import { safeJsonObjectParse } from '../utils';
+import { addWarningToast } from 'src/components/MessageToasts/actions';
 
 const useEmitGlobalFilter = () => {
   const dispatch = useDispatch();
@@ -99,6 +100,15 @@ const useEmitGlobalFilter = () => {
             .filter(f => {
               const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
                 []) as any[];
+              if (
+                colData?.[f.subject]?.type === 'JSON' ||
+                safeJsonObjectParse(f.comparator)
+              ) {
+                dispatch(
+                  addWarningToast('Excluding JSON columns from filter.'),
+                );
+                return false;
+              }
               const res =
                 f.subject !== 'undefined' &&
                 !adhoc_filters.some(
