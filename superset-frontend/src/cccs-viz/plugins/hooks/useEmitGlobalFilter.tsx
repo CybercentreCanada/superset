@@ -17,8 +17,8 @@ import {
   CLAUSES,
   EXPRESSION_TYPES,
 } from 'src/explore/components/controls/FilterControl/types';
-import { safeJsonObjectParse } from '../utils';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
+import { safeJsonObjectParse } from '../utils';
 
 const useEmitGlobalFilter = () => {
   const dispatch = useDispatch();
