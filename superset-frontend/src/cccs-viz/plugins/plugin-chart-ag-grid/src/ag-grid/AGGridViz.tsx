@@ -45,6 +45,7 @@ import EmitIcon from '../../../components/EmitIcon';
 import { AGGridVizProps, DataMap, GridData } from '../types';
 import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
+import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
@@ -316,13 +317,8 @@ export default function AGGridViz({
             );
           }}
           onSelection={handleContextMenu}
-          label="Filter On Selection"
-          disabled={
-            !adhocFiltersInScope.length ||
-            Object.values(selectedData.selectedColData).every(
-              data => data.isDateColumn,
-            )
-          }
+          label="Filter on selection"
+          disabled={!adhocFiltersInScope.length}
           key="filter-on-selection"
           icon={
             <FilterOutlined
@@ -349,7 +345,7 @@ export default function AGGridViz({
             onClick(selectedData.highlightedData);
           }}
           onSelection={handleContextMenu}
-          label="Emit Filter(s)"
+          label="Add cross-filter(s)"
           disabled={Object.keys(selectedData.highlightedData).length === 0}
           key={contextDivID.toString()}
           icon={
@@ -363,7 +359,7 @@ export default function AGGridViz({
             onClick(selectedData.principalData);
           }}
           onSelection={handleContextMenu}
-          label="Emit Principle Column Filter(s)"
+          label="Add principle column cross-filter(s)"
           disabled={Object.keys(selectedData.principalData).length === 0}
           icon={
             <EmitIcon
@@ -374,7 +370,7 @@ export default function AGGridViz({
         <EmitFilterMenuItem
           onSelection={handleContextMenu}
           onClick={() => dispatch(clearDataMask(formData.sliceId))}
-          label="Clear Emitted Filter(s)"
+          label="Remove cross-filters(s)"
           disabled={crossFilterValue === undefined}
           icon={<CloseOutlined />}
         />,
@@ -393,8 +389,8 @@ export default function AGGridViz({
           onSelection={handleContextMenu}
           label={
             selectedData.typeData.harmonized_email_id.length > 1
-              ? 'Retain EML Records To ALFRED'
-              : 'Retain EML Record To ALFRED'
+              ? 'Retain EML records to ALFRED'
+              : 'Retain EML record to ALFRED'
           }
           key="retain-eml"
           data={{
@@ -435,6 +431,21 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      specialMenuItems = [
+        ...specialMenuItems,
+        <DownloadEmailMenuItem
+          onSelection={handleContextMenu}
+          label="Download Email"
+          disabled={Object.keys(selectedData.highlightedData).length !== 1}
+          key="download-email"
+          data={selectedData.typeData.eml_path[0]}
         />,
       ];
     }

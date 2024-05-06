@@ -144,7 +144,7 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
           css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
           ariaLabel={t('Annotation layer value')}
           name="annotation-layer-value"
-          label={t('DashBoard')}
+          label={t('Dashboard')}
           showHeader
           hovered
           placeholder=""
