@@ -22,6 +22,7 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import {
   CellRange,
+  ColumnState,
   GetMainMenuItemsParams,
   MenuItemDef,
 } from 'ag-grid-community';
@@ -124,6 +125,21 @@ export default function AGGridViz({
   const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Reapply filters and sort model on window resize
+      const api = gridRef.current?.api;
+      if (api) {
+        api.onFilterChanged(); // Ensure filters are still applied
+        api.onSortChanged(); // Ensure sorting is still applied
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
