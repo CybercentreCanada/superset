@@ -439,23 +439,25 @@ export default function AGGridViz({
       selectedData.typeData.eml_path &&
       selectedData.typeData.eml_path.length > 0
     ) {
+      // Create a set to remove duplicate items
+      const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
       specialMenuItems = [
         ...specialMenuItems,
         <SubmitToAssemblyLineMenuItem
           onSelection={handleContextMenu}
           label={
-            selectedData.typeData.eml_path.length > 1
+            uniqueEmlPaths.size > 1
               ? 'Submit files to ASSEMBLYLINE'
               : 'Submit file to ASSEMBLYLINE'
           }
           key="submit-file-to-assembly-line"
-          data={selectedData.typeData.eml_path}
+          data={Array.from(uniqueEmlPaths)} // Convert set back to an array
           base_url={assemblyLineUrl}
-          disabled={selectedData.typeData.eml_path.length > SUBMISSION_LIMIT}
+          disabled={uniqueEmlPaths.size > SUBMISSION_LIMIT}
           tooltip={
-            new Set(selectedData.typeData.eml_path).size > SUBMISSION_LIMIT
-              ? `A window will open for each row selected. You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
-              : undefined
+            uniqueEmlPaths.size > SUBMISSION_LIMIT
+              ? `You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
+              : `A new tab will open for each distinct EML path submission.`
           }
         />,
       ];
