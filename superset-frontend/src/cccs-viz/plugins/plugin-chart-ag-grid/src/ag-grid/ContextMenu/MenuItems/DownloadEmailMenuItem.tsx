@@ -94,7 +94,7 @@ function b64ToBlob(b64Data: string, contentType = '', sliceSize = 512) {
     const slice = byteCharacters.slice(offset, offset + sliceSize);
 
     const byteNumbers = new Array(slice.length);
-    for (let i = 0; i < slice.length; i++) {
+    for (let i = 0; i < slice.length; i += 1) {
       byteNumbers[i] = slice.charCodeAt(i);
     }
 
