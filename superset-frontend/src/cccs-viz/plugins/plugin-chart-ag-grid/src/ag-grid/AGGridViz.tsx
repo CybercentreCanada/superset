@@ -22,7 +22,6 @@ import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import {
   CellRange,
-  ColumnState,
   GetMainMenuItemsParams,
   MenuItemDef,
 } from 'ag-grid-community';
