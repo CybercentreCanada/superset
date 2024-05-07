@@ -33,23 +33,23 @@ export default function DownloadEmailMenuItem(
       const endpoint = `/api/v1/fission/get-eml?file=${fileName}`;
       dispatch(addInfoToast('Download started'));
 
-      SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
-        .then(({ json }) => {
-          if (json.result?.content?.indexOf('base64') !== -1) {
-            // Check for base64 encoding
-            const b64Data = json.result.content.split(',')[1];
-            const contentType = 'message/rfc822'; // Correct MIME type for EML files
+    SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
+      .then(({ json }) => {
+        if (json.result?.content?.indexOf('base64') !== -1) {
+          // Check for base64 encoding
+          const b64Data = json.result.content.split(',')[1];
+          const contentType = 'message/rfc822'; // Correct MIME type for EML files
 
-            // Convert base64 data to a blob with the appropriate MIME type
-            const blob = b64ToBlob(b64Data, contentType);
+          // Convert base64 data to a blob with the appropriate MIME type
+          const blob = b64ToBlob(b64Data, contentType);
 
-            // Derive file name from the title or use a default name, ensuring it ends with .eml
-            const uniqueTitle = json.result.title
-              ? `${json.result.title}.eml`
-              : `${fileName}.eml`;
+          // Derive file name from the title or use a default name, ensuring it ends with .eml
+          const uniqueTitle = json.result.title
+            ? `${json.result.title}.eml`
+            : `${fileName}.eml`;
 
-            // Use FileSaver or a similar library to trigger the file download
-            saveAs(blob, uniqueTitle);
+          // Use FileSaver or a similar library to trigger the file download
+          saveAs(blob, uniqueTitle);
           } else if (json.result?.content) {
             dispatch(addDangerToast('Invalid file format.'));
           } else {
