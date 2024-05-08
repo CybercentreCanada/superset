@@ -1,7 +1,6 @@
 import React from 'react';
 import { Menu } from 'src/components/Menu';
-import Icon from '@ant-design/icons';
-import AlSvg from '../../../cccs-grid/images/al.svg';
+import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';
 
 interface OpenInAssemblyLineMenuItemProps {
   label: string;
@@ -34,7 +33,7 @@ export default function OpenInAssemblyLineMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<Icon component={AlSvg} />}
+      icon={<AssemblyLineIcon />}
     >
       {props.label}
     </Menu.Item>
