@@ -66,6 +66,7 @@ const DEFAULT_COL_DEF = {
 
 const RETENTION_LIMIT = 100;
 const SUBMISSION_LIMIT = 10;
+const DOWNLOAD_LIMIT = 10;
 
 const headerStyles = css`
   display: flex;
@@ -476,10 +477,10 @@ export default function AGGridViz({
           }
           key="download-email"
           data={Array.from(uniqueEmlPaths)}
-          disabled={uniqueEmlPaths.size > SUBMISSION_LIMIT}
+          disabled={uniqueEmlPaths.size > DOWNLOAD_LIMIT}
           tooltip={
-            uniqueEmlPaths.size > SUBMISSION_LIMIT
-              ? `You cannot download more than ${SUBMISSION_LIMIT} eml files at a time.`
+            uniqueEmlPaths.size > DOWNLOAD_LIMIT
+              ? `You cannot download more than ${DOWNLOAD_LIMIT} eml files at a time.`
               : `A download will begin for each distinct EML file.`
           }
         />,
