@@ -56,17 +56,20 @@ export default function DownloadEmailMenuItem(
             dispatch(addDangerToast('No content to download.'));
           }
         })
-        .catch(error => {
-          let errorMessage;
-          if (error.content === 'undefined') {
-            errorMessage = `Download failed for ${fileName}: EML file could not be found.`;
+        .catch((error) => {
+          if (error.response?.status === 404) {
+            dispatch(
+              addDangerToast(`Download failed for ${fileName}: EML file could not be found.`),
+            );
           } else {
-            errorMessage = `Download failed for ${fileName}: ${error.content}`;
+            dispatch(
+              addDangerToast(
+                `Download failed for ${fileName}: ${error.response?.statusText || error.message}`,
+              ),
+            );
           }
-          dispatch(addDangerToast(errorMessage));
         });
     });
-
     props.onSelection();
   };
 
