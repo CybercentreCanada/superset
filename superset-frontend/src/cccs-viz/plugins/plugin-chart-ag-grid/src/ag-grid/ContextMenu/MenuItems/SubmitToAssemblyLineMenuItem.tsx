@@ -40,7 +40,7 @@ export default function SubmitToAssemblyLineMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<AssemblyLineIcon/>}
+      icon={<AssemblyLineIcon />}
     >
       {props.label}
     </Menu.Item>
