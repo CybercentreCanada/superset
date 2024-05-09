@@ -7,8 +7,8 @@ import {
   addInfoToast,
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
-import Icon from '@ant-design/icons';
-import EmailSvg from '../../../cccs-grid/images/email.svg';
+import EmailIcon from 'src/cccs-viz/plugins/components/EmailIcon';
+import { Tooltip } from 'antd';
 
 const QUERY_TIMEOUT_LIMIT = 180000; // 3 minutes
 
@@ -86,9 +86,13 @@ export default function DownloadEmailMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<Icon component={EmailSvg} />}
+      icon={<EmailIcon disabled={props.disabled} />}
     >
-      {props.label}
+    {props.tooltip ? (
+        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
+      ) : (
+        props.label
+      )}
     </Menu.Item>
   );
 }

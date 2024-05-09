@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu } from 'src/components/Menu';
-import Icon from '@ant-design/icons';
-import AlSvg from '../../../cccs-grid/images/al.svg';
+import { Tooltip } from 'antd';
+import AssemblylineIcon from 'src/cccs-viz/plugins/components/AssemblylineIcon';
 
 interface SubmitToAssemblyLineMenuItemProps {
   label: string;
@@ -41,9 +41,13 @@ export default function SubmitToAssemblyLineMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<Icon component={AlSvg} />}
+      icon={<AssemblylineIcon disabled={props.disabled} />}
     >
-      {props.label}
+    {props.tooltip ? (
+        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
+      ) : (
+        props.label
+      )}
     </Menu.Item>
   );
 }
