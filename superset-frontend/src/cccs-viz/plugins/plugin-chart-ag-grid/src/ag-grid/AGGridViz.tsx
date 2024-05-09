@@ -47,6 +47,7 @@ import ExportMenu from './ContextMenu/MenuItems/ExportMenu';
 import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/utils';
 import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
+import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemblyLineMenuItem';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -64,6 +65,7 @@ const DEFAULT_COL_DEF = {
 };
 
 const RETENTION_LIMIT = 100;
+const SUBMISSION_LIMIT = 10;
 
 const headerStyles = css`
   display: flex;
@@ -431,6 +433,34 @@ export default function AGGridViz({
           key="open-file-in-assembly-line"
           data={selectedData.typeData.file_sha256}
           base_url={assemblyLineUrl}
+        />,
+      ];
+    }
+    if (
+      assemblyLineUrl &&
+      selectedData.typeData.eml_path &&
+      selectedData.typeData.eml_path.length > 0
+    ) {
+      // Create a set to remove duplicate items
+      const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
+      specialMenuItems = [
+        ...specialMenuItems,
+        <SubmitToAssemblyLineMenuItem
+          onSelection={handleContextMenu}
+          label={
+            uniqueEmlPaths.size > 1
+              ? 'Submit files to ASSEMBLYLINE'
+              : 'Submit file to ASSEMBLYLINE'
+          }
+          key="submit-file-to-assembly-line"
+          data={Array.from(uniqueEmlPaths)} // Convert set back to an array
+          base_url={assemblyLineUrl}
+          disabled={uniqueEmlPaths.size > SUBMISSION_LIMIT}
+          tooltip={
+            uniqueEmlPaths.size > SUBMISSION_LIMIT
+              ? `You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
+              : `A new tab will open for each distinct EML path submission.`
+          }
         />,
       ];
     }
