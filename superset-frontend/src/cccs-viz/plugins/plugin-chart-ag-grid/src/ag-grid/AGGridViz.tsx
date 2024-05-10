@@ -320,7 +320,9 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenu}
           label="Filter on selection"
-          disabled={!adhocFiltersInScope.length}
+          disabled={!adhocFiltersInScope.length || Object.values(selectedData.selectedColData).every(
+            data => data.type === 'JSON',
+          )}
           key="filter-on-selection"
           icon={
             <FilterOutlined
