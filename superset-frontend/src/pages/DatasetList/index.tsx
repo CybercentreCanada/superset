@@ -383,19 +383,23 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
             }
           } catch {
             // This is probably because the datahub icon does not exist
-            const parsedExtra = JSON.parse(extra);
-            if (parsedExtra?.urn && datahubUrl) {
-              return (
-                <Button
-                  type="link"
-                  href={`${datahubUrl}dataset/${parsedExtra?.urn}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ color: 'initial' }}
-                >
-                  Datahub
-                </Button>
-              );
+            try {
+              const parsedExtra = JSON.parse(extra);
+              if (parsedExtra?.urn && datahubUrl) {
+                return (
+                  <Button
+                    type="link"
+                    href={`${datahubUrl}dataset/${parsedExtra?.urn}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: 'initial' }}
+                  >
+                    Datahub
+                  </Button>
+                );
+              }
+            } catch {
+              return null;
             }
           }
           return null;
