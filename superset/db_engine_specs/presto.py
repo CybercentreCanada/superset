@@ -521,6 +521,7 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
 
     @classmethod
     def _latest_partition_from_df(cls, df: pd.DataFrame) -> list[str] | None:
+        return None
         if not df.empty:
             return df.to_records(index=False)[0].item()
         return None
