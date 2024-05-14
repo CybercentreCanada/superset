@@ -52,17 +52,15 @@ export default function DownloadEmailMenuItem(
             saveAs(blob, uniqueTitle);
           } else if (json.result?.content) {
             dispatch(addDangerToast('Invalid file format.'));
-          } else if (json.result?.Error) {
-            dispatch(
-              addDangerToast(
-                `Download failed for ${fileName}: EML file could not be found.`,
-              ),
-            );
+          } else {
+            dispatch(addDangerToast('No content to download.'));
           }
         })
-        .catch(error => {
+        .catch(_error => {
           dispatch(
-            addDangerToast(`Download failed for ${fileName}: ${error.message}`),
+            addDangerToast(
+              `Download failed for ${fileName}: EML file could not be found.`,
+            ),
           );
         });
     });
