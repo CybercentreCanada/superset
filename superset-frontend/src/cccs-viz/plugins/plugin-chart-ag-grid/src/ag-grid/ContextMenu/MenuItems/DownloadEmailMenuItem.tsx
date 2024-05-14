@@ -88,7 +88,7 @@ export default function DownloadEmailMenuItem(
       disabled={props.disabled}
       icon={<EmailIcon disabled={props.disabled} />}
     >
-    {props.tooltip ? (
+      {props.tooltip ? (
         <Tooltip title={props.tooltip}>{props.label}</Tooltip>
       ) : (
         props.label

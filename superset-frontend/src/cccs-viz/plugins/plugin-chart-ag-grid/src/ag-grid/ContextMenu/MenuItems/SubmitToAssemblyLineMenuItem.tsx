@@ -43,7 +43,7 @@ export default function SubmitToAssemblyLineMenuItem(
       disabled={props.disabled}
       icon={<AssemblylineIcon disabled={props.disabled} />}
     >
-    {props.tooltip ? (
+      {props.tooltip ? (
         <Tooltip title={props.tooltip}>{props.label}</Tooltip>
       ) : (
         props.label
