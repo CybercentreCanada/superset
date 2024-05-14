@@ -20,8 +20,8 @@ RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection
   && rm /tmp/requirements.txt
 
 # From: https://github.com/apache/superset/issues/25307#issuecomment-1885154970
-# RUN sed -i "524i \        return None" /app/superset/db_engine_specs/presto.py
-# RUN sed -i 73,92d /app/superset/db_engine_specs/trino.py
+RUN sed -i "524i \        return None" /app/superset/db_engine_specs/presto.py
+RUN sed -i 80,100d /app/superset/db_engine_specs/trino.py
 
 ENV BUILD_NUMBER_VAR=${BUILD_NUMBER}
 
