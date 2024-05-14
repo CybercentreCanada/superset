@@ -31,6 +31,7 @@ import { clearDataMask } from 'src/dataMask/actions';
 import _ from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import { Menu } from 'src/components/Menu';
+import { addWarningToast } from 'src/components/MessageToasts/actions';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
@@ -142,10 +143,21 @@ export default function AGGridViz({
       globally = false,
       selectedColData?: { [key: string]: any },
     ) => {
-      const groupBy: [string, any][] = Object.entries(data);
+      let groupBy: [string, any][] = Object.entries(data);
 
       // If not global, use the same setup as usual
       if (!globally) {
+        if (selectedColData) {
+          // filter out json columns
+          if (Object.values(selectedColData).some(c => c.type === 'JSON')) {
+            groupBy = groupBy.filter(
+              entry => selectedColData[entry[0]].type !== 'JSON',
+            );
+            dispatch(
+              addWarningToast('Removing JSON values from cross filters'),
+            );
+          }
+        }
         setDataMask({
           extraFormData: {
             filters:
@@ -349,29 +361,61 @@ export default function AGGridViz({
         <Menu.Divider key="cross-filter-divider-start" />,
         <EmitFilterMenuItem
           onClick={() => {
-            onClick(selectedData.highlightedData);
+            onClick(
+              selectedData.highlightedData,
+              false,
+              selectedData.selectedColData,
+            );
           }}
           onSelection={handleContextMenu}
           label="Add cross-filter(s)"
-          disabled={Object.keys(selectedData.highlightedData).length === 0}
+          disabled={
+            Object.keys(selectedData.highlightedData).length === 0 ||
+            Object.values(selectedData.selectedColData).every(
+              data => data.type === 'JSON',
+            )
+          }
           key={contextDivID.toString()}
           icon={
             <EmitIcon
               disabled={!Object.keys(selectedData.highlightedData).length}
             />
           }
+          tooltip={
+            Object.values(selectedData.selectedColData).some(
+              data => data.type === 'JSON',
+            )
+              ? 'JSON columns cannot be filtered on selection.'
+              : undefined
+          }
         />,
         <EmitFilterMenuItem
           onClick={() => {
-            onClick(selectedData.principalData);
+            onClick(
+              selectedData.principalData,
+              false,
+              selectedData.selectedColData,
+            );
           }}
           onSelection={handleContextMenu}
           label="Add principle column cross-filter(s)"
-          disabled={Object.keys(selectedData.principalData).length === 0}
+          disabled={
+            Object.keys(selectedData.principalData).length === 0 ||
+            Object.values(selectedData.selectedColData).every(
+              data => data.type === 'JSON',
+            )
+          }
           icon={
             <EmitIcon
               disabled={!Object.keys(selectedData.principalData).length}
             />
+          }
+          tooltip={
+            Object.values(selectedData.selectedColData).some(
+              data => data.type === 'JSON',
+            )
+              ? 'JSON columns cannot be filtered on selection.'
+              : undefined
           }
         />,
         <EmitFilterMenuItem
