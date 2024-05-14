@@ -52,26 +52,18 @@ export default function DownloadEmailMenuItem(
             saveAs(blob, uniqueTitle);
           } else if (json.result?.content) {
             dispatch(addDangerToast('Invalid file format.'));
-          } else {
-            dispatch(addDangerToast('No content to download.'));
-          }
-        })
-        .catch(error => {
-          if (error.response?.status === 404) {
+          } else if (json.result?.Error) {
             dispatch(
               addDangerToast(
                 `Download failed for ${fileName}: EML file could not be found.`,
               ),
             );
-          } else {
-            dispatch(
-              addDangerToast(
-                `Download failed for ${fileName}: ${
-                  error.response?.statusText || error.message
-                }`,
-              ),
-            );
           }
+        })
+        .catch(error => {
+          dispatch(
+            addDangerToast(`Download failed for ${fileName}: ${error.message}`),
+          );
         });
     });
     props.onSelection();

@@ -457,7 +457,7 @@ export default function AGGridViz({
           disabled={uniqueEmlPaths.size > SUBMISSION_LIMIT}
           tooltip={
             uniqueEmlPaths.size > SUBMISSION_LIMIT
-              ? `You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
+              ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
               : `A new tab will open for each distinct EML path submission.`
           }
         />,
@@ -480,7 +480,7 @@ export default function AGGridViz({
           disabled={uniqueEmlPaths.size > DOWNLOAD_LIMIT}
           tooltip={
             uniqueEmlPaths.size > DOWNLOAD_LIMIT
-              ? `You cannot download more than ${DOWNLOAD_LIMIT} eml files at a time.`
+              ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
               : `A download will begin for each distinct EML file.`
           }
         />,
