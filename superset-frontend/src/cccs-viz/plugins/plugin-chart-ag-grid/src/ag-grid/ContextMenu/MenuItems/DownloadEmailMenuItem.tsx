@@ -52,7 +52,10 @@ export default function DownloadEmailMenuItem(
             saveAs(blob, uniqueTitle);
           } else if (json.result?.content) {
             dispatch(addDangerToast('Invalid file format.'));
-          } else {
+          } else if (json.result?.Error) {
+            dispatch(addDangerToast(`Download failed. ${json.result.Error}`));
+          }
+          else {
             dispatch(addDangerToast('No content to download.'));
           }
         })
