@@ -54,8 +54,7 @@ export default function DownloadEmailMenuItem(
             dispatch(addDangerToast('Invalid file format.'));
           } else if (json.result?.Error) {
             dispatch(addDangerToast(`Download failed. ${json.result.Error}`));
-          }
-          else {
+          } else {
             dispatch(addDangerToast('No content to download.'));
           }
         })
