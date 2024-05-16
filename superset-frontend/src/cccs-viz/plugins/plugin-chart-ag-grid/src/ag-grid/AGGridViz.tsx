@@ -399,23 +399,11 @@ export default function AGGridViz({
           }}
           onSelection={handleContextMenu}
           label="Add principle column cross-filter(s)"
-          disabled={
-            Object.keys(selectedData.principalData).length === 0 ||
-            Object.values(selectedData.selectedColData).every(
-              data => data.type === 'JSON',
-            )
-          }
+          disabled={Object.keys(selectedData.principalData).length === 0}
           icon={
             <EmitIcon
               disabled={!Object.keys(selectedData.principalData).length}
             />
-          }
-          tooltip={
-            Object.values(selectedData.selectedColData).some(
-              data => data.type === 'JSON',
-            )
-              ? 'JSON columns cannot be filtered on selection.'
-              : undefined
           }
         />,
         <EmitFilterMenuItem
