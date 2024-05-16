@@ -154,7 +154,7 @@ export default function AGGridViz({
               entry => selectedColData[entry[0]].type !== 'JSON',
             );
             dispatch(
-              addWarningToast('Removing JSON values from cross filters'),
+              addWarningToast('Removing JSON values from cross-filters'),
             );
           }
         }
@@ -185,7 +185,7 @@ export default function AGGridViz({
         emitGlobalFilter(formData.sliceId, groupBy, selectedColData);
       }
     },
-    [emitGlobalFilter, formData.sliceId, setDataMask],
+    [dispatch, emitGlobalFilter, formData.sliceId, setDataMask],
   ); // only take relevant page size options
 
   const unnestValue = (value: string): string[] => {
@@ -385,7 +385,7 @@ export default function AGGridViz({
             Object.values(selectedData.selectedColData).some(
               data => data.type === 'JSON',
             )
-              ? 'JSON columns cannot be filtered on selection.'
+              ? 'JSON columns cannot be added to cross-filters.'
               : undefined
           }
         />,
