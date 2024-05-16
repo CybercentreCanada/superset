@@ -424,7 +424,7 @@ export default function AGGridViz({
       assemblyLineUrl &&
       selectedData.typeData.file_sha256 &&
       selectedData.typeData.file_sha256.length > 0 &&
-      selectedData.typeData.file_sha256[0].length > 0
+      selectedData.typeData.file_sha256[0].length > 3
     ) {
       specialMenuItems = [
         ...specialMenuItems,
@@ -441,7 +441,7 @@ export default function AGGridViz({
       assemblyLineUrl &&
       selectedData.typeData.eml_path &&
       selectedData.typeData.eml_path.length > 0 &&
-      selectedData.typeData.eml_path[0].length > 0
+      selectedData.typeData.eml_path[0].length > 3
     ) {
       // Create a set to remove duplicate items
       const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
@@ -470,7 +470,7 @@ export default function AGGridViz({
       enableDownload &&
       selectedData.typeData.eml_path &&
       selectedData.typeData.eml_path.length > 0 &&
-      selectedData.typeData.eml_path[0].length > 0
+      selectedData.typeData.eml_path[0].length > 3
     ) {
       const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
       specialMenuItems = [
