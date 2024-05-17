@@ -151,7 +151,7 @@ export default function AGGridViz({
           // filter out json columns
           if (Object.values(selectedColData).some(c => c.type === 'JSON')) {
             groupBy = groupBy.filter(
-              entry => selectedColData[entry[0]].type !== 'JSON',
+              entry => selectedColData[entry[0]]?.type !== 'JSON',
             );
             dispatch(
               addWarningToast('Removing JSON values from cross-filters'),
