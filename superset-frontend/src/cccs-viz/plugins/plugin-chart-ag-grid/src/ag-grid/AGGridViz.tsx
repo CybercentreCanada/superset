@@ -66,6 +66,7 @@ const DEFAULT_COL_DEF = {
 
 const RETENTION_LIMIT = 100;
 const SUBMISSION_LIMIT = 10;
+const DOWNLOAD_LIMIT = 10;
 
 const headerStyles = css`
   display: flex;
@@ -90,6 +91,7 @@ export default function AGGridViz({
   agGridLicenseKey,
   assemblyLineUrl,
   enableAlfred,
+  enableDownload,
   emitCrossFilters,
   jumpActionConfigs,
 }: AGGridVizProps) {
@@ -421,7 +423,8 @@ export default function AGGridViz({
     if (
       assemblyLineUrl &&
       selectedData.typeData.file_sha256 &&
-      selectedData.typeData.file_sha256.length > 0
+      selectedData.typeData.file_sha256.length > 0 &&
+      selectedData.typeData.file_sha256[0].length > 3
     ) {
       specialMenuItems = [
         ...specialMenuItems,
@@ -437,7 +440,8 @@ export default function AGGridViz({
     if (
       assemblyLineUrl &&
       selectedData.typeData.eml_path &&
-      selectedData.typeData.eml_path.length > 0
+      selectedData.typeData.eml_path.length > 0 &&
+      selectedData.typeData.eml_path[0].length > 3
     ) {
       // Create a set to remove duplicate items
       const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
@@ -456,24 +460,34 @@ export default function AGGridViz({
           disabled={uniqueEmlPaths.size > SUBMISSION_LIMIT}
           tooltip={
             uniqueEmlPaths.size > SUBMISSION_LIMIT
-              ? `You cannot submit more than ${SUBMISSION_LIMIT} eml files at a time.`
+              ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
               : `A new tab will open for each distinct EML path submission.`
           }
         />,
       ];
     }
     if (
+      enableDownload &&
       selectedData.typeData.eml_path &&
-      selectedData.typeData.eml_path.length > 0
+      selectedData.typeData.eml_path.length > 0 &&
+      selectedData.typeData.eml_path[0].length > 3
     ) {
+      const uniqueEmlPaths = new Set(selectedData.typeData.eml_path);
       specialMenuItems = [
         ...specialMenuItems,
         <DownloadEmailMenuItem
           onSelection={handleContextMenu}
-          label="Download Email"
-          disabled={Object.keys(selectedData.highlightedData).length !== 1}
+          label={
+            uniqueEmlPaths.size > 1 ? 'Download EML files' : 'Download EML file'
+          }
           key="download-email"
-          data={selectedData.typeData.eml_path[0]}
+          data={Array.from(uniqueEmlPaths)}
+          disabled={uniqueEmlPaths.size > DOWNLOAD_LIMIT}
+          tooltip={
+            uniqueEmlPaths.size > DOWNLOAD_LIMIT
+              ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
+              : `A download will begin for each distinct EML file.`
+          }
         />,
       ];
     }

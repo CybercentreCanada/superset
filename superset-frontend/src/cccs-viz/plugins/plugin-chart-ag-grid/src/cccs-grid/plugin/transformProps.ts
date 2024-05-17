@@ -251,6 +251,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
   const assemblyLineUrl = queriesData[0].assemblyLineUrl as String;
   const enableAlfred = queriesData[0].enableAlfred as Boolean;
+  const enableDownload = queriesData[0].enableDownload as Boolean;
 
   const parsedJumpActionConfigs = {};
   jumpActionConfigs?.forEach((e: any) => {
@@ -286,6 +287,7 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     agGridLicenseKey,
     assemblyLineUrl,
     enableAlfred,
+    enableDownload,
     setDataMask,
     emitCrossFilters,
     jumpActionConfigs,
