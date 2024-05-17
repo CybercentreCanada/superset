@@ -350,7 +350,7 @@ export default function AGGridViz({
               : Object.values(selectedData.selectedColData).every(
                   data => data.type === 'JSON',
                 )
-              ? 'JSON columns cannot be filtered on selection.'
+              ? 'JSON columns cannot be used as filters.'
               : adhocFiltersInScope.length > 1
               ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
                   .map(f => f.name)
@@ -385,7 +385,7 @@ export default function AGGridViz({
             Object.values(selectedData.selectedColData).some(
               data => data.type === 'JSON',
             )
-              ? 'JSON columns cannot be added to cross-filters.'
+              ? 'JSON columns cannot be used as cross-filters.'
               : undefined
           }
         />,
