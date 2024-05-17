@@ -7,19 +7,20 @@ import {
   addInfoToast,
   addDangerToast,
 } from 'src/components/MessageToasts/actions';
-import Icon from '@ant-design/icons';
-import EmailSvg from '../../../cccs-grid/images/email.svg';
+import EmailIcon from 'src/cccs-viz/plugins/components/EmailIcon';
+import { Tooltip } from 'antd';
 
 const QUERY_TIMEOUT_LIMIT = 180000; // 3 minutes
 
 interface DownloadEmailMenuItemProps {
   label: string;
-  data: string;
+  data: string[];
   onSelection: () => void;
   key?: string;
   disabled?: boolean;
   isContextMenu?: boolean;
   contextMenuY?: number;
+  tooltip?: string;
 }
 
 export default function DownloadEmailMenuItem(
@@ -28,37 +29,43 @@ export default function DownloadEmailMenuItem(
   const dispatch = useDispatch();
 
   const onClick = () => {
-    const endpoint = `/api/v1/fission/get-eml?file=${props.data}`;
-    dispatch(addInfoToast('Download started'));
+    props.data.forEach(fileName => {
+      const endpoint = `/api/v1/fission/get-eml?file=${fileName}`;
+      dispatch(addInfoToast('Download started'));
 
-    SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
-      .then(({ json }) => {
-        if (json.result?.content?.indexOf('base64') !== -1) {
-          // Check for base64 encoding
-          const b64Data = json.result.content.split(',')[1];
-          const contentType = 'message/rfc822'; // Correct MIME type for EML files
+      SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
+        .then(({ json }) => {
+          if (json.result?.content?.indexOf('base64') !== -1) {
+            // Check for base64 encoding
+            const b64Data = json.result.content.split(',')[1];
+            const contentType = 'message/rfc822'; // Correct MIME type for EML files
 
-          // Convert base64 data to a blob with the appropriate MIME type
-          const blob = b64ToBlob(b64Data, contentType);
+            // Convert base64 data to a blob with the appropriate MIME type
+            const blob = b64ToBlob(b64Data, contentType);
 
-          // Derive file name from the title or use a default name, ensuring it ends with .eml
-          const uniqueTitle = json.result.title
-            ? `${json.result.title}.eml`
-            : `${props.data}.eml`;
+            // Derive file name from the title or use a default name, ensuring it ends with .eml
+            const uniqueTitle = json.result.title
+              ? `${json.result.title}.eml`
+              : `${fileName}.eml`;
 
-          // Use FileSaver or a similar library to trigger the file download
-          saveAs(blob, uniqueTitle);
-        } else if (json.result?.content) {
-          dispatch(addDangerToast('Invalid file format.'));
-        } else {
-          dispatch(addDangerToast('No content to download.'));
-        }
-      })
-      .catch(error => {
-        const errorMessage = `Download failed: ${error.message}`;
-        dispatch(addDangerToast(errorMessage));
-      });
-
+            // Use FileSaver or a similar library to trigger the file download
+            saveAs(blob, uniqueTitle);
+          } else if (json.result?.content) {
+            dispatch(addDangerToast('Invalid file format.'));
+          } else if (json.result?.Error) {
+            dispatch(addDangerToast(`Download failed. ${json.result.Error}`));
+          } else {
+            dispatch(addDangerToast('No content to download.'));
+          }
+        })
+        .catch(_error => {
+          dispatch(
+            addDangerToast(
+              `Download failed for ${fileName}: EML file could not be found.`,
+            ),
+          );
+        });
+    });
     props.onSelection();
   };
 
@@ -71,9 +78,13 @@ export default function DownloadEmailMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<Icon component={EmailSvg} />}
+      icon={<EmailIcon disabled={props.disabled} />}
     >
-      {props.label}
+      {props.tooltip ? (
+        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
+      ) : (
+        props.label
+      )}
     </Menu.Item>
   );
 }
