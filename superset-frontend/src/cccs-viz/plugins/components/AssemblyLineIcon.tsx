@@ -1,5 +1,5 @@
 import React from 'react';
-import AssemblyLineLogo from './al.png';
+import AssemblyLineLogo from './assemblyline-logo.png';
 
 const AssemblyLineIcon: React.FC<{
   disabled?: boolean;
