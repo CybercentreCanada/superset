@@ -355,7 +355,7 @@ export default function AGGridViz({
               disabled={!Object.keys(selectedData.highlightedData).length}
             />
           }
-          tooltip='Cross-filter(s) will be applied to all charts whose datasets contain columns with the same name.'
+          tooltip="Cross-filter(s) will be applied to all charts whose datasets contain columns with the same name."
         />,
         <EmitFilterMenuItem
           onClick={() => {
