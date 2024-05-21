@@ -126,21 +126,6 @@ export default function AGGridViz({
     setPageSize(newSize <= 0 ? 0 : newSize);
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      // Reapply filters and sort model on window resize
-      const api = gridRef.current?.api;
-      if (api) {
-        api.onFilterChanged(); // Ensure filters are still applied
-        api.onSortChanged(); // Ensure sorting is still applied
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     e.preventDefault();
@@ -370,6 +355,7 @@ export default function AGGridViz({
               disabled={!Object.keys(selectedData.highlightedData).length}
             />
           }
+          tooltip='Cross-filter(s) will be applied to all of the charts whose datasets contain columns with the same name.'
         />,
         <EmitFilterMenuItem
           onClick={() => {
