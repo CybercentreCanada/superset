@@ -384,7 +384,7 @@ export default function AGGridViz({
             />
           }
           tooltip={
-            Object.values(selectedData.selectedColData).some(
+            Object.values(selectedData.selectedColData).every(
               data => data.type === 'JSON',
             )
               ? 'JSON columns cannot be used as cross-filters.'
