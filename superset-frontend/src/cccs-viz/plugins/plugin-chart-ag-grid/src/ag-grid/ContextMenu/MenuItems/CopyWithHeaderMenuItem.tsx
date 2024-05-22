@@ -18,7 +18,7 @@ export default function CopyMenuItem(props: CopyMenuItemProps) {
       className="ant-dropdown-menu-item"
       icon={<CopyFilled />}
     >
-      Copy With Headers
+      Copy with headers
     </Menu.Item>
   );
 }

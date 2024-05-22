@@ -388,7 +388,7 @@ export default function AGGridViz({
               data => data.type === 'JSON',
             )
               ? 'JSON columns cannot be used as cross-filters.'
-              : undefined
+              : 'Cross-filter(s) will be applied to all charts whose datasets contain columns with the same name.'
           }
         />,
         <EmitFilterMenuItem
