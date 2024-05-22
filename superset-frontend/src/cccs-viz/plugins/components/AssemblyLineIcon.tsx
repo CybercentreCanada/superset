@@ -1,14 +1,14 @@
 import React from 'react';
-import assemblylineLogo from './assemblyline-logo.png';
+import AssemblyLineLogo from './assemblyline-logo.png';
 
-const AssemblylineIcon: React.FC<{
+const AssemblyLineIcon: React.FC<{
   disabled?: boolean;
   disablePadding?: boolean;
 }> = ({ disabled = false }) => (
   <span role="img" className="anticon">
     <img
-      src={assemblylineLogo}
-      alt="assemblyline logo"
+      src={AssemblyLineLogo}
+      alt="AssemblyLine logo"
       style={{
         overflow: 'visible',
         width: 12,
@@ -21,4 +21,4 @@ const AssemblylineIcon: React.FC<{
   </span>
 );
 
-export default AssemblylineIcon;
+export default AssemblyLineIcon;

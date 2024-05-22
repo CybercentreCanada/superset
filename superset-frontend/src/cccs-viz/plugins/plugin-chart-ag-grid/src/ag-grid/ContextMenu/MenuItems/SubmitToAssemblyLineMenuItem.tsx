@@ -1,7 +1,8 @@
 import React from 'react';
 import { Menu } from 'src/components/Menu';
+
 import { Tooltip } from 'antd';
-import AssemblylineIcon from 'src/cccs-viz/plugins/components/AssemblylineIcon';
+import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';
 
 interface SubmitToAssemblyLineMenuItemProps {
   label: string;
@@ -41,7 +42,7 @@ export default function SubmitToAssemblyLineMenuItem(
           : 'ant-dropdown-menu-item'
       }
       disabled={props.disabled}
-      icon={<AssemblylineIcon disabled={props.disabled} />}
+      icon={<AssemblyLineIcon disabled={props.disabled} />}
     >
       {props.tooltip ? (
         <Tooltip title={props.tooltip}>{props.label}</Tooltip>

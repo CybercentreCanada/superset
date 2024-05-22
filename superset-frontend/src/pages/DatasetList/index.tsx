@@ -54,7 +54,7 @@ import { datahubUrl } from 'src/preamble';
 import Owner from 'src/types/Owner';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { Tooltip } from 'src/components/Tooltip';
-import Icons, { IconType } from 'src/components/Icons';
+import Icons from 'src/components/Icons';
 import FacePile from 'src/components/FacePile';
 import CertifiedBadge from 'src/components/CertifiedBadge';
 import InfoTooltip from 'src/components/InfoTooltip';
@@ -73,7 +73,7 @@ import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
 import { useSelector } from 'react-redux';
 import { ModifiedInfo } from 'src/components/AuditInfo';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
-import logger from 'packages/superset-ui-core/src/utils/logging';
+import { Button } from 'antd';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -369,25 +369,21 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         }: any) => {
           try {
             const parsedExtra = JSON.parse(extra);
-            if (parsedExtra?.urn) {
+            if (parsedExtra?.urn && datahubUrl) {
               return (
-                <a
+                <Button
+                  type="link"
                   href={`${datahubUrl}dataset/${parsedExtra?.urn}`}
                   target="_blank"
                   rel="noreferrer"
-                >
-                  {typeof Icons.Datahub ===
-                  typeof ((_props: IconType) => Element) ? (
-                    <Icons.Datahub viewBox="0 0 180 180" />
-                  ) : (
-                    <></>
-                  )}
-                </a>
+                  icon={<Icons.Datahub viewBox="0 0 180 180" />}
+                  style={{ color: 'initial' }}
+                />
               );
             }
           } catch {
-            logger.warn('Error rendering Datahub Link');
-            return <></>;
+            // This is probably because the datahub icon does not exist
+            return null;
           }
           return null;
         },
