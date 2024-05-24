@@ -121,9 +121,12 @@ export default function AGGridViz({
 
   const gridRef = useRef<AgGridReactType>(null);
 
+  const LOCAL_STORAGE_KEY = 'agGridState';
+
   const updatePageSize = useCallback((newSize: number) => {
     gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
+    saveGridState();
   }, []);
 
   const setSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -174,9 +177,10 @@ export default function AGGridViz({
       } else {
         emitGlobalFilter(formData.sliceId, groupBy, selectedColData);
       }
+      saveGridState();
     },
     [emitGlobalFilter, formData.sliceId, setDataMask],
-  ); // only take relevant page size options
+  );
 
   const unnestValue = (value: string): string[] => {
     let parsed;
@@ -203,7 +207,6 @@ export default function AGGridViz({
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
-        // get starting and ending row, remember rowEnd could be before rowStart
         const startRow = Math.min(
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
@@ -212,6 +215,7 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
+
         _.range(startRow, endRow + 1).forEach(rowIndex => {
           const rowNode = api.getModel().getRow(rowIndex)!;
 
@@ -269,6 +273,7 @@ export default function AGGridViz({
       selectedColData,
       jumpToData,
     });
+    saveGridState();
   }, [principalColumns]);
 
   const onClick = useCallback(
@@ -355,7 +360,7 @@ export default function AGGridViz({
               disabled={!Object.keys(selectedData.highlightedData).length}
             />
           }
-          tooltip='Cross-filter(s) will be applied to all of the charts whose datasets contain columns with the same name.'
+          tooltip="Cross-filter(s) will be applied to all of the charts whose datasets contain columns with the same name."
         />,
         <EmitFilterMenuItem
           onClick={() => {
@@ -563,6 +568,23 @@ export default function AGGridViz({
     destroyGrid();
   }, [enableGrouping]);
 
+  // Effect to load the grid state on mount
+  useEffect(() => {
+    loadGridState();
+  }, []);
+
+  // Effect to save the grid state on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      saveGridState();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const getMainMenuItems = (
     params: GetMainMenuItemsParams,
   ): (string | MenuItemDef)[] => {
@@ -574,6 +596,64 @@ export default function AGGridViz({
       }
     });
     return menuItems;
+  };
+
+  const saveGridState = () => {
+    const api = gridRef.current?.api;
+    const columnApi = gridRef.current?.columnApi;
+    if (!api || !columnApi) return;
+
+    const filterModel = api.getFilterModel();
+    const columnState = columnApi.getColumnState();
+    const sortModel = columnApi
+      .getColumns()
+      ?.map(col => ({
+        colId: col.getColId(),
+        sort: col.getSort(),
+      }))
+      .filter(col => col.sort !== undefined);
+    const gridState = {
+      filterModel,
+      columnState,
+      sortModel,
+      pageSize,
+      searchValue,
+    };
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gridState));
+  };
+
+  const loadGridState = () => {
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedState) return;
+
+    const {
+      filterModel,
+      columnState,
+      sortModel,
+      pageSize: savedPageSize,
+      searchValue: savedSearchValue,
+    } = JSON.parse(savedState);
+
+    const api = gridRef.current?.api;
+    const columnApi = gridRef.current?.columnApi;
+    if (!api || !columnApi) return;
+
+    api.setFilterModel(filterModel);
+    columnApi.applyColumnState({ state: columnState, applyOrder: true });
+    if (sortModel) {
+      columnApi.applyColumnState({
+        state: sortModel.map(
+          ({ colId, sort }: { colId: string; sort: string }) => ({
+            colId,
+            sort,
+          }),
+        ),
+        applyOrder: true,
+      });
+    }
+    setPageSize(savedPageSize);
+    setSearchValue(savedSearchValue);
   };
 
   return !isDestroyed ? (
@@ -668,6 +748,13 @@ export default function AGGridViz({
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
           getMainMenuItems={getMainMenuItems}
+          onGridReady={loadGridState}
+          onFilterChanged={saveGridState}
+          onSortChanged={saveGridState}
+          onColumnMoved={saveGridState}
+          onColumnResized={saveGridState}
+          onColumnVisible={saveGridState}
+          onColumnPinned={saveGridState}
         />
       </div>
     </>
