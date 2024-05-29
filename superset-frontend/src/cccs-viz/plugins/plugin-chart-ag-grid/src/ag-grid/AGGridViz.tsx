@@ -49,6 +49,7 @@ import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/ut
 import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemblyLineMenuItem';
+import { theme } from 'src/preamble';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
@@ -79,7 +80,7 @@ const paginationStyles = css`
 `;
 
 const highlightedCell = css`
-  background-color: rgba(255, 223, 186, 0.5); /* Light orange background */
+  background-color: ${theme.colors.primary.light3};
 `;
 
 export default function AGGridViz({
@@ -108,7 +109,7 @@ export default function AGGridViz({
 
   const getCellClass = useCallback(
     params => {
-      if (crossFilterValue && crossFilterValue.includes(params.value)) {
+      if (crossFilterValue?.includes(params.value)) {
         return highlightedCell;
       }
       return '';
