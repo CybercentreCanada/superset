@@ -78,6 +78,10 @@ const paginationStyles = css`
   margin-right: 0.5rem;
 `;
 
+const highlightEmittedStyles = css`
+  background-color: rgba(255, 223, 186, 0.5); /* Light orange background */
+`;
+
 export default function AGGridViz({
   columnDefs,
   rowData,
@@ -203,9 +207,12 @@ export default function AGGridViz({
   const onRangeSelectionChanged = useCallback(() => {
     const api = gridRef.current!.api!;
     const cellRanges = api.getCellRanges();
+    const colApi = gridRef.current!.columnApi!;
+    const allColumns = colApi.getAllColumns();
 
-    const col_api = gridRef.current!.columnApi!;
-    const all_columns = col_api.getColumns();
+    if (!allColumns) {
+      return;
+    }
 
     const newSelectedData: { [key: string]: string[] } = {};
     const newPrincipalData: { [key: string]: string[] } = {};
@@ -215,7 +222,6 @@ export default function AGGridViz({
 
     if (cellRanges) {
       cellRanges.forEach((range: CellRange) => {
-        // get starting and ending row, remember rowEnd could be before rowStart
         const startRow = Math.min(
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
@@ -224,10 +230,11 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
+
         _.range(startRow, endRow + 1).forEach(rowIndex => {
           const rowNode = api.getModel().getRow(rowIndex)!;
 
-          all_columns?.forEach((column: any) => {
+          allColumns.forEach((column: any) => {
             const colDef = column.getColDef();
             const col = colDef.field;
             const value = api.getValue(column, rowNode);
@@ -257,6 +264,9 @@ export default function AGGridViz({
                   jumpToData[dataType].push(v);
                 }
               });
+
+              // Set a flag in the data to indicate it should be highlighted
+              rowNode.data.emitted = true;
             }
             if (principalColumns?.includes(col)) {
               newPrincipalData[col] = newPrincipalData[col] || [];
@@ -273,6 +283,9 @@ export default function AGGridViz({
           });
         });
       });
+
+      // Refresh the grid to apply the cell class rules
+      api.refreshCells({ force: true });
     }
     setSelectedData({
       highlightedData: newSelectedData,
