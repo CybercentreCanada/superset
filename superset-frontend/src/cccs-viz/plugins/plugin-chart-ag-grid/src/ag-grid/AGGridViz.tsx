@@ -8,6 +8,7 @@ import React, {
 
 import 'ag-grid-enterprise';
 
+import { theme } from 'src/preamble';
 import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -49,7 +50,6 @@ import { getJumpToDashboardContextMenuItems } from './JumpActionConfigControl/ut
 import DownloadEmailMenuItem from './ContextMenu/MenuItems/DownloadEmailMenuItem';
 import OpenInAssemblyLineMenuItem from './ContextMenu/MenuItems/OpenInAssemblyLineMenuItem';
 import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemblyLineMenuItem';
-import { theme } from 'src/preamble';
 
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
