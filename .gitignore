@@ -111,3 +111,5 @@ messages.mo
 docker/requirements-local.txt
 
 cache/
+
+local_dev
