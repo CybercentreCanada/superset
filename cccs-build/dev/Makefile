@@ -119,6 +119,10 @@ admin-user:
 
 # CCCS STUFF
 
+export SUPERSET_CONFIG_PATH = cccs-build/dev/superset_config_docker.py
+
+export PUPPETEER_SKIP_DOWNLOAD = 1
+
 start-infra:
 	docker-compose -f cccs-build/dev/docker-compose.yml down && \
 	docker-compose -f cccs-build/dev/docker-compose.yml up
