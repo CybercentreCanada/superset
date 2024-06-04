@@ -115,3 +115,55 @@ report-celery-beat:
 
 admin-user:
 	superset fab create-admin
+
+
+# CCCS STUFF
+
+start-infra:
+	docker-compose -f cccs-build/dev/docker-compose.yml down && \
+	docker-compose -f cccs-build/dev/docker-compose.yml up
+
+stop-infra:
+	docker-compose -f cccs-build/dev/docker-compose.yml down
+
+install-cccs-requirements:
+	. venv/bin/activate
+
+	. cccs-build/dev/env_vars.sh
+
+	# copy in our env-overrides
+
+	# Install external dependencies
+	pip install -r requirements/local.txt
+
+	# Install Superset in editable (development) mode
+	pip install -e .
+	pip install -r cccs-build/superset/analytical-platform-requirements.txt
+	pip install -r cccs-build/superset/requirements.txt
+
+	# Create an admin user in your metadata database
+	superset fab create-admin \
+                    --username admin \
+                    --firstname "Admin I."\
+                    --lastname Strator \
+                    --email admin@superset.io \
+                    --password general
+
+	# Initialize the database
+	superset db upgrade
+
+	# Create default roles and permissions
+	superset init
+
+	# Load some data to play with
+	superset load-examples
+
+	# Install node packages
+	cd superset-frontend; npm ci
+
+start-services:
+	. venv/bin/activate && . cccs-build/dev/env_vars.sh && superset run -p 8088 --with-threads --reload --debugger --debug
+
+start-ui:
+	cd superset-frontend && . ${HOME}/.nvm/nvm.sh && nvm install && npm install && npm run dev-server
+

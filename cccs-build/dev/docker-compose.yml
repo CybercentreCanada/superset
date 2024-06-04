@@ -1,0 +1,15 @@
+name: superset-dev
+
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - ~/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: superset
+      POSTGRES_DB: superset
+      POSTGRES_PASSWORD: superset
+      PGDATA: /var/lib/postgresql/data/pgdata
