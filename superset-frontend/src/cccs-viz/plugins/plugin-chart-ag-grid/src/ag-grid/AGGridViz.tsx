@@ -37,7 +37,7 @@ import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
 import CustomHeader from './CustomHeader/customHeader';
-import "./CustomHeader/customHeaderStyles.css";
+import './CustomHeader/customHeaderStyles.css';
 
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
