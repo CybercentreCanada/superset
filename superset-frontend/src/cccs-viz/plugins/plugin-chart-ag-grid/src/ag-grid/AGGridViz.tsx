@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -35,6 +36,8 @@ import { addWarningToast } from 'src/components/MessageToasts/actions';
 import ChartContextMenu, {
   Ref as ContextRef,
 } from './ContextMenu/AGGridContextMenu';
+import CustomHeader from './CustomHeader/customHeader';
+import "./CustomHeader/customHeaderStyles.css";
 
 import CopyMenuItem from './ContextMenu/MenuItems/CopyMenuItem';
 import CopyWithHeaderMenuItem from './ContextMenu/MenuItems/CopyWithHeaderMenuItem';
@@ -68,11 +71,6 @@ const DEFAULT_COL_DEF = {
 const RETENTION_LIMIT = 100;
 const SUBMISSION_LIMIT = 10;
 const DOWNLOAD_LIMIT = 10;
-
-const headerStyles = css`
-  display: flex;
-  flex-direction: row;
-`;
 
 const paginationStyles = css`
   margin-right: 0.5rem;
@@ -614,6 +612,12 @@ export default function AGGridViz({
     return menuItems;
   };
 
+  const components = useMemo(() => {
+    return {
+      agColumnHeader: CustomHeader,
+    };
+  }, []);
+
   return !isDestroyed ? (
     <>
       <ChartContextMenu
@@ -637,7 +641,7 @@ export default function AGGridViz({
           className="form-inline"
           style={{ flex: '0 1 auto', paddingBottom: '0.5em' }}
         >
-          <div css={headerStyles}>
+          <div className="headerStyles">
             {pageLength > 0 && (
               <span
                 className="dt-select-page-size form-inline"
@@ -690,6 +694,7 @@ export default function AGGridViz({
           enableRangeSelection
           rowData={rowData}
           enableBrowserTooltips
+          components={components}
           onRangeSelectionChanged={onRangeSelectionChanged}
           cacheQuickFilter
           suppressRowClickSelection
