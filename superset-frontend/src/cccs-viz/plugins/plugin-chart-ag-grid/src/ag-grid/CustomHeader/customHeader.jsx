@@ -34,10 +34,6 @@ export default props => {
     if (!refLabel.current) {
       return;
     }
-    props.setTooltip(
-      props.displayName,
-      () => refLabel.current.scrollWidth > refLabel.current.clientWidth,
-    );
   }, [refLabel]);
 
   let sort = null;
