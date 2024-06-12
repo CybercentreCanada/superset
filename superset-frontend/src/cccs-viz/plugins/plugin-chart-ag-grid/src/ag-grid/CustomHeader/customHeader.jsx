@@ -30,12 +30,6 @@ export default props => {
     onSortChanged();
   }, []);
 
-  useEffect(() => {
-    if (!refLabel.current) {
-      return;
-    }
-  }, [refLabel]);
-
   let sort = null;
 
   if (props.enableSorting) {
