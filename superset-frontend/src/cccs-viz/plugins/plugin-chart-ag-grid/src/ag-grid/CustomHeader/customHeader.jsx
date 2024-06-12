@@ -44,29 +44,35 @@ export default props => {
 
   if (props.enableSorting) {
     sort = (
-      <React.Fragment>
+      <>
         <div
           onClick={event => onSortRequested('asc', event)}
           onTouchEnd={event => onSortRequested('asc', event)}
           className={`customSortDownLabel ${ascSort}`}
+          role="button"
+          tabIndex="0"
         >
-          <i className="fa fa-long-arrow-alt-down"></i>
+          <i className="fa fa-long-arrow-alt-down" />
         </div>
         <div
           onClick={event => onSortRequested('desc', event)}
           onTouchEnd={event => onSortRequested('desc', event)}
           className={`customSortUpLabel ${descSort}`}
+          role="button"
+          tabIndex="0"
         >
-          <i className="fa fa-long-arrow-alt-up"></i>
+          <i className="fa fa-long-arrow-alt-up" />
         </div>
         <div
           onClick={event => onSortRequested('', event)}
           onTouchEnd={event => onSortRequested('', event)}
           className={`customSortRemoveLabel ${noSort}`}
+          role="button"
+          tabIndex="0"
         >
-          <i className="fa fa-times"></i>
+          <i className="fa fa-times" />
         </div>
-      </React.Fragment>
+      </>
     );
   }
 
@@ -76,8 +82,10 @@ export default props => {
         ref={refButton}
         className="customHeaderMenuButton"
         onClick={() => onMenuClicked()}
+        role="button"
+        tabIndex="0"
       >
-        <i className={`fa ${props.menuIcon}`}></i>
+        <i className={`fa ${props.menuIcon}`} />
       </div>
       <div ref={refLabel} className="customHeaderLabel">
         {props.displayName}

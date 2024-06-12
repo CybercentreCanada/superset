@@ -612,11 +612,12 @@ export default function AGGridViz({
     return menuItems;
   };
 
-  const components = useMemo(() => {
-    return {
+  const components = useMemo(
+    () => ({
       agColumnHeader: CustomHeader,
-    };
-  }, []);
+    }),
+    [],
+  );
 
   return !isDestroyed ? (
     <>
