@@ -8,7 +8,6 @@ import React, {
 
 import 'ag-grid-enterprise';
 
-import { theme } from 'src/preamble';
 import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -79,10 +78,6 @@ const paginationStyles = css`
   margin-right: 0.5rem;
 `;
 
-const highlightedCell = css`
-  background-color: ${theme.colors.primary.light3};
-`;
-
 export default function AGGridViz({
   columnDefs,
   rowData,
@@ -106,22 +101,6 @@ export default function AGGridViz({
   const crossFilterValue = useSelector<RootState, any>(
     state => state.dataMask[formData.sliceId]?.filterState?.value,
   );
-
-  const getCellClass = useCallback(
-    params => {
-      if (crossFilterValue?.includes(params.value)) {
-        return highlightedCell;
-      }
-      return '';
-    },
-    [crossFilterValue],
-  );
-
-  const updatedColumnDefs = columnDefs.map(colDef => ({
-    ...colDef,
-    cellClass: getCellClass,
-  }));
-
   const dispatch = useDispatch();
   const emitGlobalFilter = useEmitGlobalFilter();
 
@@ -706,7 +685,7 @@ export default function AGGridViz({
         <AgGridReact
           ref={gridRef}
           className="ag-theme-balham"
-          columnDefs={updatedColumnDefs}
+          columnDefs={columnDefs}
           defaultColDef={DEFAULT_COL_DEF}
           enableRangeSelection
           rowData={rowData}
