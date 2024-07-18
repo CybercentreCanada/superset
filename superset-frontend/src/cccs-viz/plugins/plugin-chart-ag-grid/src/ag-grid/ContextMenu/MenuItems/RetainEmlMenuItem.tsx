@@ -35,9 +35,9 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
         if (Number.isNaN(date.getTime())) {
           date = new Date(d);
         }
-        const day = date.getDate();
-        const month = date.getMonth() + 1; // months are labelled 0-11;
-        const year = date.getFullYear();
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1; // months are labelled 0-11;
+        const year = date.getUTCFullYear();
         return `${year}-${month}-${day}`;
       });
     } catch (error) {
