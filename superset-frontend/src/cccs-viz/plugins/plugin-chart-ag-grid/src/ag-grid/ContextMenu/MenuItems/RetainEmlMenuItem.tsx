@@ -41,6 +41,7 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
         return `${year}-${month}-${day}`;
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Error parsing dates, ignoring date columns: ${error}`);
       allDates = [];
     }
@@ -57,6 +58,8 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
         window.open(json.result, '_blank');
       })
       .catch(error => {
+        // eslint-disable-next-line no-console
+        console.error(`Error retaining: ${error}`);
         dispatch(
           addDangerToast(
             'Retention failed. The records you attempted to retain were not retained.',
