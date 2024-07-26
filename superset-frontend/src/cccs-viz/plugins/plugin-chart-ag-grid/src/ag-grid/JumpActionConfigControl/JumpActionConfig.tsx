@@ -37,7 +37,10 @@ const useDashboardState = () => {
           .map((e: any) => ({ value: e.id, label: e.dashboard_title }));
         setDashboardList(dashboards);
       })
-      .catch(error => {});
+      .catch(error => {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      });
   }, []);
 
   const fetchFilterList = useCallback((dashboardId: number) => {
@@ -48,14 +51,19 @@ const useDashboardState = () => {
         const metadata = JSON.parse(json.result.json_metadata);
 
         setFilterList(
-          metadata?.native_filter_configuration.map((e: any) => ({
-            value: e.id,
-            label: e.name,
-            column: e?.targets[0].column?.name || '',
-          })),
+          metadata?.native_filter_configuration
+            .filter((e: any) => e?.targets?.length > 0) // jump to filters must have targets
+            .map((e: any) => ({
+              value: e.id,
+              label: e.name,
+              column: e.targets?.[0]?.column?.name || '',
+            })),
         );
       })
-      .catch(error => {});
+      .catch(error => {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      });
   }, []);
 
   return {
