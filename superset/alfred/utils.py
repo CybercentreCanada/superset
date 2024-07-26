@@ -241,6 +241,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
                     sql += " OR "
                 sql += f"(time > TIMESTAMP '{datetimes[i].strftime('%Y-%m-%d')}' AND time < TIMESTAMP '{(datetimes[i] + timedelta(days=1)).strftime('%Y-%m-%d')}')"
             sql += ")"
+        sql += f" LIMIT {limit};"
         logger.info(f"Querying EML Data from trino at {trino_host}...")
         cur = conn.cursor()
         logger.info(f"Created Connection {cur.query_id}")
