@@ -123,7 +123,6 @@ export default function AGGridViz({
   const gridRef = useRef<AgGridReactType>(null);
 
   const updatePageSize = useCallback((newSize: number) => {
-    gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
   }, []);
 
@@ -204,7 +203,7 @@ export default function AGGridViz({
     const api = gridRef.current!.api!;
     const cellRanges = api.getCellRanges();
 
-    const col_api = gridRef.current!.columnApi!;
+    const col_api = gridRef.current!.api;
     const all_columns = col_api.getColumns();
 
     const newSelectedData: { [key: string]: string[] } = {};
