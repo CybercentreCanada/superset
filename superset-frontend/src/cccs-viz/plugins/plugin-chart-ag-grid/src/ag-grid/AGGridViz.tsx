@@ -8,8 +8,7 @@ import React, {
 
 import 'ag-grid-enterprise';
 
-import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
-
+import { AgGridReact } from '@ag-grid-community/react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
 import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
@@ -556,6 +555,7 @@ export default function AGGridViz({
       <ExportMenu key="export-csv" api={gridRef.current!.api} />,
     ];
     setMenuItems(menuItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     contextDivID,
     crossFilterValue,

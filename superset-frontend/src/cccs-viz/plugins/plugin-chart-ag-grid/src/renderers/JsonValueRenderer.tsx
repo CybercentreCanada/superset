@@ -88,7 +88,7 @@ export default class JsonValueRenderer extends Component<
   // Return whether 'expanded' is set to true or false
   getExpandedValue = () => this.state.expanded;
 
-  onExpandChanged = (params: RowEvent) => {
+  onExpandChanged = (params: any) => {
     this.setState(prevState => ({
       ...prevState,
       rowNode: params.node,
