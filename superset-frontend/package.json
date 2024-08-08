@@ -77,14 +77,13 @@
     "last 3 edge versions"
   ],
   "dependencies": {
+    "@ag-grid-community/client-side-row-model": "^32.0.2",
     "@ag-grid-community/core": "^32.0.2",
     "@ag-grid-community/react": "^32.0.2",
-    "@ag-grid-community/client-side-row-model": "^32.0.2",
     "@ag-grid-enterprise/core": "^32.0.2",
     "@ag-grid-enterprise/range-selection": "^32.0.2",
     "@ag-grid-enterprise/rich-select": "^32.0.2",
     "@ag-grid-enterprise/row-grouping": "^32.0.2",
-    "ag-grid-community": "^32.0.2",
     "ag-grid-enterprise": "^32.0.2",
     "@ant-design/icons": "^5.0.1",
     "@babel/runtime-corejs3": "^7.22.6",

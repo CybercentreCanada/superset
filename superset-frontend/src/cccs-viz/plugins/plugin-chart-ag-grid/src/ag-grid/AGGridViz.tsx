@@ -119,7 +119,7 @@ export default function AGGridViz({
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
 
-  const gridRef = useRef<AgGridReactType>(null);
+  const gridRef = useRef<AgGridReact>(null);
 
   const updatePageSize = useCallback((newSize: number) => {
     setPageSize(newSize <= 0 ? 0 : newSize);
