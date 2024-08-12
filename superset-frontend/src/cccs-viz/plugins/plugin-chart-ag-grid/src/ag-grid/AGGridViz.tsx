@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 
-import 'ag-grid-enterprise';
+import '@ag-grid-enterprise';
 
 import { AgGridReact } from '@ag-grid-community/react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -16,14 +16,14 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { LicenseManager } from '@ag-grid-enterprise/core';
 import { CloseOutlined, FilterOutlined } from '@ant-design/icons';
 import { Filter, css, ensureIsArray, isNativeFilter } from '@superset-ui/core';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-balham.css';
-import { ModuleRegistry } from '@ag-grid-community/core';
+import '@ag-grid-community/styles/ag-grid.css';
+import '@ag-grid-community/styles/ag-theme-balham.css';
 import {
   CellRange,
+  ModuleRegistry,
   GetMainMenuItemsParams,
   MenuItemDef,
-} from 'ag-grid-community';
+} from '@ag-grid-community/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
