@@ -16,7 +16,7 @@
 # under the License.
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Optional
 
 from superset import app
 from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
@@ -54,6 +54,7 @@ class QueryContextFactory:  # pylint: disable=too-few-public-methods
         result_format: ChartDataResultFormat | None = None,
         force: bool = False,
         custom_cache_timeout: int | None = None,
+        viz_type: Optional[str] = None # CCCS -- This field is added to the query_context column in the slice table in our database. Adding this optional argument so that it does not cause an error
     ) -> QueryContext:
         datasource_model_instance = None
         if datasource:

@@ -37,15 +37,17 @@ def cidr_func(req: AdvancedDataTypeRequest) -> AdvancedDataTypeResponse:
         "display_value": "",
         "valid_filter_operators": [
             FilterStringOperators.EQUALS,
+            FilterStringOperators.NOT_EQUALS,
             FilterStringOperators.GREATER_THAN_OR_EQUAL,
             FilterStringOperators.GREATER_THAN,
             FilterStringOperators.IN,
+            FilterStringOperators.NOT_IN,
             FilterStringOperators.LESS_THAN,
             FilterStringOperators.LESS_THAN_OR_EQUAL,
         ],
     }
     if req["values"] == [""]:
-        resp["values"].append("")
+        resp["error_message"] = "IPv4 address or CIDR must not be empty"
         return resp
     for val in req["values"]:
         string_value = str(val)

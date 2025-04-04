@@ -107,6 +107,7 @@ export interface Props {
 }
 
 export interface AdvancedDataTypesState {
+  values: any[];
   parsedAdvancedDataType: string;
   advancedDataTypeOperatorList: string[];
   errorMessage: string;
