@@ -23,6 +23,7 @@ import Select from 'src/components/Select/Select';
 import ControlHeader from 'src/explore/components/ControlHeader';
 
 const propTypes = {
+  allowSelectAll: PropTypes.bool,
   ariaLabel: PropTypes.string,
   autoFocus: PropTypes.bool,
   choices: PropTypes.array,
@@ -69,9 +70,14 @@ const propTypes = {
   tooltipOnClick: PropTypes.func,
   warning: PropTypes.string,
   danger: PropTypes.string,
+  canCopy: PropTypes.bool,
+  copyOnClick: PropTypes.func,
+  canSelectAll: PropTypes.bool,
+  promptTextCreator: PropTypes.func,
 };
 
 const defaultProps = {
+  allowSelectAll: true,
   autoFocus: false,
   choices: [],
   clearable: true,
@@ -85,6 +91,12 @@ const defaultProps = {
   onFocus: () => {},
   showHeader: true,
   valueKey: 'value',
+  promptTextCreator: label => `Create Option ${label}`,
+  canCopy: false,
+  copyOnClick: v => {
+    navigator.clipboard.writeText(v);
+  },
+  canSelectAll: false,
 };
 
 export default class SelectControl extends PureComponent {
@@ -105,6 +117,19 @@ export default class SelectControl extends PureComponent {
       const options = this.getOptions(nextProps);
       this.setState({ options });
     }
+  }
+
+  componentDidMount() {
+    this.selectRef.addEventListener('copy', this.handleCopy.bind(this));
+    this.selectRef.addEventListener('keydown', this.handleKeyDown.bind(this));
+  }
+
+  componentWillUnmount() {
+    this.selectRef.removeEventListener('copy', this.handleCopy.bind(this));
+    this.selectRef.removeEventListener(
+      'keydown',
+      this.handleKeyDown.bind(this),
+    );
   }
 
   // Beware: This is acting like an on-click instead of an on-change
@@ -164,8 +189,34 @@ export default class SelectControl extends PureComponent {
     return filterOption({ data: option }, text);
   }
 
+  isMetaSelectAllOption(o) {
+    return o.meta && o.meta === true && o.label === 'Select all';
+  }
+
+  optionsIncludesSelectAll(o) {
+    return o.findIndex(o => this.isMetaSelectAllOption(o)) >= 0;
+  }
+
+  handleCopy() {
+    this.props.copyOnClick(this.props.value);
+  }
+
+  selectAllOnClick() {
+    this.onChange(this.props.options);
+  }
+
+  handleKeyDown = event => {
+    if (event.ctrlKey === false) {
+      return;
+    }
+    if (event.key === 'a') {
+      this.selectAllOnClick();
+    }
+  };
+
   render() {
     const {
+      allowSelectAll,
       ariaLabel,
       autoFocus,
       clearable,
@@ -196,22 +247,9 @@ export default class SelectControl extends PureComponent {
       tooltipOnClick,
       warning,
       danger,
+      canCopy,
+      canSelectAll,
     } = this.props;
-
-    const headerProps = {
-      name,
-      label,
-      description,
-      renderTrigger,
-      rightNode,
-      leftNode,
-      validationErrors,
-      onClick,
-      hovered,
-      tooltipOnClick,
-      warning,
-      danger,
-    };
 
     const getValue = () => {
       const currentValue =
@@ -228,8 +266,32 @@ export default class SelectControl extends PureComponent {
       return currentValue;
     };
 
+    const headerProps = {
+      name,
+      label,
+      description,
+      renderTrigger,
+      rightNode,
+      leftNode,
+      validationErrors,
+      onClick,
+      hovered,
+      tooltipOnClick,
+      warning,
+      danger,
+      canCopy,
+      copyOnClick: () => {
+        this.props.copyOnClick(getValue());
+      },
+      canSelectAll,
+      selectAllOnClick: () => {
+        this.onChange(this.props.options);
+      },
+    };
+
     const selectProps = {
       allowNewOptions: freeForm,
+      allowSelectAll,
       autoFocus,
       ariaLabel:
         ariaLabel || (typeof label === 'string' ? label : t('Select ...')),
@@ -268,6 +330,9 @@ export default class SelectControl extends PureComponent {
             align-items: center;
           }
         `}
+        ref={elem => {
+          this.selectRef = elem;
+        }}
       >
         <Select {...selectProps} />
       </div>

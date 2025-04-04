@@ -1,0 +1,5 @@
+--index-url=https://bagofholding.cse-cst.gc.ca/repository/pypi-cccs/simple
+hogwarts-auth==2.1.0.dev24592
+alfred_client==1.0.12056
+msal==1.25.0
+psycopg2-binary==2.9.6

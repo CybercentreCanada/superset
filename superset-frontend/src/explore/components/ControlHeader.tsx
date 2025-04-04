@@ -38,6 +38,10 @@ export type ControlHeaderProps = {
   tooltipOnClick?: () => void;
   warning?: string;
   danger?: string;
+  canCopy?: boolean;
+  copyOnClick?: () => void;
+  canSelectAll?: boolean;
+  selectAllOnClick?: () => void;
 };
 
 const iconStyles = css`
@@ -63,6 +67,10 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   tooltipOnClick = () => {},
   warning,
   danger,
+  canCopy,
+  copyOnClick,
+  canSelectAll,
+  selectAllOnClick,
 }) => {
   const { gridUnit, colors } = useTheme();
   const hasHadNoErrors = useRef(false);
@@ -130,6 +138,37 @@ const ControlHeader: FC<ControlHeaderProps> = ({
     );
   };
 
+  const renderOptionalActionIcons = () => (
+    <span
+      css={() => css`
+        padding-left: ${gridUnit}px;
+      `}
+    >
+      {canSelectAll && (
+        <span>
+          <InfoTooltipWithTrigger
+            label={t('select-all')}
+            tooltip={t('Select All (ctl+a)')}
+            placement="top"
+            icon="arrow-circle-up"
+            onClick={selectAllOnClick}
+          />{' '}
+        </span>
+      )}
+      {canCopy && (
+        <span>
+          <InfoTooltipWithTrigger
+            label={t('copy')}
+            tooltip={t('Copy the content of this control')}
+            placement="top"
+            icon="copy"
+            onClick={copyOnClick}
+          />{' '}
+        </span>
+      )}
+    </span>
+  );
+
   return (
     <div className="ControlHeader" data-test={`${name}-header`}>
       <div className="pull-left">
@@ -181,6 +220,9 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           {renderOptionalIcons()}
         </FormLabel>
       </div>
+      {!rightNode && (
+        <div className="pull-right">{renderOptionalActionIcons()}</div>
+      )}
       {rightNode && <div className="pull-right">{rightNode}</div>}
       <div className="clearfix" />
     </div>

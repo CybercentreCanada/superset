@@ -122,6 +122,8 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         #
         # pylint: disable=import-outside-toplevel,too-many-locals,too-many-statements
         from superset.advanced_data_type.api import AdvancedDataTypeRestApi
+        from superset.fission.api import FissionRestApi
+        from superset.alfred.api import AlfredRestApi
         from superset.annotation_layers.annotations.api import AnnotationRestApi
         from superset.annotation_layers.api import AnnotationLayerRestApi
         from superset.async_events.api import AsyncEventsRestApi
@@ -227,6 +229,9 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(SavedQueryRestApi)
         appbuilder.add_api(TagRestApi)
         appbuilder.add_api(SqlLabRestApi)
+        # CCCS API Views
+        appbuilder.add_api(FissionRestApi)
+        appbuilder.add_api(AlfredRestApi)
         #
         # Setup regular views
         #

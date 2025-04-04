@@ -25,7 +25,7 @@ from flask_appbuilder.api import expose, protect
 from flask_babel import gettext as _
 from marshmallow import ValidationError
 
-from superset import is_feature_enabled, security_manager
+from superset import is_feature_enabled, security_manager, app
 from superset.async_events.async_query_manager import AsyncQueryTokenException
 from superset.charts.api import ChartRestApi
 from superset.charts.data.query_context_cache_loader import QueryContextCacheLoader
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from superset.common.query_context import QueryContext
 
 logger = logging.getLogger(__name__)
-
+config = app.config
 
 class ChartDataRestApi(ChartRestApi):
     include_route_methods = {"get_data", "data", "data_from_cache"}
@@ -358,6 +358,14 @@ class ChartDataRestApi(ChartRestApi):
         if result_type == ChartDataResultType.POST_PROCESSED:
             result = apply_post_process(result, form_data, datasource)
 
+        if (form_data["viz_type"] == "cccs_grid"):
+            result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+            result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
+            result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
+            result["queries"][0]["enableDownload"] = config["ENABLE_DOWNLOAD"]
+        
+        result["queries"][0]["fissionUrl"] = config["FISSION_PROXY_URL"]
+            
         if result_format in ChartDataResultFormat.table_like():
             # Verify user has permission to export file
             if not security_manager.can_access("can_csv", "Superset"):

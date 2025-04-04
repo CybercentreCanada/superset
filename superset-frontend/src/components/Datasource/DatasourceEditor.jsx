@@ -53,6 +53,7 @@ import TextAreaControl from 'src/explore/components/controls/TextAreaControl';
 import SpatialControl from 'src/explore/components/controls/SpatialControl';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import Icons from 'src/components/Icons';
+import { bootstrapData } from 'src/preamble';
 import CurrencyControl from 'src/explore/components/controls/CurrencyControl';
 import CollectionTable from './CollectionTable';
 import Fieldset from './Fieldset';
@@ -292,9 +293,17 @@ function ColumnCollectionTable({
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
                 control={
-                  <TextControl
-                    controlId="advanced_data_type"
-                    placeholder={t('Advanced Data type')}
+                  <Select
+                    ariaLabel={t('Select advanced data type')}
+                    name="advanced_data_type"
+                    allowClear
+                    allowNewOptions
+                    options={bootstrapData?.common?.advanced_data_types?.map(
+                      v => ({
+                        value: v.id,
+                        label: v.verbose_name,
+                      }),
+                    )}
                   />
                 }
               />

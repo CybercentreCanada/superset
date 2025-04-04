@@ -39,7 +39,7 @@ if (process.env.WEBPACK_MODE === 'development') {
 }
 
 // eslint-disable-next-line import/no-mutable-exports
-const bootstrapData = getBootstrapData();
+export const bootstrapData = getBootstrapData();
 
 // Configure translation
 if (typeof window !== 'undefined') {
@@ -77,6 +77,8 @@ const getMe = makeApi<void, User>({
   method: 'GET',
   endpoint: '/api/v1/me/',
 });
+
+export const datahubUrl = bootstrapData?.common?.datahub_url;
 
 /**
  * When you re-open the window, we check if you are still logged in.
