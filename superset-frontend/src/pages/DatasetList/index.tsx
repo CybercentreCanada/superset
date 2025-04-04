@@ -50,6 +50,7 @@ import ListView, {
 } from 'src/components/ListView';
 import Loading from 'src/components/Loading';
 import SubMenu, { SubMenuProps, ButtonProps } from 'src/features/home/SubMenu';
+import { datahubUrl } from 'src/preamble';
 import Owner from 'src/types/Owner';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import { Tooltip } from 'src/components/Tooltip';
@@ -72,6 +73,7 @@ import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
 import { useSelector } from 'react-redux';
 import { ModifiedInfo } from 'src/components/AuditInfo';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
+import { Button } from 'antd';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -358,6 +360,36 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         },
         Header: t('Name'),
         accessor: 'table_name',
+      },
+      {
+        Cell: ({
+          row: {
+            original: { extra },
+          },
+        }: any) => {
+          try {
+            const parsedExtra = JSON.parse(extra);
+            if (parsedExtra?.urn && datahubUrl) {
+              return (
+                <Button
+                  type="link"
+                  href={`${datahubUrl}dataset/${parsedExtra?.urn}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  icon={<Icons.Datahub viewBox="0 0 180 180" />}
+                  style={{ color: 'initial' }}
+                />
+              );
+            }
+          } catch {
+            // This is probably because the datahub icon does not exist
+            return null;
+          }
+          return null;
+        },
+        accessor: 'datahub_link',
+        disableSortBy: true,
+        size: 'xs',
       },
       {
         Cell: ({

@@ -404,7 +404,8 @@ const Select = forwardRef(
       // if all values are selected, add select all to value
       if (
         selectAllEnabled &&
-        ensureIsArray(value).length === selectAllEligible.length
+        ensureIsArray(value).length === selectAllEligible.length &&
+        enabledOptions.length > 1
       ) {
         setSelectValue(
           labelInValue
@@ -412,7 +413,15 @@ const Select = forwardRef(
             : ([...ensureIsArray(value), SELECT_ALL_VALUE] as RawValue[]),
         );
       }
-    }, [labelInValue, selectAllEligible.length, selectAllEnabled, value]);
+    }, [
+      value,
+      isSingleMode,
+      labelInValue,
+      selectAllEligible.length,
+      selectOptions.length,
+      selectAllEnabled,
+      enabledOptions.length,
+    ]);
 
     useEffect(() => {
       const checkSelectAll = ensureIsArray(selectValue).some(
@@ -472,7 +481,7 @@ const Select = forwardRef(
               );
             }
           } else if (
-            ensureIsArray(values).length === selectAllEligible.length &&
+            ensureIsArray(values).length === selectAllEligible.length + 1 &&
             selectAllMode
           ) {
             const array = selectAllEligible.filter(

@@ -26,12 +26,14 @@ In order to do that, we reproduce the post-processing in Python
 for these chart types.
 """
 
+import logging
 from io import StringIO
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union
 
 import pandas as pd
 from flask_babel import gettext as __
 
+from superset import app
 from superset.common.chart_data import ChartDataResultFormat
 from superset.utils.core import (
     extract_dataframe_dtypes,
@@ -42,6 +44,10 @@ from superset.utils.core import (
 if TYPE_CHECKING:
     from superset.connectors.sqla.models import BaseDatasource
     from superset.models.sql_lab import Query
+
+
+logger = logging.getLogger(__name__)
+config = app.config
 
 
 def get_column_key(label: tuple[str, ...], metrics: list[str]) -> tuple[Any, ...]:
@@ -268,11 +274,47 @@ def table(
     return df
 
 
+def AgGrid(result: Dict[Any, Any], form_data: Dict[str, Any]) -> Dict[Any, Any]:
+    """
+    CCCS Grid.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+        result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
+        result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
+        result["queries"][0]["enableDownload"] = config["ENABLE_DOWNLOAD"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
+def AtAGlanceUserIDCore(
+    result: Dict[Any, Any], form_data: Dict[str, Any]
+) -> Dict[Any, Any]:
+    """
+    AAG User ID.
+    """
+    try:
+        result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+    except KeyError as err:
+        logger.exception(err)
+
+    return result
+
+
 post_processors = {
     "pivot_table_v2": pivot_table_v2,
     "table": table,
 }
 
+rawPostProcess = [
+    "cccs_grid",
+    "at_a_glance_user_id",
+    "at_a_glance_ip",
+    "at_a_glance_dns",
+    "at_a_glance_user_id_sas",
+]
 
 def apply_post_process(
     result: dict[Any, Any],

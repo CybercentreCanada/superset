@@ -75,5 +75,5 @@
     "./plugins/*/types/**/*",
     "./packages/*/test/**/*",
     "./plugins/*/test/**/*"
-  ]
+, "../../plugin-chart-ag-grid"  ]
 }

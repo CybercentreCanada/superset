@@ -100,6 +100,7 @@ module.exports = {
         camelcase: 0,
         'class-methods-use-this': 0,
         'func-names': 0,
+        'react/react-in-jsx-scope': 0,
         'guard-for-in': 0,
         'import/no-cycle': 0, // re-enable up for discussion, might require some major refactors
         'import/extensions': [

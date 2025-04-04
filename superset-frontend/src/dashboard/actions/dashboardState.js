@@ -631,6 +631,16 @@ export function unsetFocusedFilterField(chartId, column) {
   return { type: UNSET_FOCUSED_FILTER_FIELD, chartId, column };
 }
 
+export const SET_FOCUSED_CHART = 'SET_FOCUSED_CHART';
+export function setFocusedChart(chartId) {
+  return { type: SET_FOCUSED_CHART, chartId };
+}
+
+export const UNSET_FOCUSED_CHART = 'UNSET_FOCUSED_CHART';
+export function unsetFocusedChart() {
+  return { type: UNSET_FOCUSED_CHART };
+}
+
 export const SET_FULL_SIZE_CHART_ID = 'SET_FULL_SIZE_CHART_ID';
 export function setFullSizeChartId(chartId) {
   return { type: SET_FULL_SIZE_CHART_ID, chartId };
