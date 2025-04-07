@@ -21,7 +21,7 @@ steps:
 
   - bash: |
       echo "[global]" > $(Build.SourcesDirectory)/pip.conf
-      echo "extra-index-url='https://bagofholding.cse-cst.gc.ca/repository/pypi/simple global.extra-index-url='https://nexus.u.azure.chimera.cyber.gc.ca/repository/pypi/simple https://bagofholding.cse-cst.gc.ca/repository/pypi-ap/simple https://nexus.u.azure.chimera.cyber.gc.ca/repository/pypi/simple'" >> $(Build.SourcesDirectory)/pip.conf
+      echo "global.extra-index-url = https://bagofholding.cse-cst.gc.ca/repository/pypi-cccs/simple" >> $(Build.SourcesDirectory)/pip.conf
     displayName: Export Artifactory URL
 
   - task: Docker@2
