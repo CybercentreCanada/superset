@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FormInstance } from 'src/components';
-import shortid from 'shortid';
-import { getInitialDataMask } from 'src/dataMask/reducer';
 import {
+  Divider,
   Filter,
   FilterConfiguration,
-  NativeFilterType,
-  Divider,
   NativeFilterTarget,
+  NativeFilterType,
   logging,
 } from '@superset-ui/core';
+import { nanoid } from 'nanoid';
+import { FormInstance } from 'src/components';
 import { DASHBOARD_ROOT_ID } from 'src/dashboard/util/constants';
+import { getInitialDataMask } from 'src/dataMask/reducer';
 import { FilterRemoval, NativeFiltersForm } from './types';
 
 export const REMOVAL_DELAY_SECS = 5;
@@ -106,10 +106,10 @@ export const createHandleSave =
         const formInputs = values.filters?.[id];
         // if user didn't open a filter, return the original config
         if (!formInputs) return filterConfigMap[id];
-        if (formInputs.type === NativeFilterType.DIVIDER) {
+        if (formInputs.type === NativeFilterType.Divider) {
           return {
             id,
-            type: NativeFilterType.DIVIDER,
+            type: NativeFilterType.Divider,
             scope: {
               rootPath: [DASHBOARD_ROOT_ID],
               excluded: [],
@@ -194,10 +194,10 @@ export const NATIVE_FILTER_PREFIX = 'NATIVE_FILTER-';
 export const NATIVE_FILTER_DIVIDER_PREFIX = 'NATIVE_FILTER_DIVIDER-';
 export const generateFilterId = (type: NativeFilterType) => {
   const prefix =
-    type === NativeFilterType.NATIVE_FILTER
+    type === NativeFilterType.NativeFilter
       ? NATIVE_FILTER_PREFIX
       : NATIVE_FILTER_DIVIDER_PREFIX;
-  return `${prefix}${shortid.generate()}`;
+  return `${prefix}${nanoid()}`;
 };
 
 export const getFilterIds = (config: FilterConfiguration) =>

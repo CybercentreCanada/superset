@@ -31,6 +31,7 @@ import {
   extractGroupbyLabel,
   extractSeries,
   extractShowValueIndexes,
+  extractTooltipKeys,
   formatSeriesName,
   getAxisType,
   getChartPadding,
@@ -40,6 +41,7 @@ import {
   sanitizeHtml,
   sortAndFilterSeries,
   sortRows,
+  getTimeCompareStackId,
 } from '../../src/utils/series';
 import {
   EchartsTimeseriesSeriesType,
@@ -645,7 +647,7 @@ describe('formatSeriesName', () => {
     expect(
       formatSeriesName('1995-01-01 00:00:00.000000', {
         timeFormatter: annualTimeFormatter,
-        coltype: GenericDataType.TEMPORAL,
+        coltype: GenericDataType.Temporal,
       }),
     ).toEqual('1995');
   });
@@ -911,33 +913,33 @@ test('calculateLowerLogTick', () => {
 });
 
 test('getAxisType without forced categorical', () => {
-  expect(getAxisType(false, false, GenericDataType.TEMPORAL)).toEqual(
-    AxisType.time,
+  expect(getAxisType(false, false, GenericDataType.Temporal)).toEqual(
+    AxisType.Time,
   );
-  expect(getAxisType(false, false, GenericDataType.NUMERIC)).toEqual(
-    AxisType.value,
+  expect(getAxisType(false, false, GenericDataType.Numeric)).toEqual(
+    AxisType.Value,
   );
-  expect(getAxisType(true, false, GenericDataType.NUMERIC)).toEqual(
-    AxisType.category,
+  expect(getAxisType(true, false, GenericDataType.Numeric)).toEqual(
+    AxisType.Category,
   );
-  expect(getAxisType(false, false, GenericDataType.BOOLEAN)).toEqual(
-    AxisType.category,
+  expect(getAxisType(false, false, GenericDataType.Boolean)).toEqual(
+    AxisType.Category,
   );
-  expect(getAxisType(false, false, GenericDataType.STRING)).toEqual(
-    AxisType.category,
+  expect(getAxisType(false, false, GenericDataType.String)).toEqual(
+    AxisType.Category,
   );
 });
 
 test('getAxisType with forced categorical', () => {
-  expect(getAxisType(false, true, GenericDataType.NUMERIC)).toEqual(
-    AxisType.category,
+  expect(getAxisType(false, true, GenericDataType.Numeric)).toEqual(
+    AxisType.Category,
   );
 });
 
 test('getMinAndMaxFromBounds returns empty object when not truncating', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       false,
       10,
       100,
@@ -949,7 +951,7 @@ test('getMinAndMaxFromBounds returns empty object when not truncating', () => {
 test('getMinAndMaxFromBounds returns empty object for categorical axis', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.category,
+      AxisType.Category,
       false,
       10,
       100,
@@ -961,7 +963,7 @@ test('getMinAndMaxFromBounds returns empty object for categorical axis', () => {
 test('getMinAndMaxFromBounds returns empty object for time axis', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.time,
+      AxisType.Time,
       false,
       10,
       100,
@@ -973,7 +975,7 @@ test('getMinAndMaxFromBounds returns empty object for time axis', () => {
 test('getMinAndMaxFromBounds returns dataMin/dataMax for non-bar charts', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       true,
       undefined,
       undefined,
@@ -988,7 +990,7 @@ test('getMinAndMaxFromBounds returns dataMin/dataMax for non-bar charts', () => 
 test('getMinAndMaxFromBounds returns bound without scale for non-bar charts', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       true,
       10,
       undefined,
@@ -1003,7 +1005,7 @@ test('getMinAndMaxFromBounds returns bound without scale for non-bar charts', ()
 test('getMinAndMaxFromBounds returns scale when truncating without bounds', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       true,
       undefined,
       undefined,
@@ -1015,7 +1017,7 @@ test('getMinAndMaxFromBounds returns scale when truncating without bounds', () =
 test('getMinAndMaxFromBounds returns automatic upper bound when truncating', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       true,
       10,
       undefined,
@@ -1030,7 +1032,7 @@ test('getMinAndMaxFromBounds returns automatic upper bound when truncating', () 
 test('getMinAndMaxFromBounds returns automatic lower bound when truncating', () => {
   expect(
     getMinAndMaxFromBounds(
-      AxisType.value,
+      AxisType.Value,
       true,
       undefined,
       100,
@@ -1040,4 +1042,60 @@ test('getMinAndMaxFromBounds returns automatic lower bound when truncating', () 
     max: 100,
     scale: true,
   });
+});
+
+describe('getTimeCompareStackId', () => {
+  it('returns the defaultId when timeCompare is empty', () => {
+    const result = getTimeCompareStackId('default', []);
+    expect(result).toEqual('default');
+  });
+
+  it('returns the defaultId when no value in timeCompare is included in name', () => {
+    const result = getTimeCompareStackId(
+      'default',
+      ['compare1', 'compare2'],
+      'test__name',
+    );
+    expect(result).toEqual('default');
+  });
+
+  it('returns the first value in timeCompare that is included in name', () => {
+    const result = getTimeCompareStackId(
+      'default',
+      ['compare1', 'compare2'],
+      'test__compare1',
+    );
+    expect(result).toEqual('compare1');
+  });
+
+  it('handles name being a number', () => {
+    const result = getTimeCompareStackId('default', ['123', '456'], 123);
+    expect(result).toEqual('123');
+  });
+});
+
+const forecastValue = [
+  {
+    data: [0, 1],
+    seriesId: 'foo',
+  },
+  {
+    data: [0, 2],
+    seriesId: 'bar',
+  },
+];
+
+test('extractTooltipKeys with rich tooltip', () => {
+  const result = extractTooltipKeys(forecastValue, 1, true, false);
+  expect(result).toEqual(['foo', 'bar']);
+});
+
+test('extractTooltipKeys with rich tooltip and sorting by metrics', () => {
+  const result = extractTooltipKeys(forecastValue, 1, true, true);
+  expect(result).toEqual(['bar', 'foo']);
+});
+
+test('extractTooltipKeys with non-rich tooltip', () => {
+  const result = extractTooltipKeys(forecastValue, 1, false, false);
+  expect(result).toEqual(['foo']);
 });

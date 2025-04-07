@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, {
+import {
+  memo,
   ReactElement,
   useCallback,
   useEffect,
@@ -169,7 +170,8 @@ const VizTile = ({
           css`
             width: 100%;
             background-color: ${theme.colors.grayscale.light4};
-            transition: width ${TILE_TRANSITION_TIME}s ease-out,
+            transition:
+              width ${TILE_TRANSITION_TIME}s ease-out,
               background-color ${TILE_TRANSITION_TIME}s ease-out;
             cursor: default;
             svg path {
@@ -195,7 +197,7 @@ const VizTile = ({
   );
 };
 
-export const FastVizSwitcher = React.memo(
+export const FastVizSwitcher = memo(
   ({ currentSelection, onChange }: FastVizSwitcherProps) => {
     const currentViz = useSelector<ExplorePageState, string | undefined>(
       state =>

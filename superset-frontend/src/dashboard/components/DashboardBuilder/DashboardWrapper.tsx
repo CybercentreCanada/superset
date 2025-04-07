@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect } from 'react';
-import { css, styled } from '@superset-ui/core';
+import { FC, useEffect, useState } from 'react';
+
+import { FAST_DEBOUNCE, css, styled } from '@superset-ui/core';
 import { RootState } from 'src/dashboard/types';
 import { useSelector } from 'react-redux';
 import { useDragDropManager } from 'react-dnd';
 import classNames from 'classnames';
+import { debounce } from 'lodash';
 
 const StyledDiv = styled.div`
   ${({ theme }) => css`
@@ -32,10 +34,26 @@ const StyledDiv = styled.div`
     flex: 1;
     /* Special cases */
 
-    &.dragdroppable--dragging
-      .dashboard-component-tabs-content
-      > .empty-droptarget.empty-droptarget--full {
-      height: 100%;
+    &.dragdroppable--dragging {
+      &
+        .dashboard-component-tabs-content
+        > .empty-droptarget.empty-droptarget--full {
+        height: 100%;
+      }
+      & .empty-droptarget:before {
+        display: block;
+        border-color: ${theme.colors.primary.light1};
+        background-color: ${theme.colors.primary.light3};
+      }
+      & .grid-row:after {
+        border-style: hidden;
+      }
+      & .droptarget-side:last-child {
+        inset-inline-end: 0;
+      }
+      & .droptarget-edge:last-child {
+        inset-block-end: 0;
+      }
     }
 
     /* A row within a column has inset hover menu */
@@ -95,23 +113,33 @@ const StyledDiv = styled.div`
 
 type Props = {};
 
-const DashboardWrapper: React.FC<Props> = ({ children }) => {
+const DashboardWrapper: FC<Props> = ({ children }) => {
   const editMode = useSelector<RootState, boolean>(
     state => state.dashboardState.editMode,
   );
   const dragDropManager = useDragDropManager();
-  const [isDragged, setIsDragged] = React.useState(
+  const [isDragged, setIsDragged] = useState(
     dragDropManager.getMonitor().isDragging(),
   );
 
   useEffect(() => {
     const monitor = dragDropManager.getMonitor();
+    const debouncedSetIsDragged = debounce(setIsDragged, FAST_DEBOUNCE);
     const unsub = monitor.subscribeToStateChange(() => {
-      setIsDragged(monitor.isDragging());
+      const isDragging = monitor.isDragging();
+      if (isDragging) {
+        // set a debounced function to prevent HTML5 drag source
+        // from interfering with the drop zone highlighting
+        debouncedSetIsDragged(true);
+      } else {
+        debouncedSetIsDragged.cancel();
+        setIsDragged(false);
+      }
     });
 
     return () => {
       unsub();
+      debouncedSetIsDragged.cancel();
     };
   }, [dragDropManager]);
 

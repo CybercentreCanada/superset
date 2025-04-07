@@ -16,7 +16,6 @@
 # under the License.
 from __future__ import annotations
 
-import json
 import logging
 from operator import eq, ge, gt, le, lt, ne
 from timeit import default_timer
@@ -39,6 +38,7 @@ from superset.commands.report.exceptions import (
 )
 from superset.reports.models import ReportSchedule, ReportScheduleValidatorType
 from superset.tasks.utils import get_executor
+from superset.utils import json
 from superset.utils.core import override_user
 from superset.utils.retries import retry_call
 
@@ -96,7 +96,8 @@ class AlertCommand(BaseCommand):
         if len(rows) > 1:
             raise AlertQueryMultipleRowsError(
                 message=_(
-                    f"Alert query returned more than one row. {len(rows)} rows returned"
+                    "Alert query returned more than one row. %(num_rows)s rows returned",
+                    num_rows=len(rows),
                 )
             )
         # check if query returned more than one column
@@ -104,8 +105,9 @@ class AlertCommand(BaseCommand):
             raise AlertQueryMultipleColumnsError(
                 # len is subtracted by 1 to discard pandas index column
                 _(
-                    f"Alert query returned more than one column. "
-                    f"{(len(rows[0]) - 1)} columns returned"
+                    "Alert query returned more than one column. "
+                    "%(num_cols)s columns returned",
+                    num_cols=(len(rows[0]) - 1),
                 )
             )
 

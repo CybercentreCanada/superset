@@ -17,19 +17,12 @@
  * under the License.
  */
 import {
-  isFeatureEnabled,
-  FeatureFlag,
   getExtensionsRegistry,
   styled,
   SupersetClient,
   t,
 } from '@superset-ui/core';
-import React, {
-  FunctionComponent,
-  useState,
-  useMemo,
-  useCallback,
-} from 'react';
+import { FunctionComponent, useState, useMemo, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import rison from 'rison';
 import {
@@ -209,8 +202,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   const canDelete = hasPerm('can_write');
   const canCreate = hasPerm('can_write');
   const canDuplicate = hasPerm('can_duplicate');
-  const canExport =
-    hasPerm('can_export') && isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT);
+  const canExport = hasPerm('can_export');
 
   const initialSort = SORT_BY;
 
@@ -541,7 +533,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         disableSortBy: true,
       },
       {
-        accessor: QueryObjectColumns.changed_by,
+        accessor: QueryObjectColumns.ChangedBy,
         hidden: true,
       },
     ],
@@ -555,14 +547,14 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         key: 'search',
         id: 'table_name',
         input: 'search',
-        operator: FilterOperator.contains,
+        operator: FilterOperator.Contains,
       },
       {
         Header: t('Type'),
         key: 'sql',
         id: 'sql',
         input: 'select',
-        operator: FilterOperator.datasetIsNullOrEmpty,
+        operator: FilterOperator.DatasetIsNullOrEmpty,
         unfilteredLabel: 'All',
         selects: [
           { label: t('Virtual'), value: false },
@@ -574,7 +566,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         key: 'database',
         id: 'database',
         input: 'select',
-        operator: FilterOperator.relationOneMany,
+        operator: FilterOperator.RelationOneMany,
         unfilteredLabel: 'All',
         fetchSelects: createFetchRelated(
           'dataset',
@@ -590,7 +582,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         key: 'schema',
         id: 'schema',
         input: 'select',
-        operator: FilterOperator.equals,
+        operator: FilterOperator.Equals,
         unfilteredLabel: 'All',
         fetchSelects: createFetchDistinct(
           'dataset',
@@ -606,7 +598,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         key: 'owner',
         id: 'owners',
         input: 'select',
-        operator: FilterOperator.relationManyMany,
+        operator: FilterOperator.RelationManyMany,
         unfilteredLabel: 'All',
         fetchSelects: createFetchRelated(
           'dataset',
@@ -627,7 +619,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         id: 'id',
         urlDisplay: 'certified',
         input: 'select',
-        operator: FilterOperator.datasetIsCertified,
+        operator: FilterOperator.DatasetIsCertified,
         unfilteredLabel: t('Any'),
         selects: [
           { label: t('Yes'), value: true },
@@ -639,7 +631,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         key: 'changed_by',
         id: 'changed_by',
         input: 'select',
-        operator: FilterOperator.relationOneMany,
+        operator: FilterOperator.RelationOneMany,
         unfilteredLabel: t('All'),
         fetchSelects: createFetchRelated(
           'dataset',
@@ -686,21 +678,19 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       buttonStyle: 'primary',
     });
 
-    if (isFeatureEnabled(FeatureFlag.VERSIONED_EXPORT)) {
-      buttonArr.push({
-        name: (
-          <Tooltip
-            id="import-tooltip"
-            title={t('Import datasets')}
-            placement="bottomRight"
-          >
-            <Icons.Import data-test="import-button" />
-          </Tooltip>
-        ),
-        buttonStyle: 'link',
-        onClick: openDatasetImportModal,
-      });
-    }
+    buttonArr.push({
+      name: (
+        <Tooltip
+          id="import-tooltip"
+          title={t('Import datasets')}
+          placement="bottomRight"
+        >
+          <Icons.Import data-test="import-button" />
+        </Tooltip>
+      ),
+      buttonStyle: 'link',
+      onClick: openDatasetImportModal,
+    });
   }
 
   menuData.buttons = buttonArr;

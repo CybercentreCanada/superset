@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
+import { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { css, isEqualArray, t } from '@superset-ui/core';
 import Select from 'src/components/Select/Select';
@@ -99,7 +99,7 @@ const defaultProps = {
   canSelectAll: false,
 };
 
-export default class SelectControl extends React.PureComponent {
+export default class SelectControl extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -251,21 +251,6 @@ export default class SelectControl extends React.PureComponent {
       canSelectAll,
     } = this.props;
 
-    const getValue = () => {
-      const currentValue =
-        value ??
-        (this.props.default !== undefined ? this.props.default : undefined);
-
-      // safety check - the value is intended to be undefined but null was used
-      if (
-        currentValue === null &&
-        !this.state.options.find(o => o.value === null)
-      ) {
-        return undefined;
-      }
-      return currentValue;
-    };
-
     const headerProps = {
       name,
       label,
@@ -287,6 +272,21 @@ export default class SelectControl extends React.PureComponent {
       selectAllOnClick: () => {
         this.onChange(this.props.options);
       },
+    };
+
+    const getValue = () => {
+      const currentValue =
+        value ??
+        (this.props.default !== undefined ? this.props.default : undefined);
+
+      // safety check - the value is intended to be undefined but null was used
+      if (
+        currentValue === null &&
+        !this.state.options.find(o => o.value === null)
+      ) {
+        return undefined;
+      }
+      return currentValue;
     };
 
     const selectProps = {

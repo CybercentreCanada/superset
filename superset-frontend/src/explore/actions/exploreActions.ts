@@ -165,6 +165,18 @@ export function setForceQuery(force: boolean) {
   };
 }
 
+export const SET_STASH_FORM_DATA = 'SET_STASH_FORM_DATA';
+export function setStashFormData(
+  isHidden: boolean,
+  fieldNames: ReadonlyArray<string>,
+) {
+  return {
+    type: SET_STASH_FORM_DATA,
+    isHidden,
+    fieldNames,
+  };
+}
+
 export const exploreActions = {
   ...toastActions,
   fetchDatasourcesStarted,
@@ -174,6 +186,7 @@ export const exploreActions = {
   saveFaveStar,
   setControlValue,
   setExploreControls,
+  setStashFormData,
   updateChartTitle,
   createNewSlice,
   sliceUpdated,

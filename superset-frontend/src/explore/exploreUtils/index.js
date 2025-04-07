@@ -99,7 +99,7 @@ export function mountExploreUrl(endpointType, extraSearch = {}, force = false) {
     if (force) {
       search.force = '1';
     }
-    search.standalone = DashboardStandaloneMode.HIDE_NAV;
+    search.standalone = DashboardStandaloneMode.HideNav;
   }
   return uri.directory(directory).search(search).toString();
 }
@@ -316,7 +316,7 @@ export const getSimpleSQLExpression = (subject, operator, comparator) => {
       .map(val => optionLabel(val))
       .map(
         val =>
-          `${quote}${isString ? String(val).replace("'", "''") : val}${quote}`,
+          `${quote}${isString ? String(val).replace(/'/g, "''") : val}${quote}`,
       );
     if (comparatorArray.length > 0) {
       expression += ` ${prefix}${formattedComparators.join(', ')}${suffix}`;

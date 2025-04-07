@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
 import { GenericDataType, t, validateNumber } from '@superset-ui/core';
 import {
   ControlFormItemSpec,
@@ -178,14 +177,14 @@ export const SHARED_COLUMN_CONFIG_PROPS = {
 };
 
 export const DEFAULT_CONFIG_FORM_LAYOUT: ColumnConfigFormLayout = {
-  [GenericDataType.STRING]: [
+  [GenericDataType.String]: [
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },
     ],
     ['truncateLongCells'],
   ],
-  [GenericDataType.NUMERIC]: [
+  [GenericDataType.Numeric]: [
     {
       tab: t('Display'),
       children: [
@@ -207,14 +206,14 @@ export const DEFAULT_CONFIG_FORM_LAYOUT: ColumnConfigFormLayout = {
       ],
     },
   ],
-  [GenericDataType.TEMPORAL]: [
+  [GenericDataType.Temporal]: [
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },
     ],
     ['d3TimeFormat'],
   ],
-  [GenericDataType.BOOLEAN]: [
+  [GenericDataType.Boolean]: [
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },

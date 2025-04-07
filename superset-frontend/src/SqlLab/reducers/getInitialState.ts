@@ -64,6 +64,7 @@ export default function getInitialState({
     queryLimit: common.conf.DEFAULT_SQLLAB_LIMIT,
     hideLeftBar: false,
     remoteId: null,
+    cursorPosition: { row: 0, column: 0 },
   };
   let unsavedQueryEditor: UnsavedQueryEditor = {};
 
@@ -75,7 +76,7 @@ export default function getInitialState({
     let queryEditor: QueryEditor;
     if (activeTab && activeTab.id === id) {
       queryEditor = {
-        version: activeTab.extra_json?.version ?? QueryEditorVersion.v1,
+        version: activeTab.extra_json?.version ?? QueryEditorVersion.V1,
         id: id.toString(),
         loaded: true,
         name: activeTab.label,
@@ -88,6 +89,7 @@ export default function getInitialState({
         autorun: Boolean(activeTab.autorun),
         templateParams: activeTab.template_params || undefined,
         dbId: activeTab.database_id,
+        catalog: activeTab.catalog,
         schema: activeTab.schema,
         queryLimit: activeTab.query_limit,
         hideLeftBar: activeTab.hide_left_bar,
@@ -100,6 +102,7 @@ export default function getInitialState({
         id: id.toString(),
         loaded: false,
         name: label,
+        dbId: undefined,
       };
     }
     queryEditors = {
@@ -108,6 +111,7 @@ export default function getInitialState({
     };
   });
   const tabHistory = activeTab ? [activeTab.id.toString()] : [];
+  let lastUpdatedActiveTab = activeTab ? activeTab.id.toString() : '';
   let tables = {} as Record<string, Table>;
   let editorTabLastUpdatedAt = Date.now();
   if (activeTab) {
@@ -120,6 +124,7 @@ export default function getInitialState({
         const table = {
           dbId: tableSchema.database_id,
           queryEditorId: tableSchema.tab_state_id.toString(),
+          catalog: tableSchema.catalog,
           schema: tableSchema.schema,
           name: tableSchema.table,
           expanded: tableSchema.expanded,
@@ -135,7 +140,14 @@ export default function getInitialState({
       });
   }
 
-  const queries = { ...queries_ };
+  const queries = {
+    ...queries_,
+    ...(activeTab?.latest_query && {
+      [activeTab.latest_query.id]: activeTab.latest_query,
+    }),
+  };
+
+  const destroyedQueryEditors = {};
 
   /**
    * If the `SQLLAB_BACKEND_PERSISTENCE` feature flag is off, or if the user
@@ -209,6 +221,16 @@ export default function getInitialState({
         if (sqlLab.tabHistory) {
           tabHistory.push(...sqlLab.tabHistory);
         }
+        lastUpdatedActiveTab = tabHistory.slice(tabHistory.length - 1)[0] || '';
+
+        if (sqlLab.destroyedQueryEditors) {
+          Object.entries(sqlLab.destroyedQueryEditors).forEach(([id, ts]) => {
+            if (queryEditors[id]) {
+              destroyedQueryEditors[id] = ts;
+              delete queryEditors[id];
+            }
+          });
+        }
       }
     }
   } catch (error) {
@@ -242,6 +264,8 @@ export default function getInitialState({
       editorTabLastUpdatedAt,
       queryCostEstimates: {},
       unsavedQueryEditor,
+      lastUpdatedActiveTab,
+      destroyedQueryEditors,
     },
     localStorageUsageInKilobytes: 0,
     common,

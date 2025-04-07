@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import {
-  getSharedLabelColor,
+  getLabelsColorMap,
   isDefined,
   JsonObject,
   makeApi,
-  SharedLabelColorSource,
+  LabelsColorMapSource,
   t,
+  getClientErrorObject,
 } from '@superset-ui/core';
 import Loading from 'src/components/Loading';
 import { addDangerToast } from 'src/components/MessageToasts/actions';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { URL_PARAMS } from 'src/constants';
-import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import getFormDataWithExtraFilters from 'src/dashboard/util/charts/getFormDataWithExtraFilters';
 import { getAppliedFilterValues } from 'src/dashboard/util/activeDashboardFilters';
 import { getParsedExploreURLParams } from 'src/explore/exploreUtils/getParsedExploreURLParams';
@@ -75,9 +75,7 @@ const getDashboardPageContext = (pageId?: string | null) => {
   if (!pageId) {
     return null;
   }
-  return (
-    getItem(LocalStorageKeys.dashboard__explore_context, {})[pageId] || null
-  );
+  return getItem(LocalStorageKeys.DashboardExploreContext, {})[pageId] || null;
 };
 
 const getDashboardContextFormData = () => {
@@ -86,9 +84,10 @@ const getDashboardContextFormData = () => {
   if (dashboardContext) {
     const sliceId = getUrlParam(URL_PARAMS.sliceId) || 0;
     const {
-      labelColors,
-      sharedLabelColors,
       colorScheme,
+      labelsColor,
+      labelsColorMap,
+      sharedLabelsColors,
       chartConfiguration,
       nativeFilters,
       filterBoxFilters,
@@ -100,15 +99,18 @@ const getDashboardContextFormData = () => {
       filters: getAppliedFilterValues(sliceId, filterBoxFilters),
       nativeFilters,
       chartConfiguration,
-      colorScheme,
       dataMask,
-      labelColors,
-      sharedLabelColors,
+      colorScheme,
+      labelsColor,
+      labelsColorMap,
+      sharedLabelsColors,
       sliceId,
       allSliceIds: [sliceId],
       extraControls: {},
     });
-    Object.assign(dashboardContextWithFilters, { dashboardId });
+    Object.assign(dashboardContextWithFilters, {
+      dashboardId,
+    });
     return dashboardContextWithFilters;
   }
   return null;
@@ -153,7 +155,7 @@ export default function ExplorePage() {
           isExploreInitialized.current = true;
         });
     }
-    getSharedLabelColor().source = SharedLabelColorSource.explore;
+    getLabelsColorMap().source = LabelsColorMapSource.Explore;
   }, [dispatch, location]);
 
   if (!isLoaded) {

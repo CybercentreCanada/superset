@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import {
   AdhocMetric,
@@ -51,6 +51,7 @@ const Styles = styled.div<PivotTableStylesProps>`
       width: ${
         typeof width === 'string' ? parseInt(width, 10) : width - margin * 2
       }px;
+      white-space: nowrap;
  `}
 `;
 
@@ -439,8 +440,8 @@ export default function PivotTableChart(props: PivotTableProps) {
       rowSubTotals,
       highlightHeaderCellsOnHover:
         emitCrossFilters ||
-        isFeatureEnabled(FeatureFlag.DRILL_BY) ||
-        isFeatureEnabled(FeatureFlag.DRILL_TO_DETAIL),
+        isFeatureEnabled(FeatureFlag.DrillBy) ||
+        isFeatureEnabled(FeatureFlag.DrillToDetail),
       highlightedHeaderCells: selectedFilters,
       omittedHighlightHeaderGroups: [METRIC_KEY],
       cellColorFormatters: { [METRIC_KEY]: metricColorFormatters },

@@ -16,7 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, {
+import {
+  isValidElement,
+  cloneElement,
   CSSProperties,
   ReactNode,
   useMemo,
@@ -41,6 +43,7 @@ export interface ModalProps {
   className?: string;
   children: ReactNode;
   disablePrimaryButton?: boolean;
+  primaryTooltipMessage?: ReactNode;
   primaryButtonLoading?: boolean;
   onHide: () => void;
   onHandledPrimaryAction?: () => void;
@@ -232,6 +235,7 @@ const defaultResizableConfig = (hideFooter: boolean | undefined) => ({
 const CustomModal = ({
   children,
   disablePrimaryButton = false,
+  primaryTooltipMessage,
   primaryButtonLoading = false,
   onHide,
   onHandledPrimaryAction,
@@ -258,10 +262,12 @@ const CustomModal = ({
   const [bounds, setBounds] = useState<DraggableBounds>();
   const [dragDisabled, setDragDisabled] = useState<boolean>(true);
   let FooterComponent;
-  if (React.isValidElement(footer)) {
+  if (isValidElement(footer)) {
     // If a footer component is provided inject a closeModal function
     // so the footer can provide a "close" button if desired
-    FooterComponent = React.cloneElement(footer, { closeModal: onHide });
+    FooterComponent = cloneElement(footer, {
+      closeModal: onHide,
+    } as Partial<unknown>);
   }
   const modalFooter = isNil(FooterComponent)
     ? [
@@ -272,6 +278,7 @@ const CustomModal = ({
           key="submit"
           buttonStyle={primaryButtonType}
           disabled={disablePrimaryButton}
+          tooltip={primaryTooltipMessage}
           loading={primaryButtonLoading}
           onClick={onHandledPrimaryAction}
           cta
