@@ -197,4 +197,3 @@ export const OPERATOR_TOOLTIP_MAP = {
   IS_FALSE: undefined,
   TEMPORAL_RANGE: undefined,
 };
-

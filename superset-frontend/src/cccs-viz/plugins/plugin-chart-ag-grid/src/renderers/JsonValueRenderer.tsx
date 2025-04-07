@@ -1,5 +1,5 @@
 import { RowEvent } from 'ag-grid-community';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { JSONTree } from 'react-json-tree';
 
 import { safeJsonObjectParse } from 'src/cccs-viz/plugins/utils';

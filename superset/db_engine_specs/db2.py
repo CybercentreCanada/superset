@@ -25,8 +25,6 @@ from superset.sql_parse import Table
 
 logger = logging.getLogger(__name__)
 
-logger = logging.getLogger(__name__)
-
 
 class Db2EngineSpec(BaseEngineSpec):
     engine = "db2"

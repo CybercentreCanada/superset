@@ -53,7 +53,7 @@ export default class CccsTableChartPlugin extends ChartPlugin<
       ],
       exampleGallery: [{ url: example1 }],
       thumbnail,
-      behaviors: [Behavior.INTERACTIVE_CHART],
+      behaviors: [Behavior.InteractiveChart],
     });
 
     super({

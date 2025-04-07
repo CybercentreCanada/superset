@@ -1,5 +1,3 @@
-import React from 'react';
-
 const EmitIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({
   disabled = false,
 }) => (

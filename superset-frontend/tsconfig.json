@@ -74,6 +74,7 @@
     "./plugins/*/src/**/*",
     "./plugins/*/types/**/*",
     "./packages/*/test/**/*",
-    "./plugins/*/test/**/*"
-, "../../plugin-chart-ag-grid"  ]
+    "./plugins/*/test/**/*",
+    "../../plugin-chart-ag-grid"
+  ]
 }

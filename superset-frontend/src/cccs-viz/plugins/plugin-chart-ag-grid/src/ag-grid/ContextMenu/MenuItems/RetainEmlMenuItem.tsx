@@ -1,5 +1,4 @@
 import { SupersetClient } from '@superset-ui/core';
-import React from 'react';
 import { Menu } from 'src/components/Menu';
 import { useDispatch } from 'react-redux';
 import {

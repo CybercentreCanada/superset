@@ -520,18 +520,6 @@ select * from (select key from src) a
         == set()
     )
 
-    # weird query with circular dependency
-    assert (
-        extract_tables(
-            """
-with src as ( select key from q2 where key = '5'),
-q2 as ( select key from src where key = '5')
-select * from (select key from src) a
-"""
-        )
-        == set()
-    )
-
 
 def test_extract_tables_multistatement() -> None:
     """

@@ -95,11 +95,6 @@ const DragDroppableStyles = styled.div`
       z-index: 10;
     }
 
-    &.empty-droptarget--full > .drop-indicator--top {
-      height: 100%;
-      opacity: 0.3;
-    }
-
     & {
       .drop-indicator {
         display: block;

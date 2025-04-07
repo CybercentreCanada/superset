@@ -18,7 +18,7 @@
  * under the License.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
 import { t, withTheme } from '@superset-ui/core';
 import AsyncEsmComponent from 'src/components/AsyncEsmComponent';

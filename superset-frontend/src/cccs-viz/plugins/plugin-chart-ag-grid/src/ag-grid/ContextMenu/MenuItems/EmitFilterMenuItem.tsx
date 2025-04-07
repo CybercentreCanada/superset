@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Menu } from 'src/components/Menu';
 
 interface EmitFilterMenuItemProps {

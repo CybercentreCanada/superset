@@ -79,20 +79,6 @@ def _load_user_from_job_metadata(job_metadata: dict[str, Any]) -> User:
     return user
 
 
-def _load_user_from_job_metadata(job_metadata: dict[str, Any]) -> User:
-    if user_id := job_metadata.get("user_id"):
-        # logged in user
-        user = security_manager.get_user_by_id(user_id)
-    elif guest_token := job_metadata.get("guest_token"):
-        # embedded guest user
-        user = security_manager.get_guest_user_from_token(guest_token)
-        del job_metadata["guest_token"]
-    else:
-        # default to anonymous user if no user is found
-        user = security_manager.get_anonymous_user()
-    return user
-
-
 @celery_app.task(name="load_chart_data_into_cache", soft_time_limit=query_timeout)
 def load_chart_data_into_cache(
     job_metadata: dict[str, Any],

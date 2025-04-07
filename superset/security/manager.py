@@ -587,23 +587,6 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
             level=ErrorLevel.WARNING,
         )
 
-    def get_chart_access_error_object(
-        self,
-        dashboard: "Dashboard",  # pylint: disable=unused-argument
-    ) -> SupersetError:
-        """
-        Return the error object for the denied Superset dashboard.
-
-        :param dashboard: The denied Superset dashboard
-        :returns: The error object
-        """
-
-        return SupersetError(
-            error_type=SupersetErrorType.CHART_SECURITY_ACCESS_ERROR,
-            message="You don't have access to this chart.",
-            level=ErrorLevel.ERROR,
-        )
-
     @staticmethod
     def get_datasource_access_error_msg(datasource: "BaseDatasource") -> str:
         """

@@ -369,7 +369,7 @@ module.exports = {
     'react/require-default-props': 0,
     'react/sort-comp': 0, // TODO: re-enable in separate PR
     'react/static-property-placement': 0, // disabled temporarily
-    'react-prefer-function-component/react-prefer-function-component': 1,
+    'react-prefer-function-component/react-prefer-function-component': 0,
     'prettier/prettier': 'error',
     // disabling some things that come with the eslint 7->8 upgrade. Will address these in a separate PR
     'jest/no-alias-methods': 0,

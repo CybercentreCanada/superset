@@ -16,6 +16,7 @@
 # under the License.
 # isort:skip_file
 """Unit tests for Superset"""
+
 from datetime import datetime
 from io import BytesIO
 from typing import Optional

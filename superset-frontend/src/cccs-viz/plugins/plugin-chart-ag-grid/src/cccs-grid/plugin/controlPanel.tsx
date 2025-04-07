@@ -11,7 +11,6 @@ import {
   defineSavedMetrics,
   formatSelectOptions,
   QueryModeLabel,
-  sections,
   sharedControls,
 } from '@superset-ui/chart-controls';
 import {
@@ -21,19 +20,18 @@ import {
   QueryMode,
   t,
 } from '@superset-ui/core';
-import React from 'react';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from '../../ag-grid/JumpActionConfigControl';
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
-  if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
+  if (mode === QueryMode.Aggregate || mode === QueryMode.Raw) {
     return mode as QueryMode;
   }
   const rawColumns = controls?.columns?.value as QueryFormColumn[] | undefined;
   const hasRawColumns = rawColumns && rawColumns.length > 0;
-  return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
+  return hasRawColumns ? QueryMode.Raw : QueryMode.Aggregate;
 }
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
@@ -53,8 +51,8 @@ function isQueryMode(mode: QueryMode) {
     getQueryMode(controls) === mode;
 }
 
-const isAggMode = isQueryMode(QueryMode.aggregate);
-const isRawMode = isQueryMode(QueryMode.raw);
+const isAggMode = isQueryMode(QueryMode.Aggregate);
+const isRawMode = isQueryMode(QueryMode.Raw);
 
 const validateAggControlValues = (
   controls: ControlStateMapping,
@@ -71,8 +69,8 @@ const queryMode: ControlConfig<'RadioButtonControl'> = {
   label: t('Query mode'),
   default: null,
   options: [
-    [QueryMode.aggregate, QueryModeLabel[QueryMode.aggregate]],
-    [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
+    [QueryMode.Aggregate, QueryModeLabel[QueryMode.Aggregate]],
+    [QueryMode.Raw, QueryModeLabel[QueryMode.Raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
   rerender: [
@@ -139,7 +137,6 @@ const percentMetricsControl: typeof sharedControls.metrics = {
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
-    sections.genericTime,
     {
       label: t('Query'),
       expanded: true,

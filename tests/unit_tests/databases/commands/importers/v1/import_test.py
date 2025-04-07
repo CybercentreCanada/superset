@@ -17,7 +17,6 @@
 # pylint: disable=unused-argument, import-outside-toplevel, invalid-name
 
 import copy
-import json
 
 import pytest
 from pytest_mock import MockerFixture

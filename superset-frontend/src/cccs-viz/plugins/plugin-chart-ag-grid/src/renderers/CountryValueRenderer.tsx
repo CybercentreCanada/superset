@@ -1,5 +1,3 @@
-import React from 'react';
-
 const lookup = {
   Andorra: 'ad',
   'United Arab Emirates': 'ae',

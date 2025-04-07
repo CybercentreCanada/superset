@@ -14,8 +14,8 @@ import {
 import { useCallback } from 'react';
 import { RootState } from 'src/dashboard/types';
 import {
-  CLAUSES,
-  EXPRESSION_TYPES,
+  Clauses,
+  ExpressionTypes,
 } from 'src/explore/components/controls/FilterControl/types';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
 import { safeJsonObjectParse } from '../utils';
@@ -70,22 +70,22 @@ const useEmitGlobalFilter = () => {
                       : c,
                   )
                 : colData?.[col]?.useValueFormatterForExport
-                ? colData?.[col]?.valueFormatter(processedValue)
-                : processedValue;
+                  ? colData?.[col]?.valueFormatter(processedValue)
+                  : processedValue;
 
               const op = Array.isArray(processedValue)
-                ? Operators.IN
-                : Operators.EQUALS;
+                ? Operators.In
+                : Operators.Equals;
 
               // I reverse-engineered this from the redux store. There's probably a better way to do this,
               // but this is what works for now.
               return {
-                expressionType: EXPRESSION_TYPES.SIMPLE,
+                expressionType: ExpressionTypes.Simple,
                 subject: col,
                 operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation,
                 operatorId: op,
                 comparator: formattedComparator,
-                clause: CLAUSES.WHERE,
+                clause: Clauses.Where,
                 sqlExpression: null,
                 isExtra: false,
                 isNew: true,

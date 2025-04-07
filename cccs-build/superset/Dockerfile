@@ -1,7 +1,7 @@
 # Vault CA container import
 ARG VAULT_CA_CONTAINER=uchimera.azurecr.io/cccs/hogwarts/vault-ca:master_11376_a25c34e1
 FROM $VAULT_CA_CONTAINER AS vault_ca
-FROM uchimera.azurecr.io/cccs/superset-base:cccs-3.1_20240730200717_b10664
+FROM uchimera.azurecr.io/cccs/superset-base:cccs-4.1-merge_20250409190332_b12025
 
 USER root
 
@@ -19,8 +19,8 @@ RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection
   && rm /tmp/requirements.txt
 
 # From: https://github.com/apache/superset/issues/25307#issuecomment-1885154970
-RUN sed -i "524i \        return None" /app/superset/db_engine_specs/presto.py
-RUN sed -i 80,100d /app/superset/db_engine_specs/trino.py
+RUN sed -i "525i \        return None" /app/superset/db_engine_specs/presto.py
+RUN sed -i 79,96d /app/superset/db_engine_specs/trino.py
 
 ENV BUILD_NUMBER_VAR=${BUILD_NUMBER}
 

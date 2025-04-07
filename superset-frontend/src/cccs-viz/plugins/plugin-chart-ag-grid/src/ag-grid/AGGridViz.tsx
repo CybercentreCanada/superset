@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import 'ag-grid-enterprise';
 
@@ -28,7 +22,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-import _ from 'lodash';
+import { range as lodashRange } from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import { Menu } from 'src/components/Menu';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
@@ -224,7 +218,7 @@ export default function AGGridViz({
           range.startRow!.rowIndex,
           range.endRow!.rowIndex,
         );
-        _.range(startRow, endRow + 1).forEach(rowIndex => {
+        lodashRange(startRow, endRow + 1).forEach(rowIndex => {
           const rowNode = api.getModel().getRow(rowIndex)!;
 
           all_columns?.forEach((column: any) => {
@@ -241,8 +235,8 @@ export default function AGGridViz({
             const dataType: string = colDef?.advancedDataType
               ? String(colDef.advancedDataType)
               : colDef?.type
-              ? String(colDef.type)
-              : 'NoType';
+                ? String(colDef.type)
+                : 'NoType';
             if (range.columns.map(c => c.getColDef().field).includes(col)) {
               newSelectedData[col] = newSelectedData[col] || [];
               if (!newSelectedData[col].includes(value)) {
@@ -350,14 +344,14 @@ export default function AGGridViz({
             !adhocFiltersInScope.length
               ? 'No adhoc filter exists with this chart in scope'
               : Object.values(selectedData.selectedColData).every(
-                  data => data.type === 'JSON',
-                )
-              ? 'JSON columns cannot be used as filters.'
-              : adhocFiltersInScope.length > 1
-              ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
-                  .map(f => f.name)
-                  .join(', ')}`
-              : `Will apply selection to adhoc filter: ${adhocFiltersInScope[0].name}`
+                    data => data.type === 'JSON',
+                  )
+                ? 'JSON columns cannot be used as filters.'
+                : adhocFiltersInScope.length > 1
+                  ? `Will apply selection to adhoc filters: ${adhocFiltersInScope
+                      .map(f => f.name)
+                      .join(', ')}`
+                  : `Will apply selection to adhoc filter: ${adhocFiltersInScope[0].name}`
           }
         />,
         <Menu.Divider key="cross-filter-divider-start" />,

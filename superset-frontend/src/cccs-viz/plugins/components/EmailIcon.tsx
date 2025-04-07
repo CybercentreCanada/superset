@@ -1,4 +1,3 @@
-import React from 'react';
 import emailLogo from './email-logo.png';
 
 const EmailIcon: React.FC<{ disabled?: boolean; disablePadding?: boolean }> = ({

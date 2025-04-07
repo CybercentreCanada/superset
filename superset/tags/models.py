@@ -20,7 +20,6 @@ from __future__ import annotations
 import enum
 from typing import TYPE_CHECKING
 
-from flask import escape
 from flask_appbuilder import Model
 from markupsafe import escape
 from sqlalchemy import (

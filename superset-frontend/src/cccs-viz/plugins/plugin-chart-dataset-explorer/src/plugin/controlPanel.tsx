@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
-
 import {
   t,
   QueryMode,
@@ -56,10 +54,10 @@ export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
 
 function getQueryMode(controls: ControlStateMapping): QueryMode {
   const mode = controls?.query_mode?.value;
-  if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
+  if (mode === QueryMode.Aggregate || mode === QueryMode.Raw) {
     return mode as QueryMode;
   }
-  return QueryMode.raw;
+  return QueryMode.Raw;
 }
 
 /**
@@ -70,8 +68,8 @@ function isQueryMode(mode: QueryMode) {
     getQueryMode(controls) === mode;
 }
 
-const isAggMode = isQueryMode(QueryMode.aggregate);
-const isRawMode = isQueryMode(QueryMode.raw);
+const isAggMode = isQueryMode(QueryMode.Aggregate);
+const isRawMode = isQueryMode(QueryMode.Raw);
 const isTimeColumnSelected = ({
   controls,
 }: Pick<ControlPanelsContainerProps, 'controls'>) =>
@@ -80,11 +78,11 @@ const isTimeColumnSelected = ({
 const queryMode: ControlConfig<'RadioButtonControl'> = {
   type: 'RadioButtonControl',
   label: t('Query mode'),
-  default: QueryMode.raw,
-  value: QueryMode.raw,
+  default: QueryMode.Raw,
+  value: QueryMode.Raw,
   options: [
-    [QueryMode.aggregate, QueryModeLabel[QueryMode.aggregate]],
-    [QueryMode.raw, QueryModeLabel[QueryMode.raw]],
+    [QueryMode.Aggregate, QueryModeLabel[QueryMode.Aggregate]],
+    [QueryMode.Raw, QueryModeLabel[QueryMode.Raw]],
   ],
   mapStateToProps: ({ controls }) => ({ value: getQueryMode(controls) }),
   rerender: ['columns', 'groupby'],

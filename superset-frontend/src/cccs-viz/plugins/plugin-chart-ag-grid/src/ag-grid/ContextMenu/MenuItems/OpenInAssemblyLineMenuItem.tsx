@@ -1,4 +1,3 @@
-import React from 'react';
 import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';
 import { Menu } from 'src/components/Menu';
 

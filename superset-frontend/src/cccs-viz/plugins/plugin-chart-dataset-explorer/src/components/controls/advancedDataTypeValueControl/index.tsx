@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ensureIsArray, withTheme } from '@superset-ui/core';
 import { connect } from 'react-redux';
 import SelectControl from 'src/explore/components/controls/SelectControl';
