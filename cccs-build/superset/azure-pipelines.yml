@@ -19,11 +19,6 @@ steps:
       echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
     displayName: Parse Source Control Branch Name
 
-  - bash: |
-      echo "[global]" > $(Build.SourcesDirectory)/pip.conf
-      echo "global.extra-index-url = https://bagofholding.cse-cst.gc.ca/repository/pypi-cccs/simple" >> $(Build.SourcesDirectory)/pip.conf
-    displayName: Export Artifactory URL
-
   - task: Docker@2
     displayName: Login to $(containerRegistry)
     inputs:
@@ -37,7 +32,6 @@ steps:
       containerRegistry: $(containerRegistry)
       repository: $(imageRepository)
       dockerfile: $(dockerfile)
-      arguments: --secret id=pipconfig,src=$(Build.SourcesDirectory)/pip.conf --progress=plain --build-arg BUILD_NUMBER=$(Build.BuildNumber)
       tags: |
         $(BRANCH_NAME)
         $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
