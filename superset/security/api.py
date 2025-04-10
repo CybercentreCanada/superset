@@ -144,17 +144,46 @@ class SecurityRestApi(BaseSupersetApi):
               $ref: '#/components/responses/500'
         """
         try:
+            if not request.is_json:
+                return self.response_400(message="Request payload is not JSON")
+
+            # Extract and validate the access token from Authorization header
+            auth_header = request.headers.get("Authorization", None)
+            if not auth_header:
+                return self.response_401(message="Missing Authorization header")
+
+            parts = auth_header.split()
+            if parts[0].lower() != "bearer" or len(parts) != 2:
+                return self.response_400(message="Invalid Authorization header format")
+            access_token = parts[1]
+
+            # Get OBO tokens to allow user info retrieval
+            oauth_provider = "azure"  # or make this dynamic from the request if needed
+            obo_response = self.appbuilder.sm.get_on_behalf_of_tokens(access_token, "openid", oauth_provider)
+
+            # Use the passed access token explicitly
+            obo_response[self.appbuilder.sm.get_oauth_token_key_name(oauth_provider)] = access_token
+            obo_response["refresh_token"] = None
+
+            # Build the Superset session and retrieve user info
+            self.appbuilder.sm.set_oauth_session(oauth_provider, obo_response)
+            user_info = self.appbuilder.sm.oauth_user_info(oauth_provider, obo_response)
+            user = self.appbuilder.sm.auth_user_oauth(user_info)
+
+            if not user:
+                return self.response_401(message="OAuth authentication failed")
+
+            # Parse and validate the guest token request payload
             body = guest_token_create_schema.load(request.json)
             self.appbuilder.sm.validate_guest_token_resources(body["resources"])
 
-            # todo validate stuff:
-            # make sure username doesn't reference an existing user
-            # check rls rules for validity?
-            token = self.appbuilder.sm.create_guest_access_token(
-                body["user"], body["resources"], body["rls"]
-            )
+            # Issue guest token
+            token = self.appbuilder.sm.create_guest_access_token(body["user"], body["resources"], body["rls"])
             return self.response(200, token=token)
+
         except EmbeddedDashboardNotFoundError as error:
             return self.response_400(message=error.message)
         except ValidationError as error:
             return self.response_400(message=error.messages)
+        except Exception as error:
+            return self.response_500(message=f"Unexpected error: {str(error)}")
