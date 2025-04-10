@@ -333,7 +333,7 @@
     "eslint-plugin-translation-vars": "file:tools/eslint-plugin-translation-vars",
     "exports-loader": "^5.0.0",
     "fetch-mock": "^7.7.3",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "fork-ts-checker-webpack-plugin": "^9.1.0",
     "history": "^4.10.1",
     "ignore-styles": "^5.0.1",
     "imports-loader": "^5.0.0",
