@@ -49,7 +49,7 @@
     "jquery": "^3.7.1",
     "memoize-one": "^6.0.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "^19.1.0",
     "react-loadable": "^5.5.0",
     "react-resizable": "^3.0.5",
     "@mihkeleidast/storybook-addon-source": "^1.0.1"
