@@ -4,7 +4,7 @@ import {
   isFeatureEnabled,
   QueryFormData,
 } from '@superset-ui/core';
-import React, {
+import {
   forwardRef,
   RefObject,
   useCallback,
@@ -53,7 +53,7 @@ const ChartContextMenu = (
   }>({ clientX: 0, clientY: 0 });
 
   const showDrillToDetail =
-    isFeatureEnabled(FeatureFlag.DRILL_TO_DETAIL) && canExplore;
+    isFeatureEnabled(FeatureFlag.DrillToDetail) && canExplore;
 
   const open = useCallback(
     (

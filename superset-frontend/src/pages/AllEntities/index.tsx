@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styled, t, css, SupersetTheme } from '@superset-ui/core';
 import { NumberParam, useQueryParam } from 'use-query-params';
 import AllEntitiesTable, {
@@ -125,21 +125,21 @@ function AllEntities() {
   const items = [];
   if (tag?.description) {
     const description: Description = {
-      type: MetadataType.DESCRIPTION,
+      type: MetadataType.Description,
       value: tag?.description || '',
     };
     items.push(description);
   }
 
   const owner: Owner = {
-    type: MetadataType.OWNER,
+    type: MetadataType.Owner,
     createdBy: getOwnerName(tag?.created_by),
     createdOn: tag?.created_on_delta_humanized || '',
   };
   items.push(owner);
 
   const lastModified: LastModified = {
-    type: MetadataType.LAST_MODIFIED,
+    type: MetadataType.LastModified,
     value: tag?.changed_on_delta_humanized || '',
     modifiedBy: getOwnerName(tag?.changed_by),
   };

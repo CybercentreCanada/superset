@@ -19,12 +19,10 @@ import logging
 from abc import ABC
 from typing import Any, cast, Optional
 
-import simplejson as json
 from flask import request
 from flask_babel import lazy_gettext as _
 from sqlalchemy.exc import SQLAlchemyError
 
-from superset import db
 from superset.commands.base import BaseCommand
 from superset.commands.explore.form_data.get import GetFormDataCommand
 from superset.commands.explore.form_data.parameters import (
@@ -39,7 +37,7 @@ from superset.exceptions import SupersetException
 from superset.explore.exceptions import WrongEndpointError
 from superset.explore.permalink.exceptions import ExplorePermalinkGetFailedError
 from superset.extensions import security_manager
-from superset.utils import core as utils
+from superset.utils import core as utils, json
 from superset.views.utils import (
     get_datasource_info,
     get_form_data,
@@ -88,9 +86,9 @@ class GetExploreCommand(BaseCommand, ABC):
                         "Form data not found in cache, reverting to chart metadata."
                     )
             elif self._datasource_id:
-                initial_form_data[
-                    "datasource"
-                ] = f"{self._datasource_id}__{self._datasource_type}"
+                initial_form_data["datasource"] = (
+                    f"{self._datasource_id}__{self._datasource_type}"
+                )
                 if self._form_data_key:
                     message = _(
                         "Form data not found in cache, reverting to dataset metadata."
@@ -115,7 +113,7 @@ class GetExploreCommand(BaseCommand, ABC):
         if self._datasource_id is not None:
             with contextlib.suppress(DatasourceNotFound):
                 datasource = DatasourceDAO.get_datasource(
-                    db.session, cast(str, self._datasource_type), self._datasource_id
+                    cast(str, self._datasource_type), self._datasource_id
                 )
 
         datasource_name = _("[Missing Dataset]")

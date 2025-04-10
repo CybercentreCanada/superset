@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useEffect } from 'react';
-import pick from 'lodash/pick';
+import { FC, useEffect } from 'react';
+
+import { pick } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 import { DashboardContextForExplore } from 'src/types/DashboardContextForExplore';
 import {
@@ -27,6 +28,7 @@ import {
 } from 'src/utils/localStorageHelpers';
 import { RootState } from 'src/dashboard/types';
 import { getActiveFilters } from 'src/dashboard/util/activeDashboardFilters';
+import { enforceSharedLabelsColorsArray } from 'src/utils/colorScheme';
 
 type Props = { dashboardPageId: string };
 
@@ -34,7 +36,7 @@ const EMPTY_OBJECT = {};
 
 export const getDashboardContextLocalStorage = () => {
   const dashboardsContexts = getItem(
-    LocalStorageKeys.dashboard__explore_context,
+    LocalStorageKeys.DashboardExploreContext,
     {},
   );
   // A new dashboard tab id is generated on each dashboard page opening.
@@ -52,21 +54,23 @@ const updateDashboardTabLocalStorage = (
   dashboardContext: DashboardContextForExplore,
 ) => {
   const dashboardsContexts = getDashboardContextLocalStorage();
-  setItem(LocalStorageKeys.dashboard__explore_context, {
+  setItem(LocalStorageKeys.DashboardExploreContext, {
     ...dashboardsContexts,
     [dashboardPageId]: dashboardContext,
   });
 };
 
-const SyncDashboardState: React.FC<Props> = ({ dashboardPageId }) => {
+const SyncDashboardState: FC<Props> = ({ dashboardPageId }) => {
   const dashboardContextForExplore = useSelector<
     RootState,
     DashboardContextForExplore
   >(
     ({ dashboardInfo, dashboardState, nativeFilters, dataMask }) => ({
-      labelColors: dashboardInfo.metadata?.label_colors || EMPTY_OBJECT,
-      sharedLabelColors:
-        dashboardInfo.metadata?.shared_label_colors || EMPTY_OBJECT,
+      labelsColor: dashboardInfo.metadata?.label_colors || EMPTY_OBJECT,
+      labelsColorMap: dashboardInfo.metadata?.map_label_colors || EMPTY_OBJECT,
+      sharedLabelsColors: enforceSharedLabelsColorsArray(
+        dashboardInfo.metadata?.shared_label_colors,
+      ),
       colorScheme: dashboardState?.colorScheme,
       chartConfiguration:
         dashboardInfo.metadata?.chart_configuration || EMPTY_OBJECT,

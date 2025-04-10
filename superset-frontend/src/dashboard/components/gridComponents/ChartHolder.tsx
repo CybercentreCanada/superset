@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+
 import { ResizeCallback, ResizeStartCallback } from 're-resizable';
 import cx from 'classnames';
 import { useSelector } from 'react-redux';
-import { css } from '@superset-ui/core';
+import { css, useTheme } from '@superset-ui/core';
 import { LayoutItem, RootState } from 'src/dashboard/types';
 import AnchorLink from 'src/dashboard/components/AnchorLink';
 import Chart from 'src/dashboard/containers/Chart';
 import DeleteComponentButton from 'src/dashboard/components/DeleteComponentButton';
-import DragDroppable from 'src/dashboard/components/dnd/DragDroppable';
+import { Draggable } from 'src/dashboard/components/dnd/DragDroppable';
 import HoverMenu from 'src/dashboard/components/menu/HoverMenu';
 import ResizableContainer from 'src/dashboard/components/resizable/ResizableContainer';
 import getChartAndLabelComponentIdFromPath from 'src/dashboard/util/getChartAndLabelComponentIdFromPath';
@@ -69,15 +70,6 @@ interface ChartHolderProps {
   isInView: boolean;
 }
 
-const fullSizeStyle = css`
-  && {
-    position: fixed;
-    z-index: 3000;
-    left: 0;
-    top: 0;
-  }
-`;
-
 const ChartHolder: React.FC<ChartHolderProps> = ({
   id,
   parentId,
@@ -101,6 +93,16 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
   setFullSizeChartId,
   isInView,
 }) => {
+  const theme = useTheme();
+  const fullSizeStyle = css`
+    && {
+      position: fixed;
+      z-index: 3000;
+      left: 0;
+      top: 0;
+      padding: ${theme.gridUnit * 2}px;
+    }
+  `;
   const { chartId } = component.meta;
   const isFullSize = fullSizeChartId === chartId;
 
@@ -243,7 +245,7 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
   }, []);
 
   return (
-    <DragDroppable
+    <Draggable
       component={component}
       parentComponent={parentComponent}
       orientation={parentComponent.type === ROW_TYPE ? 'column' : 'row'}
@@ -253,7 +255,7 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
       disableDragDrop={false}
       editMode={editMode}
     >
-      {({ dropIndicatorProps, dragSourceRef }) => (
+      {({ dragSourceRef }) => (
         <ResizableContainer
           id={component.id}
           adjustableWidth={parentComponent.type === ROW_TYPE}
@@ -324,10 +326,9 @@ const ChartHolder: React.FC<ChartHolderProps> = ({
               </HoverMenu>
             )}
           </div>
-          {dropIndicatorProps && <div {...dropIndicatorProps} />}
         </ResizableContainer>
       )}
-    </DragDroppable>
+    </Draggable>
   );
 };
 

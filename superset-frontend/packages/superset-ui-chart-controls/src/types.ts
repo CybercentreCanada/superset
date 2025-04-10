@@ -17,7 +17,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { ReactElement, ReactNode, ReactText } from 'react';
+import { ReactElement, ReactNode, ReactText, ComponentType } from 'react';
+
 import type {
   AdhocColumn,
   Column,
@@ -82,9 +83,13 @@ export interface Dataset {
   owners?: Owner[];
   filter_select?: boolean;
   filter_select_enabled?: boolean;
+  column_names?: string[];
 }
 
 export interface ControlPanelState {
+  slice: {
+    slice_id: number;
+  };
   form_data: QueryFormData;
   datasource: Dataset | QueryResponse | null;
   controls: ControlStateMapping;
@@ -175,7 +180,7 @@ export type InternalControlType =
   | keyof SharedControlComponents; // expanded in `expandControlConfig`
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ControlType = InternalControlType | React.ComponentType<any>;
+export type ControlType = InternalControlType | ComponentType<any>;
 
 export type TabOverride = 'data' | 'customize' | boolean;
 
@@ -257,6 +262,10 @@ export interface BaseControlConfig<
     props: ControlPanelsContainerProps,
     controlData: AnyDict,
   ) => boolean;
+  disableStash?: boolean;
+  hidden?:
+    | boolean
+    | ((props: ControlPanelsContainerProps, controlData: AnyDict) => boolean);
 }
 
 export interface ControlValueValidator<
@@ -280,7 +289,6 @@ export type SelectControlType =
   | 'AdhocFilterControl'
   | 'FilterBoxItemControl';
 
-// via react-select/src/filters
 export interface FilterOption<T extends SelectOption> {
   label: string;
   value: string;
@@ -315,9 +323,7 @@ export type SharedControlConfig<
 /** --------------------------------------------
  * Custom controls
  * --------------------------------------------- */
-export type CustomControlConfig<P = {}> = BaseControlConfig<
-  React.ComponentType<P>
-> &
+export type CustomControlConfig<P = {}> = BaseControlConfig<ComponentType<P>> &
   // two run-time properties from superset-frontend/src/explore/components/Control.jsx
   Omit<P, 'onChange' | 'hovered'>;
 
@@ -331,8 +337,8 @@ export type ControlConfig<
 > = T extends InternalControlType
   ? SharedControlConfig<T, O>
   : T extends object
-  ? CustomControlConfig<T> // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  : CustomControlConfig<any>;
+    ? CustomControlConfig<T> // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    : CustomControlConfig<any>;
 
 /** ===========================================================
  * Chart plugin control panel config
@@ -377,6 +383,10 @@ export interface ControlPanelSectionConfig {
   expanded?: boolean;
   tabOverride?: TabOverride;
   controlSetRows: ControlSetRow[];
+  visibility?: (
+    props: ControlPanelsContainerProps,
+    controlData: AnyDict,
+  ) => boolean;
 }
 
 export interface StandardizedControls {
@@ -421,29 +431,29 @@ export type SectionOverrides = {
 
 // Ref:
 //  - superset-frontend/src/explore/components/ConditionalFormattingControl.tsx
-export enum COMPARATOR {
-  NONE = 'None',
-  GREATER_THAN = '>',
-  LESS_THAN = '<',
-  GREATER_OR_EQUAL = '≥',
-  LESS_OR_EQUAL = '≤',
-  EQUAL = '=',
-  NOT_EQUAL = '≠',
-  BETWEEN = '< x <',
-  BETWEEN_OR_EQUAL = '≤ x ≤',
-  BETWEEN_OR_LEFT_EQUAL = '≤ x <',
-  BETWEEN_OR_RIGHT_EQUAL = '< x ≤',
+export enum Comparator {
+  None = 'None',
+  GreaterThan = '>',
+  LessThan = '<',
+  GreaterOrEqual = '≥',
+  LessOrEqual = '≤',
+  Equal = '=',
+  NotEqual = '≠',
+  Between = '< x <',
+  BetweenOrEqual = '≤ x ≤',
+  BetweenOrLeftEqual = '≤ x <',
+  BetweenOrRightEqual = '< x ≤',
 }
 
-export const MULTIPLE_VALUE_COMPARATORS = [
-  COMPARATOR.BETWEEN,
-  COMPARATOR.BETWEEN_OR_EQUAL,
-  COMPARATOR.BETWEEN_OR_LEFT_EQUAL,
-  COMPARATOR.BETWEEN_OR_RIGHT_EQUAL,
+export const MultipleValueComparators = [
+  Comparator.Between,
+  Comparator.BetweenOrEqual,
+  Comparator.BetweenOrLeftEqual,
+  Comparator.BetweenOrRightEqual,
 ];
 
 export type ConditionalFormattingConfig = {
-  operator?: COMPARATOR;
+  operator?: Comparator;
   targetValue?: number;
   targetValueLeft?: number;
   targetValueRight?: number;
@@ -527,36 +537,36 @@ export type ControlFormItemSpec<T extends ControlType = ControlType> = {
       validators?: ControlFormValueValidator<string>[];
     }
   : T extends 'RadioButtonControl'
-  ? {
-      options: [string, ReactNode][];
-      value?: string;
-      defaultValue?: string;
-    }
-  : T extends 'Checkbox'
-  ? {
-      value?: boolean;
-      defaultValue?: boolean;
-    }
-  : T extends 'InputNumber' | 'Slider'
-  ? {
-      min?: number;
-      max?: number;
-      step?: number;
-      value?: number;
-      defaultValue?: number;
-      validators?: ControlFormValueValidator<number>[];
-    }
-  : T extends 'Input'
-  ? {
-      controlType: 'Input';
-      value?: string;
-      defaultValue?: string;
-      validators?: ControlFormValueValidator<string>[];
-    }
-  : T extends 'CurrencyControl'
-  ? {
-      controlType: 'CurrencyControl';
-      value?: Currency;
-      defaultValue?: Currency;
-    }
-  : {});
+    ? {
+        options: [string, ReactNode][];
+        value?: string;
+        defaultValue?: string;
+      }
+    : T extends 'Checkbox'
+      ? {
+          value?: boolean;
+          defaultValue?: boolean;
+        }
+      : T extends 'InputNumber' | 'Slider'
+        ? {
+            min?: number;
+            max?: number;
+            step?: number;
+            value?: number;
+            defaultValue?: number;
+            validators?: ControlFormValueValidator<number>[];
+          }
+        : T extends 'Input'
+          ? {
+              controlType: 'Input';
+              value?: string;
+              defaultValue?: string;
+              validators?: ControlFormValueValidator<string>[];
+            }
+          : T extends 'CurrencyControl'
+            ? {
+                controlType: 'CurrencyControl';
+                value?: Currency;
+                defaultValue?: Currency;
+              }
+            : {});

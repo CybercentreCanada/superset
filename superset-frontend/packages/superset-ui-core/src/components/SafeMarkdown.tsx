@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeRaw from 'rehype-raw';
@@ -44,7 +44,7 @@ function SafeMarkdown({
   htmlSanitization = true,
   htmlSchemaOverrides = {},
 }: SafeMarkdownProps) {
-  const escapeHtml = isFeatureEnabled(FeatureFlag.ESCAPE_MARKDOWN_HTML);
+  const escapeHtml = isFeatureEnabled(FeatureFlag.EscapeMarkdownHtml);
 
   const rehypePlugins = useMemo(() => {
     const rehypePlugins: any = [];

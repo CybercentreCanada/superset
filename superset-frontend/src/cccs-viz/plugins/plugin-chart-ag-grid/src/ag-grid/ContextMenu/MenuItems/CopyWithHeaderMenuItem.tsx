@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Menu } from 'src/components/Menu';
 import { CopyFilled } from '@ant-design/icons';
 

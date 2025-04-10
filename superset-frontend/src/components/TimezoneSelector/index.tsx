@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import moment from 'moment-timezone';
 import { t } from '@superset-ui/core';
 import { Select } from 'src/components';
@@ -88,8 +88,8 @@ const TIMEZONE_OPTIONS = TIMEZONES.map(zone => ({
 }));
 
 const TIMEZONE_OPTIONS_SORT_COMPARATOR = (
-  a: typeof TIMEZONE_OPTIONS[number],
-  b: typeof TIMEZONE_OPTIONS[number],
+  a: (typeof TIMEZONE_OPTIONS)[number],
+  b: (typeof TIMEZONE_OPTIONS)[number],
 ) =>
   moment.tz(currentDate, a.timezoneName).utcOffset() -
   moment.tz(currentDate, b.timezoneName).utcOffset();

@@ -44,12 +44,12 @@ import { CccsGridQueryFormData, DEFAULT_FORM_DATA } from '../types';
  */
 export function getQueryMode(formData: CccsGridQueryFormData) {
   const { query_mode: mode } = formData;
-  if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
+  if (mode === QueryMode.Aggregate || mode === QueryMode.Raw) {
     return mode;
   }
   const rawColumns = formData?.all_columns;
   const hasRawColumns = rawColumns && rawColumns.length > 0;
-  return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
+  return hasRawColumns ? QueryMode.Raw : QueryMode.Aggregate;
 }
 
 const isRange = (data: any) => {
@@ -70,7 +70,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
   const { percent_metrics: percentMetrics, order_desc: orderDesc = false } =
     formData;
   // never include time in raw records mode
-  if (queryMode === QueryMode.raw) {
+  if (queryMode === QueryMode.Raw) {
     formDataCopy = {
       ...formData,
       ...DEFAULT_FORM_DATA,
@@ -84,7 +84,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     let { metrics, orderby = [] } = baseQueryObject;
     const postProcessing: PostProcessingRule[] = [];
 
-    if (queryMode === QueryMode.aggregate) {
+    if (queryMode === QueryMode.Aggregate) {
       metrics = metrics || [];
       if (sortByMetric) {
         orderby = [[sortByMetric, !orderDesc]];
@@ -188,7 +188,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     if (
       metrics?.length &&
       formData.show_totals &&
-      queryMode === QueryMode.aggregate
+      queryMode === QueryMode.Aggregate
     ) {
       extraQueries.push({
         ...queryObject,

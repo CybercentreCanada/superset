@@ -17,7 +17,7 @@
  * under the License.
  */
 import cx from 'classnames';
-import React from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { styled, t, logging } from '@superset-ui/core';
 import { debounce, isEqual } from 'lodash';
@@ -40,9 +40,6 @@ import SliceHeader from '../SliceHeader';
 import MissingChart from '../MissingChart';
 import { slicePropShape, chartPropShape } from '../../util/propShapes';
 
-import { isFilterBox } from '../../util/activeDashboardFilters';
-import getFilterValuesByFilterId from '../../util/getFilterValuesByFilterId';
-
 const propTypes = {
   id: PropTypes.number.isRequired,
   componentId: PropTypes.string.isRequired,
@@ -57,8 +54,8 @@ const propTypes = {
   // from redux
   chart: chartPropShape.isRequired,
   formData: PropTypes.object.isRequired,
-  labelColors: PropTypes.object,
-  sharedLabelColors: PropTypes.object,
+  labelsColor: PropTypes.object,
+  labelsColorMap: PropTypes.object,
   datasource: PropTypes.object,
   slice: slicePropShape.isRequired,
   sliceName: PropTypes.string.isRequired,
@@ -100,7 +97,6 @@ const SHOULD_UPDATE_ON_PROP_CHANGES = Object.keys(propTypes).filter(
   prop =>
     prop !== 'width' && prop !== 'height' && prop !== 'isComponentVisible',
 );
-const OVERFLOWABLE_VIZ_TYPES = new Set(['filter_box']);
 const DEFAULT_HEADER_HEIGHT = 22;
 
 const ChartWrapper = styled.div`
@@ -125,7 +121,7 @@ const SliceContainer = styled.div`
   max-height: 100%;
 `;
 
-class Chart extends React.Component {
+class Chart extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -138,6 +134,7 @@ class Chart extends React.Component {
     this.handleFilterMenuOpen = this.handleFilterMenuOpen.bind(this);
     this.handleFilterMenuClose = this.handleFilterMenuClose.bind(this);
     this.exportCSV = this.exportCSV.bind(this);
+    this.exportPivotCSV = this.exportPivotCSV.bind(this);
     this.exportFullCSV = this.exportFullCSV.bind(this);
     this.exportXLSX = this.exportXLSX.bind(this);
     this.exportFullXLSX = this.exportFullXLSX.bind(this);
@@ -200,11 +197,19 @@ class Chart extends React.Component {
         }
       }
     } else if (
-      // chart should re-render if color scheme or label color was changed
+      // chart should re-render if color scheme or label colors were changed
       nextProps.formData?.color_scheme !== this.props.formData?.color_scheme ||
       !areObjectsEqual(
-        nextProps.formData?.label_colors,
-        this.props.formData?.label_colors,
+        nextProps.formData?.label_colors || {},
+        this.props.formData?.label_colors || {},
+      ) ||
+      !areObjectsEqual(
+        nextProps.formData?.map_label_colors || {},
+        this.props.formData?.map_label_colors || {},
+      ) ||
+      !isEqual(
+        nextProps.formData?.shared_label_colors || [],
+        this.props.formData?.shared_label_colors || [],
       )
     ) {
       return true;
@@ -334,6 +339,10 @@ class Chart extends React.Component {
     this.exportTable('csv', isFullCSV);
   }
 
+  exportPivotCSV() {
+    this.exportTable('csv', false, true);
+  }
+
   exportXLSX() {
     this.exportTable('xlsx', false);
   }
@@ -342,7 +351,7 @@ class Chart extends React.Component {
     this.exportTable('xlsx', true);
   }
 
-  exportTable(format, isFullCSV) {
+  exportTable(format, isFullCSV, isPivot = false) {
     const logAction =
       format === 'csv'
         ? LOG_ACTIONS_EXPORT_CSV_DASHBOARD_CHART
@@ -355,7 +364,7 @@ class Chart extends React.Component {
       formData: isFullCSV
         ? { ...this.props.formData, row_limit: this.props.maxRows }
         : this.props.formData,
-      resultType: 'full',
+      resultType: isPivot ? 'post_processed' : 'full',
       resultFormat: format,
       force: true,
       ownState: this.props.ownState,
@@ -386,8 +395,8 @@ class Chart extends React.Component {
       editMode,
       filters,
       formData,
-      labelColors,
-      sharedLabelColors,
+      labelsColor,
+      labelsColorMap,
       updateSliceName,
       sliceName,
       toggleExpandSlice,
@@ -423,13 +432,7 @@ class Chart extends React.Component {
     const cachedDttm =
       // eslint-disable-next-line camelcase
       queriesResponse?.map(({ cached_dttm }) => cached_dttm) || [];
-    const isOverflowable = OVERFLOWABLE_VIZ_TYPES.has(slice.viz_type);
-    const initialValues = isFilterBox(id)
-      ? getFilterValuesByFilterId({
-          activeFilters: filters,
-          filterId: id,
-        })
-      : {};
+    const initialValues = {};
 
     return (
       <SliceContainer
@@ -454,6 +457,7 @@ class Chart extends React.Component {
           logEvent={logEvent}
           onExploreChart={this.onExploreChart}
           exportCSV={this.exportCSV}
+          exportPivotCSV={this.exportPivotCSV}
           exportXLSX={this.exportXLSX}
           exportFullCSV={this.exportFullCSV}
           exportFullXLSX={this.exportFullXLSX}
@@ -488,14 +492,13 @@ class Chart extends React.Component {
             ref={this.setDescriptionRef}
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: slice.description_markeddown }}
+            role="complementary"
           />
         )}
 
         <ChartWrapper
-          className={cx(
-            'dashboard-chart',
-            isOverflowable && 'dashboard-chart--overflowable',
-          )}
+          className={cx('dashboard-chart')}
+          aria-label={slice.description}
         >
           {isLoading && (
             <ChartOverlay
@@ -520,8 +523,8 @@ class Chart extends React.Component {
             dashboardId={dashboardId}
             initialValues={initialValues}
             formData={formData}
-            labelColors={labelColors}
-            sharedLabelColors={sharedLabelColors}
+            labelsColor={labelsColor}
+            labelsColorMap={labelsColorMap}
             ownState={ownState}
             filterState={filterState}
             queriesResponse={chart.queriesResponse}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChangeDatasourceModal } from 'src/components/Datasource';
 import { withTheme } from '@superset-ui/core';
 import { connect, useDispatch } from 'react-redux';

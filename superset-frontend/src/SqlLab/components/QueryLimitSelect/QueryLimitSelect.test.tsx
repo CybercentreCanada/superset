@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React from 'react';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { Store } from 'redux';
@@ -32,9 +31,6 @@ import QueryLimitSelect, {
 const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
 
-jest.mock('src/components/DeprecatedSelect', () => () => (
-  <div data-test="mock-deprecated-select" />
-));
 jest.mock('src/components/Select/Select', () => () => (
   <div data-test="mock-deprecated-select-select" />
 ));
@@ -119,8 +115,8 @@ describe('QueryLimitSelect', () => {
     const expectedLabels = [10, 100, 1000, 10000, 50000].map(i =>
       convertToNumWithSpaces(i),
     );
-    const actualLabels = getAllByRole('menuitem').map(elem =>
-      elem.textContent?.trim(),
+    const actualLabels = getAllByRole('menuitem').map(
+      elem => elem.textContent?.trim(),
     );
 
     expect(actualLabels).toEqual(expectedLabels);
@@ -139,8 +135,8 @@ describe('QueryLimitSelect', () => {
     await waitFor(() => expect(getByRole('menu')).toBeInTheDocument());
 
     const expectedLabels = [5].map(i => convertToNumWithSpaces(i));
-    const actualLabels = getAllByRole('menuitem').map(elem =>
-      elem.textContent?.trim(),
+    const actualLabels = getAllByRole('menuitem').map(
+      elem => elem.textContent?.trim(),
     );
 
     expect(actualLabels).toEqual(expectedLabels);
@@ -161,8 +157,8 @@ describe('QueryLimitSelect', () => {
     const expectedLabels = [10, 100, 1000, 10000].map(i =>
       convertToNumWithSpaces(i),
     );
-    const actualLabels = getAllByRole('menuitem').map(elem =>
-      elem.textContent?.trim(),
+    const actualLabels = getAllByRole('menuitem').map(
+      elem => elem.textContent?.trim(),
     );
 
     expect(actualLabels).toEqual(expectedLabels);

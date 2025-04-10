@@ -105,7 +105,7 @@ const calcColumnColumnDefs = (
     const sort =
       sortIndex > -1 ? (orderByColsArray[sortIndex][1] ? 'asc' : 'desc') : null;
     const cellRenderer =
-      isDate || columnTypeGeneric === GenericDataType.TEMPORAL
+      isDate || columnTypeGeneric === GenericDataType.Temporal
         ? rendererMap.DATE
         : rendererMap[advancedDataType.toUpperCase()] ??
           rendererMap[columnType] ??
@@ -150,7 +150,7 @@ const calcColumnColumnDefs = (
       sort,
       sortIndex: sortIndex > -1 ? sortIndex : null,
       type: columnType,
-      isDateColumn: isDate || columnTypeGeneric === GenericDataType.TEMPORAL,
+      isDateColumn: isDate || columnTypeGeneric === GenericDataType.Temporal,
     };
   });
 

@@ -44,12 +44,12 @@ import { CccsTableFormData } from '../../types';
  */
 export function getQueryMode(formData: CccsTableFormData) {
   const { query_mode: mode } = formData;
-  if (mode === QueryMode.aggregate || mode === QueryMode.raw) {
+  if (mode === QueryMode.Aggregate || mode === QueryMode.Raw) {
     return mode;
   }
   const rawColumns = formData?.all_columns;
   const hasRawColumns = rawColumns && rawColumns.length > 0;
-  return hasRawColumns ? QueryMode.raw : QueryMode.aggregate;
+  return hasRawColumns ? QueryMode.Raw : QueryMode.Aggregate;
 }
 
 const buildQuery: BuildQuery<CccsTableFormData> = (
@@ -64,7 +64,7 @@ const buildQuery: BuildQuery<CccsTableFormData> = (
   const { percent_metrics: percentMetrics, order_desc: orderDesc = false } =
     formData;
   // never include time in raw records mode
-  if (queryMode === QueryMode.raw) {
+  if (queryMode === QueryMode.Raw) {
     formDataCopy = {
       ...formData,
       include_time: false,
@@ -75,7 +75,7 @@ const buildQuery: BuildQuery<CccsTableFormData> = (
     let { metrics, orderby = [] } = baseQueryObject;
     const postProcessing: PostProcessingRule[] = [];
 
-    if (queryMode === QueryMode.aggregate) {
+    if (queryMode === QueryMode.Aggregate) {
       metrics = metrics || [];
       if (sortByMetric) {
         orderby = [[sortByMetric, !orderDesc]];
@@ -128,7 +128,7 @@ const buildQuery: BuildQuery<CccsTableFormData> = (
     if (
       metrics?.length &&
       formData.show_totals &&
-      queryMode === QueryMode.aggregate
+      queryMode === QueryMode.Aggregate
     ) {
       extraQueries.push({
         ...queryObject,

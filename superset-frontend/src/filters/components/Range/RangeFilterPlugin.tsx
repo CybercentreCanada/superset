@@ -24,7 +24,7 @@ import {
   styled,
   t,
 } from '@superset-ui/core';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { rgba } from 'emotion-rgba';
 import { AntdSlider } from 'src/components';
 import { FilterBarOrientation } from 'src/dashboard/types';
@@ -82,14 +82,14 @@ const Wrapper = styled.div<{
     }
     & .ant-slider {
       margin-top: ${
-        orientation === FilterBarOrientation.HORIZONTAL ? 0 : theme.gridUnit
+        orientation === FilterBarOrientation.Horizontal ? 0 : theme.gridUnit
       }px;
       margin-bottom: ${
-        orientation === FilterBarOrientation.HORIZONTAL ? 0 : theme.gridUnit * 5
+        orientation === FilterBarOrientation.Horizontal ? 0 : theme.gridUnit * 5
       }px;
 
       ${
-        orientation === FilterBarOrientation.HORIZONTAL &&
+        orientation === FilterBarOrientation.Horizontal &&
         !isOverflowing &&
         `line-height: 1.2;`
       }

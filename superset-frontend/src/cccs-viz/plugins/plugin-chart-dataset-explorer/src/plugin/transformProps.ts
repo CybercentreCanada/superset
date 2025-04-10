@@ -179,7 +179,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     {} as { [index: string]: Partial<Column> },
   );
 
-  if (query_mode === QueryMode.raw) {
+  if (query_mode === QueryMode.Raw) {
     columnDefs = formData.columns.map((column: any) => {
       const columnType = columnDataMap[column]?.type || '';
       const isDate = !!columnDataMap[column]?.is_dttm;
@@ -190,7 +190,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         ? columnDataMap[column]?.verbose_name
         : column;
       const cellRenderer =
-        isDate || columnTypeGeneric === GenericDataType.TEMPORAL
+        isDate || columnTypeGeneric === GenericDataType.Temporal
           ? rendererMap.DATE
           : rendererMap[columnAdvancedType.toUpperCase()] ??
             rendererMap[columnType] ??
@@ -230,8 +230,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
           columnAdvancedType in rendererMap
             ? rendererMap[columnAdvancedType]
             : columnType in rendererMap
-            ? rendererMap[columnType]
-            : undefined;
+              ? rendererMap[columnType]
+              : undefined;
         const isSortable = true;
         const enableRowGroup = true;
         const columnDescription = columnDescriptionMap[column];

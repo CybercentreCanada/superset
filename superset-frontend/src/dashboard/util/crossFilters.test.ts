@@ -58,6 +58,7 @@ const CHARTS = {
       datasource: '2__table',
       viz_type: 'echarts_timeseries_line',
       slice_id: 1,
+      color_scheme: 'supersetColors',
     },
     chartAlert: null,
     chartStatus: 'rendered' as const,
@@ -76,6 +77,7 @@ const CHARTS = {
   '2': {
     id: 2,
     form_data: {
+      color_scheme: 'supersetColors',
       datasource: '2__table',
       viz_type: 'echarts_timeseries_line',
       slice_id: 2,
@@ -134,7 +136,7 @@ beforeEach(() => {
     .callsFake(() => ({
       // @ts-ignore
       get: () => ({
-        behaviors: [Behavior.INTERACTIVE_CHART],
+        behaviors: [Behavior.InteractiveChart],
       }),
     }));
 });
@@ -146,7 +148,7 @@ afterEach(() => {
 test('Generate correct cross filters configuration without initial configuration', () => {
   // @ts-ignore
   global.featureFlags = {
-    [FeatureFlag.DASHBOARD_CROSS_FILTERS]: true,
+    [FeatureFlag.DashboardCrossFilters]: true,
   };
 
   // @ts-ignore
@@ -180,7 +182,7 @@ test('Generate correct cross filters configuration without initial configuration
 test('Generate correct cross filters configuration with initial configuration', () => {
   // @ts-ignore
   global.featureFlags = {
-    [FeatureFlag.DASHBOARD_CROSS_FILTERS]: true,
+    [FeatureFlag.DashboardCrossFilters]: true,
   };
 
   expect(
@@ -222,7 +224,7 @@ test('Generate correct cross filters configuration with initial configuration', 
 test('Return undefined if DASHBOARD_CROSS_FILTERS feature flag is disabled', () => {
   // @ts-ignore
   global.featureFlags = {
-    [FeatureFlag.DASHBOARD_CROSS_FILTERS]: false,
+    [FeatureFlag.DashboardCrossFilters]: false,
   };
   expect(
     getCrossFiltersConfiguration(
@@ -236,7 +238,7 @@ test('Return undefined if DASHBOARD_CROSS_FILTERS feature flag is disabled', () 
 test('Recalculate charts in global filter scope when charts change', () => {
   // @ts-ignore
   global.featureFlags = {
-    [FeatureFlag.DASHBOARD_CROSS_FILTERS]: true,
+    [FeatureFlag.DashboardCrossFilters]: true,
   };
   expect(
     getCrossFiltersConfiguration(
@@ -262,8 +264,10 @@ test('Recalculate charts in global filter scope when charts change', () => {
         '3': {
           id: 3,
           form_data: {
+            slice_id: 3,
             datasource: '3__table',
             viz_type: 'echarts_timeseries_line',
+            color_scheme: 'supersetColors',
           },
           chartAlert: null,
           chartStatus: 'rendered' as const,

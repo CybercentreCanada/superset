@@ -116,7 +116,7 @@ describe('Color scheme control', () => {
 describe('VizType control', () => {
   beforeEach(() => {
     interceptChart({ legacy: false }).as('tableChartData');
-    interceptChart({ legacy: true }).as('lineChartData');
+    interceptChart({ legacy: false }).as('bigNumberChartData');
   });
 
   it('Can change vizType', () => {
@@ -126,15 +126,14 @@ describe('VizType control', () => {
     cy.contains('View all charts').click();
 
     cy.get('.ant-modal-content').within(() => {
-      cy.get('button').contains('Evolution').click(); // change categories
-      cy.get('[role="button"]').contains('Line Chart').click();
+      cy.get('button').contains('KPI').click(); // change categories
+      cy.get('[role="button"]').contains('Big Number').click();
       cy.get('button').contains('Select').click();
     });
 
     cy.get('button[data-test="run-query-button"]').click();
     cy.verifySliceSuccess({
-      waitAlias: '@lineChartData',
-      chartSelector: 'svg',
+      waitAlias: '@bigNumberChartData',
     });
   });
 });
@@ -210,7 +209,7 @@ describe('Time range filter', () => {
       .click()
       .then(() => {
         cy.get('.ant-radio-group').children().its('length').should('eq', 5);
-        cy.get('.ant-radio-checked + span').contains('last year');
+        cy.get('.ant-radio-checked + span').contains('Last year');
         cy.get('[data-test=cancel-button]').click();
       });
   });

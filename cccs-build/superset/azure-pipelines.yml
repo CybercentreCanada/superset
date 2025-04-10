@@ -11,7 +11,7 @@ variables:
   buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
   DOCKER_BUILDKIT: 1
 
-pool: cauldron-vmss
+pool: cybertron-build-pool
 
 steps:
   - bash: |
@@ -29,7 +29,6 @@ steps:
     displayName: Build the image
     inputs:
       command: build
-      containerRegistry: $(containerRegistry)
       repository: $(imageRepository)
       dockerfile: $(dockerfile)
       arguments: --progress=plain --build-arg BUILD_NUMBER=$(Build.BuildNumber)
@@ -41,7 +40,6 @@ steps:
     displayName: Push the image to $(containerRegistry)
     inputs:
       command: push
-      containerRegistry: $(containerRegistry)
       repository: $(imageRepository)
       tags: |
         $(BRANCH_NAME)

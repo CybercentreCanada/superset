@@ -25,7 +25,7 @@ export const WORLD_HEALTH_CHARTS = [
   { name: 'Most Populated Countries', viz: 'table' },
   { name: "World's Population", viz: 'big_number' },
   { name: 'Growth Rate', viz: 'line' },
-  { name: 'Rural Breakdown', viz: 'sunburst' },
+  { name: 'Rural Breakdown', viz: 'sunburst_v2' },
   { name: "World's Pop Growth", viz: 'area' },
   { name: 'Life Expectancy VS Rural %', viz: 'bubble' },
   { name: 'Treemap', viz: 'treemap_v2' },
@@ -38,17 +38,17 @@ export const SUPPORTED_TIER1_CHARTS = [
   { name: 'Pie Chart', viz: 'pie' },
   { name: 'Table', viz: 'table' },
   { name: 'Pivot Table', viz: 'pivot_table_v2' },
-  { name: 'Time-Series Line Chart', viz: 'echarts_timeseries_line' },
-  { name: 'Time-Series Area Chart', viz: 'echarts_area' },
-  { name: 'Time-Series Scatter Chart', viz: 'echarts_timeseries_scatter' },
-  { name: 'Time-Series Bar Chart V2', viz: 'echarts_timeseries_bar' },
+  { name: 'Line Chart', viz: 'echarts_timeseries_line' },
+  { name: 'Area Chart', viz: 'echarts_area' },
+  { name: 'Scatter Chart', viz: 'echarts_timeseries_scatter' },
+  { name: 'Bar Chart V2', viz: 'echarts_timeseries_bar' },
 ] as ChartSpec[];
 
 export const SUPPORTED_TIER2_CHARTS = [
   { name: 'Box Plot Chart', viz: 'box_plot' },
-  { name: 'Time-Series Generic Chart', viz: 'echarts_timeseries' },
-  { name: 'Time-Series Smooth Line Chart', viz: 'echarts_timeseries_smooth' },
-  { name: 'Time-Series Step Line Chart', viz: 'echarts_timeseries_step' },
+  { name: 'Generic Chart', viz: 'echarts_timeseries' },
+  { name: 'Smooth Line Chart', viz: 'echarts_timeseries_smooth' },
+  { name: 'Step Line Chart', viz: 'echarts_timeseries_step' },
   { name: 'Funnel Chart', viz: 'funnel' },
   { name: 'Gauge Chart', viz: 'gauge_chart' },
   { name: 'Radar Chart', viz: 'radar' },
@@ -125,7 +125,7 @@ export const valueNativeFilterOptions = [
 ];
 
 export function interceptGet() {
-  cy.intercept('/api/v1/dashboard/*').as('get');
+  cy.intercept('GET', '/api/v1/dashboard/*').as('get');
 }
 
 export function interceptFiltering() {
@@ -142,6 +142,10 @@ export function interceptDelete() {
 
 export function interceptUpdate() {
   cy.intercept('PUT', `/api/v1/dashboard/*`).as('update');
+}
+
+export function interceptExploreUpdate() {
+  cy.intercept('PUT', `/api/v1/chart/*`).as('chartUpdate');
 }
 
 export function interceptPost() {
@@ -374,7 +378,7 @@ export function cancelNativeFilterSettings() {
     .should('be.visible')
     .should('have.text', 'There are unsaved changes.');
   cy.get(nativeFilters.modal.footer)
-    .find(nativeFilters.modal.yesCancelButton)
+    .find(nativeFilters.modal.confirmCancelButton)
     .contains('cancel')
     .click({ force: true });
   cy.get(nativeFilters.modal.container).should('not.exist');
@@ -520,13 +524,17 @@ export function addCountryNameFilter() {
   );
 }
 
-export function openTab(tabComponentIndex: number, tabIndex: number) {
-  return cy
-    .getBySel('dashboard-component-tabs')
+export function openTab(
+  tabComponentIndex: number,
+  tabIndex: number,
+  target = 'dashboard-component-tabs',
+) {
+  cy.getBySel(target)
     .eq(tabComponentIndex)
     .find('[role="tab"]')
     .eq(tabIndex)
     .click();
+  cy.wait(500);
 }
 
 export const openTopLevelTab = (tabName: string) => {

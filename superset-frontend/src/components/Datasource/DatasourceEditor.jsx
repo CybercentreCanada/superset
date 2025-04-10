@@ -17,13 +17,13 @@
  * under the License.
  */
 import rison from 'rison';
-import React, { useCallback } from 'react';
+import { PureComponent, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Radio } from 'src/components/Radio';
 import Card from 'src/components/Card';
 import Alert from 'src/components/Alert';
 import Badge from 'src/components/Badge';
-import shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import {
   css,
   isFeatureEnabled,
@@ -34,6 +34,7 @@ import {
   SupersetClient,
   t,
   withTheme,
+  getClientErrorObject,
 } from '@superset-ui/core';
 import { Select, AsyncSelect, Row, Col } from 'src/components';
 import { FormLabel } from 'src/components/Form';
@@ -46,7 +47,6 @@ import Label from 'src/components/Label';
 import Loading from 'src/components/Loading';
 import TableSelector from 'src/components/TableSelector';
 import EditableTitle from 'src/components/EditableTitle';
-import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import CheckboxControl from 'src/explore/components/controls/CheckboxControl';
 import TextControl from 'src/explore/components/controls/TextControl';
 import TextAreaControl from 'src/explore/components/controls/TextAreaControl';
@@ -95,7 +95,7 @@ const StyledTableTabs = styled(Tabs)`
 `;
 
 const StyledBadge = styled(Badge)`
-  .ant-badge-count {
+  .antd5-badge-count {
     line-height: ${({ theme }) => theme.gridUnit * 4}px;
     height: ${({ theme }) => theme.gridUnit * 4}px;
     margin-left: ${({ theme }) => theme.gridUnit}px;
@@ -192,7 +192,7 @@ function ColumnCollectionTable({
   return (
     <CollectionTable
       tableColumns={
-        isFeatureEnabled(FeatureFlag.ENABLE_ADVANCED_DATA_TYPES)
+        isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)
           ? [
               'column_name',
               'advanced_data_type',
@@ -212,7 +212,7 @@ function ColumnCollectionTable({
             ]
       }
       sortColumns={
-        isFeatureEnabled(FeatureFlag.ENABLE_ADVANCED_DATA_TYPES)
+        isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)
           ? [
               'column_name',
               'advanced_data_type',
@@ -288,7 +288,7 @@ function ColumnCollectionTable({
                 }
               />
             )}
-            {isFeatureEnabled(FeatureFlag.ENABLE_ADVANCED_DATA_TYPES) ? (
+            {isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes) ? (
               <Field
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
@@ -338,7 +338,7 @@ function ColumnCollectionTable({
               control={
                 <TextControl
                   controlId="python_date_format"
-                  placeholder="%Y/%m/%d"
+                  placeholder="%Y-%m-%d"
                 />
               }
             />
@@ -368,7 +368,7 @@ function ColumnCollectionTable({
         </FormContainer>
       }
       columnLabels={
-        isFeatureEnabled(FeatureFlag.ENABLE_ADVANCED_DATA_TYPES)
+        isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)
           ? {
               column_name: t('Column'),
               advanced_data_type: t('Advanced data type'),
@@ -389,7 +389,7 @@ function ColumnCollectionTable({
       }
       onChange={onColumnsChange}
       itemRenderers={
-        isFeatureEnabled(FeatureFlag.ENABLE_ADVANCED_DATA_TYPES)
+        isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)
           ? {
               column_name: (v, onItemChange, _, record) =>
                 editableColumnName ? (
@@ -585,7 +585,7 @@ function OwnersSelector({ datasource, onChange }) {
   );
 }
 
-class DatasourceEditor extends React.PureComponent {
+class DatasourceEditor extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -638,9 +638,6 @@ class DatasourceEditor extends React.PureComponent {
     this.setColumns = this.setColumns.bind(this);
     this.validateAndChange = this.validateAndChange.bind(this);
     this.handleTabSelect = this.handleTabSelect.bind(this);
-    this.allowEditSource = !isFeatureEnabled(
-      FeatureFlag.DISABLE_DATASET_SOURCE_EDIT,
-    );
     this.currencies = ensureIsArray(props.currencies).map(currencyCode => ({
       value: currencyCode,
       label: `${getCurrencySymbol({
@@ -730,7 +727,7 @@ class DatasourceEditor extends React.PureComponent {
       if (!currentCol) {
         // new column
         finalColumns.push({
-          id: shortid.generate(),
+          id: nanoid(),
           column_name: col.column_name,
           type: col.type,
           groupby: true,
@@ -770,6 +767,7 @@ class DatasourceEditor extends React.PureComponent {
       datasource_type: datasource.type || datasource.datasource_type,
       database_name:
         datasource.database.database_name || datasource.database.name,
+      catalog_name: datasource.catalog,
       schema_name: datasource.schema,
       table_name: datasource.table_name,
       normalize_columns: datasource.normalize_columns,
@@ -1059,23 +1057,21 @@ class DatasourceEditor extends React.PureComponent {
     const { datasource } = this.state;
     return (
       <div>
-        {this.allowEditSource && (
-          <EditLockContainer>
-            <span role="button" tabIndex={0} onClick={this.onChangeEditMode}>
-              {this.state.isEditMode ? (
-                <Icons.LockUnlocked iconColor={theme.colors.grayscale.base} />
-              ) : (
-                <Icons.LockLocked iconColor={theme.colors.grayscale.base} />
-              )}
-            </span>
-            {!this.state.isEditMode && (
-              <div>{t('Click the lock to make changes.')}</div>
+        <EditLockContainer>
+          <span role="button" tabIndex={0} onClick={this.onChangeEditMode}>
+            {this.state.isEditMode ? (
+              <Icons.LockUnlocked iconColor={theme.colors.grayscale.base} />
+            ) : (
+              <Icons.LockLocked iconColor={theme.colors.grayscale.base} />
             )}
-            {this.state.isEditMode && (
-              <div>{t('Click the lock to prevent further changes.')}</div>
-            )}
-          </EditLockContainer>
-        )}
+          </span>
+          {!this.state.isEditMode && (
+            <div>{t('Click the lock to make changes.')}</div>
+          )}
+          {this.state.isEditMode && (
+            <div>{t('Click the lock to prevent further changes.')}</div>
+          )}
+        </EditLockContainer>
         <div className="m-l-10 m-t-20 m-b-10">
           {DATASOURCE_TYPES_ARR.map(type => (
             <Radio
@@ -1104,7 +1100,12 @@ class DatasourceEditor extends React.PureComponent {
                         <div css={{ marginTop: 8 }}>
                           <DatabaseSelector
                             db={datasource?.database}
+                            catalog={datasource.catalog}
                             schema={datasource.schema}
+                            onCatalogChange={catalog =>
+                              this.state.isEditMode &&
+                              this.onDatasourcePropChange('catalog', catalog)
+                            }
                             onSchemaChange={schema =>
                               this.state.isEditMode &&
                               this.onDatasourcePropChange('schema', schema)
@@ -1178,9 +1179,16 @@ class DatasourceEditor extends React.PureComponent {
                         }}
                         dbId={datasource.database?.id}
                         handleError={this.props.addDangerToast}
+                        catalog={datasource.catalog}
                         schema={datasource.schema}
                         sqlLabMode={false}
                         tableValue={datasource.table_name}
+                        onCatalogChange={
+                          this.state.isEditMode
+                            ? catalog =>
+                                this.onDatasourcePropChange('catalog', catalog)
+                            : undefined
+                        }
                         onSchemaChange={
                           this.state.isEditMode
                             ? schema =>

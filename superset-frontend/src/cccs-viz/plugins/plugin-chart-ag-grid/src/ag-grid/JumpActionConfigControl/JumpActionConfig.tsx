@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import { bootstrapData } from 'src/preamble';
 import Button from 'src/components/Button';

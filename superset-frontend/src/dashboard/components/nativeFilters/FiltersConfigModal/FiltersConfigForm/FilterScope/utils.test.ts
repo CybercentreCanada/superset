@@ -485,7 +485,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           Sports: '#8FD3E4',
           Strategy: '#A1A6BD',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         color_scheme: 'supersetColors',
         extra_filters: [
           {
@@ -710,7 +710,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
         queryFields: {
           metric: 'metrics',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         color_scheme: 'supersetColors',
         extra_filters: [
           {
@@ -759,7 +759,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
             queryFields: {
               metric: 'metrics',
             },
-            shared_label_colors: {},
+            shared_label_colors: [],
             color_scheme: 'supersetColors',
             dashboardId: 9,
             applied_time_extras: {},
@@ -3046,7 +3046,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           groupby: 'groupby',
           metrics: 'metrics',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         extra_filters: [
           {
             col: '__time_range',
@@ -3125,7 +3125,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
               groupby: 'groupby',
               metrics: 'metrics',
             },
-            shared_label_colors: {},
+            shared_label_colors: [],
             dashboardId: 9,
             applied_time_extras: {},
             where: '',
@@ -16514,7 +16514,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           groupby: 'groupby',
           metrics: 'metrics',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         extra_filters: [
           {
             col: '__time_range',
@@ -16661,7 +16661,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
               groupby: 'groupby',
               metrics: 'metrics',
             },
-            shared_label_colors: {},
+            shared_label_colors: [],
             dashboardId: 9,
             applied_time_extras: {},
             where: '',
@@ -17523,7 +17523,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           Sports: '#8FD3E4',
           Strategy: '#A1A6BD',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         extra_filters: [
           {
             col: '__time_range',
@@ -17678,7 +17678,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           groupby: 'groupby',
           metrics: 'metrics',
         },
-        shared_label_colors: {},
+        shared_label_colors: [],
         extra_filters: [
           {
             col: '__time_range',
@@ -17715,7 +17715,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
               groupby: 'groupby',
               metrics: 'metrics',
             },
-            shared_label_colors: {},
+            shared_label_colors: [],
             dashboardId: 9,
             applied_time_extras: {},
             where: '',
@@ -17853,63 +17853,6 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
           groupby: 'groupby',
           metrics: 'metrics',
         },
-      },
-    },
-    '127': {
-      id: 127,
-      chartAlert: null,
-      chartStatus: 'loading',
-      chartStackTrace: null,
-      chartUpdateEndTime: null,
-      chartUpdateStartTime: 0,
-      latestQueryFormData: {},
-      sliceFormData: null,
-      queryController: null,
-      queriesResponse: null,
-      triggerQuery: true,
-      lastRendered: 0,
-      form_data: {
-        datasource: '20__table',
-        viz_type: 'filter_box',
-        slice_id: 127,
-        url_params: {
-          preselect_filters:
-            '{"1389": {"platform": ["PS", "PS2", "PS3", "PS4"], "genre": null, "__time_range": "No filter"}}',
-        },
-        granularity_sqla: 'Year',
-        time_range: 'No filter',
-        filter_configs: [
-          {
-            asc: true,
-            clearable: true,
-            column: 'platform',
-            key: 's3ItH9vhG',
-            label: 'Platform',
-            multiple: true,
-            searchAllOptions: false,
-          },
-          {
-            asc: true,
-            clearable: true,
-            column: 'genre',
-            key: '202hDeMsG',
-            label: 'Genre',
-            multiple: true,
-            searchAllOptions: false,
-          },
-          {
-            asc: true,
-            clearable: true,
-            column: 'publisher',
-            key: '5Os6jsJFK',
-            label: 'Publisher',
-            multiple: true,
-            searchAllOptions: false,
-          },
-        ],
-        date_filter: true,
-        adhoc_filters: [],
-        queryFields: {},
       },
     },
     '131': {

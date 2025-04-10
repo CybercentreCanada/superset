@@ -25,7 +25,7 @@ import {
   t,
 } from '@superset-ui/core';
 import Modal from 'src/components/Modal';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Icons from 'src/components/Icons';
 import Select from 'src/components/Select/Select';
 import { TextArea } from 'src/components/Input';
@@ -121,7 +121,7 @@ export interface RowLevelSecurityModalProps {
 
 const DEAFULT_RULE = {
   name: '',
-  filter_type: FilterType.REGULAR,
+  filter_type: FilterType.Regular,
   tables: [],
   roles: [],
   clause: '',
@@ -413,7 +413,7 @@ function RowLevelSecurityModal(props: RowLevelSecurityModalProps) {
 
           <StyledInputContainer>
             <div className="control-label">
-              {currentRule.filter_type === FilterType.BASE
+              {currentRule.filter_type === FilterType.Base
                 ? t('Excluded roles')
                 : t('Roles')}{' '}
               <InfoTooltip

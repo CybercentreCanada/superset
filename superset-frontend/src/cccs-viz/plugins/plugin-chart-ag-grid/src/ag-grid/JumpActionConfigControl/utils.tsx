@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { FundOutlined } from '@ant-design/icons';
 import rison from 'rison';
 import { Menu } from 'src/components/Menu';

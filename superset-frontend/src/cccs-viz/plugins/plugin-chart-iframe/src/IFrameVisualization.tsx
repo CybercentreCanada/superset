@@ -1,5 +1,5 @@
 import { css, SupersetTheme } from '@superset-ui/core';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { IFrameVisualizationProps } from './types';
 
 const errorStyles = (theme: SupersetTheme) => css`

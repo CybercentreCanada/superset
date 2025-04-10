@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 import {
   AdhocFilter,
   ensureIsArray,
@@ -218,11 +218,18 @@ export const getFormDataWithDashboardContext = (
       {},
     );
 
+  const ownColorScheme = exploreFormData.color_scheme;
+  const dashboardColorScheme = dashboardContextFormData.color_scheme;
+  const appliedColorScheme = dashboardColorScheme || ownColorScheme;
+
   return {
     ...exploreFormData,
     ...dashboardContextFormData,
     ...filterBoxData,
     ...nativeFiltersData,
     ...adhocFilters,
+    own_color_scheme: ownColorScheme,
+    color_scheme: appliedColorScheme,
+    dashboard_color_scheme: dashboardColorScheme,
   };
 };

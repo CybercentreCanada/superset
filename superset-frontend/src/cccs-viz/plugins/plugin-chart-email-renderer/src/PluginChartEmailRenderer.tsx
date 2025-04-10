@@ -1,5 +1,5 @@
 /* eslint-disable theme-colors/no-literal-colors */
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SupersetClient } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
 
