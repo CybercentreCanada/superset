@@ -81,7 +81,7 @@
   "dependencies": {
     "@ag-grid-community/client-side-row-model": "^30.2.0",
     "@ag-grid-community/core": "^30.2.0",
-    "@ag-grid-enterprise/core": "^30.2.0",
+    "@ag-grid-enterprise/core": "^32.3.5",
     "@ag-grid-enterprise/range-selection": "^30.2.0",
     "@ag-grid-enterprise/rich-select": "^30.2.0",
     "@ag-grid-enterprise/row-grouping": "^30.2.0",
@@ -228,7 +228,7 @@
   },
   "devDependencies": {
     "@ag-grid-community/client-side-row-model": "^30.2.0",
-    "@ag-grid-enterprise/core": "^30.2.0",
+    "@ag-grid-enterprise/core": "^32.3.5",
     "@ag-grid-enterprise/range-selection": "^30.2.0",
     "@ag-grid-enterprise/rich-select": "^30.2.0",
     "@ag-grid-enterprise/row-grouping": "^30.2.0",
