@@ -31,6 +31,7 @@ import OptionWrapper from 'src/explore/components/controls/DndColumnSelectContro
 import { OptionSelector } from 'src/explore/components/controls/DndColumnSelectControl/utils';
 import { DatasourcePanelDndItem } from 'src/explore/components/DatasourcePanel/types';
 import { DndItemType } from 'src/explore/components/DndItemType';
+import { useKeyDown } from 'src/hooks/useKeyDown';
 import ColumnSelectPopoverTrigger from './ColumnSelectPopoverTrigger';
 import { DndControlProps } from './types';
 
@@ -38,6 +39,7 @@ export type DndColumnSelectProps = DndControlProps<QueryFormColumn> & {
   options: ColumnMeta[];
   isTemporal?: boolean;
   disabledTabs?: Set<string>;
+  selectAllOnClick?: () => void; // CCCS Prop
 };
 
 function DndColumnSelect(props: DndColumnSelectProps) {
@@ -189,6 +191,24 @@ function DndColumnSelect(props: DndColumnSelectProps) {
     [ghostButtonText, multi],
   );
 
+  // ========================== CCCS Code START ==========================
+
+  const selectAllOnClick = () => {
+    const opts = Object.keys(optionSelector.options);
+    onChange(opts);
+  };
+
+  useKeyDown((event: { ctrlKey: boolean; key: string }) => {
+    if (event.ctrlKey === false) {
+      return;
+    }
+    if (event.key === 'a') {
+      selectAllOnClick();
+    }
+  });
+
+  // ========================== CCCS Code END ============================
+
   return (
     <div>
       <DndSelectLabel
@@ -200,6 +220,8 @@ function DndColumnSelect(props: DndColumnSelectProps) {
         ghostButtonText={labelGhostButtonText}
         onClickGhostButton={openPopover}
         {...props}
+        // cccs props
+        selectAllOnClick={selectAllOnClick}
       />
       <ColumnSelectPopoverTrigger
         columns={options}
