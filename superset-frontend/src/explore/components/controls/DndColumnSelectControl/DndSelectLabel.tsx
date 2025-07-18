@@ -45,6 +45,7 @@ export type DndSelectLabelProps = {
   displayGhostButton?: boolean;
   onClickGhostButton: () => void;
   isLoading?: boolean;
+  selectAllOnClick?: () => void; // CCCS Prop
 };
 
 export default function DndSelectLabel({
