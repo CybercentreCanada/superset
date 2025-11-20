@@ -20,7 +20,7 @@ requires = ["setuptools>=40.9.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "apache-superset"
+name = "apache_superset"
 description = "A modern, enterprise-ready business intelligence web application"
 readme = "README.md"
 dynamic = ["version", "scripts", "entry-points"]
@@ -42,7 +42,7 @@ dependencies = [
     "colorama",
     "croniter>=0.3.28",
     "cron-descriptor",
-    "cryptography>=42.0.4, <43.0.0",
+    "cryptography>=42.0.4, <45.0.0",
     "deprecation>=2.1.0, <2.2.0",
     "flask>=2.2.5, <3.0.0",
     "flask-appbuilder>=4.5.0, <5.0.0",
@@ -64,6 +64,8 @@ dependencies = [
     "jsonpath-ng>=1.6.1, <2",
     "Mako>=1.2.2",
     "markdown>=3.0",
+    # marshmallow>=4 has issues: https://github.com/apache/superset/issues/33162
+    "marshmallow<4",
     "msgpack>=1.0.0, <1.1",
     "nh3>=0.2.11, <0.3",
     "numpy==1.23.5",
@@ -89,7 +91,7 @@ dependencies = [
     "slack_sdk>=3.19.0, <4",
     "sqlalchemy>=1.4, <2",
     "sqlalchemy-utils>=0.38.3, <0.39",
-    "sqlglot>=25.24.0,<26",
+    "sqlglot>=25.24.0,<27",
     "sqlparse>=0.5.0",
     "tabulate>=0.8.9, <0.9",
     "typing-extensions>=4, <5",
