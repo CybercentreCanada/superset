@@ -1040,7 +1040,7 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
             ).strip()
             params = {}
 
-        with database.get_raw_connection(schema=schema) as conn:
+        with database.get_raw_connection(schema=schema, source="test override") as conn:
             cursor = conn.cursor()
             cursor.execute(sql, params)
             results = cursor.fetchall()
