@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from celery import Task
@@ -55,7 +55,7 @@ def scheduler() -> None:
         datetime.fromisoformat(scheduler.request.expires)
         - app.config["CELERY_BEAT_SCHEDULER_EXPIRES"]
         if scheduler.request.expires
-        else datetime.utcnow()
+        else datetime.now(tz=timezone.utc)
     )
     for active_schedule in active_schedules:
         for schedule in cron_schedule_window(
@@ -127,22 +127,30 @@ def prune_log() -> None:
 
 
 @celery_app.task(name="prune_query", bind=True)
-def prune_query(  # pylint: disable=unused-argument
+def prune_query(
     self: Task, retention_period_days: int | None = None, **kwargs: Any
 ) -> None:
     stats_logger: BaseStatsLogger = app.config["STATS_LOGGER"]
     stats_logger.incr("prune_query")
 
+    # TODO: Deprecated: Remove support for passing retention period via options in 6.0
+    if retention_period_days is None:
+        retention_period_days = prune_query.request.properties.get(
+            "retention_period_days"
+        )
+        logger.warning(
+            "Your `prune_query` beat schedule uses `options` to pass the retention "
+            "period, please use `kwargs` instead."
+        )
+
     try:
-        QueryPruneCommand(
-            prune_query.request.properties.get("retention_period_days")
-        ).run()
+        QueryPruneCommand(retention_period_days).run()
     except CommandException as ex:
         logger.exception("An error occurred while pruning queries: %s", ex)
 
 
 @celery_app.task(name="prune_logs", bind=True)
-def prune_logs(  # pylint: disable=unused-argument
+def prune_logs(
     self: Task, retention_period_days: int | None = None, **kwargs: Any
 ) -> None:
     stats_logger: BaseStatsLogger = app.config["STATS_LOGGER"]

@@ -19,8 +19,7 @@
 import { useState, useEffect } from 'react';
 import { styled } from '@superset-ui/core';
 import { Dropdown, IconOrientation } from 'src/components/Dropdown';
-import { Menu } from 'src/components/Menu';
-import { MenuProps } from 'antd/lib/menu';
+import { Menu, MenuProps } from 'src/components/Menu';
 
 /**
  * Props interface for Action Cell Renderer
@@ -96,7 +95,7 @@ function ActionMenu(props: ActionMenuProps) {
   const { menuOptions, setVisible } = props;
   const handleClick: MenuProps['onClick'] = ({ key }) => {
     setVisible?.(false);
-    const menuItem = menuOptions[key];
+    const menuItem = menuOptions[parseInt(key, 10)];
     if (menuItem) {
       menuItem?.onClick?.(menuItem);
     }

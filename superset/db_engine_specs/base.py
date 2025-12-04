@@ -58,12 +58,12 @@ from sqlalchemy.sql.expression import ColumnClause, Select, TextAsFrom, TextClau
 from sqlalchemy.types import TypeEngine
 from sqlparse.tokens import CTE
 
-from superset import sql_parse
-from superset.constants import TimeGrain as TimeGrainConstants
+from superset import db, sql_parse
+from superset.constants import QUERY_CANCEL_KEY, TimeGrain as TimeGrainConstants
 from superset.databases.utils import get_table_metadata, make_url_safe
 from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
 from superset.exceptions import DisallowedSQLFunction, OAuth2Error, OAuth2RedirectError
-from superset.sql.parse import SQLScript, Table
+from superset.sql.parse import BaseSQLStatement, SQLScript, Table
 from superset.sql_parse import ParsedQuery
 from superset.superset_typing import (
     OAuth2ClientConfig,
@@ -116,25 +116,25 @@ class TimeGrain(NamedTuple):
 
 
 builtin_time_grains: dict[str | None, str] = {
-    TimeGrainConstants.SECOND: __("Second"),
-    TimeGrainConstants.FIVE_SECONDS: __("5 second"),
-    TimeGrainConstants.THIRTY_SECONDS: __("30 second"),
-    TimeGrainConstants.MINUTE: __("Minute"),
-    TimeGrainConstants.FIVE_MINUTES: __("5 minute"),
-    TimeGrainConstants.TEN_MINUTES: __("10 minute"),
-    TimeGrainConstants.FIFTEEN_MINUTES: __("15 minute"),
-    TimeGrainConstants.THIRTY_MINUTES: __("30 minute"),
-    TimeGrainConstants.HOUR: __("Hour"),
-    TimeGrainConstants.SIX_HOURS: __("6 hour"),
-    TimeGrainConstants.DAY: __("Day"),
-    TimeGrainConstants.WEEK: __("Week"),
-    TimeGrainConstants.MONTH: __("Month"),
-    TimeGrainConstants.QUARTER: __("Quarter"),
-    TimeGrainConstants.YEAR: __("Year"),
-    TimeGrainConstants.WEEK_STARTING_SUNDAY: __("Week starting Sunday"),
-    TimeGrainConstants.WEEK_STARTING_MONDAY: __("Week starting Monday"),
-    TimeGrainConstants.WEEK_ENDING_SATURDAY: __("Week ending Saturday"),
-    TimeGrainConstants.WEEK_ENDING_SUNDAY: __("Week ending Sunday"),
+    TimeGrainConstants.SECOND: _("Second"),
+    TimeGrainConstants.FIVE_SECONDS: _("5 second"),
+    TimeGrainConstants.THIRTY_SECONDS: _("30 second"),
+    TimeGrainConstants.MINUTE: _("Minute"),
+    TimeGrainConstants.FIVE_MINUTES: _("5 minute"),
+    TimeGrainConstants.TEN_MINUTES: _("10 minute"),
+    TimeGrainConstants.FIFTEEN_MINUTES: _("15 minute"),
+    TimeGrainConstants.THIRTY_MINUTES: _("30 minute"),
+    TimeGrainConstants.HOUR: _("Hour"),
+    TimeGrainConstants.SIX_HOURS: _("6 hour"),
+    TimeGrainConstants.DAY: _("Day"),
+    TimeGrainConstants.WEEK: _("Week"),
+    TimeGrainConstants.MONTH: _("Month"),
+    TimeGrainConstants.QUARTER: _("Quarter"),
+    TimeGrainConstants.YEAR: _("Year"),
+    TimeGrainConstants.WEEK_STARTING_SUNDAY: _("Week starting Sunday"),
+    TimeGrainConstants.WEEK_STARTING_MONDAY: _("Week starting Monday"),
+    TimeGrainConstants.WEEK_ENDING_SATURDAY: _("Week ending Saturday"),
+    TimeGrainConstants.WEEK_ENDING_SUNDAY: _("Week ending Sunday"),
 }
 
 
@@ -205,7 +205,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     engine_name: str | None = None  # for user messages, overridden in child classes
 
-    # These attributes map the DB engine spec to one or more SQLAlchemy dialects/drivers;
+    # These attributes map the DB engine spec to one or more SQLAlchemy dialects/drivers;  # noqa: E501
     # see the ``supports_url`` and ``supports_backend`` methods below.
     engine = "base"  # str as defined in sqlalchemy.engine.engine
     engine_aliases: set[str] = set()
@@ -410,12 +410,12 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     # if True, database will be listed as option in the upload file form
     supports_file_upload = True
 
-    # Is the DB engine spec able to change the default schema? This requires implementing
+    # Is the DB engine spec able to change the default schema? This requires implementing  # noqa: E501
     # a custom `adjust_engine_params` method.
     supports_dynamic_schema = False
 
     # Does the DB support catalogs? A catalog here is a group of schemas, and has
-    # different names depending on the DB: BigQuery calles it a "project", Postgres calls
+    # different names depending on the DB: BigQuery calles it a "project", Postgres calls  # noqa: E501
     # it a "database", Trino calls it a "catalog", etc.
     #
     # When this is changed to true in a DB engine spec it MUST support the
@@ -431,11 +431,20 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     # the user impersonation methods to handle personal tokens.
     supports_oauth2 = False
     oauth2_scope = ""
-    oauth2_authorization_request_uri = ""  # pylint: disable=invalid-name
-    oauth2_token_request_uri = ""
+    oauth2_authorization_request_uri: str | None = None  # pylint: disable=invalid-name
+    oauth2_token_request_uri: str | None = None
+    oauth2_token_request_type = "data"  # noqa: S105
 
     # Driver-specific exception that should be mapped to OAuth2RedirectError
     oauth2_exception = OAuth2RedirectError
+
+    # Does the query id related to the connection?
+    # The default value is True, which means that the query id is determined when
+    # the connection is created.
+    # When this is changed to false in a DB engine spec it means the query id
+    # is determined only after the specific query is executed and it will update
+    # the `cancel_query` value in the `extra` field of the `query` object
+    has_query_id_before_execute = True
 
     @classmethod
     def is_oauth2_enabled(cls) -> bool:
@@ -517,6 +526,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
                 "token_request_uri",
                 cls.oauth2_token_request_uri,
             ),
+            "request_content_type": db_engine_spec_config.get(
+                "request_content_type", cls.oauth2_token_request_type
+            ),
         }
 
         return config
@@ -554,18 +566,16 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
         timeout = current_app.config["DATABASE_OAUTH2_TIMEOUT"].total_seconds()
         uri = config["token_request_uri"]
-        response = requests.post(
-            uri,
-            json={
-                "code": code,
-                "client_id": config["id"],
-                "client_secret": config["secret"],
-                "redirect_uri": config["redirect_uri"],
-                "grant_type": "authorization_code",
-            },
-            timeout=timeout,
-        )
-        return response.json()
+        req_body = {
+            "code": code,
+            "client_id": config["id"],
+            "client_secret": config["secret"],
+            "redirect_uri": config["redirect_uri"],
+            "grant_type": "authorization_code",
+        }
+        if config["request_content_type"] == "data":
+            return requests.post(uri, data=req_body, timeout=timeout).json()
+        return requests.post(uri, json=req_body, timeout=timeout).json()
 
     @classmethod
     def get_oauth2_fresh_token(
@@ -578,17 +588,15 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
         timeout = current_app.config["DATABASE_OAUTH2_TIMEOUT"].total_seconds()
         uri = config["token_request_uri"]
-        response = requests.post(
-            uri,
-            json={
-                "client_id": config["id"],
-                "client_secret": config["secret"],
-                "refresh_token": refresh_token,
-                "grant_type": "refresh_token",
-            },
-            timeout=timeout,
-        )
-        return response.json()
+        req_body = {
+            "client_id": config["id"],
+            "client_secret": config["secret"],
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token",
+        }
+        if config["request_content_type"] == "data":
+            return requests.post(uri, data=req_body, timeout=timeout).json()
+        return requests.post(uri, json=req_body, timeout=timeout).json()
 
     @classmethod
     def get_allows_alias_in_select(
@@ -682,7 +690,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     ) -> str | None:
         """
         Return the schema configured in a SQLALchemy URI and connection arguments, if any.
-        """
+        """  # noqa: E501
         return None
 
     @classmethod
@@ -711,7 +719,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
         Determining the correct schema is crucial for managing access to data, so please
         make sure you understand this logic when working on a new DB engine spec.
-        """
+        """  # noqa: E501
         # dynamic schema varies on a per-query basis
         if cls.supports_dynamic_schema:
             return query.schema
@@ -800,7 +808,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             ...     connection = engine.connect()
             ...     connection.execute(sql)
 
-        """
+        """  # noqa: E501
         return database.get_sqla_engine(catalog=catalog, schema=schema, source=source)
 
     @classmethod
@@ -1093,7 +1101,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
         # old method that doesn't work with catalogs
         if hasattr(cls, "extra_table_metadata"):
-            warnings.warn(
+            warnings.warn(  # noqa: B028
                 "The `extra_table_metadata` method is deprecated, please implement "
                 "the `get_extra_table_metadata` method in the DB engine spec.",
                 DeprecationWarning,
@@ -1137,7 +1145,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return sql
 
     @classmethod
-    def apply_top_to_sql(cls, sql: str, limit: int) -> str:
+    def apply_top_to_sql(cls, sql: str, limit: int) -> str:  # noqa: C901
         """
         Alters the SQL statement to apply a TOP clause
         :param limit: Maximum number of rows to be returned by the query
@@ -1316,6 +1324,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         # TODO: Fix circular import error caused by importing sql_lab.Query
 
     @classmethod
+    # pylint: disable=consider-using-transaction
     def execute_with_cursor(
         cls,
         cursor: Any,
@@ -1333,6 +1342,13 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
         logger.debug("Query %d: Running query: %s", query.id, sql)
         cls.execute(cursor, sql, query.database, async_=True)
+        if not cls.has_query_id_before_execute:
+            cancel_query_id = query.database.db_engine_spec.get_cancel_query_id(
+                cursor, query
+            )
+            if cancel_query_id is not None:
+                query.set_extra_json_key(QUERY_CANCEL_KEY, cancel_query_id)
+                db.session.commit()
         logger.debug("Query %d: Handling cursor", query.id)
         cls.handle_cursor(cursor, query)
 
@@ -1403,7 +1419,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         that when catalog support is added to Superset the interface remains the same.
         This is important because DB engine specs can be installed from 3rd party
         packages, so we want to keep these methods as stable as possible.
-        """
+        """  # noqa: E501
         return uri, {
             **connect_args,
             **cls.enforce_uri_query_params.get(uri.get_driver_name(), {}),
@@ -1412,6 +1428,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def get_prequeries(
         cls,
+        database: Database,  # pylint: disable=unused-argument
         catalog: str | None = None,  # pylint: disable=unused-argument
         schema: str | None = None,  # pylint: disable=unused-argument
     ) -> list[str]:
@@ -1684,16 +1701,19 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             )
             if partition_query is not None:
                 qry = partition_query
-        sql = database.compile_sqla_query(qry)
+        sql = database.compile_sqla_query(qry, table.catalog, table.schema)
         if indent:
             sql = SQLScript(sql, engine=cls.engine).format()
         return sql
 
     @classmethod
-    def estimate_statement_cost(cls, statement: str, cursor: Any) -> dict[str, Any]:
+    def estimate_statement_cost(
+        cls, database: Database, statement: str, cursor: Any
+    ) -> dict[str, Any]:
         """
         Generate a SQL query that estimates the cost of a given statement.
 
+        :param database: A Database object
         :param statement: A single SQL statement
         :param cursor: Cursor instance
         :return: Dictionary with different costs
@@ -1717,18 +1737,19 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         )
 
     @classmethod
-    def process_statement(cls, statement: str, database: Database) -> str:
+    def process_statement(
+        cls,
+        statement: BaseSQLStatement[Any],
+        database: Database,
+    ) -> str:
         """
-        Process a SQL statement by stripping and mutating it.
+        Process a SQL statement by mutating it.
 
         :param statement: A single SQL statement
         :param database: Database instance
         :return: Dictionary with different costs
         """
-        parsed_query = ParsedQuery(statement, engine=cls.engine)
-        sql = parsed_query.stripped()
-
-        return database.mutate_sql_based_on_config(sql, is_split=True)
+        return database.mutate_sql_based_on_config(str(statement), is_split=True)
 
     @classmethod
     def estimate_query_cost(  # pylint: disable=too-many-arguments
@@ -1753,8 +1774,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
                 "Database does not support cost estimation"
             )
 
-        parsed_query = sql_parse.ParsedQuery(sql, engine=cls.engine)
-        statements = parsed_query.get_statements()
+        parsed_script = SQLScript(sql, engine=cls.engine)
 
         with database.get_raw_connection(
             catalog=catalog,
@@ -1764,10 +1784,11 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             cursor = conn.cursor()
             return [
                 cls.estimate_statement_cost(
+                    database,
                     cls.process_statement(statement, database),
                     cursor,
                 )
-                for statement in statements
+                for statement in parsed_script.statements
             ]
 
     @classmethod
@@ -1792,8 +1813,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return url
 
     @classmethod
-    def update_impersonation_config(
+    def update_impersonation_config(  # pylint: disable=too-many-arguments
         cls,
+        database: Database,
         connect_args: dict[str, Any],
         uri: str,
         username: str | None,
@@ -1803,6 +1825,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         Update a configuration dictionary
         that can set the correct properties for impersonating users
 
+        :param connect_args: a Database object
         :param connect_args: config to be updated
         :param uri: URI
         :param username: Effective username
@@ -2034,15 +2057,6 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             raise
 
     @classmethod
-    def is_readonly_query(cls, parsed_query: ParsedQuery) -> bool:
-        """Pessimistic readonly, 100% sure statement won't mutate anything"""
-        return (
-            parsed_query.is_select()
-            or parsed_query.is_explain()
-            or parsed_query.is_show()
-        )
-
-    @classmethod
     def is_select_query(cls, parsed_query: ParsedQuery) -> bool:
         """
         Determine if the statement should be considered as SELECT statement.
@@ -2234,6 +2248,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             "supports_file_upload": cls.supports_file_upload,
             "disable_ssh_tunneling": cls.disable_ssh_tunneling,
             "supports_dynamic_catalog": cls.supports_dynamic_catalog,
+            "supports_oauth2": cls.supports_oauth2,
         }
 
     @classmethod
@@ -2355,6 +2370,7 @@ class BasicParametersMixin:
         parameters: BasicParametersType,
         encrypted_extra: dict[str, str] | None = None,
     ) -> str:
+        # TODO (betodealmeida): this method should also build `connect_args`
         # make a copy so that we don't update the original
         query = parameters.get("query", {}).copy()
         if parameters.get("encryption"):

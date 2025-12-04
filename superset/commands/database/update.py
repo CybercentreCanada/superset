@@ -23,7 +23,7 @@ from typing import Any
 
 from flask_appbuilder.models.sqla import Model
 
-from superset import is_feature_enabled, security_manager
+from superset import db, is_feature_enabled, security_manager
 from superset.commands.base import BaseCommand
 from superset.commands.database.exceptions import (
     DatabaseConnectionFailedError,
@@ -42,7 +42,9 @@ from superset.daos.database import DatabaseDAO
 from superset.daos.dataset import DatasetDAO
 from superset.databases.ssh_tunnel.models import SSHTunnel
 from superset.db_engine_specs.base import GenericDBException
+from superset.exceptions import OAuth2RedirectError
 from superset.models.core import Database
+from superset.utils import json
 from superset.utils.decorators import on_error, transaction
 
 logger = logging.getLogger(__name__)
@@ -65,24 +67,89 @@ class UpdateDatabaseCommand(BaseCommand):
 
         self.validate()
 
-        # unmask ``encrypted_extra``
-        self._properties["encrypted_extra"] = (
-            self._model.db_engine_spec.unmask_encrypted_extra(
-                self._model.encrypted_extra,
-                self._properties.pop("masked_encrypted_extra", "{}"),
+        if "masked_encrypted_extra" in self._properties:
+            # unmask ``encrypted_extra``
+            self._properties["encrypted_extra"] = (
+                self._model.db_engine_spec.unmask_encrypted_extra(
+                    self._model.encrypted_extra,
+                    self._properties.pop("masked_encrypted_extra"),
+                )
             )
-        )
 
-        # if the database name changed we need to update any existing permissions,
-        # since they're name based
+            # Depending on the changes to the OAuth2 configuration we may need to purge
+            # existing personal tokens.
+            self._handle_oauth2()
+
+        # Some DBs require running a query to get the default catalog.
+        # In these cases, if the current connection is broken then
+        # `get_default_catalog` would raise an exception. We need to
+        # gracefully handle that so that the connection can be fixed.
         original_database_name = self._model.database_name
+        force_update: bool = False
+        try:
+            original_catalog = self._model.get_default_catalog()
+        except Exception:
+            original_catalog = None
+            force_update = True
 
+        # build new DB
         database = DatabaseDAO.update(self._model, self._properties)
         database.set_sqlalchemy_uri(database.sqlalchemy_uri)
         ssh_tunnel = self._handle_ssh_tunnel(database)
-        self._refresh_catalogs(database, original_database_name, ssh_tunnel)
+        new_catalog = database.get_default_catalog()
+
+        # update assets when the database catalog changes, if the database was not
+        # configured with multi-catalog support; if it was enabled or is enabled in the
+        # update we don't update the assets
+        if (
+            force_update
+            or new_catalog != original_catalog
+            and not self._model.allow_multi_catalog
+            and not database.allow_multi_catalog
+        ):
+            self._update_catalog_attribute(self._model.id, new_catalog)
+
+        # if the database name changed we need to update any existing permissions,
+        # since they're name based
+        try:
+            self._refresh_catalogs(database, original_database_name, ssh_tunnel)
+        except OAuth2RedirectError:
+            pass
 
         return database
+
+    def _handle_oauth2(self) -> None:
+        """
+        Handle changes in OAuth2.
+        """
+        if not self._model:
+            return
+
+        if self._properties["encrypted_extra"] is None:
+            self._model.purge_oauth2_tokens()
+            return
+
+        current_config = self._model.get_oauth2_config()
+        if not current_config:
+            return
+
+        encrypted_extra = json.loads(self._properties["encrypted_extra"])
+        new_config = encrypted_extra.get("oauth2_client_info", {})
+
+        # Keys that require purging personal tokens because they probably are no longer
+        # valid. For example, if the scope has changed the existing tokens are still
+        # associated with the old scope. Similarly, if the endpoints changed the tokens
+        # are probably no longer valid.
+        keys = {
+            "id",
+            "scope",
+            "authorization_request_uri",
+            "token_request_uri",
+        }
+        for key in keys:
+            if current_config.get(key) != new_config.get(key):
+                self._model.purge_oauth2_tokens()
+                break
 
     def _handle_ssh_tunnel(self, database: Database) -> SSHTunnel | None:
         """
@@ -110,6 +177,29 @@ class UpdateDatabaseCommand(BaseCommand):
             ssh_tunnel_properties,
         ).run()
 
+    def _update_catalog_attribute(
+        self,
+        database_id: int,
+        new_catalog: str | None,
+    ) -> None:
+        """
+        Update the catalog of the datasets that are associated with database.
+        """
+        from superset.connectors.sqla.models import SqlaTable
+        from superset.models.sql_lab import Query, SavedQuery, TableSchema, TabState
+
+        for model in [
+            SqlaTable,
+            Query,
+            SavedQuery,
+            TabState,
+            TableSchema,
+        ]:
+            fk = "db_id" if model == SavedQuery else "database_id"
+            predicate = {fk: database_id}
+            update = {"catalog": new_catalog}
+            db.session.query(model).filter_by(**predicate).update(update)
+
     def _get_catalog_names(
         self,
         database: Database,
@@ -123,6 +213,9 @@ class UpdateDatabaseCommand(BaseCommand):
                 force=True,
                 ssh_tunnel=ssh_tunnel,
             )
+        except OAuth2RedirectError:
+            # raise OAuth2 exceptions as-is
+            raise
         except GenericDBException as ex:
             raise DatabaseConnectionFailedError() from ex
 
@@ -141,6 +234,9 @@ class UpdateDatabaseCommand(BaseCommand):
                 catalog=catalog,
                 ssh_tunnel=ssh_tunnel,
             )
+        except OAuth2RedirectError:
+            # raise OAuth2 exceptions as-is
+            raise
         except GenericDBException as ex:
             raise DatabaseConnectionFailedError() from ex
 

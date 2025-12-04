@@ -47,7 +47,7 @@ export default function DownloadScreenshot({
   ...rest
 }: {
   text: string;
-  dashboardId: string;
+  dashboardId: number;
   logEvent?: Function;
   format: string;
 }) {

@@ -26,7 +26,7 @@ from marshmallow import ValidationError
 from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
 
 
-class SupersetException(Exception):
+class SupersetException(Exception):  # noqa: N818
     status = 500
     message = ""
 
@@ -323,7 +323,7 @@ class SupersetParseError(SupersetErrorException):
             if line:
                 parts.append(_(" at line %(line)d", line=line))
                 if column:
-                    parts.append(_(":%(column)d", column=column))
+                    parts.append(f":{column}")
             message = "".join(parts)
 
         error = SupersetError(
@@ -350,6 +350,8 @@ class OAuth2RedirectError(SupersetErrorException):
 
     See the `OAuth2RedirectMessage.tsx` component for more details of how this
     information is handled.
+
+    TODO (betodealmeida): change status to 403.
     """
 
     def __init__(self, url: str, tab_id: str, redirect_uri: str):
@@ -394,13 +396,13 @@ class DisallowedSQLFunction(SupersetErrorException):
         )
 
 
-class CreateKeyValueDistributedLockFailedException(Exception):
+class CreateKeyValueDistributedLockFailedException(Exception):  # noqa: N818
     """
     Exception to signalize failure to acquire lock.
     """
 
 
-class DeleteKeyValueDistributedLockFailedException(Exception):
+class DeleteKeyValueDistributedLockFailedException(Exception):  # noqa: N818
     """
     Exception to signalize failure to delete lock.
     """

@@ -45,7 +45,6 @@ import {
   extractExtraMetrics,
   getOriginalSeries,
   isDerivedSeries,
-  getTimeOffset,
 } from '@superset-ui/chart-controls';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { LineStyleOption } from 'echarts/types/src/util/types';
@@ -81,6 +80,7 @@ import {
   extractForecastValuesFromTooltipParams,
   formatForecastTooltipSeries,
   rebaseForecastDatum,
+  reorderForecastSeries,
 } from '../utils/forecast';
 import { convertInteger } from '../utils/convertInteger';
 import { defaultGrid, defaultYAxis } from '../defaults';
@@ -94,6 +94,7 @@ import {
   transformTimeseriesAnnotation,
 } from './transformers';
 import {
+  OpacityEnum,
   StackControlsValue,
   TIMEGRAIN_TO_TIMESTAMP,
   TIMESERIES_CONSTANTS,
@@ -121,6 +122,7 @@ export default function transformProps(
     theme,
     inContextMenu,
     emitCrossFilters,
+    legendIndex,
   } = chartProps;
 
   let focusedSeries: string | null = null;
@@ -166,6 +168,7 @@ export default function transformProps(
     sortSeriesAscending,
     timeGrainSqla,
     timeCompare,
+    timeShiftColor,
     stack,
     tooltipTimeFormat,
     tooltipSortByMetric,
@@ -279,21 +282,16 @@ export default function transformProps(
   const array = ensureIsArray(chartProps.rawFormData?.time_compare);
   const inverted = invert(verboseMap);
 
-  const offsetLineWidths = {};
+  let patternIncrement = 0;
 
   rawSeries.forEach(entry => {
     const derivedSeries = isDerivedSeries(entry, chartProps.rawFormData);
     const lineStyle: LineStyleOption = {};
     if (derivedSeries) {
-      const offset = getTimeOffset(
-        entry,
-        ensureIsArray(chartProps.rawFormData?.time_compare),
-      )!;
-      if (!offsetLineWidths[offset]) {
-        offsetLineWidths[offset] = Object.keys(offsetLineWidths).length + 1;
-      }
-      lineStyle.type = 'dashed';
-      lineStyle.width = offsetLineWidths[offset];
+      patternIncrement += 1;
+      // use a combination of dash and dot for the line style
+      lineStyle.type = [(patternIncrement % 5) + 1, (patternIncrement % 3) + 1];
+      lineStyle.opacity = OpacityEnum.DerivedSeries;
     }
 
     const entryName = String(entry.name || '');
@@ -317,11 +315,11 @@ export default function transformProps(
         stack,
         formatter: forcePercentFormatter
           ? percentFormatter
-          : getCustomFormatter(
+          : (getCustomFormatter(
               customFormatters,
               metrics,
               labelMap?.[seriesName]?.[0],
-            ) ?? defaultFormatter,
+            ) ?? defaultFormatter),
         showValue,
         onlyTotal,
         totalStackedValues: sortedTotalValues,
@@ -332,6 +330,7 @@ export default function transformProps(
         isHorizontal,
         lineStyle,
         timeCompare: array,
+        timeShiftColor,
       },
     );
     if (transformedSeries) {
@@ -452,6 +451,7 @@ export default function transformProps(
     setControlValue = () => {},
     onContextMenu,
     onLegendStateChanged,
+    onLegendScroll,
   } = hooks;
 
   const addYAxisLabelOffset = !!yAxisTitle;
@@ -565,7 +565,7 @@ export default function transformProps(
 
         const formatter = forcePercentFormatter
           ? percentFormatter
-          : getCustomFormatter(customFormatters, metrics) ?? defaultFormatter;
+          : (getCustomFormatter(customFormatters, metrics) ?? defaultFormatter);
 
         const rows: string[][] = [];
         const total = Object.values(forecastValues).reduce(
@@ -624,10 +624,12 @@ export default function transformProps(
         theme,
         zoomable,
         legendState,
+        padding,
       ),
+      scrollDataIndex: legendIndex || 0,
       data: legendData as string[],
     },
-    series: dedupSeries(series),
+    series: dedupSeries(reorderForecastSeries(series) as SeriesOption[]),
     toolbox: {
       show: zoomable,
       top: TIMESERIES_CONSTANTS.toolboxTop,
@@ -693,5 +695,6 @@ export default function transformProps(
     },
     refs,
     coltypeMapping: dataTypes,
+    onLegendScroll,
   };
 }

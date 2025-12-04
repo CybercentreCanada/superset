@@ -122,7 +122,7 @@ function createAxisTitleControl(axis: 'x' | 'y'): ControlSetRow[] {
           clearable: true,
           label: t('AXIS TITLE MARGIN'),
           renderTrigger: true,
-          default: sections.TITLE_MARGIN_OPTIONS[0],
+          default: sections.TITLE_MARGIN_OPTIONS[1],
           choices: formatSelectOptions(sections.TITLE_MARGIN_OPTIONS),
           description: t('Changing this control takes effect instantly'),
           visibility: ({ controls }: ControlPanelsContainerProps) =>
@@ -233,8 +233,6 @@ function createAxisControl(axis: 'x' | 'y'): ControlSetRow[] {
         },
       },
     ],
-    [truncateXAxis],
-    [xAxisBounds],
     [
       {
         name: 'truncateYAxis',
@@ -321,6 +319,7 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         ...seriesOrderSection,
         ['color_scheme'],
+        ['time_shift_color'],
         ...showValueSection,
         [minorTicks],
         [
@@ -338,6 +337,8 @@ const config: ControlPanelConfig = {
         ...legendSection,
         [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('x'),
+        [truncateXAxis],
+        [xAxisBounds],
         ...richTooltipSection,
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('y'),

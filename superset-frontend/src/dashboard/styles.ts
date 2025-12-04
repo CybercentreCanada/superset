@@ -93,9 +93,9 @@ export const filterCardPopoverStyle = (theme: SupersetTheme) => css`
   }
 
   .filter-card-tooltip {
-    &.ant-tooltip-placement-bottom {
+    &.antd5-tooltip-placement-bottom {
       padding-top: 0;
-      & .ant-tooltip-arrow {
+      & .antd5-tooltip-arrow {
         top: -13px;
       }
     }
@@ -127,7 +127,7 @@ export const focusStyle = (theme: SupersetTheme) => css`
     }
     &:not(
         .superset-button,
-        .ant-menu-item,
+        .antd5-menu-item,
         a,
         .fave-unfave-icon,
         .ant-tabs-tabpane,

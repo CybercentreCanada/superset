@@ -39,7 +39,7 @@ class QueryPruneCommand(BaseCommand):
     Attributes:
         retention_period_days (int): The number of days for which records should be retained.
                                      Records older than this period will be deleted.
-    """
+    """  # noqa: E501
 
     def __init__(self, retention_period_days: int):
         """
@@ -83,7 +83,7 @@ class QueryPruneCommand(BaseCommand):
             # Update the total number of deleted records
             total_deleted += result.rowcount
 
-            # Explicitly commit the transaction given that if an error occurs, we want to ensure that the
+            # Explicitly commit the transaction given that if an error occurs, we want to ensure that the  # noqa: E501
             # records that have been deleted so far are committed
             db.session.commit()
 

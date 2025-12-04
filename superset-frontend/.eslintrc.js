@@ -194,6 +194,12 @@ module.exports = {
             message:
               'Default React import is not required due to automatic JSX runtime in React 16.4',
           },
+          {
+            // this disallows wildcard imports from modules (but allows them for local files with `./` or `src/`)
+            selector:
+              'ImportNamespaceSpecifier[parent.source.value!=/^(\\.|src)/]',
+            message: 'Wildcard imports are not allowed',
+          },
         ],
       },
       settings: {
@@ -281,7 +287,6 @@ module.exports = {
         'theme-colors/no-literal-colors': 0,
         'translation-vars/no-template-vars': 0,
         'no-restricted-imports': 0,
-        'jest/no-alias-methods': 0,
         'react/no-void-elements': 0,
       },
     },
@@ -327,13 +332,18 @@ module.exports = {
     'no-prototype-builtins': 0,
     'no-restricted-properties': 0,
     'no-restricted-imports': [
-      'warn',
+      'error',
       {
         paths: [
           {
             name: 'antd',
             message:
               'Please import Ant components from the index of src/components',
+          },
+          {
+            name: 'antd-v5',
+            message:
+              'Please import Ant v5 components from the index of src/components',
           },
           {
             name: '@superset-ui/core',
@@ -372,7 +382,6 @@ module.exports = {
     'react-prefer-function-component/react-prefer-function-component': 0,
     'prettier/prettier': 'error',
     // disabling some things that come with the eslint 7->8 upgrade. Will address these in a separate PR
-    'jest/no-alias-methods': 0,
     'react/no-unknown-property': 0,
     'react/no-void-elements': 0,
     'react/function-component-definition': [

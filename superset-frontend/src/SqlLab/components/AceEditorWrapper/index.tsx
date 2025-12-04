@@ -151,6 +151,7 @@ const AceEditorWrapper = ({
 
       currentSelectionCache.current = selectedText;
     });
+
     editor.selection.on('changeCursor', () => {
       const cursor = editor.getCursorPosition();
       onCursorPositionChange(cursor);

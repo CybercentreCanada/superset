@@ -25,21 +25,15 @@ export default {
 };
 
 export const InteractiveProgressBar = (args: ProgressBarProps) => (
-  <AntdThemeProvider>
-    <ProgressBar {...args} type="line" />
-  </AntdThemeProvider>
+  <ProgressBar {...args} type="line" />
 );
 
 export const InteractiveProgressCircle = (args: ProgressBarProps) => (
-  <AntdThemeProvider>
-    <ProgressBar {...args} type="circle" />
-  </AntdThemeProvider>
+  <ProgressBar {...args} type="circle" />
 );
 
 export const InteractiveProgressDashboard = (args: ProgressBarProps) => (
-  <AntdThemeProvider>
-    <ProgressBar {...args} type="dashboard" />
-  </AntdThemeProvider>
+  <ProgressBar {...args} type="dashboard" />
 );
 
 const commonArgs = {

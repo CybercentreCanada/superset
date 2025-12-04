@@ -27,7 +27,6 @@ const StyledDiv = styled.div`
   width: 50%;
   label {
     color: ${({ theme }) => theme.colors.grayscale.base};
-    text-transform: uppercase;
   }
 `;
 
@@ -85,6 +84,7 @@ export default function DeleteModal({
       primaryButtonType="danger"
       show={open}
       title={title}
+      centered
     >
       <DescriptionContainer>{description}</DescriptionContainer>
       <StyledDiv>

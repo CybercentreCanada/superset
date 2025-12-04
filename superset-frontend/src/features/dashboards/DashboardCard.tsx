@@ -30,7 +30,7 @@ import { AntdDropdown } from 'src/components';
 import { Menu } from 'src/components/Menu';
 import ListViewCard from 'src/components/ListViewCard';
 import Icons from 'src/components/Icons';
-import Label from 'src/components/Label';
+import { PublishedLabel } from 'src/components/Label';
 import FacePile from 'src/components/FacePile';
 import FaveStar from 'src/components/FaveStar';
 import { Dashboard } from 'src/views/CRUD/types';
@@ -91,7 +91,7 @@ function DashboardCard({
       SupersetClient.get({
         endpoint: `/api/v1/dashboard/${dashboard.id}`,
       }).then(({ json = {} }) => {
-        setThumbnailUrl(json.thumbnail_url || '');
+        setThumbnailUrl(json.result?.thumbnail_url || '');
         setFetchingThumbnail(false);
       });
     }
@@ -153,9 +153,7 @@ function DashboardCard({
         title={dashboard.dashboard_title}
         certifiedBy={dashboard.certified_by}
         certificationDetails={dashboard.certification_details}
-        titleRight={
-          <Label>{dashboard.published ? t('published') : t('draft')}</Label>
-        }
+        titleRight={<PublishedLabel isPublished={dashboard.published} />}
         cover={
           !isFeatureEnabled(FeatureFlag.Thumbnails) || !showThumbnails ? (
             <></>
@@ -163,7 +161,7 @@ function DashboardCard({
         }
         url={bulkSelectEnabled ? undefined : dashboard.url}
         linkComponent={Link}
-        imgURL={dashboard.thumbnail_url}
+        imgURL={thumbnailUrl}
         imgFallbackURL="/static/assets/images/dashboard-card-fallback.svg"
         description={t('Modified %s', dashboard.changed_on_delta_humanized)}
         coverLeft={<FacePile users={dashboard.owners || []} />}

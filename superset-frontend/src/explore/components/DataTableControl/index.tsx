@@ -30,7 +30,6 @@ import {
 import { Global } from '@emotion/react';
 import { Column } from 'react-table';
 import { debounce } from 'lodash';
-import { Space } from 'src/components';
 import { Input } from 'src/components/Input';
 import {
   BOOL_FALSE_DISPLAY,
@@ -141,12 +140,21 @@ const FormatPicker = ({
   onChange: any;
   value: FormatPickerValue;
 }) => (
-  <Radio.Group value={value} onChange={onChange}>
-    <Space direction="vertical">
-      <Radio value={FormatPickerValue.Formatted}>{t('Formatted date')}</Radio>
-      <Radio value={FormatPickerValue.Original}>{t('Original value')}</Radio>
-    </Space>
-  </Radio.Group>
+  <Radio.GroupWrapper
+    spaceConfig={{
+      direction: 'vertical',
+      align: 'start',
+      size: 15,
+      wrap: false,
+    }}
+    size="large"
+    value={value}
+    onChange={onChange}
+    options={[
+      { label: t('Formatted date'), value: FormatPickerValue.Formatted },
+      { label: t('Original value'), value: FormatPickerValue.Original },
+    ]}
+  />
 );
 
 const FormatPickerContainer = styled.div`
@@ -160,7 +168,6 @@ const FormatPickerLabel = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.s}px;
   color: ${({ theme }) => theme.colors.grayscale.base};
   margin-bottom: ${({ theme }) => theme.gridUnit * 2}px;
-  text-transform: uppercase;
 `;
 
 const DataTableTemporalHeaderCell = ({
@@ -251,8 +258,8 @@ export const useFilteredTableData = (
       return [];
     }
     return data.filter((_, index: number) =>
-      rowsAsStrings[index].some(
-        value => value?.includes(filterText.toLowerCase()),
+      rowsAsStrings[index].some(value =>
+        value?.includes(filterText.toLowerCase()),
       ),
     );
   }, [data, filterText, rowsAsStrings]);
@@ -321,7 +328,7 @@ export const useTableColumns = (
               return {
                 // react-table requires a non-empty id, therefore we introduce a fallback value in case the key is empty
                 id: key || index,
-                accessor: row => row[key],
+                accessor: (row: Record<string, any>) => row[key],
                 Header:
                   colType === GenericDataType.Temporal &&
                   typeof firstValue !== 'string' ? (

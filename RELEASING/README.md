@@ -437,7 +437,7 @@ cd ${SUPERSET_RELEASE_RC}
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements/base.txt
-pip install twine
+pip install build twine
 ```
 
 Create the distribution
@@ -452,10 +452,10 @@ cd ../
 
 
 # Compile translations for the backend
-./scripts/translations/generate_po_files.sh
+./scripts/translations/generate_mo_files.sh
 
 # build the python distribution
-python setup.py sdist
+python -m build
 ```
 
 Publish to PyPI
@@ -467,7 +467,7 @@ while requesting access to push packages.
 
 ```bash
 twine upload dist/apache_superset-${SUPERSET_VERSION}-py3-none-any.whl
-twine upload dist/apache_superset-${SUPERSET_VERSION}.tar.gz
+twine upload dist/apache-superset-${SUPERSET_VERSION}.tar.gz
 ```
 
 Set your username to `__token__`

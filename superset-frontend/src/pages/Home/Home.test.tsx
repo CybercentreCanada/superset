@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as uiCore from '@superset-ui/core';
-import { getExtensionsRegistry } from '@superset-ui/core';
-import userEvent from '@testing-library/user-event';
 import fetchMock from 'fetch-mock';
 import { render, screen, waitFor } from 'spec/helpers/testing-library';
+import { isFeatureEnabled, getExtensionsRegistry } from '@superset-ui/core';
+import userEvent from '@testing-library/user-event';
 import Welcome from 'src/pages/Home';
 import setupExtensions from 'src/setup/setupExtensions';
 
@@ -140,8 +139,12 @@ const mockedPropsWithoutSqlRole = {
   },
 };
 
-const setupFeatureToggleMock = () =>
-  jest.spyOn(uiCore, 'isFeatureEnabled').mockReturnValue(true);
+jest.mock('@superset-ui/core', () => ({
+  ...jest.requireActual('@superset-ui/core'),
+  isFeatureEnabled: jest.fn(),
+}));
+
+const mockedIsFeatureEnabled = isFeatureEnabled as jest.Mock;
 
 const renderWelcome = (props = mockedProps) =>
   waitFor(() => {
@@ -172,15 +175,14 @@ test('With sql role - renders distinct recent activities', async () => {
   await renderWelcome();
   const recentPanel = screen.getByRole('button', { name: 'right Recents' });
   userEvent.click(recentPanel);
-  await waitFor(
-    () =>
-      expect(
-        screen.queryAllByText(mockRecentActivityResult[0].item_title),
-      ).toHaveLength(1), // eslint-disable-line jest-dom/prefer-in-document
+  await waitFor(() =>
+    expect(
+      screen.queryAllByText(mockRecentActivityResult[0].item_title),
+    ).toHaveLength(1),
   );
   expect(
     screen.queryAllByText(mockRecentActivityResult[1].item_title),
-  ).toHaveLength(1); // eslint-disable-line jest-dom/prefer-in-document
+  ).toHaveLength(1);
 });
 
 test('With sql role - calls api methods in parallel on page load', async () => {
@@ -227,14 +229,14 @@ fetchMock.get('glob:*/api/v1/dashboard/*', {
 });
 
 test('With toggle switch - shows a toggle button when feature flag is turned on', async () => {
-  setupFeatureToggleMock();
+  mockedIsFeatureEnabled.mockReturnValue(true);
 
   await renderWelcome();
   expect(screen.getByRole('switch')).toBeInTheDocument();
 });
 
 test('With toggle switch - does not show thumbnails when switch is off', async () => {
-  setupFeatureToggleMock();
+  mockedIsFeatureEnabled.mockReturnValue(true);
 
   await renderWelcome();
   const toggle = await screen.findByRole('switch');

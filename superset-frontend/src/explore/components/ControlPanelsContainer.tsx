@@ -48,6 +48,7 @@ import {
   CustomControlItem,
   Dataset,
   ExpandedControlItem,
+  isCustomControlItem,
   isTemporalColumn,
   sections,
 } from '@superset-ui/chart-controls';
@@ -587,7 +588,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
 
     const errorColor = sectionHasHadNoErrors.current[sectionId]
       ? colors.error.base
-      : colors.alert.base;
+      : colors.warning.base;
 
     const PanelHeader = () => (
       <span data-test="collapsible-control-panel-header">
@@ -595,6 +596,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
           css={(theme: SupersetTheme) => css`
             font-size: ${theme.typography.sizes.m}px;
             line-height: 1.3;
+            font-weight: ${theme.typography.weights.medium};
           `}
         >
           {label}
@@ -677,8 +679,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
                     return controlItem;
                   }
                   if (
-                    controlItem.name &&
-                    controlItem.config &&
+                    isCustomControlItem(controlItem) &&
                     controlItem.name !== 'datasource'
                   ) {
                     return renderControl(controlItem);
@@ -746,7 +747,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
 
     const errorColor = dataTabHasHadNoErrors.current
       ? colors.error.base
-      : colors.alert.base;
+      : colors.warning.base;
 
     return (
       <>
@@ -776,7 +777,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
     );
   }, [
     colors.error.base,
-    colors.alert.base,
+    colors.warning.base,
     dataTabHasHadNoErrors,
     props.errorMessage,
   ]);

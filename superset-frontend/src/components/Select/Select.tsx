@@ -617,8 +617,9 @@ const Select = forwardRef(
           <StyledHeader headerPosition={headerPosition}>{header}</StyledHeader>
         )}
         <StyledSelect
+          id={name}
           allowClear={!isLoading && allowClear}
-          aria-label={ariaLabel || name}
+          aria-label={ariaLabel}
           autoClearSearchValue={autoClearSearchValue}
           dropdownRender={dropdownRender}
           filterOption={handleFilterOption}

@@ -34,6 +34,7 @@ import {
   SupersetClient,
   SupersetTheme,
   t,
+  VizType,
 } from '@superset-ui/core';
 import rison from 'rison';
 import { useSingleViewResource } from 'src/views/CRUD/hooks';
@@ -46,7 +47,7 @@ import TimezoneSelector from 'src/components/TimezoneSelector';
 import { propertyComparator } from 'src/components/Select/utils';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import Owner from 'src/types/Owner';
-import { AntdCheckbox, AsyncSelect, Select } from 'src/components';
+import { AntdCheckbox, AsyncSelect, Select, TreeSelect } from 'src/components';
 import TextAreaControl from 'src/explore/components/controls/TextAreaControl';
 import { useCommonConf } from 'src/features/databases/state';
 import { InfoTooltipWithTrigger } from '@superset-ui/chart-controls';
@@ -57,12 +58,16 @@ import {
   ChartObject,
   DashboardObject,
   DatabaseObject,
+  Extra,
   MetaObject,
   Operator,
   Recipient,
   AlertsReportsConfig,
   ValidationObject,
   Sections,
+  TabNode,
+  SelectValue,
+  ContentType,
 } from 'src/features/alerts/types';
 import { useSelector } from 'react-redux';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
@@ -75,15 +80,10 @@ import { buildErrorTooltipMessage } from './buildErrorTooltipMessage';
 
 const TIMEOUT_MIN = 1;
 const TEXT_BASED_VISUALIZATION_TYPES = [
-  'pivot_table_v2',
+  VizType.PivotTable,
   'table',
-  'paired_ttest',
+  VizType.PairedTTest,
 ];
-
-type SelectValue = {
-  value: string;
-  label: string;
-};
 
 export interface AlertReportModalProps {
   addSuccessToast: (msg: string) => void;
@@ -104,6 +104,12 @@ const DEFAULT_NOTIFICATION_METHODS: NotificationMethodOption[] = [
   NotificationMethodOption.Email,
 ];
 const DEFAULT_NOTIFICATION_FORMAT = 'PNG';
+const DEFAULT_EXTRA_DASHBOARD_OPTIONS: Extra = {
+  dashboard: {
+    anchor: '',
+  },
+};
+
 const CONDITIONS = [
   {
     label: t('< (Smaller than)'),
@@ -183,6 +189,8 @@ const FORMAT_OPTIONS = {
   },
 };
 
+type FORMAT_OPTIONS_KEY = keyof typeof FORMAT_OPTIONS;
+
 // Apply to final text input components of each collapse panel
 const noMarginBottom = css`
   margin-bottom: 0;
@@ -192,7 +200,7 @@ const noMarginBottom = css`
 Height of modal body defined here, total width defined at component invocation as antd prop.
  */
 const StyledModal = styled(Modal)`
-  .ant-modal-body {
+  .antd5-modal-body {
     height: 720px;
   }
 
@@ -216,6 +224,10 @@ const StyledModal = styled(Modal)`
       flex: 1 1 auto;
     }
   }
+`;
+
+const StyledTreeSelect = styled(TreeSelect)`
+  width: 100%;
 `;
 
 const StyledSwitchContainer = styled.div`
@@ -441,6 +453,8 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   const [sourceOptions, setSourceOptions] = useState<MetaObject[]>([]);
   const [dashboardOptions, setDashboardOptions] = useState<MetaObject[]>([]);
   const [chartOptions, setChartOptions] = useState<MetaObject[]>([]);
+  const [tabOptions, setTabOptions] = useState<TabNode[]>([]);
+
   // Validation
   const [validationStatus, setValidationStatus] = useState<ValidationObject>({
     [Sections.General]: {
@@ -491,6 +505,7 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   const isEditMode = alert !== null;
   const formatOptionEnabled =
     isFeatureEnabled(FeatureFlag.AlertsAttachReports) || isReport;
+  const tabsEnabled = isFeatureEnabled(FeatureFlag.AlertReportTabs);
 
   const [notificationAddState, setNotificationAddState] =
     useState<NotificationAddStatus>('active');
@@ -547,6 +562,7 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     active: true,
     creation_method: 'alerts_reports',
     crontab: ALERT_REPORTS_DEFAULT_CRON_VALUE,
+    extra: DEFAULT_EXTRA_DASHBOARD_OPTIONS,
     log_retention: ALERT_REPORTS_DEFAULT_RETENTION,
     working_timeout: ALERT_REPORTS_DEFAULT_WORKING_TIMEOUT,
     name: '',
@@ -595,6 +611,22 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     setNotificationAddState('active');
   };
 
+  const updateAnchorState = (value: any) => {
+    setCurrentAlert(currentAlertData => {
+      const dashboardState = currentAlertData?.extra?.dashboard;
+      const extra = {
+        dashboard: {
+          ...dashboardState,
+          anchor: value,
+        },
+      };
+      return {
+        ...currentAlertData,
+        extra,
+      };
+    });
+  };
+
   // Alert fetch logic
   const {
     state: { loading, resource, error: fetchError },
@@ -631,7 +663,8 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
       }
     });
 
-    const shouldEnableForceScreenshot = contentType === 'chart' && !isReport;
+    const shouldEnableForceScreenshot =
+      contentType === ContentType.Chart && !isReport;
     const data: any = {
       ...currentAlert,
       type: isReport ? 'Report' : 'Alert',
@@ -640,9 +673,12 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
       validator_config_json: conditionNotNull
         ? {}
         : currentAlert?.validator_config_json,
-      chart: contentType === 'chart' ? currentAlert?.chart?.value : null,
+      chart:
+        contentType === ContentType.Chart ? currentAlert?.chart?.value : null,
       dashboard:
-        contentType === 'dashboard' ? currentAlert?.dashboard?.value : null,
+        contentType === ContentType.Dashboard
+          ? currentAlert?.dashboard?.value
+          : null,
       custom_width: isScreenshot ? currentAlert?.custom_width : undefined,
       database: currentAlert?.database?.value,
       owners: (currentAlert?.owners || []).map(
@@ -650,6 +686,7 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
       ),
       recipients,
       report_format: reportFormat || DEFAULT_NOTIFICATION_FORMAT,
+      extra: contentType === ContentType.Dashboard ? currentAlert?.extra : {},
     };
 
     if (data.recipients && !data.recipients.length) {
@@ -657,7 +694,6 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     }
 
     data.context_markdown = 'string';
-
     if (isEditMode) {
       // Edit
       if (currentAlert?.id) {
@@ -780,6 +816,57 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     [],
   );
 
+  const dashboard = currentAlert?.dashboard;
+  useEffect(() => {
+    if (!tabsEnabled) return;
+
+    if (dashboard?.value) {
+      SupersetClient.get({
+        endpoint: `/api/v1/dashboard/${dashboard.value}/tabs`,
+      })
+        .then(response => {
+          const { tab_tree: tabTree, all_tabs: allTabs } = response.json.result;
+          const allTabsWithOrder = tabTree.map(
+            (tab: { value: string }) => tab.value,
+          );
+
+          // Only show all tabs when there are more than one tab
+          if (allTabsWithOrder.length > 1) {
+            tabTree.push({
+              title: 'All Tabs',
+              // select tree only works with string value
+              value: JSON.stringify(allTabsWithOrder),
+            });
+          }
+
+          setTabOptions(tabTree);
+
+          const anchor = currentAlert?.extra?.dashboard?.anchor;
+          if (anchor) {
+            try {
+              const parsedAnchor = JSON.parse(anchor);
+              if (Array.isArray(parsedAnchor)) {
+                // Check if all elements in parsedAnchor list are in allTabs
+                const isValidSubset = parsedAnchor.every(tab => tab in allTabs);
+                if (!isValidSubset) {
+                  updateAnchorState(undefined);
+                }
+              } else {
+                throw new Error('Parsed value is not an array');
+              }
+            } catch (error) {
+              if (!(anchor in allTabs)) {
+                updateAnchorState(undefined);
+              }
+            }
+          }
+        })
+        .catch(() => {
+          addDangerToast(t('There was an error retrieving dashboard tabs.'));
+        });
+    }
+  }, [dashboard, tabsEnabled, currentAlert?.extra, addDangerToast]);
+
   const databaseLabel = currentAlert?.database && !currentAlert.database.label;
   useEffect(() => {
     // Find source if current alert has one set
@@ -891,6 +978,27 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
       endpoint: `/api/v1/chart/${chart.value}`,
     }).then(response => setChartVizType(response.json.result.viz_type));
 
+  const updateEmailSubject = () => {
+    const chartLabel = currentAlert?.chart?.label;
+    const dashboardLabel = currentAlert?.dashboard?.label;
+    if (!currentAlert?.name) {
+      setEmailSubject('');
+      return;
+    }
+    switch (contentType) {
+      case ContentType.Chart:
+        setEmailSubject(`${currentAlert?.name}: ${chartLabel || ''}`);
+        break;
+
+      case ContentType.Dashboard:
+        setEmailSubject(`${currentAlert?.name}: ${dashboardLabel || ''}`);
+        break;
+
+      default:
+        setEmailSubject('');
+    }
+  };
+
   // Handle input/textarea updates
   const onInputChange = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -907,8 +1015,14 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     }
   };
 
-  const onCustomWidthChange = (value: number | null | undefined) => {
-    updateAlertState('custom_width', value);
+  const onCustomWidthChange = (value: number | string | null | undefined) => {
+    const numValue =
+      value === null ||
+      value === undefined ||
+      (typeof value === 'string' && Number.isNaN(Number(value)))
+        ? null
+        : Number(value);
+    updateAlertState('custom_width', numValue);
   };
 
   const onTimeoutVerifyChange = (
@@ -943,6 +1057,10 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
   const onDashboardChange = (dashboard: SelectValue) => {
     updateAlertState('dashboard', dashboard || undefined);
     updateAlertState('chart', null);
+    if (tabsEnabled) {
+      setTabOptions([]);
+      updateAnchorState('');
+    }
   };
 
   const onChartChange = (chart: SelectValue) => {
@@ -1057,8 +1175,8 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     const errors = [];
     if (
       !(
-        (contentType === 'dashboard' && !!currentAlert?.dashboard) ||
-        (contentType === 'chart' && !!currentAlert?.chart)
+        (contentType === ContentType.Dashboard && !!currentAlert?.dashboard) ||
+        (contentType === ContentType.Chart && !!currentAlert?.chart)
       )
     ) {
       errors.push(TRANSLATIONS.CONTENT_ERROR_TEXT);
@@ -1206,7 +1324,9 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
           ? 'hidden'
           : 'active',
       );
-      setContentType(resource.chart ? 'chart' : 'dashboard');
+      setContentType(
+        resource.chart ? ContentType.Chart : ContentType.Dashboard,
+      );
       setReportFormat(resource.report_format || DEFAULT_NOTIFICATION_FORMAT);
       const validatorConfig =
         typeof resource.validator_config_json === 'string'
@@ -1319,28 +1439,6 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
     }
 
     return titleText;
-  };
-
-  const updateEmailSubject = () => {
-    if (contentType === 'chart') {
-      if (currentAlert?.name || currentAlert?.chart?.label) {
-        setEmailSubject(
-          `${currentAlert?.name}: ${currentAlert?.chart?.label || ''}`,
-        );
-      } else {
-        setEmailSubject('');
-      }
-    } else if (contentType === 'dashboard') {
-      if (currentAlert?.name || currentAlert?.dashboard?.label) {
-        setEmailSubject(
-          `${currentAlert?.name}: ${currentAlert?.dashboard?.label || ''}`,
-        );
-      } else {
-        setEmailSubject('');
-      }
-    } else {
-      setEmailSubject('');
-    }
   };
 
   const handleErrorUpdate = (hasError: boolean) => {
@@ -1586,7 +1684,7 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
             />
           </StyledInputContainer>
           <StyledInputContainer>
-            {contentType === 'chart' ? (
+            {contentType === ContentType.Chart ? (
               <>
                 <div className="control-label">
                   {t('Select chart')}
@@ -1649,22 +1747,42 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
                   onChange={onFormatChange}
                   value={reportFormat}
                   options={
-                    contentType === 'dashboard'
-                      ? ['pdf', 'png'].map(key => FORMAT_OPTIONS[key])
+                    contentType === ContentType.Dashboard
+                      ? ['pdf', 'png'].map(
+                          key => FORMAT_OPTIONS[key as FORMAT_OPTIONS_KEY],
+                        )
                       : /* If chart is of text based viz type: show text
                   format option */
                         TEXT_BASED_VISUALIZATION_TYPES.includes(chartVizType)
                         ? Object.values(FORMAT_OPTIONS)
-                        : ['pdf', 'png', 'csv'].map(key => FORMAT_OPTIONS[key])
+                        : ['pdf', 'png', 'csv'].map(
+                            key => FORMAT_OPTIONS[key as FORMAT_OPTIONS_KEY],
+                          )
                   }
                   placeholder={t('Select format')}
                 />
               </>
             )}
           </StyledInputContainer>
+          {tabsEnabled && contentType === ContentType.Dashboard && (
+            <StyledInputContainer>
+              <>
+                <div className="control-label">{t('Select tab')}</div>
+                <StyledTreeSelect
+                  disabled={tabOptions?.length === 0}
+                  treeData={tabOptions}
+                  value={currentAlert?.extra?.dashboard?.anchor}
+                  onSelect={updateAnchorState}
+                  placeholder={t('Select a tab')}
+                />
+              </>
+            </StyledInputContainer>
+          )}
           {isScreenshot && (
             <StyledInputContainer
-              css={!isReport && contentType === 'chart' && noMarginBottom}
+              css={
+                !isReport && contentType === ContentType.Chart && noMarginBottom
+              }
             >
               <div className="control-label">{t('Screenshot width')}</div>
               <div className="input-container">
@@ -1680,7 +1798,7 @@ const AlertReportModal: FunctionComponent<AlertReportModalProps> = ({
               </div>
             </StyledInputContainer>
           )}
-          {(isReport || contentType === 'dashboard') && (
+          {(isReport || contentType === ContentType.Dashboard) && (
             <div className="inline-container">
               <StyledCheckbox
                 data-test="bypass-cache"

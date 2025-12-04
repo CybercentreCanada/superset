@@ -22,7 +22,8 @@ import threading
 import time
 from typing import Any, TYPE_CHECKING
 
-from flask import ctx, current_app, Flask, g
+import requests
+from flask import copy_current_request_context, ctx, current_app, Flask, g
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.engine.url import URL
 from sqlalchemy.exc import NoSuchTableError
@@ -51,11 +52,32 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+try:
+    # since trino is an optional dependency, we need to handle the ImportError
+    from trino.exceptions import HttpError
+except ImportError:
+    HttpError = Exception
+
+
+class CustomTrinoAuthErrorMeta(type):
+    def __instancecheck__(cls, instance: object) -> bool:
+        logger.info("is this being called?")
+        return isinstance(instance, HttpError) and "error 401" in str(instance)
+
+
+class TrinoAuthError(HttpError, metaclass=CustomTrinoAuthErrorMeta):
+    pass
+
 
 class TrinoEngineSpec(PrestoBaseEngineSpec):
     engine = "trino"
     engine_name = "Trino"
     allows_alias_to_source_column = False
+
+    # OAuth 2.0
+    supports_oauth2 = True
+    oauth2_exception = TrinoAuthError
+    oauth2_token_request_type = "data"  # noqa: S105
 
     @classmethod
     def get_extra_table_metadata(
@@ -77,7 +99,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
                 latest_parts = tuple([None] * len(col_names))
 
             metadata["partitions"] = {
-                "cols": sorted(
+                "cols": sorted(  # noqa: C414
                     list(
                         {
                             column_name
@@ -87,7 +109,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
                         }
                     )
                 ),
-                "latest": dict(zip(col_names, latest_parts)),
+                "latest": dict(zip(col_names, latest_parts, strict=False)),
                 "partitionQuery": cls._partition_query(
                     table=table,
                     indexes=indexes,
@@ -108,8 +130,9 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         return metadata
 
     @classmethod
-    def update_impersonation_config(
+    def update_impersonation_config(  # pylint: disable=too-many-arguments
         cls,
+        database: Database,
         connect_args: dict[str, Any],
         uri: str,
         username: str | None,
@@ -118,6 +141,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         """
         Update a configuration dictionary
         that can set the correct properties for impersonating users
+        :param database: the Database object
         :param connect_args: config to be updated
         :param uri: URI string
         :param username: Effective username
@@ -132,6 +156,10 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         # Set principal_username=$effective_username
         if backend_name == "trino" and username is not None:
             connect_args["user"] = username
+            if access_token is not None:
+                http_session = requests.Session()
+                http_session.headers.update({"Authorization": f"Bearer {access_token}"})
+                connect_args["http_session"] = http_session
 
     @classmethod
     def get_url_for_impersonation(
@@ -144,6 +172,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         """
         Return a modified URL with the username set.
 
+        :param access_token: Personal access token for OAuth2
         :param url: SQLAlchemy URL object
         :param impersonate_user: Flag indicating if impersonation is enabled
         :param username: Effective username
@@ -219,6 +248,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         execute_result: dict[str, Any] = {}
         execute_event = threading.Event()
 
+        @copy_current_request_context
         def _execute(
             results: dict[str, Any],
             event: threading.Event,

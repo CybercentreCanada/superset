@@ -28,7 +28,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { api } from 'src/hooks/apiResources/queryApi';
 import DatabaseSelector, { DatabaseSelectorProps } from '.';
-import { EmptyStateSmall } from '../EmptyState';
+import { EmptyState } from '../EmptyState';
 
 const createProps = (): DatabaseSelectorProps => ({
   db: {
@@ -219,9 +219,9 @@ test('Refresh should work', async () => {
   await waitFor(() => {
     expect(fetchMock.calls(databaseApiRoute).length).toBe(1);
     expect(fetchMock.calls(schemaApiRoute).length).toBe(1);
-    expect(props.handleError).toBeCalledTimes(0);
-    expect(props.onDbChange).toBeCalledTimes(0);
-    expect(props.onSchemaChange).toBeCalledTimes(0);
+    expect(props.handleError).toHaveBeenCalledTimes(0);
+    expect(props.onDbChange).toHaveBeenCalledTimes(0);
+    expect(props.onSchemaChange).toHaveBeenCalledTimes(0);
   });
 
   // click schema reload
@@ -230,9 +230,9 @@ test('Refresh should work', async () => {
   await waitFor(() => {
     expect(fetchMock.calls(databaseApiRoute).length).toBe(1);
     expect(fetchMock.calls(schemaApiRoute).length).toBe(2);
-    expect(props.handleError).toBeCalledTimes(0);
-    expect(props.onDbChange).toBeCalledTimes(0);
-    expect(props.onSchemaChange).toBeCalledTimes(0);
+    expect(props.handleError).toHaveBeenCalledTimes(0);
+    expect(props.onDbChange).toHaveBeenCalledTimes(0);
+    expect(props.onSchemaChange).toHaveBeenCalledTimes(0);
   });
 });
 
@@ -307,7 +307,7 @@ test('should show empty state if there are no options', async () => {
     <DatabaseSelector
       {...props}
       db={undefined}
-      emptyState={<EmptyStateSmall title="empty" image="" />}
+      emptyState={<EmptyState size="small" title="empty" />}
     />,
     { useRedux: true, store },
   );
