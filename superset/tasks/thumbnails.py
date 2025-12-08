@@ -118,7 +118,6 @@ def cache_dashboard_screenshot(  # pylint: disable=too-many-arguments
     guest_token: Optional[GuestToken] = None,
     thumb_size: Optional[WindowSize] = None,
     window_size: Optional[WindowSize] = None,
-    cache_key: Optional[str] = None,
 ) -> None:
     # pylint: disable=import-outside-toplevel
     from superset.models.dashboard import Dashboard
