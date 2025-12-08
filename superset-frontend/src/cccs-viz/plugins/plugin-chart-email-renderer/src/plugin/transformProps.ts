@@ -57,7 +57,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
 
   const fissionUrl = queriesData[0].fissionUrl as String;
 
-  let value: string | number | true | Date = '';
+  let value: string | number | bigint | true | Date = '';
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {

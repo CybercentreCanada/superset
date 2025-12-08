@@ -69,7 +69,8 @@ export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
   return (
     <Menu.Item
       {...props}
-      onItemHover={() => {}}
+      // TODO I should probably remove this
+      // onItemHover={() => {}}
       onClick={() => onClick()}
       className={
         props.disabled

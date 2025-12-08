@@ -1,4 +1,4 @@
-import { RowEvent } from 'ag-grid-community';
+import { ExpandedChangedEvent } from 'ag-grid-community';
 import { Component } from 'react';
 import { JSONTree } from 'react-json-tree';
 
@@ -88,7 +88,7 @@ export default class JsonValueRenderer extends Component<
   // Return whether 'expanded' is set to true or false
   getExpandedValue = () => this.state.expanded;
 
-  onExpandChanged = (params: RowEvent) => {
+  onExpandChanged = (params: ExpandedChangedEvent) => {
     this.setState(prevState => ({
       ...prevState,
       rowNode: params.node,

@@ -22,7 +22,7 @@ import { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
 import { t, withTheme } from '@superset-ui/core';
 import AsyncEsmComponent from 'src/components/AsyncEsmComponent';
-import { List } from 'src/components';
+import { List } from 'src/components/List';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover';
 import { connect } from 'react-redux';
 import {

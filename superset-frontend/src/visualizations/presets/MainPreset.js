@@ -77,8 +77,6 @@ import {
   JSONViewChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import {
-  AdhocFilterPlugin,
-  GroupByFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
@@ -96,7 +94,6 @@ export default class MainPreset extends Preset {
       FeatureFlag.ChartPluginsExperimental,
     )
       ? [
-          new GroupByFilterPlugin().configure({ key: 'filter_groupby' }),
           new BigNumberPeriodOverPeriodChartPlugin().configure({
             key: VizType.BigNumberPeriodOverPeriod,
           }),
@@ -107,6 +104,12 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
+        new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
+        new EmailRendererChartPlugin().configure({ key: 'email' }),
+        new JSONViewChartPlugin().configure({ key: 'json_view' }),
+        new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
+        new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,

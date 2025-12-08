@@ -21,24 +21,18 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled, t } from '@superset-ui/core';
-import classNames from 'classnames';
-import PropTypes from 'prop-types';
-import { Fragment, PureComponent } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import { EmptyState } from 'src/components/EmptyState';
 import EditableTitle from 'src/components/EditableTitle';
-import { EmptyStateMedium } from 'src/components/EmptyState';
 import { setEditMode } from 'src/dashboard/actions/dashboardState';
+import DashboardComponent from 'src/dashboard/containers/DashboardComponent';
 import AnchorLink from 'src/dashboard/components/AnchorLink';
 import {
   DragDroppable,
   Droppable,
 } from 'src/dashboard/components/dnd/DragDroppable';
-import DashboardComponent from 'src/dashboard/containers/DashboardComponent';
-import { TAB_TYPE } from 'src/dashboard/util/componentTypes';
 import { componentShape } from 'src/dashboard/util/propShapes';
+import { TAB_TYPE } from 'src/dashboard/util/componentTypes';
 
 export const RENDER_TAB = 'RENDER_TAB';
 export const RENDER_TAB_CONTENT = 'RENDER_TAB_CONTENT';

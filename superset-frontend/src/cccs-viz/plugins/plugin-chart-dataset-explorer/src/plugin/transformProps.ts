@@ -137,7 +137,7 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   columns.reduce(function (columnMap, column: Column) {
     const newColumnMap = { ...columnMap };
     const name = column.column_name;
-    newColumnMap[name] = column.description;
+    newColumnMap.set(name, column.description ?? ''); // TODO make sure empty string is okay here
     return newColumnMap;
   }, columnDescriptionMap);
 
@@ -191,13 +191,13 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         : column;
       const cellRenderer =
         isDate || columnTypeGeneric === GenericDataType.Temporal
-          ? rendererMap.DATE
-          : rendererMap[columnAdvancedType.toUpperCase()] ??
-            rendererMap[columnType] ??
+          ? rendererMap.get('DATE')
+          : rendererMap.get(columnAdvancedType.toUpperCase()) ??
+            rendererMap.get(columnType) ??
             undefined;
       const isSortable = true;
       const enableRowGroup = true;
-      const columnDescription = columnDescriptionMap[column];
+      const columnDescription = columnDescriptionMap.get(column);
       const autoHeight = true;
       const rowGroupIndex = default_group_by.findIndex(
         (element: any) => element === column,
@@ -221,20 +221,20 @@ export default function transformProps(chartProps: CccsGridChartProps) {
   } else {
     if (formData.groupby) {
       const groupByColumnDefs = formData.groupby.map((column: any) => {
-        const columnType = columnTypeMap[column];
-        const columnAdvancedType = columnAdvancedTypeMap[column];
-        const columnHeader = columnVerboseNameMap[column]
-          ? columnVerboseNameMap[column]
+        const columnType = columnTypeMap.get(column) || '';
+        const columnAdvancedType = columnAdvancedTypeMap.get(column) || '';
+        const columnHeader = columnVerboseNameMap.get(column)
+          ? columnVerboseNameMap.get(column)
           : column;
         const cellRenderer =
           columnAdvancedType in rendererMap
-            ? rendererMap[columnAdvancedType]
+            ? rendererMap.get(columnAdvancedType)
             : columnType in rendererMap
-              ? rendererMap[columnType]
+              ? rendererMap.get(columnType)
               : undefined;
         const isSortable = true;
         const enableRowGroup = true;
-        const columnDescription = columnDescriptionMap[column];
+        const columnDescription = columnDescriptionMap.get(column);
         const autoHeight = true;
         const rowGroupIndex = default_group_by.findIndex(
           (element: any) => element === column,
@@ -271,8 +271,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
     if (metrics) {
       const metricsColumnDefs = formData.metrics?.map((metric: any) => {
         const metricLabel = metric.label ? metric.label : metric;
-        const metricHeader = metricVerboseNameMap[metric]
-          ? metricVerboseNameMap[metric]
+        const metricHeader = metricVerboseNameMap.get(metric)
+          ? metricVerboseNameMap.get(metric)
           : metricLabel;
         return {
           field: metricLabel,
@@ -288,8 +288,8 @@ export default function transformProps(chartProps: CccsGridChartProps) {
       const percentMetricsColumnDefs = formData.percent_metrics.map(
         (metric: any) => {
           const metricLabel = metric.label ? metric.label : metric;
-          const metricHeader = metricVerboseNameMap[metric]
-            ? metricVerboseNameMap[metric]
+          const metricHeader = metricVerboseNameMap.get(metric)
+            ? metricVerboseNameMap.get(metric)
             : metricLabel;
           return {
             field: `%${metricLabel}`,
@@ -313,25 +313,17 @@ export default function transformProps(chartProps: CccsGridChartProps) {
         params.node ? params.node.rowIndex + 1 : null,
     } as any);
   }
-  const parsed_jump_action_configs = {};
+  const parsed_jump_action_configs = new Map();
   jump_action_configs?.forEach((e: any) => {
-    if (e.dashboardID in parsed_jump_action_configs) {
-      parsed_jump_action_configs[e.dashboardID] = parsed_jump_action_configs[
-        e.dashboardID
-      ].concat({
-        advancedDataType: e.advancedDataType,
-        nativefilters: e.filters,
-        name: e.dashBoardName,
-      });
-    } else {
-      parsed_jump_action_configs[e.dashboardID] = [
-        {
-          advancedDataType: e.advancedDataType,
-          nativefilters: e.filters,
-          name: e.dashBoardName,
-        },
-      ];
+    if (!(e.dashboardID in parsed_jump_action_configs)) {
+      parsed_jump_action_configs.set(e.dashboardID, []);
     }
+
+    parsed_jump_action_configs.get(e.dashboardID).concat({
+      advancedDataType: e.advancedDataType,
+      nativefilters: e.filters,
+      name: e.dashBoardName,
+    });
   });
 
   // If the flag is set to true, add a column which will contain

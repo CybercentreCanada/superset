@@ -106,14 +106,13 @@ const calcColumnColumnDefs = (
       sortIndex > -1 ? (orderByColsArray[sortIndex][1] ? 'asc' : 'desc') : null;
     const cellRenderer =
       isDate || columnTypeGeneric === GenericDataType.Temporal
-        ? rendererMap.DATE
-        : rendererMap[advancedDataType.toUpperCase()] ??
-          rendererMap[columnType] ??
-          undefined;
+        ? rendererMap.get('DATE')
+        : rendererMap.get(advancedDataType.toUpperCase()) ??
+          rendererMap.get(columnType);
     const valueFormatter =
       advancedDataType.toUpperCase() in formatterMap
-        ? formatterMap[advancedDataType.toUpperCase()]
-        : formatterMap[columnType] ?? undefined;
+        ? formatterMap.get(advancedDataType.toUpperCase())
+        : formatterMap.get(columnType);
     const useValueFormatterForExport = !!valueFormatter;
     const getQuickFilterText = valueFormatter
       ? (params: any) =>
@@ -253,25 +252,17 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   const enableAlfred = queriesData[0].enableAlfred as Boolean;
   const enableDownload = queriesData[0].enableDownload as Boolean;
 
-  const parsedJumpActionConfigs = {};
+  const parsedJumpActionConfigs = new Map();
   jumpActionConfigs?.forEach((e: any) => {
-    if (e.dashboardID in parsedJumpActionConfigs) {
-      parsedJumpActionConfigs[e.dashboardID] = parsedJumpActionConfigs[
-        e.dashboardID
-      ].concat({
-        advancedDataType: e.advancedDataType,
-        nativefilters: e.filters,
-        name: e.dashBoardName,
-      });
-    } else {
-      parsedJumpActionConfigs[e.dashboardID] = [
-        {
-          advancedDataType: e.advancedDataType,
-          nativefilters: e.filters,
-          name: e.dashBoardName,
-        },
-      ];
+    if (!(e.dashboardID in parsedJumpActionConfigs)) {
+      parsedJumpActionConfigs.set(e.dashboardID, []);
     }
+
+    parsedJumpActionConfigs.get(e.dashboardID).concat({
+      advancedDataType: e.advancedDataType,
+      nativefilters: e.filters,
+      name: e.dashBoardName,
+    });
   });
 
   return {

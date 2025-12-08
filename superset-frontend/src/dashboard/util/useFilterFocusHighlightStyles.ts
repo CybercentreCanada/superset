@@ -44,9 +44,6 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
   const slices =
     useSelector((state: RootState) => state.sliceEntities.slices) || {};
 
-  const slices =
-    useSelector((state: RootState) => state.sliceEntities.slices) || {};
-
   const highlightedFilterId =
     nativeFilters?.focusedFilterId || nativeFilters?.hoveredFilterId;
 
@@ -61,8 +58,6 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
   );
 
   if (highlightedFilterId && relatedCharts.includes(chartId)) {
-    return focusedChartStyles;
-  } else if (dashboardState.focusedChart === chartId) {
     return focusedChartStyles;
   }
 

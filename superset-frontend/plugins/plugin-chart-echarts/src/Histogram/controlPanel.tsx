@@ -107,7 +107,6 @@ const config: ControlPanelConfig = {
         ],
       ],
     },
-    sections.titleControls,
     {
       label: t('Chart Options'),
       expanded: true,

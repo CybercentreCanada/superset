@@ -123,16 +123,19 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
     const { datasource_config } = formData;
     formDataCopy.datasource = datasource_config || formDataCopy.datasource;
 
-    const { advanced_data_type_value } = formData;
-    const { advanced_data_type_selection } = formData;
-    let filter = [];
-    if (ensureIsArray(advanced_data_type_selection).length > 0) {
+    const { advanced_data_type_value, advanced_data_type_selection } = formData;
+    let filter: string[] = [];
+    if (
+      ensureIsArray(advanced_data_type_selection).length > 0 &&
+      ensureIsArray(advanced_data_type_value).length > 0
+    ) {
       // in the case of ipv4s sometimes they can be ranges and not simple values
       // this will be handled in the advanced data type definition in the future
       // to avoid this complex logic
       let simple: any[] = [];
       let range: any[] = [];
-      advanced_data_type_value[0].data.map((d: any) => {
+      // TODO Check that I didn't break this
+      advanced_data_type_value.data.map((d: any) => {
         if (isRange(d)) {
           range = [...range, d];
         } else {
@@ -140,7 +143,7 @@ const buildQuery: BuildQuery<CccsGridQueryFormData> = (
         }
         return d;
       });
-      filter = advanced_data_type_value[0].columns.reduce(
+      filter = advanced_data_type_value.columns.reduce(
         (arr: string[], curr: string) => {
           const new_arr = [
             ...arr,

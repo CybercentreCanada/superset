@@ -15,14 +15,14 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import {
-  CellRange,
+  // CellRange,
   GetMainMenuItemsParams,
   MenuItemDef,
 } from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
-import { range as lodashRange } from 'lodash';
+// import { range as lodashRange } from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
 import { Menu } from 'src/components/Menu';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
@@ -82,7 +82,7 @@ export default function AGGridViz({
   pageLength = 0,
   enableGrouping,
   setDataMask,
-  principalColumns,
+  // principalColumns,
   agGridLicenseKey,
   assemblyLineUrl,
   enableAlfred,
@@ -101,7 +101,8 @@ export default function AGGridViz({
   const contextMenuRef = useRef<ContextRef>(null);
 
   const [, setInContextMenu] = useState<boolean>(true);
-  const [selectedData, setSelectedData] = useState<GridData>({
+  // const [selectedData, setSelectedData] = useState<GridData>({
+  const [selectedData] = useState<GridData>({
     highlightedData: {},
     principalData: {},
     selectedColData: {},
@@ -117,7 +118,7 @@ export default function AGGridViz({
   const gridRef = useRef<AgGridReactType>(null);
 
   const updatePageSize = useCallback((newSize: number) => {
-    gridRef.current?.api?.paginationSetPageSize(newSize);
+    // gridRef.current?.api?.paginationSetPageSize(newSize);
     setPageSize(newSize <= 0 ? 0 : newSize);
   }, []);
 
@@ -184,98 +185,98 @@ export default function AGGridViz({
     [dispatch, emitGlobalFilter, formData.sliceId, setDataMask],
   ); // only take relevant page size options
 
-  const unnestValue = (value: string): string[] => {
-    let parsed;
-    try {
-      parsed = JSON.parse(value);
-      return parsed;
-    } catch (e) {
-      return [value];
-    }
-  };
+  // const unnestValue = (value: string): string[] => {
+  //   let parsed;
+  //   try {
+  //     parsed = JSON.parse(value);
+  //     return parsed;
+  //   } catch (e) {
+  //     return [value];
+  //   }
+  // };
 
-  const onRangeSelectionChanged = useCallback(() => {
-    const api = gridRef.current!.api!;
-    const cellRanges = api.getCellRanges();
+  // const onRangeSelectionChanged = useCallback(() => {
+  //   const api = gridRef.current!.api!;
+  //   const cellRanges = api.getCellRanges();
 
-    const col_api = gridRef.current!.columnApi!;
-    const all_columns = col_api.getColumns();
+  //   const col_api = gridRef.current!.columnApi!;
+  //   const all_columns = col_api.getColumns();
 
-    const newSelectedData: { [key: string]: string[] } = {};
-    const newPrincipalData: { [key: string]: string[] } = {};
-    const typeData: { [key: string]: string[] } = {};
-    const selectedColData: { [key: string]: any } = {};
-    const jumpToData: { [key: string]: string[] } = {};
+  //   const newSelectedData: { [key: string]: string[] } = {};
+  //   const newPrincipalData: { [key: string]: string[] } = {};
+  //   const typeData: { [key: string]: string[] } = {};
+  //   const selectedColData: { [key: string]: any } = {};
+  //   const jumpToData: { [key: string]: string[] } = {};
 
-    if (cellRanges) {
-      cellRanges.forEach((range: CellRange) => {
-        // get starting and ending row, remember rowEnd could be before rowStart
-        const startRow = Math.min(
-          range.startRow!.rowIndex,
-          range.endRow!.rowIndex,
-        );
-        const endRow = Math.max(
-          range.startRow!.rowIndex,
-          range.endRow!.rowIndex,
-        );
-        lodashRange(startRow, endRow + 1).forEach(rowIndex => {
-          const rowNode = api.getModel().getRow(rowIndex)!;
+  //   if (cellRanges) {
+  //     cellRanges.forEach((range: CellRange) => {
+  //       // get starting and ending row, remember rowEnd could be before rowStart
+  //       const startRow = Math.min(
+  //         range.startRow!.rowIndex,
+  //         range.endRow!.rowIndex,
+  //       );
+  //       const endRow = Math.max(
+  //         range.startRow!.rowIndex,
+  //         range.endRow!.rowIndex,
+  //       );
+  //       lodashRange(startRow, endRow + 1).forEach(rowIndex => {
+  //         const rowNode = api.getModel().getRow(rowIndex)!;
 
-          all_columns?.forEach((column: any) => {
-            const colDef = column.getColDef();
-            const col = colDef.field;
-            const value = api.getValue(column, rowNode);
-            const unnested = ensureIsArray(unnestValue(value));
-            const formattedValue: any[] =
-              typeof value === 'string' && unnested?.length
-                ? unnested.map(v =>
-                    colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
-                  )
-                : [value];
-            const dataType: string = colDef?.advancedDataType
-              ? String(colDef.advancedDataType)
-              : colDef?.type
-                ? String(colDef.type)
-                : 'NoType';
-            if (range.columns.map(c => c.getColDef().field).includes(col)) {
-              newSelectedData[col] = newSelectedData[col] || [];
-              if (!newSelectedData[col].includes(value)) {
-                newSelectedData[col].push(value);
-              }
-              if (!selectedColData?.[col]) {
-                selectedColData[col] = colDef;
-              }
-              jumpToData[dataType] = jumpToData[dataType] || [];
-              formattedValue.forEach(v => {
-                if (v && !jumpToData[dataType].includes(v)) {
-                  jumpToData[dataType].push(v);
-                }
-              });
-            }
-            if (principalColumns?.includes(col)) {
-              newPrincipalData[col] = newPrincipalData[col] || [];
-              if (!newPrincipalData[col].includes(value)) {
-                newPrincipalData[col].push(value);
-              }
-            }
-            typeData[dataType] = typeData[dataType] || [];
-            formattedValue.forEach(v => {
-              if (v && !typeData[dataType].includes(v)) {
-                typeData[dataType].push(v);
-              }
-            });
-          });
-        });
-      });
-    }
-    setSelectedData({
-      highlightedData: newSelectedData,
-      principalData: newPrincipalData,
-      typeData,
-      selectedColData,
-      jumpToData,
-    });
-  }, [principalColumns]);
+  //         all_columns?.forEach((column: any) => {
+  //           const colDef = column.getColDef();
+  //           const col = colDef.field;
+  //           const value = api.getValue(column, rowNode);
+  //           const unnested = ensureIsArray(unnestValue(value));
+  //           const formattedValue: any[] =
+  //             typeof value === 'string' && unnested?.length
+  //               ? unnested.map(v =>
+  //                   colDef.valueFormatter?.name ? colDef.valueFormatter(v) : v,
+  //                 )
+  //               : [value];
+  //           const dataType: string = colDef?.advancedDataType
+  //             ? String(colDef.advancedDataType)
+  //             : colDef?.type
+  //               ? String(colDef.type)
+  //               : 'NoType';
+  //           if (range.columns.map(c => c.getColDef().field).includes(col)) {
+  //             newSelectedData[col] = newSelectedData[col] || [];
+  //             if (!newSelectedData[col].includes(value)) {
+  //               newSelectedData[col].push(value);
+  //             }
+  //             if (!selectedColData?.[col]) {
+  //               selectedColData[col] = colDef;
+  //             }
+  //             jumpToData[dataType] = jumpToData[dataType] || [];
+  //             formattedValue.forEach(v => {
+  //               if (v && !jumpToData[dataType].includes(v)) {
+  //                 jumpToData[dataType].push(v);
+  //               }
+  //             });
+  //           }
+  //           if (principalColumns?.includes(col)) {
+  //             newPrincipalData[col] = newPrincipalData[col] || [];
+  //             if (!newPrincipalData[col].includes(value)) {
+  //               newPrincipalData[col].push(value);
+  //             }
+  //           }
+  //           typeData[dataType] = typeData[dataType] || [];
+  //           formattedValue.forEach(v => {
+  //             if (v && !typeData[dataType].includes(v)) {
+  //               typeData[dataType].push(v);
+  //             }
+  //           });
+  //         });
+  //       });
+  //     });
+  //   }
+  //   setSelectedData({
+  //     highlightedData: newSelectedData,
+  //     principalData: newPrincipalData,
+  //     typeData,
+  //     selectedColData,
+  //     jumpToData,
+  //   });
+  // }, [principalColumns]);
 
   const onClick = useCallback(
     (
@@ -681,20 +682,21 @@ export default function AGGridViz({
           className="ag-theme-balham"
           columnDefs={columnDefs}
           defaultColDef={DEFAULT_COL_DEF}
-          enableRangeSelection
+          // // enableRangeSelection
           rowData={rowData}
           enableBrowserTooltips
-          onRangeSelectionChanged={onRangeSelectionChanged}
+          // // onRangeSelectionChanged={onRangeSelectionChanged}
           cacheQuickFilter
-          suppressRowClickSelection
+          // // suppressRowClickSelection
           suppressContextMenu
           suppressFieldDotNotation
-          modules={[
-            ClientSideRowModelModule,
-            RangeSelectionModule,
-            RowGroupingModule,
-            RichSelectModule,
-          ]}
+          // TODO Why modules broken??
+          // modules={[
+          //   ClientSideRowModelModule,
+          //   RangeSelectionModule,
+          //   RowGroupingModule,
+          //   RichSelectModule,
+          // ]}
           paginationPageSize={pageSize}
           pagination={pageSize > 0}
           quickFilterText={searchValue}

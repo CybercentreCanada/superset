@@ -54,7 +54,7 @@ export default function transformProps(chartProps: ChartProps) {
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
 
-  let value: string | number | true | Date = '';
+  let value: string | number | bigint | true | Date = '';
   let errorMessage = '';
 
   if (Array.isArray(data) && data.length > 1) {

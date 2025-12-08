@@ -5,17 +5,16 @@ import JsonValueRenderer from '../renderers/JsonValueRenderer';
 import TimestampValueRenderer from '../renderers/TimestampValueRenderer';
 
 // Key is column advanced type, value is renderer
-export const rendererMap = {
-  IPV6: Ipv6ValueRenderer,
-  DOMAIN: DomainValueRenderer,
-  COUNTRY: CountryValueRenderer,
-  JSON: JsonValueRenderer,
-  DATE: TimestampValueRenderer,
-  DATETIME: TimestampValueRenderer,
-  'TIMESTAMP WITHOUT TIME ZONE': TimestampValueRenderer,
-  'TIMESTAMP WITH TIME ZONE': TimestampValueRenderer,
-  DATETIMETZ: TimestampValueRenderer,
-};
+export const rendererMap = new Map();
+rendererMap.set('IPV6', Ipv6ValueRenderer);
+rendererMap.set('DOMAIN', DomainValueRenderer);
+rendererMap.set('COUNTRY', CountryValueRenderer);
+rendererMap.set('JSON', JsonValueRenderer);
+rendererMap.set('DATE', TimestampValueRenderer);
+rendererMap.set('DATETIME', TimestampValueRenderer);
+rendererMap.set('TIMESTAMP WITHOUT TIME ZONE', TimestampValueRenderer);
+rendererMap.set('TIMESTAMP WITH TIME ZONE', TimestampValueRenderer);
+rendererMap.set('DATETIMETZ', TimestampValueRenderer);
 
 export const formatIpv4 = (v: any) => {
   if (v.value === null) {
@@ -28,7 +27,7 @@ export const formatIpv4 = (v: any) => {
   return converted;
 };
 
-export const formatterMap = {
-  IPV4: formatIpv4,
-  INTERNET_ADDRESS: formatIpv4,
-};
+export const formatterMap = new Map<string, (v: any) => string>([
+  ['IPV4', formatIpv4],
+  ['INTERNET_ADDRESS', formatIpv4],
+]);
