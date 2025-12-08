@@ -11,11 +11,11 @@ ARG BUILD_NUMBER=0-development
 
 # Copy Vault CA certs
 COPY --from=vault_ca /usr/local/share/ca-certificates/ /usr/local/share/ca-certificates/
-RUN python -m pip install --no-cache-dir -r /tmp/analytical-platform-requirements.txt && \
+RUN uv pip install --no-cache-dir -r /tmp/analytical-platform-requirements.txt && \
   rm /tmp/analytical-platform-requirements.txt
 
 RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection\nBUILD_NUMBER = '${BUILD_NUMBER}'\n' /app/superset/config.py \
-  && pip install --no-cache-dir -r /tmp/requirements.txt \
+  && uv pip install --no-cache-dir -r /tmp/requirements.txt \
   && rm /tmp/requirements.txt
 
 # From: https://github.com/apache/superset/issues/25307#issuecomment-1885154970
