@@ -7,7 +7,8 @@
 # with the License.  You may obtain a copy of the License at
 #
 #   http://www.apache.org/licenses/LICENSE-2.0
-# # Unless required by applicable law or agreed to in writing,
+#
+# Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 # KIND, either express or implied.  See the License for the
@@ -15,27 +16,23 @@
 # under the License.
 """empty message
 
-Revision ID: c22cb5c2e546
-Revises: be1b217cd8cd
-Create Date: 2024-04-01 22:44:40.386543
+Revision ID: a06a82face61
+Revises: ('74ad1125881c', '85b4c5e54b4c')
+Create Date: 2025-12-09 15:17:12.051567
 
 """
 
-import sqlalchemy as sa
-
-from superset.migrations.shared.utils import add_columns, drop_columns
-
 # revision identifiers, used by Alembic.
-revision = "c22cb5c2e546"
-down_revision = "678eefb4ab44"
+revision = 'a06a82face61'
+down_revision = ('74ad1125881c', '85b4c5e54b4c')
+
+from alembic import op
+import sqlalchemy as sa
 
 
 def upgrade():
-    add_columns(
-        "user_attribute",
-        sa.Column("avatar_url", sa.String(length=100), nullable=True),
-    )
+    pass
 
 
 def downgrade():
-    drop_columns("user_attribute", "avatar_url")
+    pass

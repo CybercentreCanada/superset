@@ -26,8 +26,6 @@ import sqlalchemy as sa
 
 from superset.migrations.shared.utils import add_columns, drop_columns
 
-from superset.migrations.shared.utils import add_column_if_not_exists
-
 # revision identifiers, used by Alembic.
 revision = "5f57af97bc3f"
 down_revision = "d60591c5515f"
