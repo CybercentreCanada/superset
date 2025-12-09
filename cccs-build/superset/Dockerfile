@@ -20,7 +20,7 @@ RUN sed -i '/^VERSION_SHA_LENGTH = .*/i # CCCS Superset Azure pipeline injection
 
 # From: https://github.com/apache/superset/issues/25307#issuecomment-1885154970
 RUN sed -i "525i \        return None" /app/superset/db_engine_specs/presto.py
-RUN sed -i 79,96d /app/superset/db_engine_specs/trino.py
+RUN sed -i 101,118d /app/superset/db_engine_specs/trino.py
 
 ENV BUILD_NUMBER_VAR=${BUILD_NUMBER}
 
