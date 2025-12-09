@@ -77,6 +77,8 @@ import {
   JSONViewChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import {
+  AdhocFilterPlugin,
+  GroupByFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
