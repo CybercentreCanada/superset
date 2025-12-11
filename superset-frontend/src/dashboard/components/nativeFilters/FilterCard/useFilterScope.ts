@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Filter, t } from '@superset-ui/core';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { Filter, t } from '@superset-ui/core';
 import { Layout, LayoutItem, RootState } from 'src/dashboard/types';
-import { useChartIds } from 'src/dashboard/util/charts/useChartIds';
-import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
 import { DASHBOARD_ROOT_ID } from 'src/dashboard/util/constants';
+import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
+import { useChartIds } from 'src/dashboard/util/charts/useChartIds';
 
 const extractTabLabel = (tab?: LayoutItem) =>
   tab?.meta?.text || tab?.meta?.defaultText || '';

@@ -16,28 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
+import { uniq, isEqual, sortBy, debounce, isEmpty } from 'lodash';
 import {
-  Divider,
   Filter,
   NativeFilterType,
-  SLOW_DEBOUNCE,
-  css,
+  Divider,
   styled,
+  SLOW_DEBOUNCE,
   t,
+  css,
   useTheme,
 } from '@superset-ui/core';
-import { debounce, isEmpty, isEqual, sortBy, uniq } from 'lodash';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { AntdForm } from 'src/components';
-import ErrorBoundary from 'src/components/ErrorBoundary';
 import Icons from 'src/components/Icons';
+import ErrorBoundary from 'src/components/ErrorBoundary';
 import { StyledModal } from 'src/components/Modal';
+import { testWithId } from 'src/utils/testUtils';
 import { updateCascadeParentIds } from 'src/dashboard/actions/nativeFilters';
 import useEffectEvent from 'src/hooks/useEffectEvent';
-import { testWithId } from 'src/utils/testUtils';
 import { useFilterConfigMap, useFilterConfiguration } from '../state';
-import DividerConfigForm from './DividerConfigForm';
 import FilterConfigurePane from './FilterConfigurePane';
 import FiltersConfigForm, {
   FilterPanels,
@@ -51,14 +50,15 @@ import {
   SaveFilterChangesType,
 } from './types';
 import {
-  NATIVE_FILTER_DIVIDER_PREFIX,
-  createHandleRemoveItem,
   createHandleSave,
+  createHandleRemoveItem,
   generateFilterId,
   getFilterIds,
-  hasCircularDependency,
   validateForm,
+  NATIVE_FILTER_DIVIDER_PREFIX,
+  hasCircularDependency,
 } from './utils';
+import DividerConfigForm from './DividerConfigForm';
 
 const MODAL_MARGIN = 16;
 const MIN_WIDTH = 880;
