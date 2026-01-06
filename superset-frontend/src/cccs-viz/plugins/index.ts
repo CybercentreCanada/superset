@@ -18,7 +18,6 @@
  */
 
 export { default as CccsTableChartPlugin } from './plugin-chart-ag-grid/src/cccs-grid/plugin';
-export { default as DatasetExplorerChartPlugin } from './plugin-chart-dataset-explorer/src/plugin';
 export { default as IFrameVisualizationChartPlugin } from './plugin-chart-iframe/src/plugin';
 export { default as EmailRendererChartPlugin } from './plugin-chart-email-renderer/src/plugin';
 export { default as JSONViewChartPlugin } from './plugin-chart-json-view/plugin';

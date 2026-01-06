@@ -71,7 +71,6 @@ import {
 } from '@superset-ui/plugin-chart-echarts';
 import {
   CccsTableChartPlugin,
-  DatasetExplorerChartPlugin,
   EmailRendererChartPlugin,
   IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
@@ -110,7 +109,6 @@ export default class MainPreset extends Preset {
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
-        new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
         new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
