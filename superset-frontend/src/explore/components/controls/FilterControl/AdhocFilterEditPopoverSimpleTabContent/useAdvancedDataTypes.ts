@@ -26,6 +26,7 @@ const INITIAL_ADVANCED_DATA_TYPES_STATE: AdvancedDataTypesState = {
   parsedAdvancedDataType: '',
   advancedDataTypeOperatorList: [],
   errorMessage: '',
+  values: [],
 };
 
 const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
@@ -50,6 +51,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
         const queryParams = rison.encode({
           type: subjectAdvancedDataType,
           values,
+          operator: '', // CCCS -- This field is required by the api even if it is blank. No sure why it is not included.
         });
         const endpoint = `/api/v1/advanced_data_type/convert?q=${queryParams}`;
         SupersetClient.get({ endpoint })
@@ -58,6 +60,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
               parsedAdvancedDataType: json.result.display_value,
               advancedDataTypeOperatorList: json.result.valid_filter_operators,
               errorMessage: json.result.error_message,
+              values: json.result.values,
             });
             // Changed due to removal of status field
             validHandler(!json.result.error_message);
@@ -68,6 +71,7 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
               advancedDataTypeOperatorList:
                 advancedDataTypesState.advancedDataTypeOperatorList,
               errorMessage: t('Failed to retrieve advanced type'),
+              values: [],
             });
             validHandler(false);
           });
