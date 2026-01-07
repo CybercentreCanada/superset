@@ -20,8 +20,8 @@ under the License.
 # Superset
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/license/apache-2-0)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/apache/superset?sort=semver)](https://github.com/apache/superset/tree/latest)
-[![Build Status](https://github.com/apache/superset/workflows/Python/badge.svg)](https://github.com/apache/superset/actions)
+[![Latest Release on Github](https://img.shields.io/github/v/release/apache/superset?sort=semver)](https://github.com/apache/superset/releases/latest)
+[![Build Status](https://github.com/apache/superset/actions/workflows/superset-python-unittest.yml/badge.svg)](https://github.com/apache/superset/actions)
 [![PyPI version](https://badge.fury.io/py/apache_superset.svg)](https://badge.fury.io/py/apache_superset)
 [![Coverage Status](https://codecov.io/github/apache/superset/coverage.svg?branch=master)](https://codecov.io/github/apache/superset)
 [![PyPI](https://img.shields.io/pypi/pyversions/apache_superset.svg?maxAge=2592000)](https://pypi.python.org/pypi/apache_superset)
@@ -103,7 +103,7 @@ Here are some of the major database solutions that are supported:
 
 <p align="center">
   <img src="https://superset.apache.org/img/databases/redshift.png" alt="redshift" border="0" width="200"/>
-  <img src="https://superset.apache.org/img/databases/google-biquery.png" alt="google-biquery" border="0" width="200"/>
+  <img src="https://superset.apache.org/img/databases/google-biquery.png" alt="google-bigquery" border="0" width="200"/>
   <img src="https://superset.apache.org/img/databases/snowflake.png" alt="snowflake" border="0" width="200"/>
   <img src="https://superset.apache.org/img/databases/trino.png" alt="trino" border="0" width="150" />
   <img src="https://superset.apache.org/img/databases/presto.png" alt="presto" border="0" width="200"/>
@@ -111,7 +111,6 @@ Here are some of the major database solutions that are supported:
   <img src="https://superset.apache.org/img/databases/druid.png" alt="druid" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/firebolt.png" alt="firebolt" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/timescale.png" alt="timescale" border="0" width="200" />
-  <img src="https://superset.apache.org/img/databases/rockset.png" alt="rockset" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/postgresql.png" alt="postgresql" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/mysql.png" alt="mysql" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/mssql-server.png" alt="mssql-server" border="0" width="200" />
@@ -136,9 +135,10 @@ Here are some of the major database solutions that are supported:
   <img src="https://superset.apache.org/img/databases/starrocks.png" alt="starrocks" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/doris.png" alt="doris" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/oceanbase.svg" alt="oceanbase" border="0" width="220" />
-  <img src="https://superset.apache.org/img/databases/sap-hana.png" alt="oceanbase" border="0" width="220" />
+  <img src="https://superset.apache.org/img/databases/sap-hana.png" alt="sap-hana" border="0" width="220" />
   <img src="https://superset.apache.org/img/databases/denodo.png" alt="denodo" border="0" width="200" />
   <img src="https://superset.apache.org/img/databases/ydb.svg" alt="ydb" border="0" width="200" />
+  <img src="https://superset.apache.org/img/databases/tdengine.png" alt="TDengine" border="0" width="200" />
 </p>
 
 **A more comprehensive list of supported databases** along with the configuration instructions can be found [here](https://superset.apache.org/docs/configuration/databases).
@@ -147,7 +147,7 @@ Want to add support for your datastore or data engine? Read more [here](https://
 
 ## Installation and Configuration
 
-[Extended documentation for Superset](https://superset.apache.org/docs/installation/docker-compose)
+Try out Superset's [quickstart](https://superset.apache.org/docs/quickstart/) guide or learn about [the options for production deployments](https://superset.apache.org/docs/installation/architecture/).
 
 ## Get Involved
 

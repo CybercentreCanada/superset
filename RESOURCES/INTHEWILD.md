@@ -36,12 +36,14 @@ Join our growing community!
 - [Ontruck](https://www.ontruck.com/)
 
 ### Financial Services
+
 - [Aktia Bank plc](https://www.aktia.com)
 - [American Express](https://www.americanexpress.com) [@TheLastSultan]
 - [bumper](https://www.bumper.co/) [@vasu-ram, @JamiePercival]
 - [Cape Crypto](https://capecrypto.com)
 - [Capital Service S.A.](https://capitalservice.pl) [@pkonarzewski]
 - [Clark.de](https://clark.de/)
+- [Europace](https://europace.de)
 - [KarrotPay](https://www.daangnpay.com/)
 - [Remita](https://remita.net) [@mujibishola]
 - [Taveo](https://www.taveo.com) [@codek]
@@ -51,6 +53,7 @@ Join our growing community!
 - [Cover Genius](https://covergenius.com/)
 
 ### Gaming
+
 - [Popoko VM Games Studio](https://popoko.live)
 
 ### E-Commerce
@@ -87,6 +90,7 @@ Join our growing community!
 - [Astronomer](https://www.astronomer.io) [@ryw]
 - [Avesta Technologies](https://avestatechnologies.com/) [@TheRum]
 - [Caizin](https://caizin.com/) [@tejaskatariya]
+- [Canonical](https://canonical.com)
 - [Careem](https://www.careem.com/) [@samraHanif0340]
 - [Cloudsmith](https://cloudsmith.io) [@alancarson]
 - [Cyberhaven](https://www.cyberhaven.com/) [@toliver-ch]
@@ -98,8 +102,10 @@ Join our growing community!
 - [ELMO Cloud HR & Payroll](https://elmosoftware.com.au/)
 - [Endress+Hauser](https://www.endress.com/) [@rumbin]
 - [FBK - ICT center](https://ict.fbk.eu)
+- [Formbricks](https://formbricks.com)
 - [Gavagai](https://gavagai.io) [@gavagai-corp]
 - [GfK Data Lab](https://www.gfk.com/home) [@mherr]
+- [HPE](https://www.hpe.com/in/en/home.html) [@anmol-hpe]
 - [Hydrolix](https://www.hydrolix.io/)
 - [Intercom](https://www.intercom.com/) [@kate-gallo]
 - [jampp](https://jampp.com/)
@@ -111,6 +117,7 @@ Join our growing community!
 - [Ona](https://ona.io) [@pld]
 - [Orange](https://www.orange.com) [@icsu]
 - [Oslandia](https://oslandia.com)
+- [Oxylabs](https://oxylabs.io/) [@rytis-ulys]
 - [Peak AI](https://www.peak.ai/) [@azhar22k]
 - [PeopleDoc](https://www.people-doc.com) [@rodo]
 - [PlaidCloud](https://www.plaidcloud.com)
@@ -118,8 +125,11 @@ Join our growing community!
 - [PubNub](https://pubnub.com) [@jzucker2]
 - [ReadyTech](https://www.readytech.io)
 - [Reward Gateway](https://www.rewardgateway.com)
+- [RIADVICE](https://riadvice.tn) [@riadvice]
 - [ScopeAI](https://www.getscopeai.com) [@iloveluce]
+- [shipmnts](https://shipmnts.com)
 - [Showmax](https://showmax.com) [@bobek]
+- [SingleStore](https://www.singlestore.com/)
 - [TechAudit](https://www.techaudit.info) [@ETselikov]
 - [Tenable](https://www.tenable.com) [@dflionis]
 - [Tentacle](https://www.linkedin.com/company/tentacle-cmi/) [@jdclarke5]
@@ -130,6 +140,7 @@ Join our growing community!
 - [Virtuoso QA](https://www.virtuosoqa.com)
 - [Whale](https://whale.im)
 - [Windsor.ai](https://www.windsor.ai/) [@octaviancorlade]
+- [WinWin Network马上赢](https://brandct.cn/) [@wenbinye]
 - [Zeta](https://www.zeta.tech/) [@shaikidris]
 
 ### Media & Entertainment
@@ -184,7 +195,8 @@ Join our growing community!
 - [Symmetrics](https://www.symmetrics.fyi)
 - [bluquist](https://bluquist.com/)
 
-### Government / Non-Profit
+### Government
+
 - [City of Ann Arbor, MI](https://www.a2gov.org/) [@sfirke]
 - [RIS3 Strategy of CZ, MIT CR](https://www.ris3.cz/) [@RIS3CZ]
 - [NRLM - Sarathi, India](https://pib.gov.in/PressReleasePage.aspx?PRID=1999586)
@@ -192,6 +204,7 @@ Join our growing community!
 ### Travel
 
 - [Agoda](https://www.agoda.com/) [@lostseaway, @maiake, @obombayo]
+- [HomeToGo](https://hometogo.com/) [@pedromartinsteenstrup]
 - [Skyscanner](https://www.skyscanner.net/) [@cleslie, @stanhoucke]
 
 ### Others
@@ -200,11 +213,13 @@ Join our growing community!
 - [AI inside](https://inside.ai/en/)
 - [Automattic](https://automattic.com/) [@Khrol, @Usiel]
 - [Dropbox](https://www.dropbox.com/) [@bkyryliuk]
+- [Flowbird](https://flowbird.com) [@EmmanuelCbd]
 - [GEOTAB](https://www.geotab.com) [@JZ6]
 - [Grassroot](https://www.grassrootinstitute.org/)
 - [Increff](https://www.increff.com/) [@ishansinghania]
 - [komoot](https://www.komoot.com/) [@christophlingg]
 - [Let's Roam](https://www.letsroam.com/)
+- [Machrent SA](https://www.machrent.com/)
 - [Onebeat](https://1beat.com/) [@GuyAttia]
 - [X](https://x.com/)
 - [VLMedia](https://www.vlmedia.com.tr/) [@ibotheperfect]

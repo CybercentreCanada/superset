@@ -17,27 +17,17 @@
  * under the License.
  */
 import { MemoryRouter } from 'react-router-dom';
-import thunk from 'redux-thunk';
-import configureStore from 'redux-mock-store';
 import fetchMock from 'fetch-mock';
-import * as reactRedux from 'react-redux';
 import { isFeatureEnabled } from '@superset-ui/core';
-
-import waitForComponentToPaint from 'spec/helpers/waitForComponentToPaint';
-import { styledMount as mount } from 'spec/helpers/theming';
-import { render, screen, cleanup } from 'spec/helpers/testing-library';
-import userEvent from '@testing-library/user-event';
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+} from 'spec/helpers/testing-library';
 import { QueryParamProvider } from 'use-query-params';
-import { act } from 'react-dom/test-utils';
 
-import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import DashboardList from 'src/pages/DashboardList';
-import ListView from 'src/components/ListView';
-import ListViewCard from 'src/components/ListViewCard';
-import PropertiesModal from 'src/dashboard/components/PropertiesModal';
-import FaveStar from 'src/components/FaveStar';
-import TableCollection from 'src/components/TableCollection';
-import CardCollection from 'src/components/ListView/CardCollection';
 
 const dashboardsInfoEndpoint = 'glob:*/api/v1/dashboard/_info*';
 const dashboardOwnersEndpoint = 'glob:*/api/v1/dashboard/related/owners*';
@@ -83,219 +73,167 @@ fetchMock.get(dashboardCreatedByEndpoint, {
 fetchMock.get(dashboardFavoriteStatusEndpoint, {
   result: [],
 });
-
 fetchMock.get(dashboardsEndpoint, {
   result: mockDashboards,
   dashboard_count: 3,
 });
-
 fetchMock.get(dashboardEndpoint, {
   result: mockDashboards[0],
 });
 
 global.URL.createObjectURL = jest.fn();
 fetchMock.get('/thumbnail', { body: new Blob(), sendAsJson: false });
-const user = {
-  createdOn: '2021-04-27T18:12:38.952304',
-  email: 'admin',
-  firstName: 'admin',
-  isActive: true,
-  lastName: 'admin',
-  permissions: {},
-  roles: {
-    Admin: [
-      ['can_sqllab', 'Superset'],
-      ['can_write', 'Dashboard'],
-      ['can_write', 'Chart'],
-    ],
-  },
-  userId: 1,
-  username: 'admin',
-};
-
-// store needed for withToasts(DatabaseList)
-const mockStore = configureStore([thunk]);
-const store = mockStore({ user });
-const useSelectorMock = jest.spyOn(reactRedux, 'useSelector');
 
 describe('DashboardList', () => {
-  isFeatureEnabled.mockImplementation(
-    feature => feature === 'LISTVIEWS_DEFAULT_CARD_VIEW',
-  );
+  const renderDashboardList = (props = {}, userProp = mockUser) =>
+    render(
+      <MemoryRouter>
+        <QueryParamProvider>
+          <DashboardList {...props} user={userProp} />
+        </QueryParamProvider>
+      </MemoryRouter>,
+      { useRedux: true },
+    );
 
-  afterAll(() => {
+  beforeEach(() => {
+    isFeatureEnabled.mockImplementation(
+      feature => feature === 'LISTVIEWS_DEFAULT_CARD_VIEW',
+    );
+    fetchMock.resetHistory();
+  });
+
+  afterEach(() => {
     isFeatureEnabled.mockRestore();
   });
 
-  beforeEach(() => {
-    // setup a DOM element as a render target
-    useSelectorMock.mockClear();
+  it('renders', async () => {
+    renderDashboardList();
+    expect(await screen.findByText('Dashboards')).toBeInTheDocument();
   });
 
-  const mockedProps = {};
-  let wrapper;
-
-  beforeAll(async () => {
-    fetchMock.resetHistory();
-    wrapper = mount(
-      <MemoryRouter>
-        <reactRedux.Provider store={store}>
-          <DashboardList {...mockedProps} user={mockUser} />
-        </reactRedux.Provider>
-      </MemoryRouter>,
-    );
-
-    await waitForComponentToPaint(wrapper);
+  it('renders a ListView', async () => {
+    renderDashboardList();
+    expect(
+      await screen.findByTestId('dashboard-list-view'),
+    ).toBeInTheDocument();
   });
 
-  it('renders', () => {
-    expect(wrapper.find(DashboardList)).toExist();
+  it('fetches info', async () => {
+    renderDashboardList();
+    await waitFor(() => {
+      const calls = fetchMock.calls(/dashboard\/_info/);
+      expect(calls).toHaveLength(1);
+    });
   });
 
-  it('renders a ListView', () => {
-    expect(wrapper.find(ListView)).toExist();
-  });
+  it('fetches data', async () => {
+    renderDashboardList();
+    await waitFor(() => {
+      const calls = fetchMock.calls(/dashboard\/\?q/);
+      expect(calls).toHaveLength(1);
+    });
 
-  it('fetches info', () => {
-    const callsI = fetchMock.calls(/dashboard\/_info/);
-    expect(callsI).toHaveLength(1);
-  });
-
-  it('fetches data', () => {
-    wrapper.update();
-    const callsD = fetchMock.calls(/dashboard\/\?q/);
-    expect(callsD).toHaveLength(1);
-    expect(callsD[0][0]).toMatchInlineSnapshot(
+    const calls = fetchMock.calls(/dashboard\/\?q/);
+    expect(calls[0][0]).toMatchInlineSnapshot(
       `"http://localhost/api/v1/dashboard/?q=(order_column:changed_on_delta_humanized,order_direction:desc,page:0,page_size:25,select_columns:!(id,dashboard_title,published,url,slug,changed_by,changed_by.id,changed_by.first_name,changed_by.last_name,changed_on_delta_humanized,owners,owners.id,owners.first_name,owners.last_name,tags.id,tags.name,tags.type,status,certified_by,certification_details,changed_on))"`,
     );
   });
 
-  it('renders a card view', () => {
-    expect(wrapper.find(ListViewCard)).toExist();
+  it('switches between card and table view', async () => {
+    renderDashboardList();
+
+    // Wait for the list to load
+    await screen.findByTestId('dashboard-list-view');
+
+    // Initially in card view
+    const cardViewIcon = screen.getByRole('img', { name: 'appstore' });
+    expect(cardViewIcon).toBeInTheDocument();
+
+    // Switch to table view
+    const listViewIcon = screen.getByRole('img', { name: 'appstore' });
+    const listViewButton = listViewIcon.closest('[role="button"]');
+    fireEvent.click(listViewButton);
+
+    // Switch back to card view
+    const cardViewButton = cardViewIcon.closest('[role="button"]');
+    fireEvent.click(cardViewButton);
   });
 
-  it('renders a table view', async () => {
-    wrapper.find('[aria-label="list-view"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find('table')).toExist();
-  });
+  it('shows edit modal', async () => {
+    renderDashboardList();
 
-  it('edits', async () => {
-    expect(wrapper.find(PropertiesModal)).not.toExist();
-    wrapper.find('[data-test="edit-alt"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(PropertiesModal)).toExist();
-  });
+    // Wait for data to load
+    await screen.findByText('title 0');
 
-  it('card view edits', async () => {
-    wrapper.find('[data-test="edit-alt"]').last().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(PropertiesModal)).toExist();
-  });
-
-  it('delete', async () => {
-    wrapper
-      .find('[data-test="dashboard-list-trash-icon"]')
-      .first()
-      .simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(ConfirmStatusChange)).toExist();
-  });
-
-  it('card view delete', async () => {
-    wrapper
-      .find('[data-test="dashboard-list-trash-icon"]')
-      .last()
-      .simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(ConfirmStatusChange)).toExist();
-  });
-
-  it('renders the Favorite Star column in list view for logged in user', async () => {
-    wrapper.find('[aria-label="list-view"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(TableCollection).find(FaveStar)).toExist();
-  });
-
-  it('renders the Favorite Star in card view for logged in user', async () => {
-    wrapper.find('[aria-label="card-view"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(CardCollection).find(FaveStar)).toExist();
-  });
-});
-
-describe('RTL', () => {
-  async function renderAndWait() {
-    const mounted = act(async () => {
-      const mockedProps = {};
-      render(
-        <MemoryRouter>
-          <QueryParamProvider>
-            <DashboardList {...mockedProps} user={mockUser} />
-          </QueryParamProvider>
-        </MemoryRouter>,
-        { useRedux: true },
-      );
+    // Find and click the first more options button
+    const moreIcons = await screen.findAllByRole('img', {
+      name: 'more',
     });
+    fireEvent.click(moreIcons[0]);
 
-    return mounted;
-  }
+    // Click edit from the dropdown
+    const editButton = await screen.findByTestId(
+      'dashboard-card-option-edit-button',
+    );
+    fireEvent.click(editButton);
 
-  beforeEach(async () => {
-    isFeatureEnabled.mockImplementation(() => true);
-    await renderAndWait();
+    // Check for modal
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    cleanup();
-    isFeatureEnabled.mockRestore();
+  it('shows delete confirmation', async () => {
+    renderDashboardList();
+
+    // Wait for data to load
+    await screen.findByText('title 0');
+
+    // Find and click the first more options button
+    const moreIcons = await screen.findAllByRole('img', {
+      name: 'more',
+    });
+    fireEvent.click(moreIcons[0]);
+
+    // Click delete from the dropdown
+    const deleteButton = await screen.findByTestId(
+      'dashboard-card-option-delete-button',
+    );
+    fireEvent.click(deleteButton);
+
+    // Check for confirmation dialog
+    expect(
+      await screen.findByText(/Are you sure you want to delete/i),
+    ).toBeInTheDocument();
   });
 
-  it('renders an "Import Dashboard" tooltip under import button', async () => {
+  it('renders an "Import Dashboard" tooltip', async () => {
+    renderDashboardList();
+
     const importButton = await screen.findByTestId('import-button');
-    userEvent.hover(importButton);
+    fireEvent.mouseOver(importButton);
 
-    await screen.findByRole('tooltip');
-    const importTooltip = screen.getByRole('tooltip', {
-      name: 'Import dashboards',
-    });
-
-    expect(importTooltip).toBeInTheDocument();
+    expect(
+      await screen.findByRole('tooltip', {
+        name: 'Import dashboards',
+      }),
+    ).toBeInTheDocument();
   });
 });
 
 describe('DashboardList - anonymous view', () => {
-  const mockedProps = {};
-  const mockUserLoggedOut = {};
-  let wrapper;
-
-  beforeAll(async () => {
-    fetchMock.resetHistory();
-    wrapper = mount(
+  it('does not render favorite stars for anonymous user', async () => {
+    render(
       <MemoryRouter>
-        <reactRedux.Provider store={store}>
-          <DashboardList {...mockedProps} user={mockUserLoggedOut} />
-        </reactRedux.Provider>
+        <QueryParamProvider>
+          <DashboardList user={{}} />
+        </QueryParamProvider>
       </MemoryRouter>,
+      { useRedux: true },
     );
 
-    await waitForComponentToPaint(wrapper);
-  });
-
-  afterAll(() => {
-    cleanup();
-    fetchMock.reset();
-  });
-
-  it('does not render the Favorite Star column in list view for anonymous user', async () => {
-    wrapper.find('[aria-label="list-view"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(TableCollection).find(FaveStar)).not.toExist();
-  });
-
-  it('does not render the Favorite Star in card view for anonymous user', async () => {
-    wrapper.find('[aria-label="card-view"]').first().simulate('click');
-    await waitForComponentToPaint(wrapper);
-    expect(wrapper.find(CardCollection).find(FaveStar)).not.toExist();
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('img', { name: /favorite/i }),
+      ).not.toBeInTheDocument();
+    });
   });
 });

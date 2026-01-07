@@ -454,8 +454,11 @@ cd ../
 # Compile translations for the backend
 ./scripts/translations/generate_mo_files.sh
 
+# update build version number
+sed -i '' "s/version_string = .*/version_string = \"$SUPERSET_VERSION\"/" setup.py
+
 # build the python distribution
-python -m build
+python setup.py sdist
 ```
 
 Publish to PyPI
@@ -466,8 +469,7 @@ an account first if you don't have one, and reference your username
 while requesting access to push packages.
 
 ```bash
-twine upload dist/apache_superset-${SUPERSET_VERSION}-py3-none-any.whl
-twine upload dist/apache-superset-${SUPERSET_VERSION}.tar.gz
+twine upload dist/*
 ```
 
 Set your username to `__token__`

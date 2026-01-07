@@ -1,5 +1,5 @@
 import { JsonObject } from '@superset-ui/core';
-import { InputProps } from 'antd/lib/input';
+import { InputProps } from '@superset-ui/core/components';
 import { ChangeEvent, EventHandler, FormEvent } from 'react';
 
 /**
@@ -265,7 +265,7 @@ export interface ExtraJson {
 }
 
 export type CustomTextType = {
-  value?: string | boolean | number;
+  value?: string | boolean | number | object;
   type?: string | null;
   name?: string;
   checked?: boolean;
@@ -321,6 +321,7 @@ export interface FieldPropTypes {
   sslForced?: boolean;
   defaultDBName?: string;
   editNewDb?: boolean;
+  isValidating: boolean;
 }
 
 type ChangeMethodsType = FieldPropTypes['changeMethods'];
@@ -343,6 +344,7 @@ export interface DatabaseConnectionFormProps {
   editNewDb?: boolean;
   dbModel: DatabaseForm;
   db: Partial<DatabaseObject> | null;
+  isValidating: boolean;
   onParametersChange: (
     event: FormEvent<InputProps> | { target: HTMLInputElement },
   ) => void;
