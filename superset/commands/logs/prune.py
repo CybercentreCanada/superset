@@ -22,28 +22,28 @@ import sqlalchemy as sa
 
 from superset import db
 from superset.commands.base import BaseCommand
-from superset.models.sql_lab import Query
+from superset.models.core import Log
 
 logger = logging.getLogger(__name__)
 
 
 # pylint: disable=consider-using-transaction
-class QueryPruneCommand(BaseCommand):
+class LogPruneCommand(BaseCommand):
     """
-    Command to prune the query table by deleting rows older than the specified retention period.
+    Command to prune the logs table by deleting rows older than the specified retention period.
 
-    This command deletes records from the `Query` table that have not been changed within the
+    This command deletes records from the `Log` table that have not been changed within the
     specified number of days. It helps in maintaining the database by removing outdated entries
     and freeing up space.
 
     Attributes:
         retention_period_days (int): The number of days for which records should be retained.
                                      Records older than this period will be deleted.
-    """
+    """  # noqa: E501
 
     def __init__(self, retention_period_days: int):
         """
-        :param retention_period_days: Number of days to keep in the query table
+        :param retention_period_days: Number of days to keep in the logs table
         """
         self.retention_period_days = retention_period_days
 
@@ -58,8 +58,8 @@ class QueryPruneCommand(BaseCommand):
         # Select all IDs that need to be deleted
         ids_to_delete = (
             db.session.execute(
-                sa.select(Query.id).where(
-                    Query.changed_on
+                sa.select(Log.id).where(
+                    Log.dttm
                     < datetime.now() - timedelta(days=self.retention_period_days)
                 )
             )
@@ -78,12 +78,12 @@ class QueryPruneCommand(BaseCommand):
             batch_ids = ids_to_delete[i : i + batch_size]
 
             # Delete the selected batch using IN clause
-            result = db.session.execute(sa.delete(Query).where(Query.id.in_(batch_ids)))
+            result = db.session.execute(sa.delete(Log).where(Log.id.in_(batch_ids)))
 
             # Update the total number of deleted records
             total_deleted += result.rowcount
 
-            # Explicitly commit the transaction given that if an error occurs, we want to ensure that the
+            # Explicitly commit the transaction given that if an error occurs, we want to ensure that the  # noqa: E501
             # records that have been deleted so far are committed
             db.session.commit()
 
@@ -91,7 +91,7 @@ class QueryPruneCommand(BaseCommand):
             percentage_complete = (total_deleted / total_rows) * 100
             if percentage_complete >= next_logging_threshold:
                 logger.info(
-                    "Deleted %s rows from the query table older than %s days (%d%% complete)",  # noqa: E501
+                    "Deleted %s rows from the logs table older than %s days (%d%% complete)",  # noqa: E501
                     f"{total_deleted:,}",
                     self.retention_period_days,
                     percentage_complete,

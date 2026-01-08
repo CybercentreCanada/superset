@@ -88,7 +88,7 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
   } else if (
     chartId === focusedFilterScope?.chartId ||
     (focusedFilterScope?.scope &&
-      getChartIdsInFilterBoxScope({
+      getChartIdsInFilterScope({
         filterScope: focusedFilterScope?.scope,
       }).includes(chartId))
   ) {

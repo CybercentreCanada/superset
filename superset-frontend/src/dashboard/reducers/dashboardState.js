@@ -39,6 +39,8 @@ import {
   UNSET_FOCUSED_FILTER_FIELD,
   SET_ACTIVE_TAB,
   SET_ACTIVE_TABS,
+  SET_FOCUSED_CHART,
+  UNSET_FOCUSED_CHART,
   SET_FULL_SIZE_CHART_ID,
   ON_FILTERS_REFRESH,
   ON_FILTERS_REFRESH_SUCCESS,
@@ -252,6 +254,18 @@ export default function dashboardStateReducer(state = {}, action) {
       return {
         ...state,
         focusedFilterField: null,
+      };
+    },
+    [SET_FOCUSED_CHART]() {
+      return {
+        ...state,
+        focusedChart: action.chartId,
+      };
+    },
+    [UNSET_FOCUSED_CHART]() {
+      return {
+        ...state,
+        focusedChart: null,
       };
     },
     [SET_FULL_SIZE_CHART_ID]() {

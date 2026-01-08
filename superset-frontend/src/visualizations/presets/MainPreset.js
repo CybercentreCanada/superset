@@ -73,7 +73,6 @@ import {
 } from '@superset-ui/plugin-chart-echarts';
 import {
   CccsTableChartPlugin,
-  DatasetExplorerChartPlugin,
   EmailRendererChartPlugin,
   IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
@@ -98,6 +97,7 @@ export default class MainPreset extends Preset {
       FeatureFlag.ChartPluginsExperimental,
     )
       ? [
+          new GroupByFilterPlugin().configure({ key: 'filter_groupby' }),
           new BigNumberPeriodOverPeriodChartPlugin().configure({
             key: 'pop_kpi',
           }),
@@ -112,7 +112,6 @@ export default class MainPreset extends Preset {
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
-        new DatasetExplorerChartPlugin().configure({ key: 'dataset_explorer' }),
         new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
         new AreaChartPlugin().configure({ key: 'area' }),
         new BarChartPlugin().configure({ key: 'bar' }),

@@ -10,3 +10,6 @@ mysql-connector-python==8.0.33
 elasticsearch-dbapi==0.2.10
 cachetools~=5.0.0
 typing-extensions>=4, <5
+
+# Required for Gunicorn
+gevent
