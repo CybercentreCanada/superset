@@ -13,9 +13,9 @@ import {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { useSelector } from 'react-redux';
-import { AntdDropdown as Dropdown } from 'src/components';
+import { Dropdown } from '@superset-ui/core/components';
 import { getMenuAdjustedY } from 'src/components/Chart/utils';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 import { RootState } from 'src/dashboard/types';
 import { findPermission } from 'src/utils/findPermission';
 

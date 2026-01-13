@@ -23,7 +23,7 @@ function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
         <JSONTree
           data={jsonObject}
           theme="default"
-          shouldExpandNode={() => true}
+          shouldExpandNodeInitially={() => true}
         />
       </div>
     </span>

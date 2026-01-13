@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import SelectControl from 'src/explore/components/controls/SelectControl';
-import { bootstrapData } from 'src/preamble';
-import Button from 'src/components/Button';
+import getBootstrapData from 'src/utils/getBootstrapData';
+import { Button } from '@superset-ui/core/components/Button';
 import {
   t,
   SupersetClient,
@@ -9,6 +9,8 @@ import {
   withTheme,
   SupersetTheme,
 } from '@superset-ui/core';
+
+const bootstrapData = getBootstrapData();
 
 interface Props {
   dashboardID: number;
@@ -141,7 +143,7 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
     <div style={{ width: 400 }}>
       <div style={{ width: '9000', paddingBottom: 25 }}>
         <SelectControl
-          css={(theme: SupersetTheme) => ({ marginBottom: theme.gridUnit * 4 })}
+          css={(theme: SupersetTheme) => ({ marginBottom: theme.sizeUnit * 4 })}
           ariaLabel={t('Annotation layer value')}
           name="annotation-layer-value"
           label={t('Dashboard')}

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 
 import {
   DownloadOutlined,

@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import { ReactNode } from 'react';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 
 interface EmitFilterMenuItemProps {
   label: string;

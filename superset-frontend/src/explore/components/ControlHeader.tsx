@@ -123,27 +123,27 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   const renderOptionalActionIcons = () => (
     <span
       css={() => css`
-        padding-left: ${5 * gridUnit}px;
+        padding-left: ${5 * theme.sizeUnit}px;
       `}
     >
       {canSelectAll && (
         <span>
-          <InfoTooltipWithTrigger
+          <InfoTooltip
             label={t('select-all')}
             tooltip={t('Select All (ctl+a)')}
             placement="top"
-            icon="arrow-circle-up"
+            // icon="arrow-circle-up"
             onClick={selectAllOnClick}
           />{' '}
         </span>
       )}
       {canCopy && (
         <span>
-          <InfoTooltipWithTrigger
+          <InfoTooltip
             label={t('copy')}
             tooltip={t('Copy the content of this control')}
             placement="top"
-            icon="copy"
+            // icon="copy"
             onClick={copyOnClick}
           />{' '}
         </span>

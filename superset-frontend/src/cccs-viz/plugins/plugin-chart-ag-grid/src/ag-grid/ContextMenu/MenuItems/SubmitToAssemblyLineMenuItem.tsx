@@ -1,4 +1,4 @@
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 
 import { Tooltip } from 'antd';
 import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';

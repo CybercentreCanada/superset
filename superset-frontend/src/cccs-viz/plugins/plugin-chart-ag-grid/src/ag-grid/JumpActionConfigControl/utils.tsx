@@ -1,6 +1,6 @@
 import { FundOutlined } from '@ant-design/icons';
 import rison from 'rison';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 
 const generateNativeFilterUrlString = (
   nativefilterID: string,

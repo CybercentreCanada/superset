@@ -1,5 +1,5 @@
 import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 
 interface OpenInAssemblyLineMenuItemProps {
   label: string;

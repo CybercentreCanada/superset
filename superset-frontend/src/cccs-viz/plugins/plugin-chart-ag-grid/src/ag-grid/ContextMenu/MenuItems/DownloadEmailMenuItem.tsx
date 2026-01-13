@@ -1,6 +1,6 @@
 import { SupersetClient } from '@superset-ui/core';
 import { saveAs } from 'file-saver';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 import { useDispatch } from 'react-redux';
 import {
   addInfoToast,

@@ -1,5 +1,5 @@
 import { SupersetClient } from '@superset-ui/core';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 import { useDispatch } from 'react-redux';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import AlfredIcon from 'src/cccs-viz/plugins/components/AlfredIcon';

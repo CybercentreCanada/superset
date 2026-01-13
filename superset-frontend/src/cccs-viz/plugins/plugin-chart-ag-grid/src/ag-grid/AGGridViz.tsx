@@ -2,29 +2,25 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import 'ag-grid-enterprise';
 
-import { AgGridReact, AgGridReact as AgGridReactType } from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
-import { RichSelectModule } from '@ag-grid-enterprise/rich-select';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { LicenseManager } from '@ag-grid-enterprise/core';
+import { ClientSideRowModelModule , ModuleRegistry } from 'ag-grid-community';
+import { LicenseManager, RowGroupingModule, RichSelectModule, CellSelectionModule } from 'ag-grid-enterprise';
 import { CloseOutlined, FilterOutlined } from '@ant-design/icons';
 import { Filter, css, ensureIsArray, isNativeFilter } from '@superset-ui/core';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { ModuleRegistry } from '@ag-grid-community/core';
-import {
+// import {
   // CellRange,
-  GetMainMenuItemsParams,
-  MenuItemDef,
-} from 'ag-grid-community';
+//   GetMainMenuItemsParams,
+//   MenuItemDef,
+// } from 'ag-grid-community';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/dashboard/types';
 import { clearDataMask } from 'src/dataMask/actions';
 // import { range as lodashRange } from 'lodash';
 import useEmitGlobalFilter from 'src/cccs-viz/plugins/hooks/useEmitGlobalFilter';
-import { Menu } from 'src/components/Menu';
+import { Menu } from '@superset-ui/core/components/Menu';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
 import ChartContextMenu, {
   Ref as ContextRef,
@@ -47,7 +43,7 @@ import SubmitToAssemblyLineMenuItem from './ContextMenu/MenuItems/SubmitToAssemb
 // Register the required feature modules with the Grid
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
-  RangeSelectionModule,
+  CellSelectionModule,
   RowGroupingModule,
   RichSelectModule,
 ]);
@@ -115,7 +111,7 @@ export default function AGGridViz({
   const [isDestroyed, setIsDestroyed] = useState(false);
   const [contextDivID] = useState(Math.random());
 
-  const gridRef = useRef<AgGridReactType>(null);
+  const gridRef = useRef<AgGridReact>(null);
 
   const updatePageSize = useCallback((newSize: number) => {
     // gridRef.current?.api?.paginationSetPageSize(newSize);
@@ -293,13 +289,6 @@ export default function AGGridViz({
     contextMenuRef.current?.close();
   }, []);
 
-  const copyText = (withHeaders?: boolean) => {
-    gridRef.current?.api?.copySelectedRangeToClipboard({
-      includeHeaders: withHeaders || false,
-    });
-    handleContextMenu();
-  };
-
   const adhocFiltersInScope = useSelector<RootState, Filter[]>(
     state =>
       Object.values(state.nativeFilters.filters).filter(
@@ -311,6 +300,13 @@ export default function AGGridViz({
   );
 
   useEffect(() => {
+    const copyText = (withHeaders?: boolean) => {
+      gridRef.current?.api?.copySelectedRangeToClipboard({
+        includeHeaders: withHeaders || false,
+      });
+      handleContextMenu();
+    };
+
     let menuItems = [
       <CopyMenuItem onClick={copyText} />,
       <CopyWithHeaderMenuItem onClick={() => copyText(true)} />,
@@ -562,6 +558,15 @@ export default function AGGridViz({
     selectedData.jumpToData,
     selectedData.principalData,
     adhocFiltersInScope.length,
+    enableAlfred,
+    selectedData.typeData,
+    selectedData.selectedColData,
+    assemblyLineUrl,
+    enableDownload,
+    handleContextMenu,
+    adhocFiltersInScope,
+    onClick,
+    dispatch,
   ]);
 
   const handleOnContextMenu = (
@@ -594,20 +599,20 @@ export default function AGGridViz({
 
   useEffect(() => {
     destroyGrid();
-  }, [enableGrouping]);
+  }, [destroyGrid, enableGrouping]);
 
-  const getMainMenuItems = (
-    params: GetMainMenuItemsParams,
-  ): (string | MenuItemDef)[] => {
-    const menuItems: (MenuItemDef | string)[] = [];
-    const itemsToExclude = ['rowGroup'];
-    params.defaultItems.forEach((item: string) => {
-      if (itemsToExclude.indexOf(item) < 0) {
-        menuItems.push(item);
-      }
-    });
-    return menuItems;
-  };
+  // const getMainMenuItems = (
+  //   params: GetMainMenuItemsParams,
+  // ): (string | MenuItemDef)[] => {
+  //   const menuItems: (MenuItemDef | string)[] = [];
+  //   const itemsToExclude = ['rowGroup'];
+  //   params.defaultItems.forEach((item: string) => {
+  //     if (itemsToExclude.indexOf(item) < 0) {
+  //       menuItems.push(item);
+  //     }
+  //   });
+  //   return menuItems;
+  // };
 
   return !isDestroyed ? (
     <>
@@ -701,7 +706,7 @@ export default function AGGridViz({
           pagination={pageSize > 0}
           quickFilterText={searchValue}
           rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
-          getMainMenuItems={getMainMenuItems}
+          // getMainMenuItems={getMainMenuItems} // TODO Jess fix this
         />
       </div>
     </>

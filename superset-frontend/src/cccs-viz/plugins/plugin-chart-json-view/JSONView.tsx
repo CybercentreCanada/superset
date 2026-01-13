@@ -4,7 +4,7 @@ import { ChangeEvent, memo, useCallback, useState } from 'react';
 import { JSONTree } from 'react-json-tree';
 
 const errorStyles = (theme: SupersetTheme) => css`
-  color: ${theme.colors.error.base};
+  color: ${theme.colorError};
   font-weight: bold;
 `;
 
@@ -111,7 +111,7 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
             data={values}
             theme="default"
             hideRoot={compactView}
-            shouldExpandNode={() => true}
+            shouldExpandNodeInitially={() => true}
             labelRenderer={(keyPath, nodeType) => {
               const path = [...keyPath]
                 .reverse()
@@ -160,7 +160,7 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
                 .join('.')
                 .toLowerCase();
 
-              const valueAsString = value.toString().toLowerCase();
+              const valueAsString = (value ?? '').toString().toLowerCase(); // TODO this feels wrong
 
               if (
                 !path.includes(searchValue.toLowerCase()) &&

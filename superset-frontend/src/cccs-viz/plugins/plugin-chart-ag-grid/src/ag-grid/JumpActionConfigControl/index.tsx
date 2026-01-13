@@ -21,8 +21,8 @@
 import { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
 import { t, withTheme } from '@superset-ui/core';
-import AsyncEsmComponent from 'src/components/AsyncEsmComponent';
-import { List } from 'src/components/List';
+import { AsyncEsmComponent } from '@superset-ui/core/components';
+import { List } from '@superset-ui/core/components/List';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover';
 import { connect } from 'react-redux';
 import {
@@ -142,7 +142,8 @@ const DrillActionConfigControl: React.FC<Props> = ({
       css={theme => ({
         '&:hover': {
           cursor: 'pointer',
-          backgroundColor: theme.colors.grayscale.light4,
+          // backgroundColor: theme.colors.grayscale.light4,
+          backgroundColor: theme.colorBgContainer, // TODO check this
         },
       })}
       content={renderPopover(i, anno)}
@@ -167,7 +168,7 @@ const DrillActionConfigControl: React.FC<Props> = ({
         <ControlHeader {...props} />
       </HeaderContainer>
       <LabelsContainer>
-        <List bordered css={theme => ({ borderRadius: theme.gridUnit })}>
+        <List bordered css={theme => ({ borderRadius: theme.sizeUnit })}>
           {drillactionConfigs}
           <ControlPopover
             trigger="click"

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { IFrameVisualizationProps } from './types';
 
 const errorStyles = (theme: SupersetTheme) => css`
-  color: ${theme.colors.error.base};
+  color: ${theme.colorError};
   font-weight: bold;
 `;
 
