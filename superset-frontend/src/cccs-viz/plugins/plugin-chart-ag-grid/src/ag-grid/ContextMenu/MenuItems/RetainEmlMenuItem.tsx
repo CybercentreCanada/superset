@@ -1,12 +1,9 @@
 import { SupersetClient } from '@superset-ui/core';
 import { Menu } from 'src/components/Menu';
 import { useDispatch } from 'react-redux';
-import {
-  addInfoToast,
-  addDangerToast,
-} from 'src/components/MessageToasts/actions';
+import { useToasts } from 'src/components/MessageToasts/withToasts';
 import AlfredIcon from 'src/cccs-viz/plugins/components/AlfredIcon';
-import { Tooltip } from 'antd';
+import { Tooltip } from '@superset-ui/core/components';
 
 interface RetainEmlMenuItemProps {
   label: string;
@@ -21,6 +18,7 @@ interface RetainEmlMenuItemProps {
 
 export default function RetainEmlMenuItem(props: RetainEmlMenuItemProps) {
   const dispatch = useDispatch();
+  const { addInfoToast, addDangerToast } = useToasts();
 
   const onClick = () => {
     const endpoint = `/api/v1/alfred/retain-eml-record`;
