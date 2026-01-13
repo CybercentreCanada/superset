@@ -363,21 +363,6 @@ msgstr "(keine Beschreibung, klicken Sie hier, um Fehlermeldung zu sehen)"
 msgid "), and they become available in your SQL (example:"
 msgstr "), und sie werden in Ihrem SQL verfügbar (Beispiel:"
 
-#, fuzzy, python-format
-msgid ""
-"*%(name)s*\n"
-"\n"
-"    %(description)s\n"
-"\n"
-"    Error: %(text)s\n"
-"    "
-msgstr ""
-"*%(name)s*\n"
-"\n"
-"%(description)s\n"
-"\n"
-"Fehler: %(text)s\n"
-
 #, python-format
 msgid ""
 "*%(name)s*\n"
@@ -12314,11 +12299,6 @@ msgid ""
 msgstr ""
 "Diese Seite sollte in einen iframe eingebettet werden, aber es sieht so "
 "aus, als wäre das nicht der Fall."
-
-msgid ""
-"This page is intended to be embedded in an iframe, but it looks like that"
-" is not the case."
-msgstr ""
 
 msgid ""
 "This section allows you to configure how to use the slice\n"

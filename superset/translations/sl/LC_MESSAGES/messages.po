@@ -364,21 +364,6 @@ msgstr "(ni opisa, kliknite za ogled zapisov)"
 msgid "), and they become available in your SQL (example:"
 msgstr "), s čimer bodo na razpolago v sklopu SQL-poizvedbe (primer:"
 
-#, fuzzy, python-format
-msgid ""
-"*%(name)s*\n"
-"\n"
-"    %(description)s\n"
-"\n"
-"    Error: %(text)s\n"
-"    "
-msgstr ""
-"*%(name)s*\n"
-"\n"
-"%(description)s\n"
-"\n"
-"napaka: %(text)s\n"
-
 #, python-format
 msgid ""
 "*%(name)s*\n"
@@ -9496,10 +9481,6 @@ msgstr "Izberite katalog ali poiščite kataloge z vnosom"
 msgid "Select channels"
 msgstr "Izberitw kanale"
 
-#, fuzzy
-msgid "Select channels"
-msgstr "Izberi grafikone"
-
 msgid "Select chart"
 msgstr "Izberite grafikon"
 
@@ -11966,11 +11947,6 @@ msgid ""
 "This page is intended to be embedded in an iframe, but it looks like that"
 " is not the case."
 msgstr "Ta stran naj bi bila vdelana kot iframe, vendar izgleda, da temu ni tako."
-
-msgid ""
-"This page is intended to be embedded in an iframe, but it looks like that"
-" is not the case."
-msgstr ""
 
 msgid ""
 "This section allows you to configure how to use the slice\n"

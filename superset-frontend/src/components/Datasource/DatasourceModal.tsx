@@ -86,7 +86,6 @@ function buildExtraJsonObject(
 
 const DatasourceModal: FunctionComponent<DatasourceModalProps> = ({
   addSuccessToast,
-  addDangerToast,
   datasource,
   onDatasourceSave,
   onHide,

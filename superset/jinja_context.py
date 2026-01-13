@@ -760,6 +760,7 @@ class BaseTemplateProcessor:
 
         kwargs.update(self._context)
         context = validate_template_context(self.engine, kwargs)
+
         try:
             return template.render(context)
         except RecursionError as ex:

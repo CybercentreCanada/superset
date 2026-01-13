@@ -21,7 +21,6 @@ from collections.abc import Iterator
 from typing import Any, Callable, Optional, Union
 from uuid import uuid4
 
-import sqlalchemy as sa
 from alembic import op
 from sqlalchemy import (
     Column,

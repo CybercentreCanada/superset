@@ -39,18 +39,6 @@ jest.mock(
   () => () => <div data-test="mock-chart-context-menu" />,
 );
 
-jest.mock('@superset-ui/core', () => ({
-  ...jest.requireActual('@superset-ui/core'),
-  SuperChart: ({ formData }) => (
-    <div data-test="mock-super-chart">{JSON.stringify(formData)}</div>
-  ),
-}));
-
-jest.mock(
-  'src/components/Chart/ChartContextMenu/ChartContextMenu',
-  () => () => <div data-test="mock-chart-context-menu" />,
-);
-
 const requiredProps = {
   chartId: 1,
   datasource: {},

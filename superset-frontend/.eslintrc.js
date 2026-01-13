@@ -167,7 +167,6 @@ module.exports = {
         camelcase: 0,
         'class-methods-use-this': 0,
         'func-names': 0,
-        'react/react-in-jsx-scope': 0,
         'guard-for-in': 0,
         'import/no-cycle': 0, // re-enable up for discussion, might require some major refactors
         'import/extensions': [
@@ -462,7 +461,7 @@ module.exports = {
     'react/require-default-props': 0,
     'react/sort-comp': 0, // TODO: re-enable in separate PR
     'react/static-property-placement': 0, // disabled temporarily
-    'react-prefer-function-component/react-prefer-function-component': 0,
+    'react-prefer-function-component/react-prefer-function-component': 1,
     'prettier/prettier': 'error',
     // disabling some things that come with the eslint 7->8 upgrade. Will address these in a separate PR
     'react/no-unknown-property': 0,

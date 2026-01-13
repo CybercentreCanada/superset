@@ -22,8 +22,6 @@ module.exports = {
   testRegex:
     '\\/superset-frontend\\/(spec|src|plugins|packages|tools)\\/.*(_spec|\\.test)\\.[jt]sx?$',
   moduleNameMapper: {
-    // "d3": "<rootDir>/node_modules/d3/dist/d3.min.js",
-    // "^d3-(.*)$": "<rootDir>/node_modules/d3-$1/dist/d3-$1.min.js",
     '\\.(css|less|geojson)$': '<rootDir>/spec/__mocks__/mockExportObject.js',
     '\\.(gif|ttf|eot|png|jpg)$': '<rootDir>/spec/__mocks__/mockExportString.js',
     '\\.svg$': '<rootDir>/spec/__mocks__/svgrMock.tsx',

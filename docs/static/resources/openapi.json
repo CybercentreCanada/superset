@@ -3192,23 +3192,6 @@
         ],
         "type": "object"
       },
-      "CssTemplateRestApi.get.User1": {
-        "properties": {
-          "first_name": {
-            "maxLength": 64,
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "last_name": {
-            "maxLength": 64,
-            "type": "string"
-          }
-        },
-        "required": ["first_name", "last_name"],
-        "type": "object"
-      },
       "CssTemplateRestApi.get_list": {
         "properties": {
           "changed_by": {
@@ -4403,20 +4386,6 @@
           "first_name",
           "last_name"
         ],
-        "type": "object"
-      },
-      "DatabaseRestApi.get_list.User1": {
-        "properties": {
-          "first_name": {
-            "maxLength": 64,
-            "type": "string"
-          },
-          "last_name": {
-            "maxLength": 64,
-            "type": "string"
-          }
-        },
-        "required": ["first_name", "last_name"],
         "type": "object"
       },
       "DatabaseRestApi.post": {
@@ -9808,23 +9777,6 @@
         ],
         "type": "object"
       },
-      "SavedQueryRestApi.get.User1": {
-        "properties": {
-          "first_name": {
-            "maxLength": 64,
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "last_name": {
-            "maxLength": 64,
-            "type": "string"
-          }
-        },
-        "required": ["first_name", "last_name"],
-        "type": "object"
-      },
       "SavedQueryRestApi.get_list": {
         "properties": {
           "catalog": {
@@ -9972,23 +9924,6 @@
           "first_name",
           "last_name"
         ],
-        "type": "object"
-      },
-      "SavedQueryRestApi.get_list.User1": {
-        "properties": {
-          "first_name": {
-            "maxLength": 64,
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "last_name": {
-            "maxLength": 64,
-            "type": "string"
-          }
-        },
-        "required": ["first_name", "last_name"],
         "type": "object"
       },
       "SavedQueryRestApi.post": {
@@ -10840,11 +10775,8 @@
       },
       "Tag": {
         "properties": {
-          "all_tabs": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object"
+          "id": {
+            "type": "integer"
           },
           "name": {
             "type": "string"
@@ -11591,14 +11523,6 @@
           "type",
           "values"
         ],
-        "type": "object"
-      },
-      "database_catalogs_query_schema": {
-        "properties": {
-          "force": {
-            "type": "boolean"
-          }
-        },
         "type": "object"
       },
       "database_catalogs_query_schema": {
@@ -16251,61 +16175,6 @@
         ]
       }
     },
-    "/api/v1/dashboard/{id_or_slug}/tabs": {
-      "get": {
-        "description": "Returns a list of a dashboard's tabs and dashboard's nested tree structure for associated tabs.",
-        "parameters": [
-          {
-            "description": "Either the id of the dashboard, or its slug",
-            "in": "path",
-            "name": "id_or_slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "result": {
-                      "items": {
-                        "$ref": "#/components/schemas/TabsPayloadSchema"
-                      },
-                      "type": "object"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Dashboard tabs"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Get dashboard's tabs",
-        "tags": ["Dashboards"]
-      }
-    },
     "/api/v1/dashboard/{pk}": {
       "delete": {
         "parameters": [
@@ -17109,73 +16978,6 @@
         ]
       }
     },
-    "/api/v1/dashboard/{pk}/filters": {
-      "put": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "pk",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DashboardNativeFiltersConfigUpdateSchema"
-              }
-            }
-          },
-          "description": "Native filters configuration",
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "result": {
-                      "type": "array"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Dashboard native filters updated"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "422": {
-            "$ref": "#/components/responses/422"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Update native filters configuration for a dashboard.",
-        "tags": ["Dashboards"]
-      }
-    },
     "/api/v1/dashboard/{pk}/permalink": {
       "post": {
         "parameters": [
@@ -17414,60 +17216,6 @@
         "tags": [
           "Dashboards"
         ]
-      }
-    },
-    "/api/v1/dashboard/{pk}/screenshot/{digest}/": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "pk",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "path",
-            "name": "digest",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "image/*": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": "Dashboard thumbnail image"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Get a computed screenshot from cache",
-        "tags": ["Dashboards"]
       }
     },
     "/api/v1/dashboard/{pk}/thumbnail/{digest}/": {
@@ -19274,144 +19022,6 @@
         "tags": [
           "Database"
         ]
-      }
-    },
-    "/api/v1/database/{pk}/table_metadata/": {
-      "get": {
-        "description": "Metadata associated with the table (columns, indexes, etc.)",
-        "parameters": [
-          {
-            "description": "The database id",
-            "in": "path",
-            "name": "pk",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Table name",
-            "in": "query",
-            "name": "table",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Optional table schema, if not passed default schema will be used",
-            "in": "query",
-            "name": "schema",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Optional table catalog, if not passed default catalog will be used",
-            "in": "query",
-            "name": "catalog",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TableExtraMetadataResponseSchema"
-                }
-              }
-            },
-            "description": "Table metadata information"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Get table metadata",
-        "tags": ["Database"]
-      }
-    },
-    "/api/v1/database/{pk}/table_metadata/extra/": {
-      "get": {
-        "description": "Extra metadata associated with the table (partitions, description, etc.)",
-        "parameters": [
-          {
-            "description": "The database id",
-            "in": "path",
-            "name": "pk",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Table name",
-            "in": "query",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Optional table schema, if not passed the schema configured in the database will be used",
-            "in": "query",
-            "name": "schema",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Optional table catalog, if not passed the catalog configured in the database will be used",
-            "in": "query",
-            "name": "catalog",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TableExtraMetadataResponseSchema"
-                }
-              }
-            },
-            "description": "Table extra metadata information"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Get table extra metadata",
-        "tags": ["Database"]
       }
     },
     "/api/v1/database/{pk}/tables/": {
@@ -27130,42 +26740,6 @@
         ]
       }
     },
-    "/api/v1/sqllab/": {
-      "get": {
-        "description": "Assembles SQLLab bootstrap data (active_tab, databases, queries, tab_state_ids) in a single endpoint. The data can be assembled from the current user's id.",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SQLLabBootstrapSchema"
-                }
-              }
-            },
-            "description": "Returns the initial bootstrap data for SqlLab"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "summary": "Get the bootstrap data for SqlLab page",
-        "tags": ["SQL Lab"]
-      }
-    },
     "/api/v1/sqllab/estimate/": {
       "post": {
         "requestBody": {
@@ -28574,35 +28148,6 @@
         "tags": [
           "User"
         ]
-      }
-    },
-    "/api/v1/user/{user_id}/avatar.png": {
-      "get": {
-        "description": "Gets the avatar URL for the user with the given ID, or returns a 401 error if the user is unauthenticated.",
-        "parameters": [
-          {
-            "description": "The ID of the user",
-            "in": "path",
-            "name": "user_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "301": {
-            "description": "A redirect to the user's avatar URL"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        },
-        "summary": "Get the user avatar",
-        "tags": ["User"]
       }
     },
     "/api/{version}/_openapi": {

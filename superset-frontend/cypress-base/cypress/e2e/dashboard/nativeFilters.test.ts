@@ -20,8 +20,6 @@ import {
   nativeFilters,
   exploreView,
   dataTestChartName,
-  exploreView,
-  nativeFilters,
 } from 'cypress/support/directories';
 
 import {
@@ -35,8 +33,10 @@ import {
   expandFilterOnLeftPanel,
   getNativeFilterPlaceholderWithIndex,
   inputNativeFilterDefaultValue,
+  saveNativeFilterSettings,
   nativeFilterTooltips,
   validateFilterContentOnDashboard,
+  valueNativeFilterOptions,
   validateFilterNameOnDashboard,
   testItems,
 } from './utils';

@@ -680,7 +680,7 @@ msgstr ">= (больше или равно)"
 msgid "A Big Number"
 msgstr "Карточка"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
+msgid "A comma separated list of columns that should be parsed as dates"
 msgstr ""
 "Разделенный запятыми список столбцов, которые должны быть интерпретированы как "
 "даты."

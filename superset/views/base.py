@@ -443,18 +443,6 @@ def cached_common_bootstrap_data(  # pylint: disable=unused-argument
             "EXTRA_CATEGORICAL_COLOR_SCHEMES"
         ],
         "menu_data": menu_data(g.user),
-        "datahub_url": conf.get("DATAHUB_URL", ""),
-        "advanced_data_types": list(
-            map(
-                lambda v: {
-                    "id": v[0],
-                    "verbose_name": v[1].verbose_name,
-                    "description": v[1].description,
-                    "valid_data_types": v[1].valid_data_types,
-                },
-                config["ADVANCED_DATA_TYPES"].items(),
-            )
-        )
     }
 
     bootstrap_data.update(app.config["COMMON_BOOTSTRAP_OVERRIDES_FUNC"](bootstrap_data))

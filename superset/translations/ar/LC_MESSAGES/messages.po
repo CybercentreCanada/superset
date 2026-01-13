@@ -355,10 +355,11 @@ msgstr ""
 msgid ""
 "*%(name)s*\n"
 "\n"
-"    %(description)s\n"
+"%(description)s\n"
 "\n"
-"    Error: %(text)s\n"
-"    "
+"<%(url)s|Explore in Superset>\n"
+"\n"
+"%(table)s\n"
 msgstr ""
 
 #, python-format
@@ -801,12 +802,6 @@ msgstr "جمع"
 
 msgid "Add Alert"
 msgstr "إضافة تنبيه"
-
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
-msgstr ""
 
 msgid "Add BCC Recipients"
 msgstr ""
@@ -1856,9 +1851,6 @@ msgstr "محور تنازلي"
 msgid "BCC recipients"
 msgstr ""
 
-msgid "BCC recipients"
-msgstr ""
-
 msgid "BOOLEAN"
 msgstr "منطقيه"
 
@@ -2118,9 +2110,6 @@ msgstr "حسب القيمة: استخدام قيم المقاييس كمفتاح
 
 msgid "CANCEL"
 msgstr "إلغاء الأمر"
-
-msgid "CC recipients"
-msgstr ""
 
 msgid "CC recipients"
 msgstr ""
@@ -8388,9 +8377,6 @@ msgstr "تنسيق المحور الصادي الأساسي"
 msgid "Private Channels (Bot in channel)"
 msgstr ""
 
-msgid "Private Channels (Bot in channel)"
-msgstr ""
-
 msgid "Private Key"
 msgstr "مفتاح خاص"
 
@@ -9844,9 +9830,6 @@ msgstr "Shift + انقر للفرز حسب أعمدة متعددة"
 msgid "Shift start date"
 msgstr "تاريخ البداية"
 
-msgid "Shift start date"
-msgstr ""
-
 msgid "Short description must be unique for this layer"
 msgstr "يجب أن يكون الوصف المختصر فريدًا لهذه الطبقة"
 
@@ -10931,9 +10914,6 @@ msgstr "قامت قاعدة البيانات بإرجاع خطأ غير متوق
 msgid "The database that was used to generate this query could not be found"
 msgstr ""
 
-msgid "The database that was used to generate this query could not be found"
-msgstr ""
-
 msgid "The database was deleted."
 msgstr "تم حذف قاعدة البيانات."
 
@@ -11428,15 +11408,6 @@ msgstr ""
 #, fuzzy
 msgid "The service url of the layer"
 msgstr "عرض قيم السلسلة على الرسم البياني"
-
-msgid "The screenshot could not be downloaded. Please, try again later."
-msgstr ""
-
-msgid "The screenshot is being generated. Please, do not leave the page."
-msgstr ""
-
-msgid "The screenshot is now being downloaded."
-msgstr ""
 
 msgid "The size of each cell in meters"
 msgstr "حجم كل خلية بالأمتار"
@@ -12548,10 +12519,6 @@ msgstr "مضيف خادم Doris غير معروف \"%(hostname)s\"."
 #, python-format
 msgid "Unknown MySQL server host \"%(hostname)s\"."
 msgstr "مضيف خادم MySQL غير معروف \"%(hostname)s\"."
-
-#, python-format
-msgid "Unknown OceanBase server host \"%(hostname)s\"."
-msgstr ""
 
 #, python-format
 msgid "Unknown OceanBase server host \"%(hostname)s\"."

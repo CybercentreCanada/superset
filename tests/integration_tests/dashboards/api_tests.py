@@ -3006,9 +3006,7 @@ class TestDashboardApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCas
 
     @with_feature_flags(THUMBNAILS=True, ENABLE_DASHBOARD_SCREENSHOT_ENDPOINTS=True)
     @pytest.mark.usefixtures("create_dashboard_with_tag")
-    @patch("superset.dashboards.api.is_feature_enabled")
-    def test_cache_dashboard_screenshot_success(self, is_feature_enabled):
-        is_feature_enabled.return_value = True
+    def test_cache_dashboard_screenshot_success(self):
         self.login(ADMIN_USERNAME)
         dashboard = (
             db.session.query(Dashboard)
@@ -3063,7 +3061,6 @@ class TestDashboardApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCas
         """
         Validate screenshot returns png
         """
-        is_feature_enabled.return_value = True
         self.login(ADMIN_USERNAME)
         mock_cache_task.return_value = None
         mock_get_from_cache_key.return_value = ScreenshotCachePayload(
@@ -3093,7 +3090,6 @@ class TestDashboardApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCas
     @patch("superset.dashboards.api.cache_dashboard_screenshot")
     @patch("superset.dashboards.api.build_pdf_from_screenshots")
     @patch("superset.dashboards.api.DashboardScreenshot.get_from_cache_key")
-    @patch("superset.dashboards.api.is_feature_enabled")
     def test_screenshot_success_pdf(
         self,
         mock_get_from_cache_key,
@@ -3103,7 +3099,6 @@ class TestDashboardApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCas
         """
         Validate screenshot can return pdf.
         """
-        is_feature_enabled.return_value = True
         self.login(ADMIN_USERNAME)
         mock_cache_task.return_value = None
         mock_get_from_cache_key.return_value = ScreenshotCachePayload(
@@ -3133,11 +3128,7 @@ class TestDashboardApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCas
     @pytest.mark.usefixtures("create_dashboard_with_tag")
     @patch("superset.dashboards.api.cache_dashboard_screenshot")
     @patch("superset.dashboards.api.DashboardScreenshot.get_from_cache_key")
-    @patch("superset.dashboards.api.is_feature_enabled")
-    def test_screenshot_not_in_cache(
-        self, is_feature_enabled, mock_get_cache, mock_cache_task
-    ):
-        is_feature_enabled.return_value = True
+    def test_screenshot_not_in_cache(self, mock_get_cache, mock_cache_task):
         self.login(ADMIN_USERNAME)
         mock_cache_task.return_value = None
         mock_get_cache.return_value = None
