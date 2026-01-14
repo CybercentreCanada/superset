@@ -466,6 +466,7 @@ numpy==1.26.4
     #   pandas
     #   pandas-gbq
     #   prophet
+    #   pyarrow
 oauthlib==3.2.2
     # via requests-oauthlib
 odfpy==1.4.1
