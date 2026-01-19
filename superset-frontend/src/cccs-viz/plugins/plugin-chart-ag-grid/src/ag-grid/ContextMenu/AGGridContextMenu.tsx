@@ -38,7 +38,7 @@ export interface Ref {
 }
 
 const ChartContextMenu = (
-  { id, formData, onSelection, onClose, menuItems }: ChartContextMenuProps,
+  { id, onClose, menuItems }: ChartContextMenuProps,
   ref: RefObject<Ref>,
 ) => {
   const canExplore = useSelector((state: RootState) =>
@@ -93,7 +93,7 @@ const ChartContextMenu = (
       open,
       close,
     }),
-    [open],
+    [close, open],
   );
 
   return ReactDOM.createPortal(
