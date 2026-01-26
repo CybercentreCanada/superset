@@ -179,19 +179,20 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     queriesData,
     emitCrossFilters,
   } = chartProps;
+
+  console.log(formData);
+
   const {
-    includeSearch,
+    includeSearch = false,
     pageLength,
-    defaultGroupBy,
-    enableRowNumbers,
-    enableGrouping,
+    defaultGroupBy = [],
+    enableRowNumbers = false,
+    enableGrouping = false,
     enableJsonExpand,
     principalColumns,
-    orderByCols,
-    jumpActionConfigs,
-  }: CccsTableFormData = {
-    ...formData,
-  };
+    orderByCols = [],
+    jumpActionConfigs = [],
+  }: CccsTableFormData = formData;
 
   const datasource_metrics = datasource?.metrics as Metric[];
   const data = queriesData[0].data as TimeseriesDataRecord[];

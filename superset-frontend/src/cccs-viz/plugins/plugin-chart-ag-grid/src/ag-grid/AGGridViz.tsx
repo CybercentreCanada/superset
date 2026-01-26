@@ -8,6 +8,7 @@ import {
   useCallback,
   useState,
   ChangeEvent,
+  FunctionComponent,
 } from 'react';
 
 import {
@@ -29,9 +30,11 @@ import {
   RichSelectModule,
   RowGroupingModule,
   RowGroupingPanelModule,
+  GroupFilterModule,
+  PivotModule,
+  TreeDataModule,
 } from 'ag-grid-enterprise';
 import {
-  Image,
   Input,
   ThemedAgGridReact,
   ThemedAgGridReactProps,
@@ -40,11 +43,9 @@ import {
 import { AgGridReact } from '@superset-ui/core/components/ThemedAgGridReact';
 import { useTheme } from '@superset-ui/core';
 import { PAGE_SIZE_OPTIONS } from '../consts';
-import EmitFilterMenuItem from './ContextMenu/MenuItems/EmitFilterMenuItem';
 
 // Module TODOs:
-//  - Pagination: "All" option, on by default
-//  - Row grouping: Show panel conditionally
+//  - Pagination: Fix it lol
 //  - Search/find: Make it pretty. Also I broke the CSS and the pagination stuff isn't visible anymore
 //  - Context menu:
 //    - Add back the contextual logic once I have all the menu items working
@@ -56,21 +57,28 @@ const DEFAULT_COL_DEF: ColDef = {
   autoHeight: true,
   sortable: true,
   enableRowGroup: true,
-  // contextMenuItems: ['copy', 'copyWithHeaders', 'export'],
 };
 
-const RETENTION_LIMIT = 100;
-const SUBMISSION_LIMIT = 10;
-const DOWNLOAD_LIMIT = 10;
-
 export interface ThemedCCCSGridVizProps extends ThemedAgGridReactProps {
+  includeSearch: boolean;
+  pageLength: number;
+  enableGrouping: boolean;
   agGridLicenseKey: string;
   height: number;
   assemblyLineUrl: string;
 }
 
 const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
-  ({ columnDefs, rowData, height, agGridLicenseKey, assemblyLineUrl }) => {
+  ({
+    columnDefs,
+    rowData,
+    height,
+    includeSearch,
+    pageLength = 0,
+    enableGrouping,
+    agGridLicenseKey,
+    assemblyLineUrl,
+  }) => {
     const theme = useTheme();
 
     const gridRef = useRef<AgGridReact>(null);
@@ -86,7 +94,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     );
 
     const headerStyles = useMemo(
-      () => ({ display: 'flex', 'flex-direction': 'row' }),
+      () => ({ display: 'flex', flexDirection: 'row' }),
       [],
     );
     const containerStyles = useMemo(() => ({ height }), [height]);
@@ -94,7 +102,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(
       () => PAGE_SIZE_OPTIONS,
-      [],
+      [pageLength],
     );
 
     const [quickFilterText, setQuickFilterText] = useState<string>();
@@ -109,9 +117,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     const getContextMenuItems = useCallback(
       (
         params: GetContextMenuItemsParams,
-      ):
-        | (DefaultMenuItem | MenuItemDef)[]
-        | Promise<(DefaultMenuItem | MenuItemDef)[]> => {
+      ): (DefaultMenuItem | MenuItemDef)[] => {
+        const nodes = params.api.getSelectedNodes();
+
         const result: (DefaultMenuItem | MenuItemDef)[] = [
           'copy',
           'copyWithHeaders',
@@ -126,66 +134,67 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
           // add principle column cross-filter(s),
           // remove cross-filter(s),
           'separator',
-          {
-            name: 'Retain EML record(s) to ALFRED',
-            disabled: params.node?.data?.length > RETENTION_LIMIT,
-            tooltip:
-              params.node?.data?.length > RETENTION_LIMIT
-                ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
-                : undefined,
-            action: () => {
-              const email_ids =
-                params.node?.data?.map((d: any) => d.harmonized_email_id) ?? [];
-            },
-          },
+          // {
+          //   name: 'Retain EML record(s) to ALFRED',
+          //   disabled: params.node?.data?.length > RETENTION_LIMIT,
+          //   tooltip:
+          //     params.node?.data?.length > RETENTION_LIMIT
+          //       ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
+          //       : undefined,
+          //   action: () => {
+          //     const email_ids =
+          //       params.node?.data?.map((d: any) => d.harmonized_email_id) ?? [];
+          //   },
+          // },
           {
             name: 'Open in ASSEMBLYLINE',
             // icon: AssemblyLineLogo,
             action: () => {
-              const data =
-                params.node?.data?.map((d: any) => d.file_sha256) ?? [];
-              console.log(
-                `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${data.join('+')}\`)`,
-              );
+              console.log("hello");
+              // const data =
+              //   params.node?.data?.map((d: any) => d.file_sha256) ?? [];
+              // console.log(
+              //   `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${data.join('+')}\`)`,
+              // );
             },
           },
-          {
-            name: 'Submit file(s) to ASSEMBLYLINE',
-            // icon: `<img src="${AssemblyLineLogo}" />`,
-            disabled: params.node?.data?.length > SUBMISSION_LIMIT,
-            tooltip:
-              params.node?.data?.length > SUBMISSION_LIMIT
-                ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
-                : `A new tab will open for each distinct EML path submission.`,
-            action: () => {
-              const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
-              for (const d of data) {
-                console.log(
-                  `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${d}\`)`,
-                );
-              }
-            },
-          },
-          {
-            name: 'Download EML file(s)',
-            disabled: params.node?.data?.length > DOWNLOAD_LIMIT,
-            tooltip:
-              params.node?.data?.length > DOWNLOAD_LIMIT
-                ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
-                : `A download will begin for each distinct EML file.`,
-            action: () => {
-              const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
-              for (const d of data) {
-                console.log(
-                  `TODO omg this actually does something. "Download" file at /api/v1/fission/get-eml?file=${d}`,
-                );
-              }
-            },
-          },
-          'separator',
-          {
-            name: 'something about jump to dashboard configs here',
-          },
+          // {
+          //   name: 'Submit file(s) to ASSEMBLYLINE',
+          //   // icon: `<img src="${AssemblyLineLogo}" />`,
+          //   disabled: params.node?.data?.length > SUBMISSION_LIMIT,
+          //   tooltip:
+          //     params.node?.data?.length > SUBMISSION_LIMIT
+          //       ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
+          //       : `A new tab will open for each distinct EML path submission.`,
+          //   action: () => {
+          //     const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
+          //     for (const d of data) {
+          //       console.log(
+          //         `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${d}\`)`,
+          //       );
+          //     }
+          //   },
+          // },
+          // {
+          //   name: 'Download EML file(s)',
+          //   disabled: params.node?.data?.length > DOWNLOAD_LIMIT,
+          //   tooltip:
+          //     params.node?.data?.length > DOWNLOAD_LIMIT
+          //       ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
+          //       : `A download will begin for each distinct EML file.`,
+          //   action: () => {
+          //     const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
+          //     for (const d of data) {
+          //       console.log(
+          //         `TODO omg this actually does something. "Download" file at /api/v1/fission/get-eml?file=${d}`,
+          //       );
+          //     }
+          //   },
+          // },
+          // 'separator',
+          // {
+          //   name: 'something about jump to dashboard configs here',
+          // },
           'separator',
           'export',
         ];
@@ -199,15 +208,17 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
 
     return (
       <div style={containerStyles}>
-        <div style={headerStyles}>
-          <span>Quick Filter:</span>
-          <Input
-            type="text"
-            id="filter-text-box"
-            placeholder="Filter..."
-            onInput={onFilterTextBoxChanged}
-          />
-        </div>
+        {includeSearch && (
+          <div style={headerStyles}>
+            <span>Quick Filter:</span>
+            <Input
+              type="text"
+              id="filter-text-box"
+              placeholder="Filter..."
+              onInput={onFilterTextBoxChanged}
+            />
+          </div>
+        )}
         <div ref={containerRef} style={gridStyle}>
           <ThemedAgGridReact
             themeOverrides={themeOverrides}
@@ -215,9 +226,10 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
+            cellSelection
             cacheQuickFilter
             quickFilterText={quickFilterText}
-            pagination
+            pagination={pageLength > 0}
             paginationPageSizeSelector={paginationPageSizeSelector}
             getContextMenuItems={getContextMenuItems}
             modules={[
@@ -227,8 +239,12 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
               ColumnMenuModule,
               QuickFilterModule,
               // row grouping modules
+              // TODO revisit if TreeData/Pivot/GroupFilter still needed
               RowGroupingModule,
               RowGroupingPanelModule,
+              TreeDataModule,
+              PivotModule,
+              GroupFilterModule,
               // context menu modules
               ClipboardModule,
               ContextMenuModule,
@@ -238,7 +254,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
                 ? [ValidationModule]
                 : []),
             ]}
-            rowGroupPanelShow="always"
+            rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
           />
         </div>
       </div>
