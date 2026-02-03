@@ -13,3 +13,6 @@ typing-extensions>=4, <5
 
 # Required for Gunicorn
 gevent
+
+# Metrics
+prometheus-flask-exporter==0.23.2

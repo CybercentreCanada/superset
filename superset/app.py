@@ -36,6 +36,13 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
         )
         app.config.from_object(config_module)
 
+        export_app_metrics = app.config.get("EXPORT_FLASK_METRICS", False)
+        if export_app_metrics:
+            from prometheus_flask_exporter import PrometheusMetrics
+            
+            metrics = PrometheusMetrics.for_app_factory()
+            metrics.init_app(app)
+
         app_initializer = app.config.get("APP_INITIALIZER", SupersetAppInitializer)(app)
         app_initializer.init_app()
 
