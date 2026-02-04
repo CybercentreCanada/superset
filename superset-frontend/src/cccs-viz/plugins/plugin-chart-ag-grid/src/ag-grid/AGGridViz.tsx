@@ -35,6 +35,7 @@ import {
   TreeDataModule,
 } from 'ag-grid-enterprise';
 import {
+  Icons,
   Input,
   ThemedAgGridReact,
   ThemedAgGridReactProps,
@@ -85,24 +86,30 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     const defaultColDef = useMemo<ColDef>(() => DEFAULT_COL_DEF, []);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Superset has a custom context menu and doesn't override ag-grid's context menu styling, which has a weird transparent background.
+    // Some of the grid menus are transparent and illegible, these overrides fix that.
     const themeOverrides = useMemo(
       () => ({
         menuBackgroundColor: theme.colorBgElevated,
+        pickerListBackgroundColor: theme.colorBgElevated,
       }),
       [theme.colorBgElevated],
     );
 
     const headerStyles = useMemo(
-      () => ({ display: 'flex', flexDirection: 'row' }),
-      [],
+      () => ({ width: 'auto', paddingBottom: theme.sizeUnit }),
+      [theme.sizeUnit],
     );
     const containerStyles = useMemo(() => ({ height }), [height]);
     const gridStyle = useMemo(() => ({ height: '100%' }), []);
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(
-      () => PAGE_SIZE_OPTIONS,
+      () => (pageLength > 0 ? PAGE_SIZE_OPTIONS : false),
       [pageLength],
+    );
+
+    const rowGroupPanelShow = useMemo<'always' | 'never'>(
+      () => (enableGrouping ? 'always' : 'never'),
+      [enableGrouping],
     );
 
     const [quickFilterText, setQuickFilterText] = useState<string>();
@@ -150,7 +157,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             name: 'Open in ASSEMBLYLINE',
             // icon: AssemblyLineLogo,
             action: () => {
-              console.log("hello");
+              console.log('hello');
               // const data =
               //   params.node?.data?.map((d: any) => d.file_sha256) ?? [];
               // console.log(
@@ -210,12 +217,17 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
       <div style={containerStyles}>
         {includeSearch && (
           <div style={headerStyles}>
-            <span>Quick Filter:</span>
             <Input
+              allowClear
               type="text"
-              id="filter-text-box"
-              placeholder="Filter..."
+              placeholder="Search..."
               onInput={onFilterTextBoxChanged}
+              prefix={
+                <Icons.SearchOutlined
+                  iconColor={theme.colorIcon}
+                  iconSize="l"
+                />
+              }
             />
           </div>
         )}
@@ -230,6 +242,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             cacheQuickFilter
             quickFilterText={quickFilterText}
             pagination={pageLength > 0}
+            paginationPageSize={pageLength}
             paginationPageSizeSelector={paginationPageSizeSelector}
             getContextMenuItems={getContextMenuItems}
             modules={[
@@ -254,7 +267,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
                 ? [ValidationModule]
                 : []),
             ]}
-            rowGroupPanelShow={enableGrouping ? 'always' : 'never'}
+            rowGroupPanelShow={rowGroupPanelShow}
           />
         </div>
       </div>

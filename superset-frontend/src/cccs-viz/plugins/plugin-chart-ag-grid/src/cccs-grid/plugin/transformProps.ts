@@ -180,8 +180,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     emitCrossFilters,
   } = chartProps;
 
-  console.log(formData);
-
   const {
     includeSearch = false,
     pageLength,
