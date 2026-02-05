@@ -107,8 +107,8 @@ const calcColumnColumnDefs = (
     const cellRenderer =
       isDate || columnTypeGeneric === GenericDataType.Temporal
         ? rendererMap.get('DATE')
-        : rendererMap.get(advancedDataType.toUpperCase()) ??
-          rendererMap.get(columnType);
+        : (rendererMap.get(advancedDataType.toUpperCase()) ??
+          rendererMap.get(columnType));
     const valueFormatter =
       advancedDataType.toUpperCase() in formatterMap
         ? formatterMap.get(advancedDataType.toUpperCase())

@@ -454,7 +454,7 @@ def cached_common_bootstrap_data(  # pylint: disable=unused-argument
                 },
                 app.config["ADVANCED_DATA_TYPES"].items(),
             )
-        )
+        ),
     }
 
     bootstrap_data.update(app.config["COMMON_BOOTSTRAP_OVERRIDES_FUNC"](bootstrap_data))

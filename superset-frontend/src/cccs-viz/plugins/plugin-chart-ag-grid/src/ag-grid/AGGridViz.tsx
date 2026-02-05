@@ -12,12 +12,15 @@ import {
 } from 'react';
 
 import {
+  CellSelectionChangedEvent,
   ClientSideRowModelModule,
   ColDef,
   DefaultMenuItem,
   GetContextMenuItemsParams,
+  GetRowIdParams,
   MenuItemDef,
   QuickFilterModule,
+  RowSelectionModule,
   ValidationModule,
 } from 'ag-grid-community';
 import {
@@ -46,7 +49,6 @@ import { useTheme } from '@superset-ui/core';
 import { PAGE_SIZE_OPTIONS } from '../consts';
 
 // Module TODOs:
-//  - Pagination: Fix it lol
 //  - Search/find: Make it pretty. Also I broke the CSS and the pagination stuff isn't visible anymore
 //  - Context menu:
 //    - Add back the contextual logic once I have all the menu items working
@@ -67,6 +69,9 @@ export interface ThemedCCCSGridVizProps extends ThemedAgGridReactProps {
   agGridLicenseKey: string;
   height: number;
   assemblyLineUrl: string;
+  enableAlfred: boolean;
+  enableDownload: boolean;
+  emitCrossFilters: boolean;
 }
 
 const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
@@ -79,6 +84,8 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     enableGrouping,
     agGridLicenseKey,
     assemblyLineUrl,
+    enableAlfred,
+    enableDownload,
   }) => {
     const theme = useTheme();
 
@@ -121,11 +128,70 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
       [],
     );
 
+    const [harmonizedEmailIds, setHarmonizedEmailIds] = useState<string[]>();
+    const [fileSHA256s, setFileSHA256s] = useState<string[]>();
+
+    const onCellSelectionChanged = useCallback(
+      (e: CellSelectionChangedEvent) => {
+        if (!e.started && e.finished) {
+          const gridApi = e.api;
+
+          const selectedHarmonizedEmailIds = [];
+          const selectedFileSHA256s = [];
+
+          const cellRanges = gridApi.getCellRanges() ?? [];
+          for (const range of cellRanges) {
+            if (range.startRow && range.endRow) {
+              const hasHarmonizedEmailIds = range.columns.some(
+                col =>
+                  col.getColDef().advancedDataType === 'harmonized_email_id',
+              );
+              const hasFileSHA256s = range.columns.some(
+                col => col.getColDef().advancedDataType === 'file_sha256',
+              );
+
+              const startIdx = Math.min(
+                range.startRow.rowIndex,
+                range.endRow.rowIndex,
+              );
+              const endIdx = Math.max(
+                range.startRow.rowIndex,
+                range.endRow.rowIndex,
+              );
+
+              // Iterate over the selected data for what we're interested in
+              for (let i = startIdx; i < endIdx + 1; i += 1) {
+                const row = gridApi.getDisplayedRowAtIndex(i);
+
+                if (row) {
+                  if (hasHarmonizedEmailIds) {
+                    selectedHarmonizedEmailIds.push(row.data.id);
+                  }
+                  if (hasFileSHA256s) {
+                    selectedFileSHA256s.push(row.data.file_sha256);
+                  }
+                } else {
+                  console.error('Missing row displayed at index ', i);
+                }
+              }
+            }
+          }
+          setHarmonizedEmailIds(selectedHarmonizedEmailIds);
+          setFileSHA256s(selectedFileSHA256s);
+        }
+      },
+      [],
+    );
+
     const getContextMenuItems = useCallback(
       (
         params: GetContextMenuItemsParams,
       ): (DefaultMenuItem | MenuItemDef)[] => {
-        const nodes = params.api.getSelectedNodes();
+        const contextMenuItems: (DefaultMenuItem | MenuItemDef)[] = [
+          'copy',
+          'copyWithHeaders',
+          'separator',
+        ];
 
         const result: (DefaultMenuItem | MenuItemDef)[] = [
           'copy',
@@ -134,7 +200,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
           // filter on selection,
           {
             name: 'Filter on selection',
-            action: () => console.log('filter on selection clicked'),
+            action: () => {
+              console.log('filter on selection clicked');
+            },
           },
           'separator',
           // add cross-filter(s),
@@ -238,7 +306,12 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
+            // Cell selection - I'm struggling
             cellSelection
+            onCellSelectionChanged={onCellSelectionChanged}
+            // Let's try row selection
+            // rowSelection="multiple" // TODO use the new RowSelectionOptions interface
+            // onSelectionChanged={onSelectionChanged}
             cacheQuickFilter
             quickFilterText={quickFilterText}
             pagination={pageLength > 0}
@@ -248,6 +321,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             modules={[
               ClientSideRowModelModule,
               CellSelectionModule,
+              RowSelectionModule,
               RichSelectModule,
               ColumnMenuModule,
               QuickFilterModule,

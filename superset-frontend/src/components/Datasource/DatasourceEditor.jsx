@@ -69,13 +69,14 @@ import {
   resetDatabaseState,
 } from 'src/database/actions';
 import Mousetrap from 'mousetrap';
+import getBootstrapData from 'src/utils/getBootstrapData';
 import { DatabaseSelector } from '../DatabaseSelector';
 import CollectionTable from './CollectionTable';
 import Fieldset from './Fieldset';
 import Field from './Field';
 import { fetchSyncedColumns, updateColumns } from './utils';
-import { bootstrapData } from 'src/preamble';
 
+const bootstrapData = getBootstrapData();
 const extensionsRegistry = getExtensionsRegistry();
 
 const DatasourceContainer = styled.div`
