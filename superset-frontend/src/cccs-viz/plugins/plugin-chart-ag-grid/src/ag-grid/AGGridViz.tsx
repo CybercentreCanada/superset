@@ -62,6 +62,10 @@ const DEFAULT_COL_DEF: ColDef = {
   enableRowGroup: true,
 };
 
+const RETENTION_LIMIT = 100;
+const SUBMISSION_LIMIT = 10;
+const DOWNLOAD_LIMIT = 10;
+
 export interface ThemedCCCSGridVizProps extends ThemedAgGridReactProps {
   includeSearch: boolean;
   pageLength: number;
@@ -86,6 +90,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     assemblyLineUrl,
     enableAlfred,
     enableDownload,
+    emitCrossFilters,
   }) => {
     const theme = useTheme();
 
@@ -128,8 +133,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
       [],
     );
 
-    const [harmonizedEmailIds, setHarmonizedEmailIds] = useState<string[]>();
-    const [fileSHA256s, setFileSHA256s] = useState<string[]>();
+    const [harmonizedEmailIds, setHarmonizedEmailIds] = useState<string[]>([]);
+    const [emlPaths, setEmlPaths] = useState<string[]>([]);
+    const [fileSHA256s, setFileSHA256s] = useState<string[]>([]);
 
     const onCellSelectionChanged = useCallback(
       (e: CellSelectionChangedEvent) => {
@@ -193,90 +199,87 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
           'separator',
         ];
 
-        const result: (DefaultMenuItem | MenuItemDef)[] = [
-          'copy',
-          'copyWithHeaders',
-          'separator',
-          // filter on selection,
-          {
+        if (emitCrossFilters) {
+          contextMenuItems.push('separator');
+          contextMenuItems.push({
             name: 'Filter on selection',
-            action: () => {
-              console.log('filter on selection clicked');
-            },
-          },
-          'separator',
-          // add cross-filter(s),
-          // add principle column cross-filter(s),
-          // remove cross-filter(s),
-          'separator',
-          // {
-          //   name: 'Retain EML record(s) to ALFRED',
-          //   disabled: params.node?.data?.length > RETENTION_LIMIT,
-          //   tooltip:
-          //     params.node?.data?.length > RETENTION_LIMIT
-          //       ? `Cannot retain more than ${RETENTION_LIMIT} unique harmonized email IDs.`
-          //       : undefined,
-          //   action: () => {
-          //     const email_ids =
-          //       params.node?.data?.map((d: any) => d.harmonized_email_id) ?? [];
-          //   },
-          // },
-          {
+            disabled: false,
+            action: () => console.log('filter on selection clicked'),
+          });
+          contextMenuItems.push('separator');
+          contextMenuItems.push({
+            name: 'Add cross-filter(s)',
+            disabled: false,
+            action: () => console.log('Add cross-filter(s) clicked'),
+          });
+          contextMenuItems.push({
+            name: 'Add principle column cross-filter(s)',
+            disabled: false,
+            action: () =>
+              console.log('Add principle column cross-filter(s) clicked'),
+          });
+          contextMenuItems.push({
+            name: 'Remove cross-filters(s)',
+            disabled: false,
+            action: () => console.log('Remove cross-filters(s) clicked'),
+          });
+        }
+
+        if (enableAlfred && harmonizedEmailIds.length > 0) {
+          contextMenuItems.push('separator');
+          contextMenuItems.push({
+            name: 'Retain EML record(s) to ALFRED',
+            disabled: false,
+            action: () => console.log('Retain EML record(s) to ALFRED clicked'),
+          });
+        }
+
+        if (assemblyLineUrl && fileSHA256s.length > 0) {
+          contextMenuItems.push({
             name: 'Open in ASSEMBLYLINE',
             // icon: AssemblyLineLogo,
+            disabled:
+              fileSHA256s.length > 0 && fileSHA256s.length < SUBMISSION_LIMIT,
             action: () => {
-              console.log('hello');
-              // const data =
-              //   params.node?.data?.map((d: any) => d.file_sha256) ?? [];
-              // console.log(
-              //   `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${data.join('+')}\`)`,
-              // );
+              console.log(
+                `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${fileSHA256s.join('+')}\`)`,
+              );
             },
-          },
-          // {
-          //   name: 'Submit file(s) to ASSEMBLYLINE',
-          //   // icon: `<img src="${AssemblyLineLogo}" />`,
-          //   disabled: params.node?.data?.length > SUBMISSION_LIMIT,
-          //   tooltip:
-          //     params.node?.data?.length > SUBMISSION_LIMIT
-          //       ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
-          //       : `A new tab will open for each distinct EML path submission.`,
-          //   action: () => {
-          //     const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
-          //     for (const d of data) {
-          //       console.log(
-          //         `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${d}\`)`,
-          //       );
-          //     }
-          //   },
-          // },
-          // {
-          //   name: 'Download EML file(s)',
-          //   disabled: params.node?.data?.length > DOWNLOAD_LIMIT,
-          //   tooltip:
-          //     params.node?.data?.length > DOWNLOAD_LIMIT
-          //       ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
-          //       : `A download will begin for each distinct EML file.`,
-          //   action: () => {
-          //     const data = params.node?.data?.map((d: any) => d.eml_path) ?? [];
-          //     for (const d of data) {
-          //       console.log(
-          //         `TODO omg this actually does something. "Download" file at /api/v1/fission/get-eml?file=${d}`,
-          //       );
-          //     }
-          //   },
-          // },
-          // 'separator',
-          // {
-          //   name: 'something about jump to dashboard configs here',
-          // },
-          'separator',
-          'export',
-        ];
+          });
+        }
 
-        return result;
+        if (assemblyLineUrl && emlPaths.length > 0) {
+          contextMenuItems.push({
+            name: 'Submit file(s) to Assemblyline',
+            disabled: false,
+            action: () => console.log('Submit to Assemblyline clicked'),
+          });
+        }
+
+        if (enableDownload && emlPaths.length > 0) {
+          contextMenuItems.push({
+            name: 'Download EML file(s)',
+            disabled: false,
+            action: () => console.log('Download EML file(s) clicked'),
+          });
+        }
+
+        // jump action configs
+
+        contextMenuItems.push('separator');
+        contextMenuItems.push('export');
+
+        return contextMenuItems;
       },
-      [],
+      [
+        assemblyLineUrl,
+        emitCrossFilters,
+        emlPaths.length,
+        enableAlfred,
+        enableDownload,
+        fileSHA256s,
+        harmonizedEmailIds.length,
+      ],
     );
 
     LicenseManager.setLicenseKey(agGridLicenseKey);
