@@ -1,6 +1,3 @@
-import AssemblyLineLogo from 'src/cccs-viz/plugins/components/assemblyline-logo.png';
-import AssemblyLineIcon from 'src/cccs-viz/plugins/components/AssemblyLineIcon';
-
 import {
   useMemo,
   memo,
@@ -17,7 +14,6 @@ import {
   ColDef,
   DefaultMenuItem,
   GetContextMenuItemsParams,
-  GetRowIdParams,
   MenuItemDef,
   QuickFilterModule,
   RowSelectionModule,
@@ -48,6 +44,10 @@ import { AgGridReact } from '@superset-ui/core/components/ThemedAgGridReact';
 import { useTheme } from '@superset-ui/core';
 import { PAGE_SIZE_OPTIONS } from '../consts';
 
+import AlfredLogo from 'src/cccs-viz/plugins/components/alfred-logo-black-small.png';
+import AssemblyLineLogo from 'src/cccs-viz/plugins/components/assemblyline-logo.png';
+import EmailLogo from 'src/cccs-viz/plugins/components/email-logo.png';
+
 // Module TODOs:
 //  - Search/find: Make it pretty. Also I broke the CSS and the pagination stuff isn't visible anymore
 //  - Context menu:
@@ -76,6 +76,7 @@ export interface ThemedCCCSGridVizProps extends ThemedAgGridReactProps {
   enableAlfred: boolean;
   enableDownload: boolean;
   emitCrossFilters: boolean;
+  jumpActionConfigs: any[]; // TODO get this actual object type
 }
 
 const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
@@ -91,6 +92,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
     enableAlfred,
     enableDownload,
     emitCrossFilters,
+    jumpActionConfigs,
   }) => {
     const theme = useTheme();
 
@@ -144,6 +146,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
 
           const selectedHarmonizedEmailIds = [];
           const selectedFileSHA256s = [];
+          const selectedEmlPaths = [];
 
           const cellRanges = gridApi.getCellRanges() ?? [];
           for (const range of cellRanges) {
@@ -154,6 +157,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
               );
               const hasFileSHA256s = range.columns.some(
                 col => col.getColDef().advancedDataType === 'file_sha256',
+              );
+              const hasEmlPaths = range.columns.some(
+                col => col.getColDef().advancedDataType === 'eml_path',
               );
 
               const startIdx = Math.min(
@@ -176,6 +182,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
                   if (hasFileSHA256s) {
                     selectedFileSHA256s.push(row.data.file_sha256);
                   }
+                  if (hasEmlPaths) {
+                    selectedEmlPaths.push(row.data.eml_path);
+                  }
                 } else {
                   console.error('Missing row displayed at index ', i);
                 }
@@ -184,6 +193,7 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
           }
           setHarmonizedEmailIds(selectedHarmonizedEmailIds);
           setFileSHA256s(selectedFileSHA256s);
+          setEmlPaths(selectedEmlPaths);
         }
       },
       [],
@@ -225,11 +235,13 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
           });
         }
 
+        contextMenuItems.push('separator');
+
         if (enableAlfred && harmonizedEmailIds.length > 0) {
-          contextMenuItems.push('separator');
           contextMenuItems.push({
             name: 'Retain EML record(s) to ALFRED',
             disabled: false,
+            icon: `<img src="${AlfredLogo}" class="ag-icon ag-icon-copy" />`,
             action: () => console.log('Retain EML record(s) to ALFRED clicked'),
           });
         }
@@ -237,9 +249,9 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
         if (assemblyLineUrl && fileSHA256s.length > 0) {
           contextMenuItems.push({
             name: 'Open in ASSEMBLYLINE',
-            // icon: AssemblyLineLogo,
-            disabled:
-              fileSHA256s.length > 0 && fileSHA256s.length < SUBMISSION_LIMIT,
+            icon: `<img src="${AssemblyLineLogo}" class="ag-icon ag-icon-copy" />`,
+            disabled: fileSHA256s.length > SUBMISSION_LIMIT,
+            tooltip: '',
             action: () => {
               console.log(
                 `Would open URL: window.open(\`https://${assemblyLineUrl}/search/submission?query=${fileSHA256s.join('+')}\`)`,
@@ -250,21 +262,48 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
 
         if (assemblyLineUrl && emlPaths.length > 0) {
           contextMenuItems.push({
-            name: 'Submit file(s) to Assemblyline',
-            disabled: false,
-            action: () => console.log('Submit to Assemblyline clicked'),
+            name: 'Submit file(s) to ASSEMBLYLINE',
+            icon: `<img src="${AssemblyLineLogo}" class="ag-icon ag-icon-copy" />`,
+            disabled: emlPaths.length > SUBMISSION_LIMIT,
+            tooltip:
+              emlPaths.length > SUBMISSION_LIMIT
+                ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
+                : `A new tab will open for each distinct EML path submission.`,
+            action: () => {
+              for (const eml in emlPaths) {
+                const url = `https://${assemblyLineUrl}/submit?input=${encodeURIComponent(eml)}`;
+                window.open(url, '_blank');
+              }
+            },
           });
         }
 
         if (enableDownload && emlPaths.length > 0) {
           contextMenuItems.push({
             name: 'Download EML file(s)',
-            disabled: false,
+            icon: `<img src="${EmailLogo}" class="ag-icon ag-icon-copy" />`,
+            disabled: emlPaths.length > DOWNLOAD_LIMIT,
+            tooltip:
+              emlPaths.length > DOWNLOAD_LIMIT
+                ? `You cannot download more than ${DOWNLOAD_LIMIT} EML files at a time.`
+                : `A download will begin for each distinct EML file.`,
             action: () => console.log('Download EML file(s) clicked'),
           });
         }
 
         // jump action configs
+        if (jumpActionConfigs.length) {
+          const disabled = false; // TODO disable if any selected data contains an ADT... I think?
+
+          contextMenuItems.push({
+            name: 'Jump to dashboard',
+            disabled: false,
+            subMenu: jumpActionConfigs.map(advancedDataTypeNativeFilters => ({
+              name: advancedDataTypeNativeFilters.name,
+              action: () => console.log(advancedDataTypeNativeFilters),
+            })),
+          });
+        }
 
         contextMenuItems.push('separator');
         contextMenuItems.push('export');
@@ -274,11 +313,12 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
       [
         assemblyLineUrl,
         emitCrossFilters,
-        emlPaths.length,
+        emlPaths,
         enableAlfred,
         enableDownload,
         fileSHA256s,
         harmonizedEmailIds.length,
+        jumpActionConfigs,
       ],
     );
 
@@ -309,12 +349,8 @@ const AGGridViz: FunctionComponent<ThemedCCCSGridVizProps> = memo(
             rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
-            // Cell selection - I'm struggling
             cellSelection
             onCellSelectionChanged={onCellSelectionChanged}
-            // Let's try row selection
-            // rowSelection="multiple" // TODO use the new RowSelectionOptions interface
-            // onSelectionChanged={onSelectionChanged}
             cacheQuickFilter
             quickFilterText={quickFilterText}
             pagination={pageLength > 0}

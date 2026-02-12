@@ -320,7 +320,7 @@ function ColumnCollectionTable({
                 }
               />
             )}
-            {isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes) ? (
+            {isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes) && (
               <Field
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
@@ -339,8 +339,6 @@ function ColumnCollectionTable({
                   />
                 }
               />
-            ) : (
-              <></>
             )}
             <Field
               fieldKey="python_date_format"
