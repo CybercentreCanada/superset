@@ -26,10 +26,10 @@ from alfred_client.instance import InstanceUtil
 from alfred_client import RetentionInstance
 from alfred_client.model.retention import DataSetMapper
 from alfred_client.instance.AbstractInstance import AbstractInstance
+from alfred_client.instance.JWTAuthInstance import JWTAuthInstance
 from alfred_client.model.retention.DTOContractData import DataSetEntry
 
 import logging
-import os.path
 from datetime import datetime
 from datetime import timedelta
 from typing import List, Optional, Union
@@ -52,51 +52,6 @@ def validate_json(value: Union[bytes, bytearray, str]) -> None:
     except SupersetException as ex:
         raise ValidationError("JSON not valid") from ex
 
-class TokenOAuthInstance(AbstractInstance):
-    """
-    Alfred Instance with OAuth with on-behalf-of authentication instance only supported from Hogwarts.
-    """
-
-    def __init__(self, url: str, token: str):
-        """
-        Constructor.
-
-        Args:
-            url:
-                The url to alfred service.
-        """
-        super(TokenOAuthInstance, self).__init__(url)
-        self.__access_token: str = token
-        self.__oath_token_expiry: Optional[datetime] = None
-        self.__oath_token: Optional[str] = None
-
-    def _add_header(self):
-        expiry_buffer = timedelta(minutes=30)
-        if (
-            self.__oath_token_expiry is None
-            or self.__oath_token_expiry - datetime.now() < expiry_buffer
-        ):
-            logger.info("Authenticating via hogwarts vault...")
-            api = InstanceUtil.build_scope(self.url)
-            vault_client = VaultClient()
-            alfred_app = vault_client.get_oauth_client("alfred")
-            obo_access_token, obo_ctx_refresh_token = vault_client.on_behalf_of(
-                f"{alfred_app.audience}/{alfred_app.scope}",
-                self.__access_token,
-                token_client_name="superset",
-            )
-
-            refreshed_obo_access_token = vault_client.refresh(obo_ctx_refresh_token)
-            self.__oath_token = refreshed_obo_access_token[0]
-            decoded = jwt.decode(
-                str.encode(self.__oath_token),
-                options={"verify_signature": False, "verify_aud": False},
-            )
-            self.__oath_token_expiry = datetime.fromtimestamp(decoded["exp"])
-
-            logger.info("Authenticated.")
-
-        self.session.headers["Authorization"] = f"Bearer {self.__oath_token}"
 
 def create_retention(
     data_set,
@@ -118,7 +73,7 @@ def create_retention(
     logger = current_app.logger
     logger.info(f"Connecting to Alfred {alfred_instance}...")
     alfred = AlfredService.for_instance(
-        TokenOAuthInstance(InstanceUtil.build_url(alfred_instance), token)
+        JWTAuthInstance(f"{alfred_instance}/rest", token)
     )
     logger.info(
         f"Connected to Alfred {alfred_instance} version {alfred.fetch_version()}."
@@ -142,12 +97,8 @@ def create_retention(
         )
 
     # Return the URL
-    retention_url = (
-        InstanceUtil.build_url(alfred_instance)
-        .replace(":9488", "")
-        .replace("/rest", f"/ui/{retention.uri}")
-    )
-
+    retention_url = f"{alfred_instance}/ui/{retention.uri}"
+    
     return retention_url
 
 def sanitize_results(data, warnings=None, safe_js_ints=False):
@@ -178,10 +129,8 @@ def sanitize_results(data, warnings=None, safe_js_ints=False):
         return data
     return result
 
-def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
+def retain_eml_to_alfred(ids, alfred_url, alfred_token, trino_token, dates=None):
     try:
-        client = VaultClient()
-
         ids_string = ""
         datetimes = []
         if ids:
@@ -197,19 +146,10 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
                 except ValueError as ve:
                     logger.info(ve)
                     continue
-        if alfred_env:
-            logger.info(f'Found Alfred-env: "{alfred_env}" in arguments')
+        if alfred_url:
+            logger.info(f'Found Alfred-url: "{alfred_url}" in arguments')
         else:
-            raise Exception("No field 'alfred_env' found in request")
-
-        logger.info("Generating access token for trino...")
-        trino_app = client.get_oauth_client("trino")
-
-        trino_acces_token, trino_ctx = client.on_behalf_of(
-            f"{trino_app.audience}/{trino_app.scope}",
-            access_token,
-            token_client_name="superset",
-        )
+            raise Exception("No field 'alfred_url' found in request")
 
         trino_host = os.environ.get('TRINO_HOST')
         if not trino_host:
@@ -217,7 +157,7 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             raise Exception('TRINO_HOST environment variable not set')
         logger.info(f"Establishing connection to trino at {trino_host}...")
         conn = connect(
-            auth=JWTAuthentication(trino_acces_token),
+            auth=JWTAuthentication(trino_token),
             http_scheme="https",
             host=trino_host,
             port=443,
@@ -243,7 +183,6 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
             sql += ")"
         logger.info(f"Querying EML Data from trino at {trino_host}...")
         cur = conn.cursor()
-        logger.info(f"Created Connection {cur.query_id}")
         cur.execute(sql)
         logger.info(f"executed query {cur.query_id}")
         columns = list(map(lambda d: d[0], cur.description))
@@ -262,8 +201,8 @@ def retain_eml_to_alfred(ids, alfred_env, access_token, dates=None):
         logger.info("Creating Retention...")
         retention_url = create_retention(
             data_to_map,
-            alfred_env,
-            token=access_token,
+            alfred_url,
+            token=alfred_token,
         )
         logger.info("Completed Retention.")
 
