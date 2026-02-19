@@ -65,7 +65,7 @@ class FissionRestApi(BaseApi):
         token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
             os.environ.get("FISSION_SCOPE"),
-            "superset"
+            "azure"
         )
 
         logger.info("Args is %s", request.args)

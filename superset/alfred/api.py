@@ -97,12 +97,12 @@ class AlfredRestApi(BaseApi):
         alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
             os.environ.get("ALFRED_SCOPE"),
-            "superset"
+            "azure"
         )
         trino_token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
             os.environ.get("TRINO_SCOPE"),
-            "superset"
+            "azure"
         )
         status, result = retain_eml_to_alfred(email_ids, alfred_url, alfred_token, trino_token, dates)
         return self.response(status, result=result)
