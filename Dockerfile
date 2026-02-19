@@ -92,7 +92,7 @@ COPY --chown=superset:superset requirements/base.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/pip \
   apt-get update -qq && apt-get install -yqq --no-install-recommends \
   build-essential \
-  && pip install --upgrade setuptools pip \
+  && pip install --upgrade setuptools==80.10.2 pip \
   && pip install -r requirements/base.txt \
   && apt-get autoremove -yqq --purge build-essential \
   && rm -rf /var/lib/apt/lists/*
