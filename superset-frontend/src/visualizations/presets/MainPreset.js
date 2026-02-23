@@ -97,6 +97,7 @@ export default class MainPreset extends Preset {
       FeatureFlag.ChartPluginsExperimental,
     )
       ? [
+          new GroupByFilterPlugin().configure({ key: 'filter_groupby' }),
           new BigNumberPeriodOverPeriodChartPlugin().configure({
             key: VizType.BigNumberPeriodOverPeriod,
           }),

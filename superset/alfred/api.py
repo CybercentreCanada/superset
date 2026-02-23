@@ -56,11 +56,11 @@ class AlfredRestApi(BaseApi):
 
     @protect()
     @safe
-    @expose("/retain-eml-record", methods=["POST"])
+    @expose("/retain-eml-record", methods=("POST",))
     @permission_name("read")
     @event_logger.log_this_with_context(
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
-        log_to_statsd=False,  # pylint: disable-arguments-renamed
+        log_to_statsd=False,
     )
     def post(self, **kwargs: Any) -> Response:
         """
@@ -89,16 +89,20 @@ class AlfredRestApi(BaseApi):
         if 'dates' in request_payload:
             dates = request_payload['dates']
 
-        alfred_env = os.environ.get("ALFRED_ENV")
-        if not alfred_env:
-            logger.error("ALFRED_ENV environment variable not set")
-            return self.response_400('ALFRED_ENV environment variable not set')
+        alfred_url = os.environ.get("ALFRED_URL")
+        if not alfred_url:
+            logger.error("ALFRED_URL environment variable not set")
+            return self.response_400('ALFRED_URL environment variable not set')
         user = current_user
-        token = security_manager.get_on_behalf_of_access_token_with_cache(
+        alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            os.environ.get("SUPERSET_SCOPE"),
-            "superset",
-            cache_result=True,
+            os.environ.get("ALFRED_SCOPE"),
+            "azure"
         )
-        status, result = retain_eml_to_alfred(email_ids, alfred_env, token, dates)
+        trino_token = security_manager.get_on_behalf_of_access_token_with_cache(
+            user.username,
+            os.environ.get("TRINO_SCOPE"),
+            "azure"
+        )
+        status, result = retain_eml_to_alfred(email_ids, alfred_url, alfred_token, trino_token, dates)
         return self.response(status, result=result)

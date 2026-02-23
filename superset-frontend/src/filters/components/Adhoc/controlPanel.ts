@@ -16,16 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { ControlPanelConfig } from '@superset-ui/chart-controls';
 import { t } from '@superset-ui/core';
-import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
 import { DEFAULT_FORM_DATA } from './types';
 
 const { enableEmptyFilter } = DEFAULT_FORM_DATA;
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
-    // @ts-ignore
-    sections.legacyRegularTime,
     {
       label: t('UI Configuration'),
       expanded: true,

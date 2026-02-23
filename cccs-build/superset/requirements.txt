@@ -9,3 +9,6 @@ mysql-connector-python==9.5.0
 
 # Required for Gunicorn
 gevent==24.2.1
+
+# Metrics
+prometheus-flask-exporter==0.23.2

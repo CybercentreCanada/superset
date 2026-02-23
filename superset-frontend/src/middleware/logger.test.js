@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import sinon from 'sinon';
 import { SupersetClient } from '@superset-ui/core';
-import logger from 'src/middleware/loggerMiddleware';
+import sinon from 'sinon';
 import { LOG_EVENT } from 'src/logger/actions';
 import {
   LOG_ACTIONS_LOAD_CHART,
