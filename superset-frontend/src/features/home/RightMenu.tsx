@@ -652,9 +652,15 @@ const RightMenu = ({
             'default',
           ];
 
-          const tagColor = validAntDesignColors.includes(environmentTag.color)
+          let tagColor = validAntDesignColors.includes(environmentTag.color)
             ? environmentTag.color
             : 'default';
+
+          // Add CCCS colours for funsies
+          const cccsClassiColours = ['u', 'pb'];
+          if (cccsClassiColours.includes(environmentTag.color)) {
+            tagColor = environmentTag.color === 'pb' ? '#1976D2' : '#388E3C';
+          }
 
           return (
             <Tag

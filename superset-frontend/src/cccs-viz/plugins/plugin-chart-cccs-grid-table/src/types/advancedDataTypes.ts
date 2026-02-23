@@ -1,11 +1,14 @@
+import BooleanRenderer from '../renderers/BooleanRenderer';
 import CountryValueRenderer from '../renderers/CountryValueRenderer';
 import DomainValueRenderer from '../renderers/DomainValueRenderer';
+import Ipv4ValueRenderer from '../renderers/Ipv4ValueRenderer';
 import Ipv6ValueRenderer from '../renderers/Ipv6ValueRenderer';
 import JsonValueRenderer from '../renderers/JsonValueRenderer';
 import TimestampValueRenderer from '../renderers/TimestampValueRenderer';
 
 // Key is column advanced type, value is renderer
 export const rendererMap = new Map();
+rendererMap.set('IPV4', Ipv4ValueRenderer);
 rendererMap.set('IPV6', Ipv6ValueRenderer);
 rendererMap.set('DOMAIN', DomainValueRenderer);
 rendererMap.set('COUNTRY', CountryValueRenderer);
@@ -15,6 +18,7 @@ rendererMap.set('DATETIME', TimestampValueRenderer);
 rendererMap.set('TIMESTAMP WITHOUT TIME ZONE', TimestampValueRenderer);
 rendererMap.set('TIMESTAMP WITH TIME ZONE', TimestampValueRenderer);
 rendererMap.set('DATETIMETZ', TimestampValueRenderer);
+rendererMap.set('BOOLEAN', BooleanRenderer);
 
 export const formatIpv4 = (v: any) => {
   if (v.value === null) {

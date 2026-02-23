@@ -55,6 +55,12 @@ def create_app(
         )
         app.config.from_object(config_module)
 
+        export_app_metrics = app.config.get("EXPORT_FLASK_METRICS", False)
+        if export_app_metrics:
+            from prometheus_flask_exporter import PrometheusMetrics
+            metrics = PrometheusMetrics.for_app_factory()
+            metrics.init_app(app)
+
         # Allow application to sit on a non-root path
         # *Please be advised that this feature is in BETA.*
         app_root = cast(

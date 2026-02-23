@@ -17,49 +17,40 @@
  * under the License.
  */
 import { Behavior, ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
-import { CccsTableChartProps, CccsTableFormData } from '../../types';
-import thumbnail from '../images/thumbnail.png';
-import example1 from '../images/Table1.png';
+import { CccsTableChartProps, CccsTableFormData } from './types';
+import thumbnail from './images/thumbnail.png';
+import example1 from './images/Table1.png';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
+
+const metadata = new ChartMetadata({
+  behaviors: [Behavior.InteractiveChart],
+  category: t('Table'),
+  description: t('CCCS Table: An AG Grid control for Hogwarts data.'),
+  name: t('CCCS Table'),
+  exampleGallery: [{ url: example1 }],
+  tags: [
+    t('CCCS'),
+    t('Table'),
+    t('Grid'),
+    t('Popular'),
+    t('Report'),
+    t('Tabular'),
+  ],
+  thumbnail,
+  suppressContextMenu: true,
+});
 
 export default class CccsTableChartPlugin extends ChartPlugin<
   CccsTableFormData,
   CccsTableChartProps
 > {
-  /**
-   * The constructor is used to pass relevant metadata and callbacks that get
-   * registered in respective registries that are used throughout the library
-   * and application. A more thorough description of each property is given in
-   * the respective imported file.
-   *
-   * It is worth noting that `buildQuery` and is optional, and only needed for
-   * advanced visualizations that require either post processing operations
-   * (pivoting, rolling aggregations, sorting etc) or submitting multiple queries.
-   */
   constructor() {
-    const metadata = new ChartMetadata({
-      description: t('CCCS Table: An AG Grid control for Hogwarts data.'),
-      name: t('CCCS Table'),
-      category: t('Table'),
-      tags: [
-        t('CCCS'),
-        t('Table'),
-        t('Grid'),
-        t('Popular'),
-        t('Report'),
-        t('Tabular'),
-      ],
-      exampleGallery: [{ url: example1 }],
-      thumbnail,
-      behaviors: [Behavior.InteractiveChart],
-    });
-
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('../../ag-grid/AGGridViz'),
+      loadChart: () => import('./CccsGridTable'),
       metadata,
       transformProps,
     });

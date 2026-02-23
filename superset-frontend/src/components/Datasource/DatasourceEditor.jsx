@@ -41,6 +41,7 @@ import TableSelector from 'src/components/TableSelector';
 import CheckboxControl from 'src/explore/components/controls/CheckboxControl';
 import TextControl from 'src/explore/components/controls/TextControl';
 import TextAreaControl from 'src/explore/components/controls/TextAreaControl';
+import SelectControl from 'src/explore/components/controls/SelectControl';
 import SpatialControl from 'src/explore/components/controls/SpatialControl';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import CurrencyControl from 'src/explore/components/controls/CurrencyControl';
@@ -325,7 +326,7 @@ function ColumnCollectionTable({
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
                 control={
-                  <Select
+                  <SelectControl
                     ariaLabel={t('Select advanced data type')}
                     name="advanced_data_type"
                     allowClear
@@ -742,6 +743,11 @@ class DatasourceEditor extends PureComponent {
   }
 
   async onQueryRun() {
+    const databaseId = this.state.datasource.database?.id;
+    const { sql } = this.state.datasource;
+    if (!databaseId || !sql) {
+      return;
+    }
     this.props.runQuery({
       client_id: this.props.clientId,
       database_id: this.state.datasource.database.id,

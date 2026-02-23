@@ -71,7 +71,7 @@ import {
   EchartsGanttChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
-  CccsTableChartPlugin,
+  CccsGridTableChartPlugin,
   EmailRendererChartPlugin,
   IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
@@ -97,7 +97,6 @@ export default class MainPreset extends Preset {
       FeatureFlag.ChartPluginsExperimental,
     )
       ? [
-          new GroupByFilterPlugin().configure({ key: 'filter_groupby' }),
           new BigNumberPeriodOverPeriodChartPlugin().configure({
             key: VizType.BigNumberPeriodOverPeriod,
           }),
@@ -116,7 +115,7 @@ export default class MainPreset extends Preset {
         new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
-        new CccsTableChartPlugin().configure({ key: 'cccs_grid' }),
+        new CccsGridTableChartPlugin().configure({ key: 'cccs_grid' }),
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,

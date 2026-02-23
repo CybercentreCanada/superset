@@ -18,7 +18,12 @@
  */
 import { FC, ReactNode } from 'react';
 import { t, css, useTheme, SupersetTheme } from '@superset-ui/core';
-import { FormLabel, InfoTooltip, Tooltip } from '@superset-ui/core/components';
+import {
+  Flex,
+  FormLabel,
+  InfoTooltip,
+  Tooltip,
+} from '@superset-ui/core/components';
 import { Icons } from '@superset-ui/core/components/Icons';
 
 type ValidationError = string;
@@ -121,39 +126,39 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   };
 
   const renderOptionalActionIcons = () => (
-    <span
-      css={() => css`
-        padding-left: ${5 * theme.sizeUnit}px;
-      `}
-    >
+    <div style={{ marginBottom: `${theme.sizeUnit * 0.5}px` }}>
       {canSelectAll && (
         <span>
-          <InfoTooltip
-            label={t('select-all')}
-            tooltip={t('Select All (ctl+a)')}
+          <Tooltip
+            id="select-all-tooltip"
+            title={t('Select All (ctl+a)')}
             placement="top"
-            // icon="arrow-circle-up"
-            onClick={selectAllOnClick}
-          />{' '}
+          >
+            <Icons.UpCircleFilled css={iconStyles} onClick={selectAllOnClick} />
+          </Tooltip>{' '}
         </span>
       )}
       {canCopy && (
         <span>
-          <InfoTooltip
-            label={t('copy')}
-            tooltip={t('Copy the content of this control')}
+          <Tooltip
+            id="copy-tooltip"
+            title={t('Copy the content of this control')}
             placement="top"
-            // icon="copy"
-            onClick={copyOnClick}
-          />{' '}
+          >
+            <Icons.CopyFilled css={iconStyles} onClick={copyOnClick} />
+          </Tooltip>
         </span>
       )}
-    </span>
+    </div>
   );
 
   return (
-    <div className="ControlHeader" data-test={`${name}-header`}>
-      <div className="pull-left">
+    <div
+      className="ControlHeader"
+      data-test={`${name}-header`}
+      style={{ width: '100%' }}
+    >
+      <Flex align="flex-end" justify="space-between">
         <FormLabel
           css={(theme: SupersetTheme) => css`
             margin-bottom: ${theme.sizeUnit * 0.5}px;
@@ -162,7 +167,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           `}
           htmlFor={name}
         >
-          {leftNode && <span>{leftNode} </span>}
+          {leftNode && <span>{leftNode}</span>}
           <span
             role="button"
             tabIndex={0}
@@ -212,12 +217,9 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           )}
           {renderOptionalIcons()}
         </FormLabel>
-      </div>
-      {!rightNode && (
-        <div className="pull-right">{renderOptionalActionIcons()}</div>
-      )}
-      {rightNode && <div className="pull-right">{rightNode}</div>}
-      <div className="clearfix" />
+        {!rightNode && renderOptionalActionIcons()}
+        {rightNode && <div className="pull-right">{rightNode}</div>}
+      </Flex>
     </div>
   );
 };

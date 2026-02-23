@@ -197,6 +197,7 @@ class DashboardRestApi(BaseSupersetModelRestApi):
         "status",
         "slug",
         "url",
+        "json_metadata", # TODO temporary workaround to get jump action configuration working
         "thumbnail_url",
         "certified_by",
         "certification_details",

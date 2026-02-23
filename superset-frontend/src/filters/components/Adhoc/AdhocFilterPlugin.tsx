@@ -28,17 +28,14 @@ import {
   SupersetApiError,
   SupersetClient,
   t,
+  useChangeEffect,
 } from '@superset-ui/core';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useImmerReducer } from 'use-immer';
 import AdhocFilterControl from 'src/explore/components/controls/FilterControl/AdhocFilterControl';
 import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
-// eslint-disable-next-line import/no-unresolved
-import { addDangerToast } from 'src/components/MessageToasts/actions';
-// eslint-disable-next-line import/no-unresolved
 import { cacheWrapper } from 'src/utils/cacheWrapper';
-// eslint-disable-next-line import/no-unresolved
-import { useChangeEffect } from 'src/hooks/useChangeEffect';
+import { useToasts } from 'src/components/MessageToasts/withToasts';
 import { PluginFilterAdhocProps } from './types';
 import { StyledFormItem, FilterPluginStyle, StatusMessage } from '../common';
 import { getDataRecordFormatter, getAdhocExtraFormData } from '../../utils';
@@ -91,6 +88,7 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
     appSection,
     inputRef,
   } = props;
+  const { addDangerToast } = useToasts();
   const { enableEmptyFilter, inverseSelection, defaultToFirstItem } = formData;
   const datasetId = useMemo(
     () => formData.datasource.split('_')[0],

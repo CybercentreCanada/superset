@@ -26,7 +26,7 @@ import {
   removeDuplicates,
 } from '@superset-ui/core';
 import { BuildQuery } from '@superset-ui/core/src/chart/registries/ChartBuildQueryRegistrySingleton';
-import { CccsTableFormData } from '../../types';
+import { CccsTableFormData } from './types';
 
 /**
  * The buildQuery function is used to create an instance of QueryContext that's

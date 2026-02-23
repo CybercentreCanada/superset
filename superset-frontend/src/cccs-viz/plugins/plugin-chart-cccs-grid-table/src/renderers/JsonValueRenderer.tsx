@@ -3,13 +3,13 @@ import { Component } from 'react';
 import { JSONTree } from 'react-json-tree';
 
 import { safeJsonObjectParse } from 'src/cccs-viz/plugins/utils';
-import '../Button.css';
+import './Button.css';
 
 // JSX which shows the JSON tree inline, and a button to collapse it
 function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
   return (
     <span style={{ display: 'flex' }}>
-      <div style={{ float: 'left' }}>
+      <div>
         <button
           className="ag-grid-btn ag-grid-btn-collapse"
           type="button"
@@ -19,7 +19,7 @@ function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
           {' '}
         </button>
       </div>
-      <div style={{ float: 'left' }}>
+      <div style={{ width: '100%' }}>
         <JSONTree
           data={jsonObject}
           theme="default"

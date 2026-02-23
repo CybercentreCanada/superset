@@ -174,10 +174,10 @@ export const DEFAULT_COMMON_BOOTSTRAP_DATA: CommonBootstrapData = {
       color: '',
     },
   },
-  d3_format: DEFAULT_D3_FORMAT,
-  d3_time_format: DEFAULT_D3_TIME_FORMAT,
   datahub_url: '',
   advanced_data_types: [],
+  d3_format: DEFAULT_D3_FORMAT,
+  d3_time_format: DEFAULT_D3_TIME_FORMAT,
 };
 
 export const DEFAULT_BOOTSTRAP_DATA: BootstrapData = {

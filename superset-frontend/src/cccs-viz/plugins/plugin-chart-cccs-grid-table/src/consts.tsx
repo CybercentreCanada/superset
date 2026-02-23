@@ -17,4 +17,10 @@
  * under the License.
  */
 
-export * from './usePrevious';
+export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100, 200];
+
+export const RETENTION_LIMIT = 100;
+export const SUBMISSION_LIMIT = 10;
+export const DOWNLOAD_LIMIT = 10;
+
+export const QUERY_TIMEOUT_LIMIT = 180000; // 3 minutes

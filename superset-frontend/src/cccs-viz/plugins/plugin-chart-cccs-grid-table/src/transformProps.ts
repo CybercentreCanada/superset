@@ -8,10 +8,14 @@ import {
   getNumberFormatter,
 } from '@superset-ui/core';
 
-import { ValueFormatterParams } from 'ag-grid-community';
-import ExpandAllValueRenderer from '../../renderers/ExpandAllValueRenderer';
-import { CccsTableChartProps, CccsTableFormData } from '../../types';
-import { formatterMap, rendererMap } from '../../types/advancedDataTypes';
+import { ColDef, ValueFormatterParams } from 'ag-grid-community';
+import {
+  CccsGridTransformedProps,
+  CccsTableChartProps,
+  CccsTableFormData,
+} from './types';
+import { formatterMap, rendererMap } from './types/advancedDataTypes';
+import ExpandRowButtonRenderer from './renderers/ExpandRowButtonRenderer';
 
 const calcMetricColumnDefs = (
   metrics: any[],
@@ -41,6 +45,26 @@ const calcMetricColumnDefs = (
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
         : metricLabel;
+
+      if (metric.column) {
+        const isDate = metric.column.is_dttm;
+        const columnType = metric.column.type ?? '';
+        const columnTypeGeneric = metric.column.type_generic || -1;
+        const advancedDataType =
+          metric.column.context?.advanced_data_type || '';
+        const cellRenderer =
+          isDate || columnTypeGeneric === GenericDataType.Temporal
+            ? rendererMap.get('DATE')
+            : (rendererMap.get(advancedDataType.toUpperCase()) ??
+              rendererMap.get(columnType));
+
+        return {
+          field: metricLabel,
+          headerName: metricHeader,
+          cellRenderer,
+        };
+      }
+
       return {
         field: metricLabel,
         headerName: metricHeader,
@@ -70,13 +94,14 @@ const calcMetricColumnDefs = (
   return columnDefs;
 };
 
+// TODO a lot of this could be offloaded to the CccsGridTable using Column Types / the default column definition
+// https://www.ag-grid.com/react-data-grid/column-definitions/#column-types
 const calcColumnColumnDefs = (
   columns: QueryFormColumn[],
   defaultGroupBy: string[],
   dataset_columns: Column[],
-  enable_row_numbers = true,
   orderByCols: any,
-) => {
+): ColDef[] => {
   const columnDataMap = dataset_columns.reduce(
     (columnMap, column: Column) => ({
       ...columnMap,
@@ -89,10 +114,10 @@ const calcColumnColumnDefs = (
         description: column.description,
       },
     }),
-    {} as { [index: string]: Partial<Column> },
+    {} as { [index: string]: Column },
   );
 
-  const columnDefs = columns.map((column: any) => {
+  const columnDefs = columns.map((column: any): ColDef => {
     const columnType = columnDataMap[column]?.type || '';
     const isDate = !!columnDataMap[column]?.is_dttm;
     const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
@@ -103,7 +128,11 @@ const calcColumnColumnDefs = (
     const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
     const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
     const sort =
-      sortIndex > -1 ? (orderByColsArray[sortIndex][1] ? 'asc' : 'desc') : null;
+      sortIndex > -1
+        ? orderByColsArray[sortIndex][1]
+          ? 'asc'
+          : 'desc'
+        : undefined;
     const cellRenderer =
       isDate || columnTypeGeneric === GenericDataType.Temporal
         ? rendererMap.get('DATE')
@@ -118,8 +147,6 @@ const calcColumnColumnDefs = (
       ? (params: any) =>
           params.value ? params.colDef.valueFormatter(params.value) : undefined
       : undefined;
-    const isSortable = true;
-    const enableRowGroup = true;
     const columnDescription = columnDataMap[column]?.description || '';
     const autoHeight = columnType === 'JSON';
     const rowGroupIndex = defaultGroupBy.findIndex(
@@ -132,14 +159,11 @@ const calcColumnColumnDefs = (
     return {
       field: column,
       headerName: columnHeader,
-      sortable: isSortable,
-      enableRowGroup,
-      advancedDataType,
       rowGroup,
       hide,
       cellRenderer,
-      rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
-      initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+      rowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
+      initialRowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
       headerTooltip: columnDescription,
       autoHeight,
       maxWidth,
@@ -147,29 +171,21 @@ const calcColumnColumnDefs = (
       useValueFormatterForExport,
       getQuickFilterText,
       sort,
-      sortIndex: sortIndex > -1 ? sortIndex : null,
+      sortIndex: sortIndex > -1 ? sortIndex : undefined,
       type: columnType,
-      isDateColumn: isDate || columnTypeGeneric === GenericDataType.Temporal,
+      context: {
+        isDateColumn: isDate || columnTypeGeneric === GenericDataType.Temporal,
+        advancedDataType,
+      },
     };
   });
-
-  if (enable_row_numbers) {
-    columnDefs.splice(0, 0, {
-      headerName: '#',
-      colId: 'rowNum',
-      pinned: 'left',
-      width: 70,
-      lockVisible: true,
-      enableRowGroup: false,
-      valueGetter: (params: any) =>
-        params.node ? params.node.rowIndex + 1 : null,
-    } as any);
-  }
 
   return columnDefs;
 };
 
-export default function transformProps(chartProps: CccsTableChartProps) {
+const transformProps = (
+  chartProps: CccsTableChartProps,
+): CccsGridTransformedProps => {
   const {
     hooks,
     datasource,
@@ -181,15 +197,15 @@ export default function transformProps(chartProps: CccsTableChartProps) {
   } = chartProps;
 
   const {
-    includeSearch = false,
+    includeSearch,
     pageLength,
-    defaultGroupBy = [],
-    enableRowNumbers = false,
-    enableGrouping = false,
+    defaultGroupBy,
+    enableRowNumbers,
+    enableGrouping,
     enableJsonExpand,
     principalColumns,
-    orderByCols = [],
-    jumpActionConfigs = [],
+    orderByCols,
+    jumpActionConfigs,
   }: CccsTableFormData = formData;
 
   const datasource_metrics = datasource?.metrics as Metric[];
@@ -206,7 +222,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     columns,
     defaultGroupBy,
     datasource?.columns as Column[],
-    enableRowNumbers,
     orderByCols,
   );
   columnDefs = columnDefs.concat(
@@ -225,9 +240,12 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     columnDefs.splice(1, 0, {
       colId: 'jsonExpand',
       pinned: 'left',
-      cellRenderer: ExpandAllValueRenderer,
-      minWidth: 105,
+      cellRenderer: ExpandRowButtonRenderer,
+      resizable: false,
+      width: 100,
       lockVisible: true,
+      suppressHeaderMenuButton: true,
+      suppressHeaderContextMenu: true,
     } as any);
   } else if (enableGrouping) {
     // enable row grouping
@@ -246,10 +264,10 @@ export default function transformProps(chartProps: CccsTableChartProps) {
       };
     });
   }
-  const agGridLicenseKey = queriesData[0].agGridLicenseKey as String;
-  const assemblyLineUrl = queriesData[0].assemblyLineUrl as String;
-  const enableAlfred = queriesData[0].enableAlfred as Boolean;
-  const enableDownload = queriesData[0].enableDownload as Boolean;
+  const agGridLicenseKey = queriesData[0].agGridLicenseKey as string;
+  const assemblyLineUrl = queriesData[0].assemblyLineUrl as string;
+  const enableAlfred = queriesData[0].enableAlfred as boolean;
+  const enableDownload = queriesData[0].enableDownload as boolean;
 
   const parsedJumpActionConfigs = new Map();
   jumpActionConfigs?.forEach((e: any) => {
@@ -268,10 +286,11 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     width,
     height,
     formData: chartProps.formData,
-    rowData: data,
-    columnDefs,
+    data,
+    columns: columnDefs,
     includeSearch,
     pageLength,
+    enableRowNumbers,
     enableGrouping,
     principalColumns,
     agGridLicenseKey,
@@ -282,4 +301,6 @@ export default function transformProps(chartProps: CccsTableChartProps) {
     emitCrossFilters,
     jumpActionConfigs,
   };
-}
+};
+
+export default transformProps;

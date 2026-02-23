@@ -12,20 +12,23 @@ import {
   formatSelectOptions,
   QueryModeLabel,
   sharedControls,
+  sections,
 } from '@superset-ui/chart-controls';
 import {
   ensureIsArray,
   legacyValidateInteger,
   QueryFormColumn,
   QueryMode,
+  isFeatureEnabled,
+  FeatureFlag,
   t,
 } from '@superset-ui/core';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
-import DrillActionConfig from '../../ag-grid/JumpActionConfigControl';
+import DrillActionConfig from './JumpActionConfigControl';
 
 export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
-  [0, t('page_size.all')],
+  [0, t('All')],
   10,
   20,
   50,
@@ -245,18 +248,13 @@ const config: ControlPanelConfig = {
           {
             name: 'order_by_cols',
             config: {
-              type: 'SelectControl',
-              label: t('Ordering'),
-              description: t('Order results by selected columns'),
-              multi: true,
-              default: [],
+              ...sharedControls.order_by_cols,
               mapStateToProps: ({ datasource }) => ({
                 choices: datasource?.hasOwnProperty('order_by_choices')
                   ? (datasource as Dataset)?.order_by_choices
                   : datasource?.columns || [],
               }),
               visibility: isRawMode,
-              resetOnHide: false,
             },
           },
         ],
@@ -276,12 +274,9 @@ const config: ControlPanelConfig = {
               canSelectAll: true,
               allowSelectAll: false,
               optionRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
               ),
-              // eslint-disable-next-line react/react-in-jsx-scope
               valueRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption column={c} />
               ),
               valueKey: 'column_name',
@@ -385,12 +380,9 @@ const config: ControlPanelConfig = {
               canSelectAll: true,
               renderTrigger: true,
               optionRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption showType column={c} />
               ),
-              // eslint-disable-next-line react/react-in-jsx-scope
               valueRenderer: (c: ColumnMeta) => (
-                // eslint-disable-next-line react/react-in-jsx-scope
                 <StyledColumnOption column={c} />
               ),
               valueKey: 'column_name',
@@ -487,6 +479,18 @@ const config: ControlPanelConfig = {
           },
         ],
       ],
+    },
+    // TODO this section is a duct-tape fix for a bug where going back on a fresh chart will be missing a bunch of form controls, causing an app crash.
+    // Hopefully we can just remove this in v7?
+    {
+      ...sections.timeComparisonControls({
+        multi: false,
+        showCalculationType: false,
+        showFullChoices: false,
+      }),
+      visibility: ({ controls }) =>
+        isAggMode({ controls }) &&
+        isFeatureEnabled(FeatureFlag.TableV2TimeComparisonEnabled),
     },
   ],
 };

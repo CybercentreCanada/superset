@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import dayjs from 'dayjs';
+import { extendedDayjs } from '@superset-ui/core/utils/dates';
 
 /**
  * Defines a list of hardcoded formats when the column definition has a matching field
@@ -12,23 +12,24 @@ const HARDCODED_FORMATS = new Map<string, string>([
   ['week', 'W'],
 ]);
 
+// show all dates in UTC
 const TimestampValueRenderer: React.FC<{
   [index: string]: any;
 }> = memo(data => {
-  const date = dayjs.utc(data.value); // show all dates in UTC
+  const date = extendedDayjs(data.value);
 
   if (!date.isValid()) {
     return <>{data.value}</>;
   }
 
-  const timezone = date.format('z');
-
   return (
     <>
-      {date.format(
-        HARDCODED_FORMATS.get(data.colDef?.field?.toLowerCase()) ??
-          'YYYY-MM-DD HH:mm:ss.SSS',
-      ) + (timezone ? ` ${timezone}` : '')}
+      {date
+        .utc()
+        .format(
+          HARDCODED_FORMATS.get(data.colDef?.field?.toLowerCase()) ??
+            'YYYY-MM-DD HH:mm:ss.SSS [UTC]',
+        )}
     </>
   );
 });

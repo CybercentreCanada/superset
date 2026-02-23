@@ -344,7 +344,6 @@ const config = {
       stream: require.resolve('stream-browserify'),
       ...(isDevMode ? { buffer: require.resolve('buffer/') } : {}), // Fix legacy-plugin-chart-paired-t-test broken Story
     },
-    fullySpecified: false
   },
   context: APP_DIR, // to automatically find tsconfig.json
   module: {
@@ -413,12 +412,6 @@ const config = {
         test: /\.js$/,
         include: /node_modules\/react-dom/,
         use: ['react-hot-loader/webpack'],
-      },
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
       },
       {
         test: /\.css$/,

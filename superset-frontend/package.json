@@ -114,6 +114,7 @@
     "@superset-ui/switchboard": "file:./packages/superset-ui-switchboard",
     "@types/d3-format": "^3.0.1",
     "@types/d3-time-format": "^4.0.3",
+    "@types/file-saver": "^2.0.7",
     "@types/react-google-recaptcha": "^2.1.9",
     "@visx/axis": "^3.8.0",
     "@visx/grid": "^3.5.0",

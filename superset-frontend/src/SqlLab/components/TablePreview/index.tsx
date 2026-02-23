@@ -28,10 +28,10 @@ import {
   useTheme,
 } from '@superset-ui/core';
 import {
-  SafeMarkdown,
+  // SafeMarkdown,
   Alert,
   Breadcrumb,
-  Card,
+  // Card,
   Skeleton,
   Flex,
 } from '@superset-ui/core/components';
@@ -42,7 +42,7 @@ import { CopyToClipboard, FilterableTable } from 'src/components';
 import Tabs from '@superset-ui/core/components/Tabs';
 import {
   tableApiUtil,
-  TableMetaData,
+  // TableMetaData,
   useTableExtendedMetadataQuery,
   useTableMetadataQuery,
 } from 'src/hooks/apiResources';
@@ -84,38 +84,39 @@ const Title = styled.div`
     padding-left: ${theme.sizeUnit * 4}px;
   `}
 `;
-const renderWell = (partitions: TableMetaData['partitions']) => {
-  if (!partitions) {
-    return null;
-  }
-  const { partitionQuery } = partitions;
-  let partitionClipBoard;
-  if (partitionQuery) {
-    const tt = t('Copy partition query to clipboard');
-    partitionClipBoard = (
-      <CopyToClipboard
-        text={partitionQuery}
-        shouldShowText={false}
-        tooltipText={tt}
-        copyNode={<Icons.CopyOutlined iconSize="s" />}
-      />
-    );
-  }
-  const latest = Object.entries(partitions.latest || [])
-    .map(([key, value]) => `${key}=${value}`)
-    .join('/');
+// TODO Commented out to fix CCCS build
+// const renderWell = (partitions: TableMetaData['partitions']) => {
+//   if (!partitions) {
+//     return null;
+//   }
+//   const { partitionQuery } = partitions;
+//   let partitionClipBoard;
+//   if (partitionQuery) {
+//     const tt = t('Copy partition query to clipboard');
+//     partitionClipBoard = (
+//       <CopyToClipboard
+//         text={partitionQuery}
+//         shouldShowText={false}
+//         tooltipText={tt}
+//         copyNode={<Icons.CopyOutlined iconSize="s" />}
+//       />
+//     );
+//   }
+//   const latest = Object.entries(partitions.latest || [])
+//     .map(([key, value]) => `${key}=${value}`)
+//     .join('/');
 
-  return (
-    <Card size="small">
-      <div>
-        <small>
-          {t('latest partition:')} {latest}
-        </small>{' '}
-        {partitionClipBoard}
-      </div>
-    </Card>
-  );
-};
+//   return (
+//     <Card size="small">
+//       <div>
+//         <small>
+//           {t('latest partition:')} {latest}
+//         </small>{' '}
+//         {partitionClipBoard}
+//       </div>
+//     </Card>
+//   );
+// };
 
 const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
   const dispatch = useDispatch();
@@ -157,7 +158,8 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         schema: schema ?? '',
         table: tableName ?? '',
       },
-      { skip: !dbId || !schema || !tableName },
+      // { skip: !dbId || !schema || !tableName },
+      { skip: true }, // TODO hack to true because this breaks a lot for CCCS stuff
     );
   const data = useMemo(
     () =>
@@ -185,6 +187,8 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
     dataPreviewQueryId: previewQueryId,
     ...tableMetadata,
     ...tableExtendedMetadata,
+    // TODO hack to fix the SELECT * statements
+    selectStar: `SELECT * FROM ${tableMetadata?.name} LIMIT 100;`,
   };
   const refreshTableMetadata = () => {
     dispatch(
@@ -334,8 +338,9 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         <Skeleton active />
       ) : (
         <>
-          {tableData.comment && <SafeMarkdown source={tableData.comment} />}
-          {renderWell(tableData.partitions)}
+          {/* TODO These two elements are hella buggy */}
+          {/* {tableData.comment && <SafeMarkdown source={tableData.comment} />} */}
+          {/* {renderWell(tableData.partitions)} */}
           <div
             css={css`
               flex: 1 1 auto;

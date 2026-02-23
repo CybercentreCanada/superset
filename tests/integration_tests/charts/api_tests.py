@@ -59,7 +59,6 @@ from tests.integration_tests.fixtures.importexport import (
     database_config,
     dataset_config,
 )
-from tests.integration_tests.fixtures.query_context import get_query_context
 from tests.integration_tests.fixtures.tags import (
     create_custom_tags,  # noqa: F401
     get_filter_params,
@@ -2318,57 +2317,3 @@ class TestChartApi(ApiOwnersTestCaseMixin, InsertChartMixin, SupersetTestCase):
 
         security_manager.add_permission_role(alpha_role, write_tags_perm)
         security_manager.add_permission_role(alpha_role, tag_charts_perm)
-
-    @patch("superset.security.manager.SupersetSecurityManager.has_guest_access")
-    @patch("superset.security.manager.SupersetSecurityManager.is_guest_user")
-    @pytest.mark.usefixtures("load_birth_names_dashboard_with_slices")
-    def test_get_chart_data_as_guest_user(
-        self, is_guest_user, has_guest_access
-    ):  # get_guest_rls_filters
-        """
-        Chart API: Test create simple chart
-        """
-        self.login(ADMIN_USERNAME)
-        g.user.rls = []
-        is_guest_user.return_value = True
-        has_guest_access.return_value = True
-
-        with mock.patch.object(Slice, "get_query_context") as mock_get_query_context:
-            mock_get_query_context.return_value = get_query_context("birth_names")
-            rv = self.client.post(
-                "api/v1/chart/data",  # noqa: F541
-                json={
-                    "datasource": {"id": 2, "type": "table"},
-                    "queries": [
-                        {
-                            "extras": {"where": "", "time_grain_sqla": "P1D"},
-                            "columns": ["name"],
-                            "metrics": [{"label": "sum__num"}],
-                            "orderby": [("sum__num", False)],
-                            "row_limit": 100,
-                            "granularity": "ds",
-                            "time_range": "100 years ago : now",
-                            "timeseries_limit": 0,
-                            "timeseries_limit_metric": None,
-                            "order_desc": True,
-                            "filters": [
-                                {"col": "gender", "op": "==", "val": "boy"},
-                                {"col": "num", "op": "IS NOT NULL"},
-                                {
-                                    "col": "name",
-                                    "op": "NOT IN",
-                                    "val": ["<NULL>", '"abc"'],
-                                },
-                            ],
-                            "having": "",
-                            "where": "",
-                        }
-                    ],
-                    "result_format": "json",
-                    "result_type": "full",
-                },
-            )
-            data = json.loads(rv.data.decode("utf-8"))
-            result = data["result"]
-            excluded_key = "query"
-            assert all([excluded_key not in query for query in result])

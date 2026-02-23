@@ -147,6 +147,9 @@ import {
   CompressOutlined,
   HistoryOutlined,
   SlackOutlined,
+  WindowsFilled,
+  UpCircleFilled,
+  CopyFilled,
 } from '@ant-design/icons';
 import { FC } from 'react';
 import { IconType } from './types';
@@ -189,6 +192,7 @@ const AntdIcons = {
   ColumnWidthOutlined,
   CommentOutlined,
   ConsoleSqlOutlined,
+  CopyFilled,
   CopyOutlined,
   DashboardOutlined,
   DatabaseOutlined,
@@ -261,6 +265,7 @@ const AntdIcons = {
   LockOutlined,
   UploadOutlined,
   UnlockOutlined,
+  UpCircleFilled,
   UpOutlined,
   UserAddOutlined,
   UsergroupAddOutlined,
@@ -269,6 +274,7 @@ const AntdIcons = {
   VerticalAlignTopOutlined,
   VerticalLeftOutlined,
   VerticalRightOutlined,
+  WindowsFilled,
   NumberOutlined,
   ThunderboltOutlined,
   FilterOutlined,

@@ -39,7 +39,7 @@ const useDashboardState = () => {
           .map((e: any) => ({ value: e.id, label: e.dashboard_title }));
         setDashboardList(dashboards);
       })
-      .catch(error => {});
+      .catch(error => console.error(error));
   }, []);
 
   const fetchFilterList = useCallback((dashboardId: number) => {
@@ -57,7 +57,7 @@ const useDashboardState = () => {
           })),
         );
       })
-      .catch(error => {});
+      .catch(error => console.error(error));
   }, []);
 
   return {

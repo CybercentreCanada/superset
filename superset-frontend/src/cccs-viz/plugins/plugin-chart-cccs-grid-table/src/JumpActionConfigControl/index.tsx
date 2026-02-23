@@ -23,6 +23,7 @@ import CustomListItem from 'src/explore/components/controls/CustomListItem';
 import { t, withTheme } from '@superset-ui/core';
 import { AsyncEsmComponent } from '@superset-ui/core/components';
 import { List } from '@superset-ui/core/components/List';
+import { Icons } from '@superset-ui/core/components/Icons';
 import ControlPopover from 'src/explore/components/controls/ControlPopover/ControlPopover';
 import { connect } from 'react-redux';
 import {
@@ -147,16 +148,11 @@ const DrillActionConfigControl: React.FC<Props> = ({
         },
       })}
       content={renderPopover(i, anno)}
-      visible={visiblePopoverIndex === i}
-      onVisibleChange={visible => handleVisibleChange(visible, i)}
+      open={visiblePopoverIndex === i}
+      onOpenChange={visible => handleVisibleChange(visible, i)}
     >
-      <CustomListItem selectable style={{ fontSize: 12 }}>
-        <i
-          onClick={() => removeDrillActionConfig(anno)}
-          data-test="add-annotation-layer-button"
-          className="fa fa-times"
-        />{' '}
-        &nbsp; {anno.name}
+      <CustomListItem selectable onClick={() => removeDrillActionConfig(anno)}>
+        <Icons.DeleteFilled /> {anno.name}
       </CustomListItem>
     </ControlPopover>
   ));
@@ -174,18 +170,15 @@ const DrillActionConfigControl: React.FC<Props> = ({
             trigger="click"
             content={renderPopover(addLayerPopoverKey, addedDrillActionConfig)}
             title={t('Add jump action')}
-            visible={visiblePopoverIndex === addLayerPopoverKey}
-            destroyTooltipOnHide
-            onVisibleChange={visible =>
+            open={visiblePopoverIndex === addLayerPopoverKey}
+            destroyOnHidden
+            onOpenChange={visible =>
               handleVisibleChange(visible, addLayerPopoverKey)
             }
           >
-            <CustomListItem selectable style={{ fontSize: 12 }}>
-              <i
-                data-test="add-annotation-layer-button"
-                className="fa fa-plus"
-              />{' '}
-              &nbsp; {t('Add jump action')}
+            <CustomListItem selectable>
+              <Icons.PlusOutlined data-test="add-annotation-layer-button" />
+              {t('Add jump action')}
             </CustomListItem>
           </ControlPopover>
         </List>

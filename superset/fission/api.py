@@ -31,6 +31,7 @@ from superset.advanced_data_type.schemas import (
 )
 from superset.constants import RouteMethod
 from superset.extensions import event_logger, security_manager
+from superset.views.base_api import BaseSupersetApi
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ config = app.config
 API_HOST = os.environ.get("FISSION_PROXY_URL")
 
 
-class FissionRestApi(BaseApi):
+class FissionRestApi(BaseSupersetApi):
     """
     Fission rest endpoint to proxy hogwarts fission
     """
@@ -53,7 +54,7 @@ class FissionRestApi(BaseApi):
 
     @protect()
     @safe
-    @expose("/<path>", methods=["GET"])
+    @expose("/<string:path>", methods=("GET",))
     @permission_name("read")
     @event_logger.log_this_with_context(
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.get",
