@@ -199,7 +199,6 @@ const transformProps = (
   const {
     includeSearch,
     pageLength,
-    defaultGroupBy,
     enableRowNumbers,
     enableGrouping,
     enableJsonExpand,
@@ -217,6 +216,8 @@ const transformProps = (
       : formData.groupby || [];
 
   const { metrics, percentMetrics } = formData;
+
+  const defaultGroupBy = formData.defaultGroupBy ?? [];
 
   let columnDefs = calcColumnColumnDefs(
     columns,
@@ -251,15 +252,15 @@ const transformProps = (
     // enable row grouping
     columnDefs = columnDefs.map(c => {
       const rowGroupIndex = defaultGroupBy.findIndex(
-        (element: any) => element === c.field,
+        (element: string) => element === c.field,
       );
       const rowGroup = rowGroupIndex >= 0;
       const hide = rowGroup;
       return {
         ...c,
         rowGroup,
-        rowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
-        initialRowGroupIndex: rowGroupIndex === -1 ? null : rowGroupIndex,
+        rowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
+        initialRowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
         hide,
       };
     });

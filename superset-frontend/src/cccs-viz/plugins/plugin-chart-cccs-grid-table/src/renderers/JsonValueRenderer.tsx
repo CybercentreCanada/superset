@@ -9,23 +9,21 @@ import './Button.css';
 function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
   return (
     <span style={{ display: 'flex' }}>
-      <div>
-        <button
-          className="ag-grid-btn ag-grid-btn-collapse"
-          type="button"
-          title="Collapse"
+      <span className="ag-group-contracted">
+        <span
+          className="ag-icon ag-icon-tree-open"
+          role="presentation"
+          unselectable="on"
           onClick={toggleExpand}
-        >
-          {' '}
-        </button>
-      </div>
-      <div style={{ width: '100%' }}>
+        />
+      </span>
+      <span style={{ width: '100%' }}>
         <JSONTree
           data={jsonObject}
           theme="default"
           shouldExpandNodeInitially={() => true}
         />
-      </div>
+      </span>
     </span>
   );
 }
@@ -33,17 +31,16 @@ function collapseJSON(this: any, toggleExpand: any, jsonObject: any) {
 // JSX which shows the JSON data on one line, and a button to open the JSON tree
 function expandJSON(this: any, toggleExpand: any, cellData: any) {
   return (
-    <>
-      <button
-        className="ag-grid-btn ag-grid-btn-expand"
-        type="button"
-        title="Expand"
+    <span className="ag-group-expanded">
+      <span
+        className="ag-icon ag-icon-tree-closed"
+        style={{ display: 'inline-block' }}
+        role="presentation"
+        unselectable="on"
         onClick={toggleExpand}
-      >
-        {' '}
-      </button>
-      {cellData}
-    </>
+      />
+      <span style={{ width: '100%' }}>{cellData}</span>
+    </span>
   );
 }
 

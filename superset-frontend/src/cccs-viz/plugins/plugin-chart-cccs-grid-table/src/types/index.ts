@@ -28,6 +28,7 @@ import { ColDef } from 'ag-grid-community';
 export type CccsTableFormData = QueryFormData & {
   includeSearch: boolean;
   pageLength: number;
+  defaultGroupBy?: string[];
   enableRowNumbers: boolean;
   enableGrouping: boolean;
   enableJsonExpand: boolean;
