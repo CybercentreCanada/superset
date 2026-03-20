@@ -357,7 +357,7 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               default: false,
               description: t(
-                'Whether to enable row grouping (this will only take affect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
+                'Whether to enable row grouping (this will only take effect after a save). NOTE: "JSON Row Expand" and "Row Grouping" are mutually exclusive. If "Row Grouping" is selected, "JSON Row Expand" will not be visible.',
               ),
               visibility: ({ controls }) =>
                 Boolean(!controls?.enable_json_expand?.value),
@@ -480,8 +480,6 @@ const config: ControlPanelConfig = {
         ],
       ],
     },
-    // TODO this section is a duct-tape fix for a bug where going back on a fresh chart will be missing a bunch of form controls, causing an app crash.
-    // Hopefully we can just remove this in v7?
     {
       ...sections.timeComparisonControls({
         multi: false,

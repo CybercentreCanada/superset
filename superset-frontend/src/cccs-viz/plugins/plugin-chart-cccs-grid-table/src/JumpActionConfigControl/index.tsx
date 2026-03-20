@@ -140,13 +140,6 @@ const DrillActionConfigControl: React.FC<Props> = ({
       key={i}
       trigger="click"
       title={t('Edit jump action')}
-      css={theme => ({
-        '&:hover': {
-          cursor: 'pointer',
-          // backgroundColor: theme.colors.grayscale.light4,
-          backgroundColor: theme.colorBgContainer, // TODO check this
-        },
-      })}
       content={renderPopover(i, anno)}
       open={visiblePopoverIndex === i}
       onOpenChange={visible => handleVisibleChange(visible, i)}

@@ -94,8 +94,6 @@ const calcMetricColumnDefs = (
   return columnDefs;
 };
 
-// TODO a lot of this could be offloaded to the CccsGridTable using Column Types / the default column definition
-// https://www.ag-grid.com/react-data-grid/column-definitions/#column-types
 const calcColumnColumnDefs = (
   columns: QueryFormColumn[],
   defaultGroupBy: string[],

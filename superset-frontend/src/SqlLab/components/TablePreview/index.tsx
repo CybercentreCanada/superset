@@ -84,7 +84,7 @@ const Title = styled.div`
     padding-left: ${theme.sizeUnit * 4}px;
   `}
 `;
-// TODO Commented out to fix CCCS build
+// TODO Commented out to fix CCCS build - see https://cccs.atlassian.net/browse/CLDN-2699
 // const renderWell = (partitions: TableMetaData['partitions']) => {
 //   if (!partitions) {
 //     return null;
@@ -159,7 +159,8 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         table: tableName ?? '',
       },
       // { skip: !dbId || !schema || !tableName },
-      { skip: true }, // TODO hack to true because this breaks a lot for CCCS stuff
+      // TODO hack to true because this breaks a lot for CCCS stuff - see https://cccs.atlassian.net/browse/CLDN-2699
+      { skip: true },
     );
   const data = useMemo(
     () =>
@@ -187,7 +188,7 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
     dataPreviewQueryId: previewQueryId,
     ...tableMetadata,
     ...tableExtendedMetadata,
-    // TODO hack to fix the SELECT * statements
+    // hack to fix the SELECT * statements
     selectStar: `SELECT * FROM ${tableMetadata?.name} LIMIT 100;`,
   };
   const refreshTableMetadata = () => {
@@ -338,7 +339,7 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         <Skeleton active />
       ) : (
         <>
-          {/* TODO These two elements are hella buggy */}
+          {/* TODO These two elements will crash the app sometimes - see https://cccs.atlassian.net/browse/CLDN-2699 */}
           {/* {tableData.comment && <SafeMarkdown source={tableData.comment} />} */}
           {/* {renderWell(tableData.partitions)} */}
           <div

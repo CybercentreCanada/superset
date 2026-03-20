@@ -15,7 +15,6 @@ import {
   ColDef,
   DefaultMenuItem,
   GetContextMenuItemsParams,
-  GridStateModule,
   MenuItemDef,
   QuickFilterModule,
   RowSelectionModule,
@@ -32,9 +31,6 @@ import {
   RowGroupingModule,
   RowGroupingPanelModule,
   RowNumbersModule,
-  GroupFilterModule,
-  PivotModule,
-  TreeDataModule,
 } from 'ag-grid-enterprise';
 import { Icons, Input, ThemedAgGridReact } from '@superset-ui/core/components';
 
@@ -56,6 +52,7 @@ import rison from 'rison';
 import { RootState } from 'src/dashboard/types';
 import AssemblyLineLogo from './images/assemblyline-logo.png';
 import AlfredLogo from './images/alfred-logo-black-small.png';
+import EmailLogo from './images/email-logo.png';
 import {
   DOWNLOAD_LIMIT,
   PAGE_SIZE_OPTIONS,
@@ -288,7 +285,6 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                       colDef.type ??
                       'NoType';
                     const value = row.data[field];
-                    // TODO this whole thing could be better
                     const unnested = ensureIsArray(unnestValue(value));
                     const formattedValue: any[] =
                       typeof value === 'string' && unnested?.length
@@ -527,7 +523,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                 ? `You cannot submit more than ${SUBMISSION_LIMIT} EML files at a time.`
                 : `A new tab will open for each distinct EML path submission.`,
             action: () => {
-              // TODO I preserved the original code's "functionality" here but it was bugged anyway,
+              // I preserved the original code's "functionality" here but it was bugged anyway,
               // you can only open one browser window per user interaction...
               // Probably not a huge problem since no one's complained about it.
               for (const eml of selectedData.typeData.eml_path) {
@@ -545,7 +541,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
         ) {
           contextMenuItems.push({
             name: 'Download EML file(s)',
-            icon: '✉️',
+            icon: `<img src="${EmailLogo}" class="ag-icon" />`,
             disabled: selectedData.typeData.eml_path.size > DOWNLOAD_LIMIT,
             tooltip:
               selectedData.typeData.eml_path.size > DOWNLOAD_LIMIT
@@ -740,20 +736,15 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
             getContextMenuItems={getContextMenuItems}
             modules={[
               ClientSideRowModelModule,
-              GridStateModule,
+              ColumnMenuModule,
               RowNumbersModule,
               CellSelectionModule,
               RowSelectionModule,
               RichSelectModule,
-              ColumnMenuModule,
               QuickFilterModule,
               // row grouping modules
-              // TODO revisit if TreeData/Pivot/GroupFilter still needed
               RowGroupingModule,
               RowGroupingPanelModule,
-              TreeDataModule,
-              PivotModule,
-              GroupFilterModule,
               // context menu modules
               ClipboardModule,
               ContextMenuModule,

@@ -27,7 +27,7 @@ import transformProps from './transformProps';
 const metadata = new ChartMetadata({
   behaviors: [Behavior.InteractiveChart],
   category: t('Table'),
-  description: t('CCCS Table: An AG Grid control for Hogwarts data.'),
+  description: t('CCCS Table: An AG Grid control for Aurora data.'),
   name: t('CCCS Table'),
   exampleGallery: [{ url: example1 }],
   tags: [

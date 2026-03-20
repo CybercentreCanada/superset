@@ -160,7 +160,7 @@ const JSONViewVisualization: React.FC<PrettyPrintVisualizationProps> = ({
                 .join('.')
                 .toLowerCase();
 
-              const valueAsString = (value ?? '').toString().toLowerCase(); // TODO this feels wrong
+              const valueAsString = (value ?? '').toString().toLowerCase();
 
               if (
                 !path.includes(searchValue.toLowerCase()) &&
