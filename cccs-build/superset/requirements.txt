@@ -1,5 +1,5 @@
 # Required for OAuth
-authlib==1.6.6
+authlib==1.6.9
 
 # Required for our custom logger
 python-json-logger==4.0.0
