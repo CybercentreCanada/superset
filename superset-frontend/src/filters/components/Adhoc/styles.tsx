@@ -32,27 +32,27 @@ export const AdhocControlContainer = styled.div<{
     }
 
     &:hover{
-      transition-duration: ${({ theme }) => theme.transitionTiming}s;
+      transition-duration: ${({ theme }) => theme.motionDurationMid}s;
       transition-property: border-color, box-shadow;
       transition-timing-function: ease-in-out;
       border: ${({ theme, validateStatus }) =>
         `1px solid ${
           validateStatus
-            ? theme.colors[validateStatus]?.base
-            : theme.colors.primary.base
+            ? (validateStatus === 'error' ? theme.colorError : validateStatus === 'warning' ? theme.colorWarning : theme.colorInfo)
+            : theme.colorPrimary
         }`} !important;
       border-radius: ${({ theme }) => theme.borderRadius}px;
     }
 
     &:focus{
-      transition-duration: ${({ theme }) => theme.transitionTiming}s;
+      transition-duration: ${({ theme }) => theme.motionDurationMid}s;
       transition-property: border-color, box-shadow;
       transition-timing-function: ease-in-out;
       border: ${({ theme, validateStatus }) =>
         `1px solid ${
           validateStatus
-            ? theme.colors[validateStatus]?.base
-            : theme.colors.primary.base
+            ? (validateStatus === 'error' ? theme.colorError : validateStatus === 'warning' ? theme.colorWarning : theme.colorInfo)
+            : theme.colorPrimary
         }`} !important;
       border-radius: ${({ theme }) => theme.borderRadius}px;
       box-shadow: 0 0 0 2px

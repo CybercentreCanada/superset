@@ -20,13 +20,18 @@ import URI from 'urijs';
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
 
-import * as chartlib from '@superset-ui/core';
-import { FeatureFlag, SupersetClient } from '@superset-ui/core';
+import {
+  FeatureFlag,
+  SupersetClient,
+  getChartMetadataRegistry,
+  getChartBuildQueryRegistry,
+} from '@superset-ui/core';
 import { LOG_EVENT } from 'src/logger/actions';
 import * as exploreUtils from 'src/explore/exploreUtils';
 import * as actions from 'src/components/Chart/chartAction';
 import * as asyncEvent from 'src/middleware/asyncEvent';
 import { handleChartDataResponse } from 'src/components/Chart/chartAction';
+import * as dataMaskActions from 'src/dataMask/actions';
 
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -49,13 +54,18 @@ const mockGetState = () => ({
   },
 });
 
+jest.mock('@superset-ui/core', () => ({
+  ...jest.requireActual('@superset-ui/core'),
+  getChartMetadataRegistry: jest.fn(),
+  getChartBuildQueryRegistry: jest.fn(),
+}));
+
 describe('chart actions', () => {
   const MOCK_URL = '/mockURL';
   let dispatch;
   let getExploreUrlStub;
   let getChartDataUriStub;
-  let metadataRegistryStub;
-  let buildQueryRegistryStub;
+  let buildV1ChartDataPayloadStub;
   let waitForAsyncDataStub;
   let fakeMetadata;
 
@@ -67,7 +77,7 @@ describe('chart actions', () => {
     setupDefaultFetchMock();
   });
 
-  afterAll(fetchMock.restore);
+  afterAll(() => fetchMock.restore());
 
   beforeEach(() => {
     dispatch = sinon.spy();
@@ -77,30 +87,97 @@ describe('chart actions', () => {
     getChartDataUriStub = sinon
       .stub(exploreUtils, 'getChartDataUri')
       .callsFake(({ qs }) => URI(MOCK_URL).query(qs));
+    buildV1ChartDataPayloadStub = sinon
+      .stub(exploreUtils, 'buildV1ChartDataPayload')
+      .resolves({
+        some_param: 'fake query!',
+        result_type: 'full',
+        result_format: 'json',
+      });
     fakeMetadata = { useLegacyApi: true };
-    metadataRegistryStub = sinon
-      .stub(chartlib, 'getChartMetadataRegistry')
-      .callsFake(() => ({ get: () => fakeMetadata }));
-    buildQueryRegistryStub = sinon
-      .stub(chartlib, 'getChartBuildQueryRegistry')
-      .callsFake(() => ({
-        get: () => () => ({
-          some_param: 'fake query!',
-          result_type: 'full',
-          result_format: 'json',
-        }),
-      }));
+    getChartMetadataRegistry.mockImplementation(() => ({
+      get: () => fakeMetadata,
+    }));
+    getChartBuildQueryRegistry.mockImplementation(() => ({
+      get: () => () => ({
+        some_param: 'fake query!',
+        result_type: 'full',
+        result_format: 'json',
+      }),
+    }));
     waitForAsyncDataStub = sinon
       .stub(asyncEvent, 'waitForAsyncData')
       .callsFake(data => Promise.resolve(data));
   });
 
+  test('should defer abort of previous controller to avoid Redux state mutation', async () => {
+    jest.useFakeTimers();
+    const chartKey = 'defer_abort_test';
+    const formData = {
+      slice_id: 123,
+      datasource: 'table__1',
+      viz_type: 'table',
+    };
+    const oldController = new AbortController();
+    const abortSpy = jest.spyOn(oldController, 'abort');
+    const state = {
+      charts: {
+        [chartKey]: {
+          queryController: oldController,
+        },
+      },
+      common: {
+        conf: {
+          SUPERSET_WEBSERVER_TIMEOUT: 60,
+        },
+      },
+    };
+    const getState = jest.fn(() => state);
+    const dispatchMock = jest.fn();
+    const getChartDataRequestSpy = jest
+      .spyOn(actions, 'getChartDataRequest')
+      .mockResolvedValue({
+        response: { status: 200 },
+        json: { result: [] },
+      });
+    const handleChartDataResponseSpy = jest
+      .spyOn(actions, 'handleChartDataResponse')
+      .mockResolvedValue([]);
+    const updateDataMaskSpy = jest
+      .spyOn(dataMaskActions, 'updateDataMask')
+      .mockReturnValue({ type: 'UPDATE_DATA_MASK' });
+    const getQuerySettingsStub = sinon
+      .stub(exploreUtils, 'getQuerySettings')
+      .returns([false, () => {}]);
+
+    try {
+      const thunk = actions.exploreJSON(formData, false, undefined, chartKey);
+      const promise = thunk(dispatchMock, getState);
+
+      expect(abortSpy).not.toHaveBeenCalled();
+      expect(oldController.signal.aborted).toBe(false);
+
+      jest.runOnlyPendingTimers();
+
+      expect(abortSpy).toHaveBeenCalledTimes(1);
+      expect(oldController.signal.aborted).toBe(true);
+
+      await promise;
+    } finally {
+      getChartDataRequestSpy.mockRestore();
+      handleChartDataResponseSpy.mockRestore();
+      updateDataMaskSpy.mockRestore();
+      getQuerySettingsStub.restore();
+      abortSpy.mockRestore();
+      jest.useRealTimers();
+    }
+  });
+
   afterEach(() => {
     getExploreUrlStub.restore();
     getChartDataUriStub.restore();
+    buildV1ChartDataPayloadStub.restore();
     fetchMock.resetHistory();
-    metadataRegistryStub.restore();
-    buildQueryRegistryStub.restore();
     waitForAsyncDataStub.restore();
 
     global.featureFlags = {
@@ -358,7 +435,7 @@ describe('chart actions timeout', () => {
     jest.clearAllMocks();
   });
 
-  it('should use the timeout from arguments when given', () => {
+  it('should use the timeout from arguments when given', async () => {
     const postSpy = jest.spyOn(SupersetClient, 'post');
     postSpy.mockImplementation(() => Promise.resolve({ json: { result: [] } }));
     const timeout = 10; // Set the timeout value here
@@ -366,7 +443,7 @@ describe('chart actions timeout', () => {
     const key = 'chartKey'; // Set the chart key here
 
     const store = mockStore(initialState);
-    store.dispatch(
+    await store.dispatch(
       actions.runAnnotationQuery({
         annotation: {
           value: 'annotationValue',
@@ -390,14 +467,14 @@ describe('chart actions timeout', () => {
     expect(postSpy).toHaveBeenCalledWith(expectedPayload);
   });
 
-  it('should use the timeout from common.conf when not passed as an argument', () => {
+  it('should use the timeout from common.conf when not passed as an argument', async () => {
     const postSpy = jest.spyOn(SupersetClient, 'post');
     postSpy.mockImplementation(() => Promise.resolve({ json: { result: [] } }));
     const formData = { datasource: 'table__1' }; // Set the formData here
     const key = 'chartKey'; // Set the chart key here
 
     const store = mockStore(initialState);
-    store.dispatch(
+    await store.dispatch(
       actions.runAnnotationQuery({
         annotation: {
           value: 'annotationValue',

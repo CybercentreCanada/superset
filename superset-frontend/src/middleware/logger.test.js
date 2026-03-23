@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SupersetClient } from '@superset-ui/core';
 import sinon from 'sinon';
+import { SupersetClient } from '@superset-ui/core';
+import logger from 'src/middleware/loggerMiddleware';
 import { LOG_EVENT } from 'src/logger/actions';
 import {
   LOG_ACTIONS_LOAD_CHART,
   LOG_ACTIONS_SPA_NAVIGATION,
 } from 'src/logger/LogUtils';
-import logger from 'src/middleware/loggerMiddleware';
 
 describe('logger middleware', () => {
   const dashboardId = 123;
@@ -114,11 +114,10 @@ describe('logger middleware', () => {
   });
 
   it('should debounce a few log requests to one', () => {
-    const clock = sinon.useFakeTimers();
     logger(mockStore)(next)(action);
     logger(mockStore)(next)(action);
     logger(mockStore)(next)(action);
-    clock.tick(2000);
+    timeSandbox.clock.tick(2000);
 
     expect(SupersetClient.post.callCount).toBe(1);
     expect(
@@ -127,7 +126,6 @@ describe('logger middleware', () => {
   });
 
   it('should use navigator.sendBeacon if it exists', () => {
-    const clock = sinon.useFakeTimers();
     const beaconMock = jest.fn();
     Object.defineProperty(navigator, 'sendBeacon', {
       writable: true,
@@ -136,7 +134,7 @@ describe('logger middleware', () => {
 
     logger(mockStore)(next)(action);
     expect(beaconMock.mock.calls.length).toBe(0);
-    clock.tick(2000);
+    timeSandbox.clock.tick(2000);
 
     expect(beaconMock.mock.calls.length).toBe(1);
     const endpoint = beaconMock.mock.calls[0][0];
@@ -144,7 +142,6 @@ describe('logger middleware', () => {
   });
 
   it('should pass a guest token to sendBeacon if present', () => {
-    const clock = sinon.useFakeTimers();
     const beaconMock = jest.fn();
     Object.defineProperty(navigator, 'sendBeacon', {
       writable: true,
@@ -154,7 +151,7 @@ describe('logger middleware', () => {
 
     logger(mockStore)(next)(action);
     expect(beaconMock.mock.calls.length).toBe(0);
-    clock.tick(2000);
+    timeSandbox.clock.tick(2000);
     expect(beaconMock.mock.calls.length).toBe(1);
 
     const formData = beaconMock.mock.calls[0][1];

@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FC, ReactNode, useMemo, useRef } from 'react';
+import { FC, ReactNode } from 'react';
 import { t, css, useTheme, SupersetTheme } from '@superset-ui/core';
-import { InfoTooltipWithTrigger } from '@superset-ui/chart-controls';
-import { Tooltip } from 'src/components/Tooltip';
-import { FormLabel } from 'src/components/Form';
-import Icons from 'src/components/Icons';
+import {
+  Flex,
+  FormLabel,
+  InfoTooltip,
+  Tooltip,
+} from '@superset-ui/core/components';
+import { Icons } from '@superset-ui/core/components/Icons';
 
 type ValidationError = string;
 
@@ -72,23 +75,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   canSelectAll,
   selectAllOnClick,
 }) => {
-  const { gridUnit, colors } = useTheme();
-  const hasHadNoErrors = useRef(false);
-  const labelColor = useMemo(() => {
-    if (!validationErrors.length) {
-      hasHadNoErrors.current = true;
-    }
-
-    if (hasHadNoErrors.current) {
-      if (validationErrors.length) {
-        return colors.error.base;
-      }
-
-      return 'unset';
-    }
-
-    return colors.alert.base;
-  }, [colors.error.base, colors.alert.base, validationErrors.length]);
+  const theme = useTheme();
 
   if (!label) {
     return null;
@@ -105,7 +92,7 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           position: absolute;
           top: 50%;
           right: 0;
-          padding-left: ${gridUnit}px;
+          padding-left: ${theme.sizeUnit}px;
           transform: translate(100%, -50%);
           white-space: nowrap;
         `}
@@ -126,11 +113,11 @@ const ControlHeader: FC<ControlHeaderProps> = ({
         )}
         {renderTrigger && (
           <span>
-            <InfoTooltipWithTrigger
+            <InfoTooltip
               label={t('bolt')}
               tooltip={t('Changing this control takes effect instantly')}
               placement="top"
-              icon="bolt"
+              type="notice"
             />{' '}
           </span>
         )}
@@ -139,44 +126,46 @@ const ControlHeader: FC<ControlHeaderProps> = ({
   };
 
   const renderOptionalActionIcons = () => (
-    <span
-      css={() => css`
-        padding-left: ${5 * gridUnit}px;
-      `}
-    >
+    <div style={{ marginBottom: `${theme.sizeUnit * 0.5}px` }}>
       {canSelectAll && (
         <span>
-          <InfoTooltipWithTrigger
-            label={t('select-all')}
-            tooltip={t('Select All (ctl+a)')}
+          <Tooltip
+            id="select-all-tooltip"
+            title={t('Select All (ctl+a)')}
             placement="top"
-            icon="arrow-circle-up"
-            onClick={selectAllOnClick}
-          />{' '}
+          >
+            <Icons.UpCircleFilled css={iconStyles} onClick={selectAllOnClick} />
+          </Tooltip>{' '}
         </span>
       )}
       {canCopy && (
         <span>
-          <InfoTooltipWithTrigger
-            label={t('copy')}
-            tooltip={t('Copy the content of this control')}
+          <Tooltip
+            id="copy-tooltip"
+            title={t('Copy the content of this control')}
             placement="top"
-            icon="copy"
-            onClick={copyOnClick}
-          />{' '}
+          >
+            <Icons.CopyFilled css={iconStyles} onClick={copyOnClick} />
+          </Tooltip>
         </span>
       )}
-    </span>
+    </div>
   );
 
   return (
-    <div className="ControlHeader" data-test={`${name}-header`}>
-      <div className="pull-left">
+    <div
+      className="ControlHeader"
+      data-test={`${name}-header`}
+      style={{ width: '100%' }}
+    >
+      <Flex align="flex-end" justify="space-between">
         <FormLabel
           css={(theme: SupersetTheme) => css`
-            margin-bottom: ${theme.gridUnit * 0.5}px;
+            margin-bottom: ${theme.sizeUnit * 0.5}px;
             position: relative;
+            font-size: ${theme.fontSizeSM}px;
           `}
+          htmlFor={name}
         >
           {leftNode && <span>{leftNode}</span>}
           <span
@@ -190,41 +179,47 @@ const ControlHeader: FC<ControlHeaderProps> = ({
           {warning && (
             <span>
               <Tooltip id="error-tooltip" placement="top" title={warning}>
-                <Icons.AlertSolid iconColor={colors.alert.base} iconSize="s" />
+                <Icons.WarningOutlined
+                  iconColor={theme.colorWarning}
+                  css={css`
+                    vertical-align: baseline;
+                  `}
+                  iconSize="s"
+                />
               </Tooltip>{' '}
             </span>
           )}
           {danger && (
             <span>
               <Tooltip id="error-tooltip" placement="top" title={danger}>
-                <Icons.ErrorSolid iconColor={colors.error.base} iconSize="s" />
+                <Icons.CloseCircleOutlined
+                  iconColor={theme.colorErrorText}
+                  iconSize="s"
+                />
               </Tooltip>{' '}
             </span>
           )}
           {validationErrors?.length > 0 && (
-            <span data-test="error-tooltip">
+            <span
+              data-test="error-tooltip"
+              css={css`
+                cursor: pointer;
+              `}
+            >
               <Tooltip
                 id="error-tooltip"
                 placement="top"
                 title={validationErrors?.join(' ')}
               >
-                <Icons.ExclamationCircleOutlined
-                  css={css`
-                    ${iconStyles};
-                    color: ${labelColor};
-                  `}
-                />
+                <Icons.ExclamationCircleOutlined iconColor={theme.colorError} />
               </Tooltip>{' '}
             </span>
           )}
           {renderOptionalIcons()}
         </FormLabel>
-      </div>
-      {!rightNode && (
-        <div className="pull-right">{renderOptionalActionIcons()}</div>
-      )}
-      {rightNode && <div className="pull-right">{rightNode}</div>}
-      <div className="clearfix" />
+        {!rightNode && renderOptionalActionIcons()}
+        {rightNode && <div className="pull-right">{rightNode}</div>}
+      </Flex>
     </div>
   );
 };

@@ -26,6 +26,10 @@ superset:
 	# Install external dependencies
 	pip install -r requirements/development.txt
 
+	# Install CCCS dependencies
+	pip install -r cccs-build/superset/analytical-platform-requirements.txt
+	pip install -r cccs-build/superset/requirements.txt
+
 	# Install Superset in editable (development) mode
 	pip install -e .
 
@@ -86,9 +90,6 @@ format: py-format js-format
 
 py-format: pre-commit
 	pre-commit run black --all-files
-
-py-lint: pre-commit
-	pylint -j 0 superset
 
 js-format:
 	cd superset-frontend; npm run prettier

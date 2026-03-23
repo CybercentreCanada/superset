@@ -20,8 +20,7 @@ import sinon from 'sinon';
 import fetchMock from 'fetch-mock';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import { waitFor } from '@testing-library/react';
-import * as uiCore from '@superset-ui/core';
+import { waitFor } from 'spec/helpers/testing-library';
 import * as actions from 'src/SqlLab/actions/sqlLab';
 import { LOG_EVENT } from 'src/logger/actions';
 import {
@@ -30,7 +29,7 @@ import {
   initialState,
   queryId,
 } from 'src/SqlLab/fixtures';
-import { SupersetClient } from '@superset-ui/core';
+import { SupersetClient, isFeatureEnabled } from '@superset-ui/core';
 import { ADD_TOAST } from 'src/components/MessageToasts/actions';
 import { ToastType } from '../../components/MessageToasts/types';
 
@@ -44,6 +43,11 @@ jest.mock('nanoid', () => ({
 afterAll(() => {
   jest.resetAllMocks();
 });
+
+jest.mock('@superset-ui/core', () => ({
+  ...jest.requireActual('@superset-ui/core'),
+  isFeatureEnabled: jest.fn(),
+}));
 
 describe('getUpToDateQuery', () => {
   test('should return the up to date query editor state', () => {
@@ -85,7 +89,7 @@ describe('async actions', () => {
     dispatch = sinon.spy();
   });
 
-  afterEach(fetchMock.resetHistory);
+  afterEach(() => fetchMock.resetHistory());
 
   const fetchQueryEndpoint = 'glob:*/api/v1/sqllab/results/*';
   fetchMock.get(
@@ -290,7 +294,7 @@ describe('async actions', () => {
     });
 
     it('calls queryFailed on fetch error and logs the error details', () => {
-      expect.assertions(3);
+      expect.assertions(2);
 
       fetchMock.post(
         runQueryEndpoint,
@@ -308,7 +312,6 @@ describe('async actions', () => {
       const expectedActionTypes = [
         actions.START_QUERY,
         LOG_EVENT,
-        LOG_EVENT,
         actions.QUERY_FAILED,
       ];
       const { dispatch } = store;
@@ -316,12 +319,7 @@ describe('async actions', () => {
       return request(dispatch, () => initialState).then(() => {
         const actions = store.getActions();
         expect(actions.map(a => a.type)).toEqual(expectedActionTypes);
-        expect(actions[1].payload.eventData.error_details).toContain(
-          'Issue 1000',
-        );
-        expect(actions[2].payload.eventData.error_details).toContain(
-          'Issue 1001',
-        );
+        expect(actions[1].payload.eventData.issue_codes).toEqual([1000, 1001]);
       });
     });
   });
@@ -443,6 +441,7 @@ describe('async actions', () => {
             queryLimit: undefined,
             maxRow: undefined,
             id: 'abcd',
+            immutableId: 'abcd',
             templateParams: undefined,
             inLocalStorage: true,
             loaded: true,
@@ -572,6 +571,7 @@ describe('async actions', () => {
           type: actions.ADD_QUERY_EDITOR,
           queryEditor: {
             ...queryEditor,
+            immutableId: 'abcd',
             inLocalStorage: true,
             loaded: true,
           },
@@ -599,6 +599,7 @@ describe('async actions', () => {
             type: actions.ADD_QUERY_EDITOR,
             queryEditor: {
               id: 'abcd',
+              immutableId: 'abcd',
               sql: expect.stringContaining('SELECT ...'),
               name: `Untitled Query 7`,
               dbId: defaultQueryEditor.dbId,
@@ -732,21 +733,17 @@ describe('async actions', () => {
       'glob:**/api/v1/database/*/table_metadata/extra/*';
     fetchMock.get(getExtraTableMetadataEndpoint, {});
 
-    let isFeatureEnabledMock;
-
     beforeEach(() => {
-      isFeatureEnabledMock = jest
-        .spyOn(uiCore, 'isFeatureEnabled')
-        .mockImplementation(
-          feature => feature === 'SQLLAB_BACKEND_PERSISTENCE',
-        );
+      isFeatureEnabled.mockImplementation(
+        feature => feature === 'SQLLAB_BACKEND_PERSISTENCE',
+      );
     });
 
     afterEach(() => {
-      isFeatureEnabledMock.mockRestore();
+      isFeatureEnabled.mockRestore();
     });
 
-    afterEach(fetchMock.resetHistory);
+    afterEach(() => fetchMock.resetHistory());
 
     describe('addQueryEditor', () => {
       it('creates the tab state in the local storage', () => {
@@ -759,6 +756,7 @@ describe('async actions', () => {
             queryEditor: {
               ...queryEditor,
               id: 'abcd',
+              immutableId: 'abcd',
               loaded: true,
               inLocalStorage: true,
             },
@@ -908,11 +906,9 @@ describe('async actions', () => {
       });
       describe('with backend persistence flag off', () => {
         it('does not update the tab state in the backend', () => {
-          const backendPersistenceOffMock = jest
-            .spyOn(uiCore, 'isFeatureEnabled')
-            .mockImplementation(
-              feature => !(feature === 'SQLLAB_BACKEND_PERSISTENCE'),
-            );
+          isFeatureEnabled.mockImplementation(
+            feature => !(feature === 'SQLLAB_BACKEND_PERSISTENCE'),
+          );
 
           const store = mockStore({
             ...initialState,
@@ -926,7 +922,7 @@ describe('async actions', () => {
 
           expect(store.getActions()).toEqual(expectedActions);
           expect(fetchMock.calls(updateTabStateEndpoint)).toHaveLength(0);
-          backendPersistenceOffMock.mockRestore();
+          isFeatureEnabled.mockRestore();
         });
       });
     });
@@ -1006,6 +1002,85 @@ describe('async actions', () => {
           }),
         );
       });
+
+      it('uses tabViewId when available', () => {
+        const tableName = 'table';
+        const catalogName = null;
+        const schemaName = 'schema';
+        const expectedDbId = 473892;
+        const tabViewId = '123';
+        const queryWithTabViewId = { ...query, tabViewId };
+
+        const store = mockStore({
+          ...initialState,
+          sqlLab: {
+            ...initialState.sqlLab,
+            unsavedQueryEditor: {
+              id: query.id,
+              dbId: expectedDbId,
+            },
+          },
+        });
+
+        const request = actions.addTable(
+          queryWithTabViewId,
+          tableName,
+          catalogName,
+          schemaName,
+        );
+        request(store.dispatch, store.getState);
+
+        expect(store.getActions()[0]).toEqual(
+          expect.objectContaining({
+            table: expect.objectContaining({
+              name: tableName,
+              catalog: catalogName,
+              schema: schemaName,
+              dbId: expectedDbId,
+              queryEditorId: tabViewId, // Should use tabViewId, not id
+            }),
+          }),
+        );
+      });
+
+      it('falls back to id when tabViewId is not available', () => {
+        const tableName = 'table';
+        const catalogName = null;
+        const schemaName = 'schema';
+        const expectedDbId = 473892;
+        const queryWithoutTabViewId = { ...query, tabViewId: undefined };
+
+        const store = mockStore({
+          ...initialState,
+          sqlLab: {
+            ...initialState.sqlLab,
+            unsavedQueryEditor: {
+              id: query.id,
+              dbId: expectedDbId,
+            },
+          },
+        });
+
+        const request = actions.addTable(
+          queryWithoutTabViewId,
+          tableName,
+          catalogName,
+          schemaName,
+        );
+        request(store.dispatch, store.getState);
+
+        expect(store.getActions()[0]).toEqual(
+          expect.objectContaining({
+            table: expect.objectContaining({
+              name: tableName,
+              catalog: catalogName,
+              schema: schemaName,
+              dbId: expectedDbId,
+              queryEditorId: query.id, // Should use id when tabViewId is not available
+            }),
+          }),
+        );
+      });
     });
 
     describe('syncTable', () => {
@@ -1033,30 +1108,38 @@ describe('async actions', () => {
     });
 
     describe('runTablePreviewQuery', () => {
-      it('updates and runs data preview query when configured', () => {
-        expect.assertions(3);
+      const results = {
+        data: mockBigNumber,
+        query: { sqlEditorId: 'null', dbId: 1 },
+        query_id: 'efgh',
+      };
+      const tableName = 'table';
+      const catalogName = null;
+      const schemaName = 'schema';
+      const store = mockStore({
+        ...initialState,
+        sqlLab: {
+          ...initialState.sqlLab,
+          databases: {
+            1: { disable_data_preview: false },
+          },
+        },
+      });
 
-        const results = {
-          data: mockBigNumber,
-          query: { sqlEditorId: 'null', dbId: 1 },
-          query_id: 'efgh',
-        };
+      beforeEach(() => {
         fetchMock.post(runQueryEndpoint, JSON.stringify(results), {
           overwriteRoutes: true,
         });
+      });
 
-        const tableName = 'table';
-        const catalogName = null;
-        const schemaName = 'schema';
-        const store = mockStore({
-          ...initialState,
-          sqlLab: {
-            ...initialState.sqlLab,
-            databases: {
-              1: { disable_data_preview: false },
-            },
-          },
-        });
+      afterEach(() => {
+        store.clearActions();
+        fetchMock.resetHistory();
+      });
+
+      it('updates and runs data preview query when configured', () => {
+        expect.assertions(3);
+
         const expectedActionTypes = [
           actions.MERGE_TABLE, // addTable (data preview)
           actions.START_QUERY, // runQuery (data preview)
@@ -1068,6 +1151,30 @@ describe('async actions', () => {
           catalog: catalogName,
           schema: schemaName,
         });
+        return request(store.dispatch, store.getState).then(() => {
+          expect(store.getActions().map(a => a.type)).toEqual(
+            expectedActionTypes,
+          );
+          expect(fetchMock.calls(runQueryEndpoint)).toHaveLength(1);
+          // tab state is not updated, since the query is a data preview
+          expect(fetchMock.calls(updateTabStateEndpoint)).toHaveLength(0);
+        });
+      });
+
+      it('runs data preview query only', () => {
+        const expectedActionTypes = [
+          actions.START_QUERY, // runQuery (data preview)
+          actions.QUERY_SUCCESS, // querySuccess
+        ];
+        const request = actions.runTablePreviewQuery(
+          {
+            dbId: 1,
+            name: tableName,
+            catalog: catalogName,
+            schema: schemaName,
+          },
+          true,
+        );
         return request(store.dispatch, store.getState).then(() => {
           expect(store.getActions().map(a => a.type)).toEqual(
             expectedActionTypes,
@@ -1228,15 +1335,10 @@ describe('async actions', () => {
             // new qe has a different id
             newQueryEditor: {
               ...oldQueryEditor,
-              id: '1',
+              tabViewId: '1',
               inLocalStorage: false,
               loaded: true,
             },
-          },
-          {
-            type: actions.MIGRATE_TAB_HISTORY,
-            newId: '1',
-            oldId: 'abcd',
           },
           {
             type: actions.MIGRATE_TABLE,

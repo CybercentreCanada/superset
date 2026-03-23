@@ -1,14 +1,17 @@
 /* eslint-disable theme-colors/no-literal-colors */
 import { useState, useMemo, useEffect } from 'react';
-import { SupersetClient } from '@superset-ui/core';
+import { SupersetClient, useTheme } from '@superset-ui/core';
 import { EmailRendererProps } from './types';
+import { Card, Space } from '@superset-ui/core/components';
+import { QUERY_TIMEOUT_LIMIT } from '../../plugin-chart-cccs-grid-table/src/consts';
 
-const QUERY_TIMEOUT_LIMIT = 180000;
 const RETRY_ATTEMPTS = 5;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
   const { url_parameter_value, parameter_prefix, errorMessage, fissionUrl } =
     props;
+
+  const theme = useTheme();
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,51 +90,47 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   if (errorMessage) {
     return (
-      <div
-        style={{
-          padding: '20px',
-          border: '1px solid #007bff',
-          borderRadius: '8px',
-          backgroundColor: '#cce5ff',
-          margin: '20px',
-          textAlign: 'center',
-        }}
-      >
-        <span style={{ fontSize: '14px', color: '#004085' }}>
-          <strong>Info:</strong> {errorMessage}
-        </span>
-      </div>
+      <>
+        <Card
+          style={{
+            padding: theme.paddingSM,
+            backgroundColor: theme.colorInfoBg,
+            borderColor: theme.colorInfoBorder,
+          }}
+        >
+          <p>
+            <strong>Info:</strong> {errorMessage}
+          </p>
+        </Card>
+      </>
     );
   }
 
   if (imageError) {
     return (
-      <div
+      <Card
         style={{
-          padding: '20px',
-          border: '1px solid red',
-          borderRadius: '8px',
-          backgroundColor: '#ffcccc',
-          margin: '20px',
-          textAlign: 'center',
+          padding: theme.paddingSM,
+          backgroundColor: theme.colorErrorBg,
+          borderColor: theme.colorErrorBorder,
         }}
       >
-        <span style={{ fontSize: '16px', color: 'red' }}>
-          <strong>Error:</strong> {imageError}
-        </span>
-        <p style={{ marginTop: '15px', fontSize: '14px' }}>
-          Please click on the following{' '}
-          <a
-            href={linkUrl}
-            target="_blank"
-            rel="noreferrer"
-            style={{ textDecoration: 'underline', color: 'blue' }}
+        <Space align="center" direction="vertical" style={{ display: 'flex' }}>
+          <span
+            style={{ fontSize: theme.fontSizeLG, color: theme.colorErrorText }}
           >
-            link
-          </a>{' '}
-          to view the visualization in a new window.
-        </p>
-      </div>
+            <strong>Error:</strong> {imageError}
+          </span>
+
+          <p>
+            Please click on the following{' '}
+            <a href={linkUrl} target="_blank" rel="noreferrer">
+              link
+            </a>{' '}
+            to view the visualization in a new window.
+          </p>
+        </Space>
+      </Card>
     );
   }
 
