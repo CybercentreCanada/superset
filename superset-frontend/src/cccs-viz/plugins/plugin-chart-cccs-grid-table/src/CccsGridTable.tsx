@@ -61,6 +61,7 @@ import {
   SUBMISSION_LIMIT,
 } from './consts';
 import { CccsGridTransformedProps, DataMap, GridData } from './types';
+import { StyledChartContainer } from './styles';
 
 const b64ToBlob = (b64Data: string, contentType = '', sliceSize = 512) => {
   const byteCharacters = atob(b64Data);
@@ -124,24 +125,6 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
       typeData: {},
       jumpToData: {},
     });
-
-    // Some of the grid elements are transparent, these overrides fix that.
-    const themeOverrides = useMemo(
-      () => ({
-        menuBackgroundColor: theme.colorBgElevated,
-        pickerListBackgroundColor: theme.colorBgElevated,
-        panelBackgroundColor: theme.colorBgElevated,
-        checkboxCheckedShapeColor: theme.colorText,
-      }),
-      [theme.colorBgElevated, theme.colorText],
-    );
-
-    const headerStyles = useMemo(
-      () => ({ width: 'auto', paddingBottom: theme.sizeUnit * 2 }),
-      [theme.sizeUnit],
-    );
-    const containerStyles = useMemo(() => ({ height }), [height]);
-    const gridStyle = useMemo(() => ({ height: '100%' }), []);
 
     const paginationPageSizeSelector = useMemo<number[] | boolean>(
       () => ((pageLength ?? 0) > 0 ? PAGE_SIZE_OPTIONS : false),
@@ -700,64 +683,65 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
     LicenseManager.setLicenseKey(agGridLicenseKey);
 
     return (
-      <div style={containerStyles}>
-        {!!includeSearch && (
-          <div style={headerStyles}>
-            <Input
-              allowClear
-              type="text"
-              placeholder={`Search ${data?.length || 0} records...`}
-              onInput={onFilterTextBoxChanged}
-              onClear={() => setQuickFilterText('')}
-              prefix={
-                <Icons.SearchOutlined
-                  iconColor={theme.colorIcon}
-                  iconSize="l"
-                />
-              }
+      <StyledChartContainer height={height}>
+        <div className="table-container">
+          {!!includeSearch && (
+            <div className="search-container">
+              <Input
+                allowClear
+                type="text"
+                placeholder={`Search ${data?.length || 0} records...`}
+                onInput={onFilterTextBoxChanged}
+                onClear={() => setQuickFilterText('')}
+                prefix={
+                  <Icons.SearchOutlined
+                    iconColor={theme.colorIcon}
+                    iconSize="l"
+                  />
+                }
+              />
+            </div>
+          )}
+          <div ref={containerRef} className="grid-container">
+            <ThemedAgGridReact
+              ref={gridRef}
+              rowData={data}
+              columnDefs={columns}
+              defaultColDef={defaultColDef}
+              rowNumbers={rowNumbers}
+              cellSelection
+              onCellSelectionChanged={onCellSelectionChanged}
+              cacheQuickFilter
+              quickFilterText={quickFilterText}
+              pagination={!!pageLength}
+              paginationPageSize={pageLength}
+              paginationPageSizeSelector={paginationPageSizeSelector}
+              getContextMenuItems={getContextMenuItems}
+              modules={[
+                ClientSideRowModelModule,
+                ColumnMenuModule,
+                RowNumbersModule,
+                CellSelectionModule,
+                RowSelectionModule,
+                RichSelectModule,
+                QuickFilterModule,
+                // row grouping modules
+                RowGroupingModule,
+                RowGroupingPanelModule,
+                // context menu modules
+                ClipboardModule,
+                ContextMenuModule,
+                ExcelExportModule,
+                // ValidationModule is a development helper
+                ...(process.env.NODE_ENV !== 'production'
+                  ? [ValidationModule]
+                  : []),
+              ]}
+              rowGroupPanelShow={rowGroupPanelShow}
             />
           </div>
-        )}
-        <div ref={containerRef} style={gridStyle}>
-          <ThemedAgGridReact
-            themeOverrides={themeOverrides}
-            ref={gridRef}
-            rowData={data}
-            columnDefs={columns}
-            defaultColDef={defaultColDef}
-            rowNumbers={rowNumbers}
-            cellSelection
-            onCellSelectionChanged={onCellSelectionChanged}
-            cacheQuickFilter
-            quickFilterText={quickFilterText}
-            pagination={!!pageLength}
-            paginationPageSize={pageLength}
-            paginationPageSizeSelector={paginationPageSizeSelector}
-            getContextMenuItems={getContextMenuItems}
-            modules={[
-              ClientSideRowModelModule,
-              ColumnMenuModule,
-              RowNumbersModule,
-              CellSelectionModule,
-              RowSelectionModule,
-              RichSelectModule,
-              QuickFilterModule,
-              // row grouping modules
-              RowGroupingModule,
-              RowGroupingPanelModule,
-              // context menu modules
-              ClipboardModule,
-              ContextMenuModule,
-              ExcelExportModule,
-              // ValidationModule is a development helper
-              ...(process.env.NODE_ENV !== 'production'
-                ? [ValidationModule]
-                : []),
-            ]}
-            rowGroupPanelShow={rowGroupPanelShow}
-          />
         </div>
-      </div>
+      </StyledChartContainer>
     );
   },
 );
