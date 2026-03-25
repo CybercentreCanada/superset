@@ -19,9 +19,11 @@
 import { css, styled } from '@superset-ui/core';
 
 export const StyledChartContainer = styled.div<{
+  width: number;
   height: number;
 }>`
-  ${({ theme, height }) => css`
+  ${({ theme, width, height }) => css`
+    width: ${width}px;
     height: ${height}px;
 
     // Some of the grid elements are transparent, these overrides fix that.
@@ -42,8 +44,10 @@ export const StyledChartContainer = styled.div<{
       margin-bottom: ${theme.sizeUnit * 2}px;
     }
 
-    .grid-container {
+    .cccs-grid-container {
+      width: auto;
       height: 100%;
+      margin: 0;
     }
   `}
 `;

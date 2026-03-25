@@ -95,6 +95,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
     formData,
     columns,
     data,
+    width,
     height,
     includeSearch,
     pageLength,
@@ -683,7 +684,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
     LicenseManager.setLicenseKey(agGridLicenseKey);
 
     return (
-      <StyledChartContainer height={height}>
+      <StyledChartContainer width={width} height={height}>
         <div className="table-container">
           {!!includeSearch && (
             <div className="search-container">
@@ -702,7 +703,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
               />
             </div>
           )}
-          <div ref={containerRef} className="grid-container">
+          <div ref={containerRef} className="cccs-grid-container">
             <ThemedAgGridReact
               ref={gridRef}
               rowData={data}
