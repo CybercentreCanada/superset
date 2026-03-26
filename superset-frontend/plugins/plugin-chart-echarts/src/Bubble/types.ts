@@ -31,6 +31,7 @@ export type EchartsBubbleFormData = QueryFormData &
   LegendFormData & {
     series?: string;
     entity: string;
+    xAxisTimeFormat: string;
     xAxisFormat: string;
     yAXisFormat: string;
     logXAxis: boolean;
