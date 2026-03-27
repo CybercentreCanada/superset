@@ -179,10 +179,13 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
 
   normalizeSymbolSize(series, maxBubbleSize);
 
+  // const xAxisFormatter = getNumberFormatter(xAxisFormat);
+  // CCCS code - format numbers or dates
   const xAxisFormatter =
     xAxisDataType === GenericDataType.Temporal
       ? getTimeFormatter(xAxisTimeFormat)
       : getNumberFormatter(xAxisFormat);
+  // end CCCS code
   const yAxisFormatter = getNumberFormatter(yAxisFormat);
   const tooltipSizeFormatter = getNumberFormatter(tooltipSizeFormat);
 
@@ -201,11 +204,14 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
     convertInteger(xAxisTitleMargin),
   );
 
+  // const xAxisType = logXAxis ? AxisType.Log : AxisType.Value;
+  // CCCS code - add temporal axis type
   const xAxisType = logXAxis
     ? AxisType.Log
     : xAxisDataType === GenericDataType.Temporal
       ? AxisType.Time
       : AxisType.Value;
+  // end CCCS code
   const echartOptions: EChartsCoreOption = {
     series,
     xAxis: {
