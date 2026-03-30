@@ -22,7 +22,7 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 
-export default class IFrameVisualizationChartPlugin extends ChartPlugin {
+export default class JSONViewChartPlugin extends ChartPlugin {
   /**
    * The constructor is used to pass relevant metadata and callbacks that get
    * registered in respective registries that are used throughout the library

@@ -55,7 +55,7 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
 
   const data = queriesData[0]?.data as TimeseriesDataRecord[];
 
-  const fissionUrl = queriesData[0].fissionUrl as String;
+  const clueUrl = queriesData[0].clueUrl as String;
 
   let value: string | number | bigint | true | Date = '';
   let errorMessage = '';
@@ -78,6 +78,6 @@ export default function transformProps(chartProps: EmailRenderChartProps) {
     url_parameter_value: value,
     parameter_prefix: parameterPrefix,
     errorMessage,
-    fissionUrl,
+    clueUrl,
   };
 }

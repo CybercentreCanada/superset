@@ -73,7 +73,6 @@ import {
 import {
   CccsGridTableChartPlugin,
   EmailRendererChartPlugin,
-  IFrameVisualizationChartPlugin,
   JSONViewChartPlugin,
 } from 'src/cccs-viz/plugins/';
 import {
@@ -112,7 +111,6 @@ export default class MainPreset extends Preset {
       presets: [new DeckGLChartPreset()],
       plugins: [
         new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
-        new IFrameVisualizationChartPlugin().configure({ key: 'i_frame' }),
         new EmailRendererChartPlugin().configure({ key: 'email' }),
         new JSONViewChartPlugin().configure({ key: 'json_view' }),
         new CccsGridTableChartPlugin().configure({ key: 'cccs_grid' }),

@@ -1,15 +1,14 @@
 /* eslint-disable theme-colors/no-literal-colors */
 import { useState, useMemo, useEffect } from 'react';
 import { SupersetClient, useTheme } from '@superset-ui/core';
-import { EmailRendererProps } from './types';
 import { Card, Space } from '@superset-ui/core/components';
+import { EmailRendererProps } from './types';
 import { QUERY_TIMEOUT_LIMIT } from '../../plugin-chart-cccs-grid-table/src/consts';
 
 const RETRY_ATTEMPTS = 5;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
-  const { url_parameter_value, parameter_prefix, errorMessage, fissionUrl } =
-    props;
+  const { url_parameter_value, parameter_prefix, errorMessage } = props;
 
   const theme = useTheme();
 
@@ -19,18 +18,10 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   const apiUrl = useMemo(
     () =>
-      `/api/v1/fission/emailpreview?eml=${
+      `/api/v1/clue/preview-eml/${
         parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
       }${encodeURIComponent(url_parameter_value)}`,
     [parameter_prefix, url_parameter_value],
-  );
-
-  const linkUrl = useMemo(
-    () =>
-      `${fissionUrl}/emailpreview?eml=${
-        parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-      }${encodeURIComponent(url_parameter_value)}`,
-    [fissionUrl, parameter_prefix, url_parameter_value],
   );
 
   useEffect(() => {
@@ -54,8 +45,7 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           break; // Break the loop on success
         } catch (error) {
           setImageError(
-            error.message ||
-              'Fission function trouble fetching image, retry in process.',
+            error.message || 'Clue trouble fetching image, retry in process.',
           );
           attempts += 1;
         } finally {
@@ -74,35 +64,38 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
 
   if (loading) {
     return (
-      <div
+      <Card
         style={{
-          padding: '20px',
-          backgroundColor: '#f0f0f0',
-          margin: '20px',
-          textAlign: 'center',
-          borderRadius: '8px',
+          padding: theme.paddingSM,
+          backgroundColor: theme.colorBgElevated,
+          borderColor: theme.colorBorderBg,
         }}
       >
-        <span style={{ fontSize: '16px', color: '#555' }}>Loading...</span>
-      </div>
+        <p
+          style={{
+            fontSize: theme.fontSizeLG,
+            color: theme.colorTextLightSolid,
+          }}
+        >
+          Loading...
+        </p>
+      </Card>
     );
   }
 
   if (errorMessage) {
     return (
-      <>
-        <Card
-          style={{
-            padding: theme.paddingSM,
-            backgroundColor: theme.colorInfoBg,
-            borderColor: theme.colorInfoBorder,
-          }}
-        >
-          <p>
-            <strong>Info:</strong> {errorMessage}
-          </p>
-        </Card>
-      </>
+      <Card
+        style={{
+          padding: theme.paddingSM,
+          backgroundColor: theme.colorInfoBg,
+          borderColor: theme.colorInfoBorder,
+        }}
+      >
+        <p>
+          <strong>Info:</strong> {errorMessage}
+        </p>
+      </Card>
     );
   }
 
@@ -121,14 +114,6 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           >
             <strong>Error:</strong> {imageError}
           </span>
-
-          <p>
-            Please click on the following{' '}
-            <a href={linkUrl} target="_blank" rel="noreferrer">
-              link
-            </a>{' '}
-            to view the visualization in a new window.
-          </p>
         </Space>
       </Card>
     );

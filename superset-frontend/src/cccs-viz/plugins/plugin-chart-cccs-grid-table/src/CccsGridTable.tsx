@@ -533,7 +533,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                 : `A download will begin for each distinct EML file.`,
             action: () => {
               for (const emlPath of selectedData.typeData.eml_path) {
-                const endpoint = `/api/v1/fission/get-eml?file=${emlPath}`;
+                const endpoint = `/api/v1/clue/download-eml/${emlPath}`;
                 addInfoToast('Download started');
 
                 SupersetClient.get({ endpoint, timeout: QUERY_TIMEOUT_LIMIT })
@@ -555,9 +555,9 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                       saveAs(blob, uniqueTitle);
                     } else if (json.result?.content) {
                       addDangerToast(`Invalid file format for ${emlPath}.`);
-                    } else if (json.result?.Error) {
+                    } else if (json.message) {
                       addDangerToast(
-                        `Download failed for ${emlPath}. ${json.result.Error}`,
+                        `Download failed for ${emlPath}. ${json.message}`,
                       );
                     } else {
                       addDangerToast(`No content to download for ${emlPath}.`);
