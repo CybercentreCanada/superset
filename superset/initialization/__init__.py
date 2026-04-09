@@ -150,7 +150,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         #
         # pylint: disable=import-outside-toplevel,too-many-locals,too-many-statements
         from superset.advanced_data_type.api import AdvancedDataTypeRestApi
-        from superset.fission.api import FissionRestApi
         from superset.alfred.api import AlfredRestApi
         from superset.annotation_layers.annotations.api import AnnotationRestApi
         from superset.annotation_layers.api import AnnotationLayerRestApi
@@ -159,6 +158,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.cachekeys.api import CacheRestApi
         from superset.charts.api import ChartRestApi
         from superset.charts.data.api import ChartDataRestApi
+        from superset.clue.api import ClueRestApi
         from superset.css_templates.api import CssTemplateRestApi
         from superset.dashboards.api import DashboardRestApi
         from superset.dashboards.filter_state.api import DashboardFilterStateRestApi
@@ -233,6 +233,13 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 
         self.superset_app.register_blueprint(health_blueprint)
 
+        # --- CCCS CODE BLOCK
+        if (self.config.get("ENABLE_ALFRED")):
+            appbuilder.add_api(AlfredRestApi)
+        if (self.config.get("ENABLE_CLUE")):
+            appbuilder.add_api(ClueRestApi)
+        # --- END CCCS CODE BLOCK
+
         #
         # Setup API views
         #
@@ -240,7 +247,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(AnnotationLayerRestApi)
         appbuilder.add_api(AsyncEventsRestApi)
         appbuilder.add_api(AdvancedDataTypeRestApi)
-        appbuilder.add_api(AlfredRestApi)
         appbuilder.add_api(AvailableDomainsRestApi)
         appbuilder.add_api(CacheRestApi)
         appbuilder.add_api(ChartRestApi)
@@ -261,7 +267,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(ExploreRestApi)
         appbuilder.add_api(ExploreFormDataRestApi)
         appbuilder.add_api(ExplorePermalinkRestApi)
-        appbuilder.add_api(FissionRestApi)
         appbuilder.add_api(ImportExportRestApi)
         appbuilder.add_api(QueryRestApi)
         appbuilder.add_api(ReportScheduleRestApi)

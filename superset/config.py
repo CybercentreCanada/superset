@@ -1073,12 +1073,30 @@ QUERY_LOGGER = None
 # Set this API key to enable Mapbox visualizations
 MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
 
-# Set this license key to validate Ag Grid visualizations
+# ---------------------------------------------------
+# CCCS properties block
+# ---------------------------------------------------
+
 AG_GRID_LICENSE_KEY = os.environ.get("AG_GRID_LICENSE_KEY", "")
+
 ASSEMBLY_LINE_URL = os.environ.get("ASSEMBLY_LINE_URL", "")
-FISSION_PROXY_URL = os.environ.get("FISSION_PROXY_URL", "")
-ENABLE_ALFRED = os.environ.get("ENABLE_ALFRED", "")
-ENABLE_DOWNLOAD = os.environ.get("ENABLE_DOWNLOAD", "")
+
+ENABLE_ALFRED = os.environ.get("ENABLE_ALFRED", False)
+ALFRED_SCOPE = os.environ.get("ALFRED_SCOPE", "")
+ALFRED_URL = os.environ.get("ALFRED_URL", "")
+
+ENABLE_CLUE = os.environ.get("ENABLE_CLUE", False)
+CLUE_SCOPE = os.environ.get("CLUE_SCOPE", "")
+CLUE_URL = os.environ.get("CLUE_URL", "")
+
+ENABLE_DOWNLOAD = os.environ.get("ENABLE_DOWNLOAD", False)
+
+TRINO_SCOPE = os.environ.get("TRINO_SCOPE", "")
+TRINO_HOST = os.environ.get("TRINO_HOST", "")
+
+# ---------------------------------------------------
+# end CCCS properties block
+# ---------------------------------------------------
 
 # Maximum number of rows returned from a database
 # in async mode, no more than SQL_MAX_ROW will be returned and stored

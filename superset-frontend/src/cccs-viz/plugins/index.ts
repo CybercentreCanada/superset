@@ -18,6 +18,5 @@
  */
 
 export { default as CccsGridTableChartPlugin } from './plugin-chart-cccs-grid-table/src';
-export { default as IFrameVisualizationChartPlugin } from './plugin-chart-iframe/src/plugin';
 export { default as EmailRendererChartPlugin } from './plugin-chart-email-renderer/src/plugin';
 export { default as JSONViewChartPlugin } from './plugin-chart-json-view/plugin';
