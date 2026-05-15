@@ -51,7 +51,7 @@ describe('isProbablyHTML', () => {
     expect(isProbablyHTML(trickyText)).toBe(false);
   });
 
-  it('should return false for strings with angle brackets that are not HTML', () => {
+  test('should return false for strings with angle brackets that are not HTML', () => {
     // Test case from issue #25561
     expect(isProbablyHTML('<abcdef:12345>')).toBe(false);
 
@@ -64,6 +64,24 @@ describe('isProbablyHTML', () => {
     // Mathematical expressions
     expect(isProbablyHTML('if x < 5 and y > 10')).toBe(false);
     expect(isProbablyHTML('price < $100')).toBe(false);
+  });
+
+  test('should return true for all known HTML tags', () => {
+    expect(isProbablyHTML('<section>Content</section>')).toBe(true);
+    expect(isProbablyHTML('<article>Content</article>')).toBe(true);
+    expect(isProbablyHTML('<nav>Content</nav>')).toBe(true);
+    expect(isProbablyHTML('<header>Content</header>')).toBe(true);
+    expect(isProbablyHTML('<footer>Content</footer>')).toBe(true);
+    expect(isProbablyHTML('<button>Click me</button>')).toBe(true);
+    expect(isProbablyHTML('<form>Content</form>')).toBe(true);
+    expect(isProbablyHTML('<input type="text">')).toBe(true);
+    expect(isProbablyHTML('<textarea>Content</textarea>')).toBe(true);
+    expect(isProbablyHTML('<select><option>1</option></select>')).toBe(true);
+    expect(isProbablyHTML('<blockquote>Quote</blockquote>')).toBe(true);
+    expect(isProbablyHTML('<video src="video.mp4"></video>')).toBe(true);
+    expect(isProbablyHTML('<audio src="audio.mp3"></audio>')).toBe(true);
+    expect(isProbablyHTML('<canvas></canvas>')).toBe(true);
+    expect(isProbablyHTML('<iframe src="page.html"></iframe>')).toBe(true);
   });
 });
 
@@ -88,6 +106,7 @@ describe('safeHtmlSpan', () => {
     expect(safeSpan).toEqual(
       <span
         className="safe-html-wrapper"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: htmlString }}
       />,
     );
@@ -207,31 +226,31 @@ describe('getParagraphContents', () => {
 });
 
 describe('extractTextFromHTML', () => {
-  it('should extract text from HTML div tags', () => {
+  test('should extract text from HTML div tags', () => {
     const htmlString = '<div>Hello World</div>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('Hello World');
   });
 
-  it('should extract text from nested HTML tags', () => {
+  test('should extract text from nested HTML tags', () => {
     const htmlString = '<div><p>Hello <strong>World</strong></p></div>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('Hello World');
   });
 
-  it('should extract text from multiple HTML elements', () => {
+  test('should extract text from multiple HTML elements', () => {
     const htmlString = '<h1>Title</h1><p>Content</p><span>Footer</span>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('TitleContentFooter');
   });
 
-  it('should return original string when input is not HTML', () => {
+  test('should return original string when input is not HTML', () => {
     const plainText = 'Just plain text';
     const result = extractTextFromHTML(plainText);
     expect(result).toBe('Just plain text');
   });
 
-  it('should return original value when input is not a string', () => {
+  test('should return original value when input is not a string', () => {
     const numberValue = 12345;
     const result = extractTextFromHTML(numberValue);
     expect(result).toBe(12345);
@@ -245,31 +264,31 @@ describe('extractTextFromHTML', () => {
     expect(booleanResult).toBe(true);
   });
 
-  it('should handle empty HTML tags', () => {
+  test('should handle empty HTML tags', () => {
     const htmlString = '<div></div>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('');
   });
 
-  it('should handle HTML with only whitespace', () => {
+  test('should handle HTML with only whitespace', () => {
     const htmlString = '<div>   </div>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('   ');
   });
 
-  it('should extract text from HTML with attributes', () => {
+  test('should extract text from HTML with attributes', () => {
     const htmlString = '<div class="container" id="main">Hello World</div>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('Hello World');
   });
 
-  it('should handle self-closing tags', () => {
+  test('should handle self-closing tags', () => {
     const htmlString = '<img src="image.jpg" alt="Image"><br><p>Text after</p>';
     const result = extractTextFromHTML(htmlString);
     expect(result).toBe('Text after');
   });
 
-  it('should handle complex HTML structure', () => {
+  test('should handle complex HTML structure', () => {
     const htmlString = `
       <html>
         <head><title>Page Title</title></head>
@@ -293,7 +312,7 @@ describe('extractTextFromHTML', () => {
     expect(result).toContain('Item 2');
   });
 
-  it('should not extract text from strings that look like HTML but are not', () => {
+  test('should not extract text from strings that look like HTML but are not', () => {
     const fakeHtmlString = '<abcdef:12345>';
     const result = extractTextFromHTML(fakeHtmlString);
     expect(result).toBe('<abcdef:12345>');

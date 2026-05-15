@@ -42,9 +42,12 @@ const customIcons = [
   'Error',
   'Full',
   'Layers',
+  'Move',
+  'Multiple',
   'Queued',
   'Redo',
   'Running',
+  'Sigma',
   'Slack',
   'Square',
   'SortAsc',
@@ -53,7 +56,6 @@ const customIcons = [
   'Transparent',
   'TriangleDown',
   'Undo',
-  'Datahub',
 ] as const;
 
 type CustomIconType = Record<(typeof customIcons)[number], FC<IconType>>;

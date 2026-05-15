@@ -30,7 +30,8 @@ import {
   ReactElement,
 } from 'react';
 
-import { ensureIsArray, t, usePrevious } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
+import { ensureIsArray, formatNumber, usePrevious } from '@superset-ui/core';
 import { Constants } from '@superset-ui/core/components';
 import {
   LabeledValue as AntdLabeledValue,
@@ -63,6 +64,7 @@ import {
 } from './styles';
 import {
   DEFAULT_SORT_COMPARATOR,
+  DROPDOWN_ALIGN_BOTTOM,
   EMPTY_OPTIONS,
   MAX_TAG_COUNT,
   TOKEN_SEPARATORS,
@@ -128,13 +130,9 @@ const Select = forwardRef(
     const shouldShowSearch = allowNewOptions ? true : showSearch;
     const [selectValue, setSelectValue] = useState(value);
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(loading);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [visibleOptions, setVisibleOptions] = useState<SelectOptionsType>([]);
-    const [maxTagCount, setMaxTagCount] = useState(
-      propsMaxTagCount ?? MAX_TAG_COUNT,
-    );
     const [onChangeCount, setOnChangeCount] = useState(0);
     const previousChangeCount = usePrevious(onChangeCount, 0);
     const fireOnChange = useCallback(
@@ -142,15 +140,17 @@ const Select = forwardRef(
       [onChangeCount],
     );
 
-    useEffect(() => {
-      if (oneLine) {
-        setMaxTagCount(isDropdownVisible ? 0 : 1);
-      }
-    }, [isDropdownVisible, oneLine]);
+    const maxTagCount = oneLine
+      ? isDropdownVisible
+        ? 0
+        : 1
+      : (propsMaxTagCount ?? MAX_TAG_COUNT);
 
     // Prevent maxTagCount change during click events to avoid click target disappearing
     const [stableMaxTagCount, setStableMaxTagCount] = useState(maxTagCount);
     const isOpeningRef = useRef(false);
+    const selectContainerRef = useRef<HTMLDivElement>(null);
+    const [dropdownWidth, setDropdownWidth] = useState<number | true>(true);
 
     useEffect(() => {
       if (oneLine) {
@@ -161,12 +161,23 @@ const Select = forwardRef(
           requestAnimationFrame(() => {
             setStableMaxTagCount(0);
             isOpeningRef.current = false;
+
+            // Measure collapsed width and update dropdown width
+            const selectElement =
+              selectContainerRef.current?.querySelector('.ant-select');
+            if (selectElement) {
+              const { width } = selectElement.getBoundingClientRect();
+              if (width > 0) {
+                setDropdownWidth(width);
+              }
+            }
           });
           return;
         }
         if (!isDropdownVisible) {
           // When closing, immediately show the first tag
           setStableMaxTagCount(1);
+          setDropdownWidth(true); // Reset to default when closing
           isOpeningRef.current = false;
         }
         return;
@@ -174,7 +185,9 @@ const Select = forwardRef(
       setStableMaxTagCount(maxTagCount);
     }, [maxTagCount, isDropdownVisible, oneLine]);
 
-    const mappedMode = isSingleMode ? undefined : 'multiple';
+    // Prevent maxTagCount change during click events to avoid click target disappearing
+    const [stableMaxTagCount, setStableMaxTagCount] = useState(maxTagCount);
+    const isOpeningRef = useRef(false);
 
     const sortSelectedFirst = useCallback(
       (a: AntdLabeledValue, b: AntdLabeledValue) =>
@@ -496,7 +509,7 @@ const Select = forwardRef(
 
     const bulkSelectComponent = useMemo(
       () => (
-        <StyledBulkActionsContainer justify="center">
+        <StyledBulkActionsContainer justify="space-between">
           <Button
             type="link"
             buttonStyle="link"
@@ -508,7 +521,7 @@ const Select = forwardRef(
               handleSelectAll();
             }}
           >
-            {`${t('Select all')} (${bulkSelectCounts.selectable})`}
+            {`${t('Select all')} (${formatNumber('SMART_NUMBER', bulkSelectCounts.selectable)})`}
           </Button>
           <Button
             type="link"
@@ -525,7 +538,7 @@ const Select = forwardRef(
               handleDeselectAll();
             }}
           >
-            {`${t('Deselect all')} (${bulkSelectCounts.deselectable})`}
+            {`${t('Clear')} (${formatNumber('SMART_NUMBER', bulkSelectCounts.deselectable)})`}
           </Button>
         </StyledBulkActionsContainer>
       ),
@@ -536,6 +549,8 @@ const Select = forwardRef(
         bulkSelectCounts.deselectable,
       ],
     );
+
+    const isLoading = loading ?? false;
 
     const popupRender = (
       originNode: ReactElement & { ref?: RefObject<HTMLElement> },
@@ -562,12 +577,6 @@ const Select = forwardRef(
       setSelectOptions(initialOptions);
       setVisibleOptions(initialOptions);
     }, [initialOptions]);
-
-    useEffect(() => {
-      if (loading !== undefined && loading !== isLoading) {
-        setIsLoading(loading);
-      }
-    }, [isLoading, loading]);
 
     useEffect(() => {
       setSelectValue(value);
@@ -723,7 +732,11 @@ const Select = forwardRef(
     };
 
     return (
-      <StyledContainer className={className} headerPosition={headerPosition}>
+      <StyledContainer
+        ref={selectContainerRef}
+        className={className}
+        headerPosition={headerPosition}
+      >
         {header && (
           <StyledHeader headerPosition={headerPosition}>{header}</StyledHeader>
         )}
@@ -754,7 +767,7 @@ const Select = forwardRef(
           onBlur={handleOnBlur}
           onDeselect={handleOnDeselect}
           onOpenChange={handleOnDropdownVisibleChange}
-          // @ts-ignore
+          // @ts-expect-error
           onPaste={onPaste}
           onPopupScroll={undefined}
           onSearch={shouldShowSearch ? handleOnSearch : undefined}
@@ -783,7 +796,9 @@ const Select = forwardRef(
           options={visibleOptions}
           optionRender={option => <Space>{option.label || option.value}</Space>}
           oneLine={oneLine}
+          popupMatchSelectWidth={oneLine ? dropdownWidth : true}
           css={props.css}
+          dropdownAlign={DROPDOWN_ALIGN_BOTTOM}
           {...props}
           showSearch={shouldShowSearch}
           ref={ref}

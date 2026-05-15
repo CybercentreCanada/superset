@@ -33,10 +33,12 @@ else:
     if TYPE_CHECKING:
         from _typeshed.wsgi import StartResponse, WSGIApplication, WSGIEnvironment
 
-
 from flask import Flask, Response
 from werkzeug.exceptions import NotFound
 
+from superset.extensions.local_extensions_watcher import (
+    start_local_extensions_watcher_thread,
+)
 from superset.initialization import SupersetAppInitializer
 
 logger = logging.getLogger(__name__)
@@ -55,16 +57,13 @@ def create_app(
         )
         app.config.from_object(config_module)
 
-        export_app_metrics = app.config.get("EXPORT_FLASK_METRICS", False)
-        if export_app_metrics:
-            from prometheus_flask_exporter import PrometheusMetrics
-            metrics = PrometheusMetrics.for_app_factory()
-            metrics.init_app(app)
-
         # Allow application to sit on a non-root path
         # *Please be advised that this feature is in BETA.*
         app_root = cast(
-            str, superset_app_root or os.environ.get("SUPERSET_APP_ROOT", "/")
+            str,
+            superset_app_root
+            or os.environ.get("SUPERSET_APP_ROOT")
+            or app.config["APPLICATION_ROOT"],
         )
         if app_root != "/":
             app.wsgi_app = AppRootMiddleware(app.wsgi_app, app_root)
@@ -72,11 +71,31 @@ def create_app(
             # value of app_root so things work out of the box
             if not app.config["STATIC_ASSETS_PREFIX"]:
                 app.config["STATIC_ASSETS_PREFIX"] = app_root
+            # Prefix APP_ICON path with subdirectory root for subdirectory deployments
+            if (
+                app.config.get("APP_ICON", "").startswith("/static/")
+                and app_root != "/"
+            ):
+                app.config["APP_ICON"] = f"{app_root}{app.config['APP_ICON']}"
+                # Also update theme tokens for subdirectory deployments
+                for theme_key in ("THEME_DEFAULT", "THEME_DARK"):
+                    theme = app.config[theme_key]
+                    token = theme.get("token", {})
+                    # Update brandLogoUrl if it points to /static/
+                    if token.get("brandLogoUrl", "").startswith("/static/"):
+                        token["brandLogoUrl"] = f"{app_root}{token['brandLogoUrl']}"
+                    # Update brandLogoHref if it's the default "/"
+                    if token.get("brandLogoHref") == "/":
+                        token["brandLogoHref"] = app_root
             if app.config["APPLICATION_ROOT"] == "/":
                 app.config["APPLICATION_ROOT"] = app_root
 
         app_initializer = app.config.get("APP_INITIALIZER", SupersetAppInitializer)(app)
         app_initializer.init_app()
+
+        # Set up LOCAL_EXTENSIONS file watcher when in debug mode
+        if app.debug:
+            start_local_extensions_watcher_thread(app)
 
         return app
 
@@ -100,8 +119,8 @@ class SupersetApp(Flask):
                 return super().send_static_file(filename)
             except NotFound:
                 logger.debug(
-                    "Webpack hot-update file not found (likely HMR "
-                    f"race condition): {filename}"
+                    "Webpack hot-update file not found (likely HMR race condition): %s",
+                    filename,
                 )
                 return Response("", status=204)  # No Content
         return super().send_static_file(filename)

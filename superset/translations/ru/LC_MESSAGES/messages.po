@@ -17,9 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-30 12:49+0300\n"
-"PO-Revision-Date: 2025-10-30 12:54+0300\n"
-"Last-Translator: Polina Fam\n"
+"POT-Creation-Date: 2026-02-06 23:58-0800\n"
+"PO-Revision-Date: 2025-11-05 14:37+0300\n"
+"Last-Translator: innovark\n"
+"Language: ru\n"
 "Language-Team: Russian <>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -43,16 +44,16 @@ msgid ""
 "                original data, it just changes the way the histogram is displayed."
 msgstr ""
 "\n"
-"                Опция позволяет увидеть, как накапливаются данные при различных "
-"значениях.\n"
-"                Если включено, столбцы гистограммы представляют собой общую сумму "
-"частот\n"
-"                до каждого бина. Это поможет вам понять, насколько велика "
-"вероятность\n"
+"                Опция позволяет увидеть, как накапливаются данные при "
+"различных значениях.\n"
+"                Если включено, столбцы гистограммы представляют собой "
+"общую сумму частот\n"
+"                до каждого бина. Это поможет вам понять, насколько велика"
+" вероятность\n"
 "                встретить значения ниже определенной точки. Помните, что "
 "включение этого режима\n"
-"                не изменяет исходные данные, а лишь меняет способ отображения "
-"гистограммы."
+"                не изменяет исходные данные, а лишь меняет способ "
+"отображения гистограммы."
 
 msgid ""
 "\n"
@@ -68,12 +69,14 @@ msgid ""
 "each bin."
 msgstr ""
 "\n"
-"                Нормировка преобразует значения гистограммы в пропорции или\n"
-"                вероятности путем деления количества точек в каждом бине на общее "
-"количество\n"
-"                точек данных. Такой процесс гарантирует, что итоговые суммы будут "
-"равны 1,\n"
-"                что позволяет сравнить распределение данных и получить более\n"
+"                Нормировка преобразует значения гистограммы в пропорции "
+"или\n"
+"                вероятности путем деления количества точек в каждом бине "
+"на общее количество\n"
+"                точек данных. Такой процесс гарантирует, что итоговые "
+"суммы будут равны 1,\n"
+"                что позволяет сравнить распределение данных и получить "
+"более\n"
 "                четкое представление о доле точек данных в каждом бине."
 
 msgid ""
@@ -90,17 +93,17 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            <p>Your report/alert was unable to be generated because of the "
-"following error: %(text)s</p>\n"
+"            <p>Your report/alert was unable to be generated because of "
+"the following error: %(text)s</p>\n"
 "            <p>Please check your dashboard/chart for errors.</p>\n"
 "            <p><b><a href=\"%(url)s\">%(call_to_action)s</a></b></p>\n"
 "            "
 msgstr ""
 "\n"
-"            <p>Не удалось сгенерировать ваш отчет/оповещение из-за следующей "
-"ошибки: %(text)s</p>\n"
-"            <p>Пожалуйста, проверьте ваш дашборд/диаграмму на наличие ошибок.</"
-"p>\n"
+"            <p>Не удалось сгенерировать ваш отчет/оповещение из-за "
+"следующей ошибки: %(text)s</p>\n"
+"            <p>Пожалуйста, проверьте ваш дашборд/диаграмму на наличие "
+"ошибок.</p>\n"
 "            <p><b><a href=\"%(url)s\">%(call_to_action)s</a></b></p>\n"
 "            "
 
@@ -238,9 +241,9 @@ msgid ""
 "%(report_type)s schedule frequency exceeding limit. Please configure a schedule "
 "with a minimum interval of %(minimum_interval)d minutes per execution."
 msgstr ""
-"Частота выполнения %(report_type)s превышает лимит. Пожалуйста, настройте "
-"расписание с минимальным интервалом не менее %(minimum_interval)d минут(ы) между "
-"выполнениями."
+"Частота выполнения %(report_type)s превышает лимит. Пожалуйста, настройте"
+" расписание с минимальным интервалом не менее %(minimum_interval)d "
+"минут(ы) между выполнениями."
 
 #, python-format
 msgid "%(rows)d rows returned"
@@ -254,7 +257,8 @@ msgstr[0] "%(suggestion)s вместо \"%(undefinedParameter)s\"?"
 msgstr[1] ""
 "%(firstSuggestions)s или %(lastSuggestion)s вместо \"%(undefinedParameter)s\"?"
 msgstr[2] ""
-"%(firstSuggestions)s или %(lastSuggestion)s вместо \"%(undefinedParameter)s\"?"
+"%(firstSuggestions)s или %(lastSuggestion)s вместо "
+"\"%(undefinedParameter)s\"?"
 
 #, python-format
 msgid ""
@@ -301,6 +305,10 @@ msgstr "%s Выбрано (Физические)"
 #, python-format
 msgid "%s Selected (Virtual)"
 msgstr "%s Выбрано (Виртуальные)"
+
+#, fuzzy, python-format
+msgid "%s URL"
+msgstr "Ссылка (URL)"
 
 #, python-format
 msgid "%s aggregates(s)"
@@ -680,6 +688,12 @@ msgstr ">= (больше или равно)"
 msgid "A Big Number"
 msgstr "Карточка"
 
+msgid "A JavaScript function that generates a label configuration object"
+msgstr ""
+
+msgid "A JavaScript function that generates an icon configuration object"
+msgstr ""
+
 msgid "A comma separated list of columns that should be parsed as dates"
 msgstr ""
 "Разделенный запятыми список столбцов, которые должны быть интерпретированы как "
@@ -833,6 +847,10 @@ msgstr "Доступ и владение"
 msgid "Access token"
 msgstr "Токен доступа"
 
+#, fuzzy
+msgid "Account"
+msgstr "количество"
+
 msgid "Action"
 msgstr "Действие"
 
@@ -890,10 +908,12 @@ msgstr "Добавить слой"
 msgid "Add Log"
 msgstr "Добавить запись"
 
-msgid "Add Query A and Query B identifiers to tooltips to help differentiate series"
+msgid ""
+"Add Query A and Query B identifiers to tooltips to help differentiate "
+"series"
 msgstr ""
-"Добавить идентификаторы запроса A и запроса B во всплывающие подсказки для "
-"различия рядов"
+"Добавить идентификаторы запроса A и запроса B во всплывающие подсказки "
+"для различия рядов"
 
 msgid "Add Role"
 msgstr "Добавить роль"
@@ -930,9 +950,6 @@ msgstr "Добавить слой аннотации"
 
 msgid "Add an item"
 msgstr "Добавить запись"
-
-msgid "Add and edit filters"
-msgstr "Добавить и изменить фильтры"
 
 msgid "Add annotation"
 msgstr "Добавить аннотацию"
@@ -973,16 +990,13 @@ msgstr "Добавить способ оповещения"
 msgid "Add description of your tag"
 msgstr "Заполните описание тега"
 
-msgid "Add description that will be displayed when hovering over the label..."
-msgstr ""
+#, fuzzy
+msgid "Add display control"
+msgstr "Настройки отображения"
 
 # Если переводить дословно "Добавить разделитель", то поедет верстка
 msgid "Add divider"
 msgstr "Разделитель"
-
-#, fuzzy
-msgid "Add dynamic group by"
-msgstr "Добавить правило"
 
 msgid "Add extra connection information."
 msgstr "Дополнительная информация по подключению"
@@ -1002,10 +1016,15 @@ msgid ""
 "                    of the underlying data or limit the available values "
 "displayed in the filter."
 msgstr ""
-"Добавьте дополнительные условия к запросу, получающему список значений для "
-"фильтра. Пригодится, если нужно улучшить производительность запроса, ограничив "
-"его некоторой выборкой из всего набора данных или показывать не все возможные "
-"варианты в фильтре."
+"Добавьте дополнительные условия к запросу, получающему список значений "
+"для фильтра. Пригодится, если нужно улучшить производительность запроса, "
+"ограничив его некоторой выборкой из всего набора данных или показывать не"
+" все возможные варианты в фильтре."
+
+# Если переводить дословно "Добавить фильтр", то поедет верстка
+#, fuzzy
+msgid "Add folder"
+msgstr "Фильтр"
 
 msgid "Add item"
 msgstr "Добавить запись"
@@ -1022,7 +1041,12 @@ msgstr "Окрашивать по условию"
 msgid "Add new formatter"
 msgstr "Новое условие"
 
-msgid "Add or edit filters"
+#, fuzzy
+msgid "Add or edit display controls"
+msgstr "Добавить или изменить фильтры"
+
+#, fuzzy
+msgid "Add or edit filters and controls"
 msgstr "Добавить или изменить фильтры"
 
 msgid "Add report"
@@ -1050,6 +1074,10 @@ msgid "Add theme"
 msgstr "Добавить тему"
 
 msgid "Add to dashboard"
+msgstr "Добавить на дашборд"
+
+#, fuzzy
+msgid "Add to tabs"
 msgstr "Добавить на дашборд"
 
 msgid "Added"
@@ -1146,8 +1174,8 @@ msgid "After"
 msgstr "После"
 
 msgid ""
-"After making the changes, copy the query and paste in the virtual dataset SQL "
-"snippet settings."
+"After making the changes, copy the query and paste in the virtual dataset"
+" SQL snippet settings."
 msgstr ""
 "После изменений скопируйте запрос и вставьте в настройки SQL-фрагмента "
 "виртуального датасета."
@@ -1335,11 +1363,12 @@ msgid "Allow node selections"
 msgstr "Разрешить выбор вершин"
 
 msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, TRUNCATE, "
-"etc.) and DML (Data Modification Language: INSERT, UPDATE, DELETE, etc)"
+"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
+"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
+"DELETE, etc)"
 msgstr ""
-"Разрешить выполнение DDL (язык определения данных: CREATE, DROP, TRUNCATE и др.) "
-"и DML (язык модификации данных: INSERT, UPDATE, DELETE и др.)"
+"Разрешить выполнение DDL (язык определения данных: CREATE, DROP, TRUNCATE"
+" и др.) и DML (язык модификации данных: INSERT, UPDATE, DELETE и др.)"
 
 msgid "Allow this database to be explored"
 msgstr "Разрешить изучение этой базы данных"
@@ -1348,7 +1377,7 @@ msgid "Allow this database to be queried in SQL Lab"
 msgstr "Разрешить запросы к этой базе данных в SQL Lab"
 
 #, fuzzy
-msgid "Allow users to select multiple values for this filter"
+msgid "Allow users to select multiple values"
 msgstr "Для использования фильтра нужно будет выбрать значение"
 
 msgid "Allowed Domains (comma separated)"
@@ -1535,6 +1564,13 @@ msgid "An error occurred while fetching usage data"
 msgstr "Произошла ошибка при получении данных об использовании"
 
 #, python-format
+msgid "An error occurred while fetching theme datasource values: %s"
+msgstr "Произошла ошибка при получении значений источника данных темы: %s"
+
+msgid "An error occurred while fetching usage data"
+msgstr "Произошла ошибка при получении данных об использовании"
+
+#, python-format
 msgid "An error occurred while fetching user values: %s"
 msgstr "Произошла ошибка при извлечении пользовательских значений: %s"
 
@@ -1551,8 +1587,9 @@ msgstr "Произошла ошибка при загрузке информац
 msgid "An error occurred while loading the SQL"
 msgstr "Произошла ошибка при загрузке SQL"
 
-msgid "An error occurred while opening Explore"
-msgstr "Произошла ошибка при открытии режима исследования"
+#, fuzzy
+msgid "An error occurred while overwriting the dataset"
+msgstr "Произошла ошибка при создании источника данных"
 
 #, fuzzy
 msgid "An error occurred while overwriting the dataset"
@@ -1587,6 +1624,13 @@ msgid ""
 msgstr ""
 "Произошла ошибка при сохранении запроса на сервере. Чтобы сохранить изменения, "
 "пожалуйста, сохраните ваш запрос через кнопку \"Сохранить как\"."
+
+#, python-format
+msgid "An error occurred while syncing permissions for %s: %s"
+msgstr "Произошла ошибка при синхронизации прав доступа для %s: %s"
+
+msgid "An error occurred while updating the extension."
+msgstr "Произошла ошибка при обновлении расширения."
 
 #, python-format
 msgid "An error occurred while syncing permissions for %s: %s"
@@ -1742,6 +1786,18 @@ msgstr "Любые дашборды, использующие эти темы, �
 msgid "Any dashboards using this theme will be automatically dissociated from it."
 msgstr "Любые дашборды, использующие эту тему, будут автоматически отвязаны от нее."
 
+msgid ""
+"Any dashboards using these themes will be automatically dissociated from "
+"them."
+msgstr ""
+"Любые дашборды, использующие эти темы, будут автоматически отвязаны от "
+"них."
+
+msgid "Any dashboards using this theme will be automatically dissociated from it."
+msgstr ""
+"Любые дашборды, использующие эту тему, будут автоматически отвязаны от "
+"нее."
+
 msgid "Any databases that allow connections via SQL Alchemy URIs can be added. "
 msgstr ""
 "Любые базы данных, подключаемые через SQL Alchemy URI, могут быть добавлены. "
@@ -1795,11 +1851,11 @@ msgid "Apply conditional color formatting to numeric columns"
 msgstr "Применить условное цветовое форматирование к столбцам"
 
 msgid ""
-"Apply custom CSS to the dashboard. Use class names or element selectors to target "
-"specific components."
+"Apply custom CSS to the dashboard. Use class names or element selectors "
+"to target specific components."
 msgstr ""
-"Настройте внешний вид дашборда с помощью CSS. Используйте классы или селекторы "
-"для обращения к конкретным элементам."
+"Настройте внешний вид дашборда с помощью CSS. Используйте классы или "
+"селекторы для обращения к конкретным элементам."
 
 msgid "Apply filters"
 msgstr "Применить"
@@ -1848,9 +1904,6 @@ msgstr "Вы уверены, что хотите удалить выбранны
 msgid "Are you sure you want to delete the selected layers?"
 msgstr "Вы уверены, что хотите удалить выбранные слои?"
 
-msgid "Are you sure you want to delete the selected queries?"
-msgstr "Вы уверены, что хотите удалить выбранные запросы?"
-
 msgid "Are you sure you want to delete the selected roles?"
 msgstr "Вы уверены, что хотите удалить выбранные роли?"
 
@@ -1876,39 +1929,39 @@ msgid "Are you sure you want to proceed?"
 msgstr "Вы уверены, что хотите продолжить?"
 
 msgid ""
-"Are you sure you want to remove the system dark theme? The application will fall "
-"back to the configuration file dark theme."
+"Are you sure you want to remove the system dark theme? The application "
+"will fall back to the configuration file dark theme."
 msgstr ""
-"Вы уверены, что хотите удалить системную темную тему? Будет использована тема из "
-"файла конфигурации."
+"Вы уверены, что хотите удалить системную темную тему? Будет использована "
+"тема из файла конфигурации."
 
 msgid ""
-"Are you sure you want to remove the system default theme? The application will "
-"fall back to the configuration file default."
+"Are you sure you want to remove the system default theme? The application"
+" will fall back to the configuration file default."
 msgstr ""
-"Вы уверены, что хотите удалить системную светлую тему? Будет использована тема из "
-"файла конфигурации."
+"Вы уверены, что хотите удалить системную светлую тему? Будет использована"
+" тема из файла конфигурации."
 
 msgid "Are you sure you want to save and apply changes?"
 msgstr "Вы уверены, что хотите сохранить и применить изменения?"
 
 #, python-format
 msgid ""
-"Are you sure you want to set \"%s\" as the system dark theme? This will apply to "
-"all users who haven't set a personal preference."
+"Are you sure you want to set \"%s\" as the system dark theme? This will "
+"apply to all users who haven't set a personal preference."
 msgstr ""
-"Вы уверены, что хотите установить \"%s\" в качестве системной темной темы? Это "
-"будет применено ко всем пользователям, которые не установили персональные "
-"настройки."
+"Вы уверены, что хотите установить \"%s\" в качестве системной темной "
+"темы? Это будет применено ко всем пользователям, которые не установили "
+"персональные настройки."
 
 #, python-format
 msgid ""
-"Are you sure you want to set \"%s\" as the system default theme? This will apply "
-"to all users who haven't set a personal preference."
+"Are you sure you want to set \"%s\" as the system default theme? This "
+"will apply to all users who haven't set a personal preference."
 msgstr ""
-"Вы уверены, что хотите установить \"%s\" в качестве системной светлой темы? Это "
-"будет применено ко всем пользователям, которые не установили персональные "
-"настройки."
+"Вы уверены, что хотите установить \"%s\" в качестве системной светлой "
+"темы? Это будет применено ко всем пользователям, которые не установили "
+"персональные настройки."
 
 msgid "Area"
 msgstr "Площадь"
@@ -1950,6 +2003,10 @@ msgstr "Атрибуция"
 msgid "August"
 msgstr "Август"
 
+#, fuzzy
+msgid "Authorization Request URI"
+msgstr "Требуется авторизация"
+
 msgid "Authorization needed"
 msgstr "Требуется авторизация"
 
@@ -1958,6 +2015,10 @@ msgstr "Автоматически"
 
 msgid "Auto Zoom"
 msgstr "Автомасштабирование"
+
+#, fuzzy
+msgid "Auto-detect"
+msgstr "Автозаполнение"
 
 msgid "Autocomplete"
 msgstr "Автозаполнение"
@@ -2192,9 +2253,18 @@ msgstr ""
 "функция только расширит диапазон осей. Она не изменит размер диаграммы."
 
 msgid ""
-"Bounds for the axis. When left empty, the bounds are dynamically defined based on "
-"the min/max of the data. Note that this feature will only expand the axis range. "
-"It won't narrow the data's extent."
+"Bounds for the X-axis. Selected time merges with min/max date of the "
+"data. When left empty, bounds dynamically defined based on the min/max of"
+" the data."
+msgstr ""
+"Задает границы для оси X. Выбранное время объединяется с min/max датами "
+"данных. При пустом значении границы определяются динамически на основе "
+"min/max значений данных."
+
+msgid ""
+"Bounds for the Y-axis. When left empty, the bounds are dynamically "
+"defined based on the min/max of the data. Note that this feature will "
+"only expand the axis range. It won't narrow the data's extent."
 msgstr ""
 "Границы для оси. Если оставить поле пустым, границы динамически определяются на "
 "основе минимального/максимального значения данных. Обратите внимание, что эта "
@@ -2344,6 +2414,10 @@ msgstr "Не удалось удалить CSS-шаблоны"
 msgid "CSV Export"
 msgstr "Экспорт в CSV"
 
+#, fuzzy
+msgid "CSV file downloaded successfully"
+msgstr "Пользователь успешно обновлен"
+
 msgid "CSV upload"
 msgstr "Загрузка CSV"
 
@@ -2351,8 +2425,20 @@ msgid "CTAS & CVAS SCHEMA"
 msgstr "СХЕМА CTAS & CVAS"
 
 msgid ""
-"CTAS (create table as select) can only be run with a query where the last "
-"statement is a SELECT. Please make sure your query has a SELECT as its last "
+"CTAS (create table as select) can only be run with a query where the last"
+" statement is a SELECT. Please make sure your query has a SELECT as its "
+"last statement. Then, try running your query again."
+msgstr ""
+"CTAS (CREATE TABLE AS SELECT) может быть выполнен в запросе с "
+"единственным SELECT. Пожалуйста, убедитесь, что запрос содержит только "
+"один SELECT и выполните его заново."
+
+msgid "CUSTOM"
+msgstr "РУЧНОЙ"
+
+msgid ""
+"CVAS (create view as select) can only be run with a query with a single "
+"SELECT statement. Please make sure your query has only a SELECT "
 "statement. Then, try running your query again."
 msgstr ""
 "CTAS (CREATE TABLE AS SELECT) может быть выполнен в запросе с единственным "
@@ -2384,9 +2470,9 @@ msgid ""
 "Cache data separately for each user based on their data access roles and "
 "permissions. When disabled, a single cache will be used for all users."
 msgstr ""
-"Кешировать данные отдельно для каждого пользователя на основе его ролей и "
-"разрешений. При отключении этой опции будет использоваться единое кеширование для "
-"всех пользователей."
+"Кешировать данные отдельно для каждого пользователя на основе его ролей и"
+" разрешений. При отключении этой опции будет использоваться единое "
+"кеширование для всех пользователей."
 
 msgid "Cache timeout"
 msgstr "Время жизни кэша"
@@ -2449,11 +2535,13 @@ msgstr "Невозможно удалить системные темы"
 
 msgid "Cannot delete theme that is set as system default or dark theme"
 msgstr ""
-"Невозможно удалить тему, установленную как системная светлая или темная тема"
+"Невозможно удалить тему, установленную как системная светлая или темная "
+"тема"
 
 msgid "Cannot delete theme that is set as system default or dark theme."
 msgstr ""
-"Невозможно удалить тему, установленную как системная светлая или темная тема."
+"Невозможно удалить тему, установленную как системная светлая или темная "
+"тема."
 
 #, python-format
 msgid "Cannot find the table (%s) metadata."
@@ -2465,16 +2553,19 @@ msgstr "Нельзя использовать несколько учетных 
 msgid "Cannot load filter"
 msgstr "Невозможно загрузить фильтр"
 
-#, fuzzy
-msgid "Cannot load filter: "
-msgstr "Невозможно загрузить фильтр"
-
 msgid "Cannot modify system themes."
 msgstr "Невозможно изменять системные темы."
+
+msgid "Cannot nest folders in default folders"
+msgstr ""
 
 #, python-format
 msgid "Cannot parse time string [%(human_readable)s]"
 msgstr "Не удается разобрать временную строку [%(human_readable)s]"
+
+#, fuzzy
+msgid "Captcha"
+msgstr "Создать диаграмму"
 
 msgid "Cartodiagram"
 msgstr "Картодиаграмма"
@@ -2627,14 +2718,6 @@ msgstr "Диаграмма"
 msgid "Chart %(id)s not found"
 msgstr "Диаграмма %(id)s не найдена"
 
-#, fuzzy
-msgid "Chart Customization"
-msgstr "Ориентация диаграммы"
-
-#, fuzzy, python-format
-msgid "Chart Customization (%d)"
-msgstr "Ориентация диаграммы"
-
 #, python-format
 msgid "Chart Data: %s"
 msgstr "Данные диаграммы: %s"
@@ -2688,9 +2771,12 @@ msgstr "Не удалось создать диаграмму"
 msgid "Chart could not be updated."
 msgstr "Не удалось обновить диаграмму"
 
+msgid "Chart customization to control deck.gl layer visibility"
+msgstr ""
+
 #, fuzzy
-msgid "Chart customization"
-msgstr "Ориентация диаграммы"
+msgid "Chart customization value is required"
+msgstr "Имя диаграммы обязательно к заполнению"
 
 msgid "Chart does not exist"
 msgstr "Диаграмма не существует"
@@ -2740,6 +2826,10 @@ msgstr "Тип диаграммы"
 
 msgid "Chart type requires a dataset"
 msgstr "Для этого типа диаграммы нужен датасет"
+
+#, fuzzy
+msgid "Chart was saved but could not be added to the selected tab."
+msgstr "Не удалось удалить диаграммы"
 
 msgid "Chart width"
 msgstr "Ширина диаграммы"
@@ -2824,17 +2914,22 @@ msgid "Choose columns to read"
 msgstr "Выберите столбцы для чтения"
 
 msgid ""
-"Choose from existing dashboard filters and select a value to refine your report "
-"results."
+"Choose from existing dashboard filters and select a value to refine your "
+"report results."
 msgstr ""
-"Выберите из существующих фильтров дашборда и укажите значение для уточнения "
-"результатов отчета."
+"Выберите из существующих фильтров дашборда и укажите значение для "
+"уточнения результатов отчета."
 
 msgid "Choose how many X-Axis labels to show"
 msgstr "Выберите количество меток на оси X"
 
 msgid "Choose index column"
 msgstr "Выберите индексный столбец"
+
+msgid ""
+"Choose layers to hide from all deck.gl Multiple Layer charts in this "
+"dashboard."
+msgstr ""
 
 msgid "Choose notification method and recipients."
 msgstr "Выбрать способ уведомления и получателей"
@@ -2875,7 +2970,8 @@ msgid ""
 "Choose whether a country should be shaded by the metric, or assigned a color "
 "based on a categorical color palette"
 msgstr ""
-"Определяет метод окраски стран: по значению меры или по категориальной палитре"
+"Определяет метод окраски стран: по значению меры или по категориальной "
+"палитре"
 
 msgid "Choose..."
 msgstr "Выбрать..."
@@ -2923,6 +3019,18 @@ msgstr "Сбросить"
 msgid "Clear all data"
 msgstr "Очистить все данные"
 
+#, fuzzy
+msgid "Clear all filters"
+msgstr "сбросить все фильтры"
+
+#, fuzzy
+msgid "Clear default dark theme"
+msgstr "Дата/время по умолчанию"
+
+#, fuzzy
+msgid "Clear default light theme"
+msgstr "Сбросить локальную тему"
+
 msgid "Clear form"
 msgstr "Очистить форму"
 
@@ -2931,6 +3039,14 @@ msgstr "Сбросить локальную тему"
 
 msgid "Clear the selection to revert to the system default theme"
 msgstr "Сбросьте выбор для возврата к системной светлой теме"
+
+#, fuzzy
+msgid ""
+"Click on \"Add or edit filters and controls\" option in Settings to "
+"create new dashboard filters"
+msgstr ""
+"Нажмите \"Добавить или изменить фильтры\" в настройках, чтобы создать "
+"новые фильтры на дашборде"
 
 msgid ""
 "Click on \"Add or Edit Filters\" option in Settings to create new dashboard "
@@ -3005,6 +3121,14 @@ msgstr "Нажмите для сортировки по возрастанию"
 
 msgid "Click to sort descending"
 msgstr "Нажмите для сортировки по убыванию"
+
+#, fuzzy
+msgid "Client ID"
+msgstr "ID среза"
+
+#, fuzzy
+msgid "Client Secret"
+msgstr "Выбор столбца"
 
 msgid "Close"
 msgstr "Закрыть"
@@ -3149,12 +3273,16 @@ msgstr "Столбец, на который ссылается агрегат, �
 msgid "Column select"
 msgstr "Выбор столбца"
 
+#, fuzzy
+msgid "Column to group by"
+msgstr "Столбцы для группировки"
+
 msgid ""
 "Column to use as the index of the dataframe. If None is given, Index label is "
 "used."
 msgstr ""
-"Столбец, используемый в качестве индекса датафрейма. Если не указан, используется "
-"метка индексного столбца."
+"Столбец, используемый в качестве индекса датафрейма. Если не указан, "
+"используется метка индексного столбца."
 
 msgid "Column type"
 msgstr "Тип столбца"
@@ -3171,6 +3299,9 @@ msgstr "Столбцы (%s)"
 
 msgid "Columns and metrics"
 msgstr "Столбцы и меры"
+
+msgid "Columns folder can only contain column items"
+msgstr ""
 
 #, python-format
 msgid "Columns missing in dataset: %(invalid_columns)s"
@@ -3245,18 +3376,18 @@ msgid ""
 "Compares how a metric changes over time between different groups. Each group is "
 "mapped to a row and change over time is visualized bar lengths and color."
 msgstr ""
-"Сравнивает изменение меры во времени между разными группами. Каждая группа "
-"отображается отдельной строкой, а динамика изменений визуализируется через длину "
-"столбцов и цвет."
+"Сравнивает изменение меры во времени между разными группами. Каждая "
+"группа отображается отдельной строкой, а динамика изменений "
+"визуализируется через длину столбцов и цвет."
 
 msgid ""
-"Compares metrics between different time periods. Displays time series data across "
-"multiple periods (like weeks or months) to show period-over-period trends and "
-"patterns."
+"Compares metrics between different time periods. Displays time series "
+"data across multiple periods (like weeks or months) to show period-over-"
+"period trends and patterns."
 msgstr ""
-"Сравнивает меры за разные периоды времени. Отображает данные временных рядов за "
-"несколько периодов (например, недель или месяцев), чтобы показать тенденции и "
-"закономерности между периодами."
+"Сравнивает меры за разные периоды времени. Отображает данные временных "
+"рядов за несколько периодов (например, недель или месяцев), чтобы "
+"показать тенденции и закономерности между периодами."
 
 msgid "Comparison"
 msgstr "Сравнение"
@@ -3374,6 +3505,10 @@ msgstr "Подключиться к этой базе, используя дин
 msgid "Connect this database with a SQLAlchemy URI string instead"
 msgstr "Подключиться к этой базе через SQLAlchemy URI"
 
+#, fuzzy
+msgid "Connect to engine"
+msgstr "База данных"
+
 msgid "Connection"
 msgstr "База данных"
 
@@ -3440,9 +3575,6 @@ msgstr "Скопировать и вставить JSON-данные"
 msgid "Copy code to clipboard"
 msgstr "Скопировать код в буфер обмена"
 
-msgid "Copy link"
-msgstr "Скопировать ссылку"
-
 #, python-format
 msgid "Copy of %s"
 msgstr "Копия %s"
@@ -3452,9 +3584,6 @@ msgstr "Скопировать часть запроса в буфер обме�
 
 msgid "Copy permalink to clipboard"
 msgstr "Скопировать ссылку в буфер обмена"
-
-msgid "Copy query URL"
-msgstr "Скопировать ссылку на запрос"
 
 msgid "Copy query link to your clipboard"
 msgstr "Скопировать ссылку на запрос в буфер обмена"
@@ -3505,8 +3634,8 @@ msgstr "Не удалось найти объект визуализации"
 msgid "Could not load database driver"
 msgstr "Не удалось загрузить драйвер базы данных"
 
-#, python-brace-format
-msgid "Could not load database driver: {}"
+#, fuzzy, python-brace-format, python-format
+msgid "Could not load database driver for: %(engine)s"
 msgstr "Не удалось загрузить драйвер базы данных: {}"
 
 #, python-format
@@ -3561,6 +3690,9 @@ msgid ""
 msgstr ""
 "Создайте датасет для визуализации ваших данных на диаграмме или перейдите в SQL "
 "Lab для просмотра данных"
+
+msgid "Create a new Tag"
+msgstr "Создать новый тег"
 
 msgid "Create a new Tag"
 msgstr "Создать новый тег"
@@ -3637,6 +3769,10 @@ msgstr "С накоплением"
 msgid "Currency"
 msgstr "Валюта"
 
+#, fuzzy
+msgid "Currency code column"
+msgstr "Символ валюты"
+
 msgid "Currency format"
 msgstr "Формат валюты"
 
@@ -3691,7 +3827,8 @@ msgstr "Пользовательские палитры"
 
 msgid "Custom column name (leave blank for default)"
 msgstr ""
-"Пользовательское название столбца (оставьте пустым для значения по умолчанию)"
+"Пользовательское название столбца (оставьте пустым для значения по "
+"умолчанию)"
 
 msgid "Custom conditional formatting"
 msgstr "Условное форматирование"
@@ -3709,8 +3846,20 @@ msgid "Custom width of the screenshot in pixels"
 msgstr "Ширина скриншота в пикселях"
 
 #, fuzzy
-msgid "Customization settings"
+msgid "Custom..."
+msgstr "Пользовательский"
+
+#, fuzzy
+msgid "Customization type"
 msgstr "Настройки полигона"
+
+#, fuzzy
+msgid "Customization value is required"
+msgstr "Требуется значение фильтра"
+
+#, fuzzy, python-format
+msgid "Customizations out of scope (%d)"
+msgstr "Фильтры вне рамок дашборда (%d)"
 
 msgid "Customize"
 msgstr "Кастомизация"
@@ -3719,18 +3868,11 @@ msgid "Customize Metrics"
 msgstr "Настроить меры"
 
 msgid ""
-"Customize cell titles using Handlebars template syntax. Available variables: "
-"{{rowLabel}}, {{colLabel}}"
+"Customize cell titles using Handlebars template syntax. Available "
+"variables: {{rowLabel}}, {{colLabel}}"
 msgstr ""
-"Настроить заголовки ячеек, используя синтаксис Handlebars. Доступные переменные: "
-"{{rowLabel}}, {{colLabel}}"
-
-msgid ""
-"Customize chart metrics or columns with currency symbols as prefixes or suffixes. "
-"Choose a symbol from dropdown or type your own."
-msgstr ""
-"Настройте отображение мер или столбцов с символами валют (префиксы или суффиксы). "
-"Выберите символ из списка или введите свой."
+"Настроить заголовки ячеек, используя синтаксис Handlebars. Доступные "
+"переменные: {{rowLabel}}, {{colLabel}}"
 
 msgid "Customize columns"
 msgstr "Настроить столбцы"
@@ -3739,25 +3881,25 @@ msgid "Customize data source, filters, and layout."
 msgstr "Настройте источник данных, фильтры и шаблон"
 
 msgid ""
-"Customize the label displayed for decreasing values in the chart tooltips and "
-"legend."
+"Customize the label displayed for decreasing values in the chart tooltips"
+" and legend."
 msgstr ""
 "Настройте подпись, отображаемую для снижающихся значений во всплывающих "
 "подсказках и легенде диаграммы."
 
 msgid ""
-"Customize the label displayed for increasing values in the chart tooltips and "
-"legend."
+"Customize the label displayed for increasing values in the chart tooltips"
+" and legend."
 msgstr ""
-"Настройте подпись, отображаемую для растущих значений во всплывающих подсказках и "
-"легенде диаграммы."
+"Настройте подпись, отображаемую для растущих значений во всплывающих "
+"подсказках и легенде диаграммы."
 
 msgid ""
-"Customize the label displayed for total values in the chart tooltips, legend, and "
-"chart axis."
+"Customize the label displayed for total values in the chart tooltips, "
+"legend, and chart axis."
 msgstr ""
-"Настройте подпись, отображаемую для итоговых значений во всплывающих подсказках, "
-"легенде и на оси диаграммы."
+"Настройте подпись, отображаемую для итоговых значений во всплывающих "
+"подсказках, легенде и на оси диаграммы."
 
 msgid "Customize tooltips template"
 msgstr "Настроить шаблон всплывающих подсказок"
@@ -3838,6 +3980,10 @@ msgstr "Дашборд нельзя добавить в избранное."
 msgid "Dashboard cannot be unfavorited."
 msgstr "Дашборд нельзя удалить из избранного."
 
+#, fuzzy
+msgid "Dashboard chart customizations could not be updated."
+msgstr "Не удалось обновить цветовые настройки дашборда."
+
 msgid "Dashboard color configuration could not be updated."
 msgstr "Не удалось обновить цветовые настройки дашборда."
 
@@ -3849,6 +3995,14 @@ msgstr "Не удалось обновить дашборд"
 
 msgid "Dashboard does not exist"
 msgstr "Дашборд не существует"
+
+#, fuzzy
+msgid "Dashboard exported as example successfully"
+msgstr "Дашборд сохранен"
+
+#, fuzzy
+msgid "Dashboard exported successfully"
+msgstr "Дашборд сохранен"
 
 msgid "Dashboard imported"
 msgstr "Дашборд импортирован"
@@ -3903,6 +4057,10 @@ msgstr "Штрих"
 
 msgid "Data"
 msgstr "Данные"
+
+#, fuzzy
+msgid "Data Export Options"
+msgstr "Свойства диаграммы"
 
 msgid "Data Table"
 msgstr "Таблица"
@@ -4089,8 +4247,8 @@ msgid ""
 "Datasets can be created from database tables or SQL queries. Select a database "
 "table to the left or "
 msgstr ""
-"Датасеты могут быть созданы из таблиц базы данных или SQL-запросов. Выберите "
-"таблицу из базы данных слева или "
+"Датасеты могут быть созданы из таблиц базы данных или SQL-запросов. "
+"Выберите таблицу из базы данных слева или "
 
 msgid "Datasets could not be deleted."
 msgstr "Не удалось удалить датасет"
@@ -4198,6 +4356,14 @@ msgstr "Deck.gl - Точечная диаграмма"
 msgid "Deck.gl - Screen Grid"
 msgstr "Deck.gl - Экранная сетка"
 
+#, fuzzy
+msgid "Deck.gl Layer Visibility"
+msgstr "Deck.gl - Точечная диаграмма"
+
+#, fuzzy
+msgid "Deckgl"
+msgstr "карта deckGL"
+
 msgid "Decrease"
 msgstr "Падение"
 
@@ -4213,6 +4379,10 @@ msgstr "Светлая"
 msgid "Default Catalog"
 msgstr "Каталог по умолчанию"
 
+#, fuzzy
+msgid "Default Column Settings"
+msgstr "Настройки столбца"
+
 msgid "Default Schema"
 msgstr "Схема по умолчанию"
 
@@ -4220,11 +4390,11 @@ msgid "Default URL"
 msgstr "URL по умолчанию"
 
 msgid ""
-"Default URL to redirect to when accessing from the dataset list page. Accepts "
-"relative URLs such as"
+"Default URL to redirect to when accessing from the dataset list page. "
+"Accepts relative URLs such as"
 msgstr ""
-"URL по умолчанию для перенаправления со страницы списка датасетов.Поддерживает "
-"относительные URL, например"
+"URL по умолчанию для перенаправления со страницы списка "
+"датасетов.Поддерживает относительные URL, например"
 
 msgid "Default Value"
 msgstr "Значение по умолчанию"
@@ -4232,8 +4402,13 @@ msgstr "Значение по умолчанию"
 msgid "Default color"
 msgstr "Цвет по умолчанию"
 
-msgid "Default datetime"
-msgstr "Дата/время по умолчанию"
+#, fuzzy, python-format
+msgid "Default datetime column"
+msgstr "Назначить %s столбцом даты/времени по умолчанию"
+
+#, fuzzy
+msgid "Default folders cannot be nested"
+msgstr "Не удалось создать датасет"
 
 msgid "Default latitude"
 msgstr "Широта по умолчанию"
@@ -4241,27 +4416,16 @@ msgstr "Широта по умолчанию"
 msgid "Default longitude"
 msgstr "Долгота по умолчанию"
 
+#, fuzzy
+msgid "Default message"
+msgstr "Значение по умолчанию"
+
 msgid ""
 "Default minimal column width in pixels, actual width may still be larger than "
 "this if other columns don't need much space"
 msgstr ""
 "Минимальная ширина столбца (в пикселях). Реальная ширина по-прежнему может быть "
 "больше, чем указанная, если остальным столбцам не будет хватать места."
-
-#, fuzzy
-msgid ""
-"Default value is required when \"Dynamic group by value is required\" is enabled"
-msgstr "Для использования фильтра нужно будет выбрать значение"
-
-#, fuzzy
-msgid ""
-"Default value must be set when \"Dynamic group by has a default value\" is checked"
-msgstr "Включив эту настройку, нужно выбрать значение фильтра по умолчанию"
-
-#, fuzzy
-msgid ""
-"Default value must be set when \"Dynamic group by value is required\" is checked"
-msgstr "Для использования фильтра нужно будет выбрать значение"
 
 msgid "Default value must be set when \"Filter has default value\" is checked"
 msgstr "Включив эту настройку, нужно выбрать значение фильтра по умолчанию"
@@ -4296,15 +4460,18 @@ msgstr ""
 msgid "Define color breakpoints for the data"
 msgstr "Настройте цветовые пороги для данных"
 
+msgid "Define color breakpoints for the data"
+msgstr "Настройте цветовые пороги для данных"
+
 msgid ""
 "Define contour layers. Isolines represent a collection of line segments that "
 "serparate the area above and below a given threshold. Isobands represent a "
 "collection of polygons that fill the are containing values in a given threshold "
 "range."
 msgstr ""
-"Определите контурные слои. Изолинии представляют набор отрезков, разделяющих зоны "
-"выше и ниже заданного порога. Изополосы — набор полигонов, заполняющих область со "
-"значениями в заданном диапазоне."
+"Определите контурные слои. Изолинии представляют набор отрезков, "
+"разделяющих зоны выше и ниже заданного порога. Изополосы — набор "
+"полигонов, заполняющих область со значениями в заданном диапазоне."
 
 msgid "Define delivery schedule, timezone, and frequency settings."
 msgstr "Определите расписание отправки, часовой пояс и частоту"
@@ -4316,11 +4483,11 @@ msgid "Defined through system configuration."
 msgstr "Задана в системных настройках."
 
 msgid ""
-"Defines a rolling window function to apply, works along with the [Periods] text "
-"box"
+"Defines a rolling window function to apply, works along with the "
+"[Periods] text box"
 msgstr ""
-"Функция, которая применяется к скользящему окну. Работает вместе с текстовым "
-"полем [Периоды]."
+"Функция, которая применяется к скользящему окну. Работает вместе с "
+"текстовым полем [Периоды]."
 
 msgid "Defines the grid size in pixels"
 msgstr "Определяет размер сетки (в пикселях)"
@@ -4349,8 +4516,8 @@ msgid ""
 "Defines the value that determines the boundary between different regions or "
 "levels in the data "
 msgstr ""
-"Определяет значение, которое задает границу между различными регионами или "
-"уровнями в данных "
+"Определяет значение, которое задает границу между различными регионами "
+"или уровнями в данных "
 
 msgid ""
 "Defines whether the step should appear at the beginning, middle or end between "
@@ -4417,8 +4584,12 @@ msgstr "Удалить рассылку по email"
 msgid "Delete group"
 msgstr "Удалить группу"
 
-msgid "Delete query"
-msgstr "Удалить запрос"
+#, fuzzy
+msgid "Delete item"
+msgstr "Удалить тему"
+
+msgid "Delete role"
+msgstr "Удалить роль"
 
 msgid "Delete role"
 msgstr "Удалить роль"
@@ -4551,11 +4722,11 @@ msgid "Deleted: %s"
 msgstr "Удалено: %s"
 
 msgid ""
-"Deleting a tab will remove all content within it and will deactivate any related "
-"alerts or reports. You may still reverse this action with the"
+"Deleting a tab will remove all content within it and will deactivate any "
+"related alerts or reports. You may still reverse this action with the"
 msgstr ""
-"Удаление вкладки приведет к удалению всего ее содержимого и отключению связанных "
-"оповещений и отчетов. Это действие можно отменить с помощью"
+"Удаление вкладки приведет к удалению всего ее содержимого и отключению "
+"связанных оповещений и отчетов. Это действие можно отменить с помощью"
 
 msgid "Delimited long & lat single column"
 msgstr "Долгота и широта в одном столбце"
@@ -4704,11 +4875,54 @@ msgstr "Отображать название столбца"
 msgid "Display configuration"
 msgstr "Настройки отображения"
 
+#, fuzzy
+msgid "Display control configuration"
+msgstr "Настройки отображения"
+
+#, fuzzy
+msgid "Display control has default value"
+msgstr "Фильтр имеет значение по умолчанию"
+
+#, fuzzy
+msgid "Display control name"
+msgstr "Отображать название столбца"
+
+#, fuzzy
+msgid "Display control settings"
+msgstr "Оставить прежние настройки?"
+
+#, fuzzy
+msgid "Display control type"
+msgstr "Отображать название столбца"
+
+#, fuzzy
+msgid "Display controls"
+msgstr "Настройки отображения"
+
+#, fuzzy, python-format
+msgid "Display controls (%d)"
+msgstr "Настройки отображения"
+
+#, fuzzy, python-format
+msgid "Display controls (%s)"
+msgstr "Настройки отображения"
+
+#, fuzzy
+msgid "Display cumulative total at end"
+msgstr "Отобразить итог по столбцу"
+
 msgid "Display headers for each column at the top of the matrix"
 msgstr "Отображать заголовки для каждого столбца в верхней части матрицы"
 
 msgid "Display labels for each row on the left side of the matrix"
 msgstr "Отображать подписи для каждой строки слева от матрицы"
+
+msgid ""
+"Display metrics side by side within each column, as opposed to each "
+"column being displayed side by side for each metric."
+msgstr ""
+"Отобразить меры для каждого столбца или продублировать все столбцы для "
+"каждой меры"
 
 msgid ""
 "Display metrics side by side within each column, as opposed to each column being "
@@ -4728,6 +4942,9 @@ msgstr "Отобразить подытог по строке"
 
 msgid "Display row level total"
 msgstr "Отобразить общий итог по строке"
+
+msgid "Display the last queried timestamp on charts in the dashboard view"
+msgstr ""
 
 msgid "Display type icon"
 msgstr "Отображать значок типа"
@@ -4753,11 +4970,11 @@ msgid "Divider"
 msgstr "Разделитель"
 
 msgid ""
-"Divides each category into subcategories based on the values in the dimension. It "
-"can be used to exclude intersections."
+"Divides each category into subcategories based on the values in the "
+"dimension. It can be used to exclude intersections."
 msgstr ""
-"Разделяет каждую категорию на подкатегории на основе значений в измерении. Может "
-"использоваться для исключения пересечений."
+"Разделяет каждую категорию на подкатегории на основе значений в "
+"измерении. Может использоваться для исключения пересечений."
 
 msgid "Do you want a donut or a pie?"
 msgstr "Кольцевая или круговая диаграмма"
@@ -4792,13 +5009,17 @@ msgstr "Идет загрузка"
 msgid "Download to CSV"
 msgstr "Сохранить в CSV"
 
+#, fuzzy
+msgid "Download to client"
+msgstr "Сохранить в CSV"
+
 #, python-format
 msgid ""
-"Downloading %(rows)s rows based on the LIMIT configuration. If you want the "
-"entire result set, you need to adjust the LIMIT."
+"Downloading %(rows)s rows based on the LIMIT configuration. If you want "
+"the entire result set, you need to adjust the LIMIT."
 msgstr ""
-"Загрузка %(rows)s строк согласно настройке LIMIT. Для получения полного набора "
-"результатов измените параметр LIMIT."
+"Загрузка %(rows)s строк согласно настройке LIMIT. Для получения полного "
+"набора результатов измените параметр LIMIT."
 
 msgid "Draft"
 msgstr "Черновик"
@@ -4810,13 +5031,14 @@ msgid "Drag and drop components to this tab"
 msgstr "Переместите компоненты в эту вкладку"
 
 msgid ""
-"Drag columns and metrics here to customize tooltip content. Order matters - items "
-"will appear in the same order in tooltips. Click the button to manually select "
-"columns and metrics."
+"Drag columns and metrics here to customize tooltip content. Order matters"
+" - items will appear in the same order in tooltips. Click the button to "
+"manually select columns and metrics."
 msgstr ""
-"Перетащите столбцы и меры сюда, чтобы настроить содержание всплывающих подсказок. "
-"Порядок имеет значение — элементы будут отображаться в том же порядке в "
-"подсказках. Нажмите кнопку, чтобы вручную выбрать столбцы и меры."
+"Перетащите столбцы и меры сюда, чтобы настроить содержание всплывающих "
+"подсказок. Порядок имеет значение — элементы будут отображаться в том же "
+"порядке в подсказках. Нажмите кнопку, чтобы вручную выбрать столбцы и "
+"меры."
 
 msgid "Draw a marker on data points. Only applicable for line types."
 msgstr "Отобразить маркеры на точках данных. Применимо только для графиков."
@@ -4912,6 +5134,10 @@ msgstr ""
 msgid "Duplicate dataset"
 msgstr "Дублировать датасет"
 
+#, fuzzy, python-format
+msgid "Duplicate folder name: %s"
+msgstr "Дублировать роль %(name)s"
+
 msgid "Duplicate role"
 msgstr "Дублировать роль"
 
@@ -4936,18 +5162,20 @@ msgstr ""
 "конфигурации."
 
 msgid ""
-"Duration (in seconds) of the caching timeout for this chart. Set to -1 to bypass "
-"the cache. Note this defaults to the dataset's timeout if undefined."
+"Duration (in seconds) of the caching timeout for this chart. Set to -1 to"
+" bypass the cache. Note this defaults to the dataset's timeout if "
+"undefined."
 msgstr ""
-"Продолжительность (в секундах) таймаута кэша для этой диаграммы. Обратите "
-"внимание, что если значение не задано, применяется значение таймаута датасета."
+"Продолжительность (в секундах) таймаута кэша для этой диаграммы. Обратите"
+" внимание, что если значение не задано, применяется значение таймаута "
+"датасета."
 
 msgid ""
-"Duration (in seconds) of the metadata caching timeout for schemas of this "
-"database. If left unset, the cache never expires."
+"Duration (in seconds) of the metadata caching timeout for schemas of this"
+" database. If left unset, the cache never expires."
 msgstr ""
-"Продолжительность (в секундах) таймаута кэша для схем этой базы данных. Обратите "
-"внимание, что если значение не задано, кэш никогда не очистится."
+"Продолжительность (в секундах) таймаута кэша для схем этой базы данных. "
+"Обратите внимание, что если значение не задано, кэш никогда не очистится."
 
 msgid ""
 "Duration (in seconds) of the metadata caching timeout for tables of this "
@@ -4955,6 +5183,9 @@ msgid ""
 msgstr ""
 "Таймаут кэша для таблиц этой базы данных (в секундах). Обратите внимание, что "
 "если значение не задано, кэш никогда не очистится."
+
+msgid "Duration Ms"
+msgstr "Продолжительность (мс)"
 
 msgid "Duration Ms"
 msgstr "Продолжительность (мс)"
@@ -4971,6 +5202,10 @@ msgstr "Продолжительность в мс (10500 => 0:10.5)"
 msgid "Duration in ms (66000 => 1m 6s)"
 msgstr "Продолжительность в мс (66000 => 1m 6s)"
 
+#, fuzzy
+msgid "Dynamic"
+msgstr "Группировать по"
+
 msgid "Dynamic Aggregation Function"
 msgstr "Динамическая агрегирующая функция"
 
@@ -4978,19 +5213,11 @@ msgstr "Динамическая агрегирующая функция"
 msgid "Dynamic group by"
 msgstr "Группировать по"
 
-#, fuzzy
-msgid "Dynamic group by has a default value"
-msgstr "Фильтр имеет значение по умолчанию"
-
-msgid "Dynamic group by name"
-msgstr ""
-
-#, fuzzy
-msgid "Dynamic group by value is required"
-msgstr "Требуется значение фильтра"
-
 msgid "Dynamically search all filter values"
 msgstr "Динамически искать все значения фильтра"
+
+msgid "Dynamically select grouping columns from a dataset"
+msgstr ""
 
 # Не переводить
 msgid "ECharts"
@@ -5017,6 +5244,10 @@ msgstr "Толщина ребра"
 
 msgid "Edit"
 msgstr "Редактировать"
+
+#, fuzzy, python-format
+msgid "Edit %s in modal"
+msgstr "в модальном окне"
 
 msgid "Edit CSS template properties"
 msgstr "Редактировать свойства шаблона CSS"
@@ -5087,8 +5318,14 @@ msgstr "Редактировать группу"
 msgid "Edit properties"
 msgstr "Редактировать свойства"
 
-msgid "Edit query"
-msgstr "Редактировать запрос"
+msgid "Edit report"
+msgstr "Редактировать отчет"
+
+msgid "Edit role"
+msgstr "Редактировать роль"
+
+msgid "Edit tag"
+msgstr "Редактировать тег"
 
 msgid "Edit report"
 msgstr "Редактировать отчет"
@@ -5107,9 +5344,6 @@ msgstr "Редактировать параметры шаблонизации J
 
 msgid "Edit the dashboard"
 msgstr "Редактировать дашборд"
-
-msgid "Edit theme"
-msgstr "Редактировать тему"
 
 msgid "Edit theme properties"
 msgstr "Редактировать свойства темы"
@@ -5144,6 +5378,10 @@ msgstr ""
 msgid "Either the username or the password is wrong."
 msgstr "Неверное имя пользователя или пароль"
 
+#, fuzzy
+msgid "Elapsed"
+msgstr "Обновить"
+
 msgid "Elevation"
 msgstr "Высота"
 
@@ -5152,6 +5390,10 @@ msgstr "Email"
 
 msgid "Email is required"
 msgstr "Email обязателен к заполнению"
+
+#, fuzzy
+msgid "Email link"
+msgstr "Email"
 
 msgid "Email reports active"
 msgstr "Включить рассылки"
@@ -5224,6 +5466,20 @@ msgstr "Включить перемещение по графу"
 msgid "Enable horizontal layout (columns)"
 msgstr "Включить горизонтальное расположение (столбцы)"
 
+msgid "Enable icon JavaScript mode"
+msgstr ""
+
+#, fuzzy
+msgid "Enable icons"
+msgstr "Столбцы таблицы"
+
+msgid "Enable label JavaScript mode"
+msgstr ""
+
+#, fuzzy
+msgid "Enable labels"
+msgstr "Метки диапазона"
+
 msgid "Enable node dragging"
 msgstr "Разрешить перемещение вершин"
 
@@ -5238,6 +5494,18 @@ msgstr "Включить серверную пагинацию результа�
 
 msgid "Enable vertical layout (rows)"
 msgstr "Включить вертикальное расположение (строки)"
+
+msgid "Enables custom icon configuration via JavaScript"
+msgstr ""
+
+msgid "Enables custom label configuration via JavaScript"
+msgstr ""
+
+msgid "Enables rendering of icons for GeoJSON points"
+msgstr ""
+
+msgid "Enables rendering of labels for GeoJSON points"
+msgstr ""
 
 msgid ""
 "Encountered invalid NULL spatial entry,                                        "
@@ -5301,6 +5569,10 @@ msgstr "Введите название для этого листа"
 msgid "Enter a new title for the tab"
 msgstr "Введите новое название для вкладки"
 
+#, fuzzy
+msgid "Enter a part of the object name"
+msgstr "Использовать заливку для объектов"
+
 msgid "Enter alert name"
 msgstr "Введите имя оповещения"
 
@@ -5340,6 +5612,10 @@ msgstr "Введите имя"
 
 msgid "Enter the user's last name"
 msgstr "Введите фамилию"
+
+#, fuzzy
+msgid "Enter the user's password"
+msgstr "Подтвердите пароль пользователя"
 
 msgid "Enter the user's username"
 msgstr "Введите имя пользователя"
@@ -5511,6 +5787,9 @@ msgstr "Не удалось определить формат Excel-файла"
 msgid "Excel upload"
 msgstr "Загрузка Excel"
 
+msgid "Exclude layers (deck.gl)"
+msgstr ""
+
 msgid "Exclude selected values"
 msgstr "Исключить выбранные значения"
 
@@ -5550,9 +5829,6 @@ msgstr "Расширить панель данных"
 msgid "Expand row"
 msgstr "Развернуть строку"
 
-msgid "Expand tool bar"
-msgstr "Показать панель инструментов"
-
 msgid ""
 "Expects a formula with depending time parameter 'x'\n"
 "        in milliseconds since epoch. mathjs is used to evaluate the formulas.\n"
@@ -5577,11 +5853,49 @@ msgstr "Создать диаграмму на основе этих данны�
 msgid "Export"
 msgstr "Экспортировать"
 
+#, fuzzy
+msgid "Export All Data"
+msgstr "Очистить все данные"
+
+#, fuzzy
+msgid "Export Current View"
+msgstr "Инвертировать текущую страницу"
+
+#, fuzzy
+msgid "Export YAML"
+msgstr "Имя отчета"
+
+#, fuzzy
+msgid "Export as Example"
+msgstr "Экспорт темы"
+
+#, fuzzy
+msgid "Export cancelled"
+msgstr "Рассылка не удалась"
+
 msgid "Export dashboards?"
 msgstr "Экспортировать дашборды?"
 
-msgid "Export query"
-msgstr "Экспорт запроса"
+#, fuzzy
+msgid "Export failed"
+msgstr "Рассылка не удалась"
+
+#, fuzzy
+msgid "Export failed - please try again"
+msgstr ""
+"Произошла ошибка скачивания PDF-файла. Обновите страницу и попробуйте "
+"заново."
+
+#, fuzzy, python-format
+msgid "Export failed: %s"
+msgstr "Рассылка не удалась"
+
+msgid "Export screenshot (jpeg)"
+msgstr ""
+
+#, fuzzy, python-format
+msgid "Export successful: %s"
+msgstr "Экспорт в целый CSV"
 
 msgid "Export theme"
 msgstr "Экспорт темы"
@@ -5650,10 +5964,10 @@ msgid ""
 "\"This table is the source of truth.\" }, \"warning_markdown\": \"This is a "
 "warning.\" }`."
 msgstr ""
-"Дополнительные метаданные таблицы. В настоящий момент поддерживается следующий "
-"формат: `{ \"certification\": { \"certified_by\": \"Руководитель отдела\", "
-"\"details\": \"Эта таблица - источник правды.\" }, \"warning_markdown\": \"Это "
-"предупреждение.\" }`."
+"Дополнительные метаданные таблицы. В настоящий момент поддерживается "
+"следующий формат: `{ \"certification\": { \"certified_by\": "
+"\"Руководитель отдела\", \"details\": \"Эта таблица - источник правды.\" "
+"}, \"warning_markdown\": \"Это предупреждение.\" }`."
 
 msgid "Extra parameters for use in jinja templated queries"
 msgstr "Дополнительные параметры для запросов, использующих шаблонизацию Jinja"
@@ -5705,6 +6019,9 @@ msgstr "Не удалось создать рассылку"
 msgid "Failed to execute %(query)s"
 msgstr "Не удалось выполнить %(query)s"
 
+msgid "Failed to fetch user info:"
+msgstr ""
+
 msgid "Failed to generate chart edit URL"
 msgstr "Не удалось сгенерировать URL для редактирования диаграммы"
 
@@ -5714,8 +6031,16 @@ msgstr "Не удалось загрузить данные диаграммы"
 msgid "Failed to load chart data."
 msgstr "Не удалось загрузить данные"
 
+#, fuzzy, python-format
+msgid "Failed to load columns for dataset %s"
+msgstr "Не удалось загрузить данные диаграммы"
+
 msgid "Failed to load top values"
 msgstr "Не удалось загрузить топовые значения"
+
+#, fuzzy
+msgid "Failed to open file. Please try again."
+msgstr "Не удалось проверить выражение. Пожалуйста, попробуйте еще раз."
 
 #, python-format
 msgid "Failed to remove system dark theme: %s"
@@ -5756,6 +6081,10 @@ msgstr "Не удалось запустить удаленный запрос"
 msgid "Failed to stop query."
 msgstr "Не удалось остановить запрос."
 
+#, fuzzy
+msgid "Failed to store query results. Please try again."
+msgstr "Не удалось проверить выражение. Пожалуйста, попробуйте еще раз."
+
 msgid "Failed to tag items"
 msgstr "Не удалось применить теги"
 
@@ -5768,6 +6097,9 @@ msgstr "Не удалось проверить выражение. Пожалу�
 #, python-format
 msgid "Failed to verify select options: %s"
 msgstr "Ошибка при проверке вариантов выбора: %s"
+
+msgid "Falling back to CSV; Excel export library not available."
+msgstr ""
 
 msgid "False"
 msgstr "Ложь"
@@ -5807,6 +6139,11 @@ msgstr "Поле обязательно к заполнению"
 
 msgid "File extension is not allowed."
 msgstr "Данное расширение файла не поддерживается."
+
+msgid ""
+"File handling is not supported in this browser. Please use a modern "
+"browser like Chrome or Edge."
+msgstr ""
 
 msgid "File settings"
 msgstr "Настройки файла"
@@ -5878,6 +6215,10 @@ msgstr "Поиск"
 
 msgid "Filters"
 msgstr "Фильтры"
+
+#, fuzzy
+msgid "Filters and controls"
+msgstr "Дополнительные переключатели"
 
 msgid "Filters by columns"
 msgstr "Фильтры по столбцам"
@@ -5961,6 +6302,14 @@ msgstr "Фиксированный радиус"
 msgid "Flow"
 msgstr "Поток"
 
+#, fuzzy
+msgid "Folder with content must have a name"
+msgstr "Фильтры для сравнения должны содержать значение"
+
+#, fuzzy
+msgid "Folders"
+msgstr "Фильтры"
+
 msgid "Font size"
 msgstr "Размер шрифта"
 
@@ -5990,8 +6339,8 @@ msgid "For further instructions, consult the"
 msgstr "Для получения дальнейших инструкций обратитесь к"
 
 msgid ""
-"For more information about objects are in context in the scope of this function, "
-"refer to the"
+"For more information about objects are in context in the scope of this "
+"function, refer to the"
 msgstr "Подробнее об объектах в рамках этой функции см."
 
 msgid ""
@@ -6006,6 +6355,9 @@ msgstr ""
 msgid "Forbidden"
 msgstr "Запрещено"
 
+msgid "Forbidden"
+msgstr "Запрещено"
+
 msgid "Force"
 msgstr "Силовой"
 
@@ -6013,11 +6365,11 @@ msgid "Force Time Grain as Max Interval"
 msgstr "Принудительно использовать временной интервал как максимальный"
 
 msgid ""
-"Force all tables and views to be created in this schema when clicking CTAS or "
-"CVAS in SQL Lab."
+"Force all tables and views to be created in this schema when clicking "
+"CTAS or CVAS in SQL Lab."
 msgstr ""
-"Принудить создание всех таблиц и представлений в этой схеме при нажатии кнопок "
-"CTAS или CVAS в SQL Lab"
+"Принудить создание всех таблиц и представлений в этой схеме при нажатии "
+"кнопок CTAS или CVAS в SQL Lab"
 
 msgid "Force categorical"
 msgstr "Принудительная категоризация"
@@ -6041,7 +6393,9 @@ msgid "Force refresh table list"
 msgstr "Обновить список таблиц"
 
 msgid "Forces selected Time Grain as the maximum interval for X Axis Labels"
-msgstr "Использует выбранный временной интервал как максимальный для подписей оси X"
+msgstr ""
+"Использует выбранный временной интервал как максимальный для подписей оси"
+" X"
 
 msgid "Forecast periods"
 msgstr "Кол-во прогнозных периодов"
@@ -6070,9 +6424,16 @@ msgid ""
 "new line. ECharts compatibility:\n"
 "{a} (series), {b} (name), {c} (value), {d} (percentage)"
 msgstr ""
-"Формат подписей данных. Используйте переменные: {name}, {value}, {percent}. \\n - "
-"перенос строки. Совместимость с ECharts:\n"
+"Формат подписей данных. Используйте переменные: {name}, {value}, "
+"{percent}. \\n - перенос строки. Совместимость с ECharts:\n"
 "{a} (серия), {b} (название), {c} (значение), {d} (процент)"
+
+msgid ""
+"Format metrics or columns with currency symbols as prefixes or suffixes. "
+"Choose a symbol manually or use 'Auto-detect' to apply the correct symbol"
+" based on the dataset's currency code column. When multiple currencies "
+"are present, formatting falls back to neutral numbers."
+msgstr ""
 
 msgid "Formatted CSV attached in email"
 msgstr "Форматированный CSV, прикрепленный к письму"
@@ -6133,11 +6494,12 @@ msgid "Gantt Chart"
 msgstr "Диаграмма Ганта"
 
 msgid ""
-"Gantt chart visualizes important events over a time span. Every data point "
-"displayed as a separate event along a horizontal line."
+"Gantt chart visualizes important events over a time span. Every data "
+"point displayed as a separate event along a horizontal line."
 msgstr ""
-"Диаграмма Ганта визуализирует важные события в течение временного периода. Каждая "
-"точка данных отображается как отдельное событие вдоль горизонтальной линии."
+"Диаграмма Ганта визуализирует важные события в течение временного "
+"периода. Каждая точка данных отображается как отдельное событие вдоль "
+"горизонтальной линии."
 
 msgid "Gauge Chart"
 msgstr "Индикаторная диаграмма"
@@ -6239,25 +6601,28 @@ msgstr "Группа"
 msgid "Group by"
 msgstr "Группировать по"
 
-#, python-format
-msgid "Group by settings (%s)"
-msgstr ""
-
 msgid "Group remaining as \"Others\""
 msgstr "Группировать остальное в \"Другое\""
+
+#, fuzzy
+msgid "Grouping"
+msgstr "Группа"
 
 msgid "Groups"
 msgstr "Группы"
 
 msgid ""
-"Groups remaining series into an \"Others\" category when series limit is reached. "
-"This prevents incomplete time series data from being displayed."
+"Groups remaining series into an \"Others\" category when series limit is "
+"reached. This prevents incomplete time series data from being displayed."
 msgstr ""
-"Объединяет оставшиеся ряды в категорию \"Другое\" при достижении лимита. Это "
-"предотвращает отображение неполных данных временных рядов."
+"Объединяет оставшиеся ряды в категорию \"Другое\" при достижении лимита. "
+"Это предотвращает отображение неполных данных временных рядов."
 
 msgid "Guest user cannot modify chart payload"
 msgstr "Гость не может изменять данные диаграммы"
+
+msgid "HTTP Path"
+msgstr ""
 
 msgid "Handlebars"
 msgstr "Handlebars"
@@ -6277,6 +6642,10 @@ msgstr "Заголовок"
 msgid "Header row"
 msgstr "Строка заголовка"
 
+#, fuzzy
+msgid "Header row is required"
+msgstr "Имя обязательно"
+
 msgid "Heatmap"
 msgstr "Тепловая карта"
 
@@ -6288,6 +6657,10 @@ msgstr "Высота каждой строки (пиксели)"
 
 msgid "Height of the sparkline"
 msgstr "Высота спарклайна"
+
+#, fuzzy
+msgid "Hidden"
+msgstr "Показать"
 
 msgid "Hide Column"
 msgstr "Скрыть столбец"
@@ -6303,9 +6676,6 @@ msgstr "Скрыть слой"
 
 msgid "Hide password."
 msgstr "Скрыть пароль."
-
-msgid "Hide tool bar"
-msgstr "Скрыть панель инструментов"
 
 msgid "Hides the Line for the time series"
 msgstr "Скрывает линию для временного ряда"
@@ -6383,6 +6753,22 @@ msgstr "Коды ISO 3166-2"
 msgid "ISO 8601"
 msgstr "ISO 8601"
 
+#, fuzzy
+msgid "Icon JavaScript config generator"
+msgstr "JavaScript-генератор всплывающих подсказок"
+
+#, fuzzy
+msgid "Icon URL"
+msgstr "Скопировать URL"
+
+#, fuzzy
+msgid "Icon size"
+msgstr "Размер шрифта"
+
+#, fuzzy
+msgid "Icon size unit"
+msgstr "Размер шрифта"
+
 msgid "Id"
 msgstr "ID"
 
@@ -6395,11 +6781,12 @@ msgid ""
 "hive.server2.enable.doAs is enabled, will run the queries as service account, but "
 "impersonate the currently logged on user via hive.server2.proxy.user property."
 msgstr ""
-"Если вы используете Presto или Trino, все запросы в SQL Lab будут выполняться от "
-"авторизованного пользователя, который должен иметь разрешение на их выполнение. "
-"Если включены Hive и hive.server2.enable.doAs, то запросы будут выполняться через "
-"техническую учетную запись, но имперсонировать зарегистрированного пользователя "
-"можно через свойство hive.server2.proxy.user."
+"Если вы используете Presto или Trino, все запросы в SQL Lab будут "
+"выполняться от авторизованного пользователя, который должен иметь "
+"разрешение на их выполнение. Если включены Hive и "
+"hive.server2.enable.doAs, то запросы будут выполняться через техническую "
+"учетную запись, но имперсонировать зарегистрированного пользователя можно"
+" через свойство hive.server2.proxy.user."
 
 msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr "Если выбрать меру, список значений фильтров будет отсортирован по ней"
@@ -6408,6 +6795,11 @@ msgid ""
 "If enabled, this control sorts the results/values descending, otherwise it sorts "
 "the results ascending."
 msgstr "Если включено, сортирует результаты по убыванию"
+
+msgid ""
+"If it stays empty, it won't be saved and will be removed from the list. "
+"To remove folders, move metrics and columns to other folders."
+msgstr ""
 
 msgid "If table already exists"
 msgstr "Если таблица уже существует"
@@ -6432,7 +6824,9 @@ msgstr ""
 "Произошла ошибка скачивания изображения. Обновите страницу и попробуйте заново."
 
 msgid "Impersonate logged in user (Presto, Trino, Drill, Hive, and Google Sheets)"
-msgstr "Имперсонировать пользователя (Presto, Trino, Drill, Hive, и Google Таблицы)"
+msgstr ""
+"Имперсонировать пользователя (Presto, Trino, Drill, Hive, и Google "
+"Таблицы)"
 
 msgid "Import"
 msgstr "Импорт"
@@ -6484,11 +6878,11 @@ msgid "In Range"
 msgstr "В промежутке"
 
 msgid ""
-"In order to connect to non-public sheets you need to either provide a service "
-"account or configure an OAuth2 client."
+"In order to connect to non-public sheets you need to either provide a "
+"service account or configure an OAuth2 client."
 msgstr ""
-"Для подключения к непубличным листам необходимо либо предоставить сервисный "
-"аккаунт, либо настроить OAuth2-клиент."
+"Для подключения к непубличным листам необходимо либо предоставить "
+"сервисный аккаунт, либо настроить OAuth2-клиент."
 
 msgid "In this view you can preview the first 25 rows. "
 msgstr "В этом представлении вы можете просмотреть первые 25 строк. "
@@ -6540,6 +6934,9 @@ msgstr "Личные данные"
 msgid "Inherit range from time filter"
 msgstr "Наследовать диапазон из фильтра"
 
+msgid "Initial tree depth"
+msgstr ""
+
 msgid "Inner Radius"
 msgstr "Внутренний радиус"
 
@@ -6557,6 +6954,41 @@ msgstr "Введите URL слоя"
 
 msgid "Insert Layer title"
 msgstr "Введите название слоя"
+
+#, fuzzy
+msgid "Inside"
+msgstr "Индекс"
+
+#, fuzzy
+msgid "Inside bottom"
+msgstr "снизу"
+
+#, fuzzy
+msgid "Inside bottom left"
+msgstr "Снизу слева"
+
+#, fuzzy
+msgid "Inside bottom right"
+msgstr "Снизу справа"
+
+#, fuzzy
+msgid "Inside left"
+msgstr "Закрепить слева"
+
+#, fuzzy
+msgid "Inside right"
+msgstr "Закрепить справа"
+
+msgid "Inside top"
+msgstr ""
+
+#, fuzzy
+msgid "Inside top left"
+msgstr "Сверху слева"
+
+#, fuzzy
+msgid "Inside top right"
+msgstr "Сверху справа"
 
 msgid "Intensity"
 msgstr "Насыщенность"
@@ -6592,8 +7024,8 @@ msgid ""
 "Invalid Connection String: Expecting String of the form 'ocient://"
 "user:pass@host:port/database'."
 msgstr ""
-"Неверная строка подключения. Ожидается строка вида 'ocient://"
-"пользователь:пароль@хост:порт/схема'."
+"Неверная строка подключения. Ожидается строка вида "
+"'ocient://пользователь:пароль@хост:порт/схема'."
 
 msgid "Invalid JSON"
 msgstr "Недопустимый формат JSON"
@@ -6614,6 +7046,13 @@ msgstr "Неверный сертификат"
 
 msgid "Invalid color"
 msgstr "Некорректный цвет"
+
+msgid ""
+"Invalid connection string, a valid string usually follows: "
+"backend+driver://user:password@database-host/database-name"
+msgstr ""
+"Недопустимая строка для подключения. Валидная строка соответствует "
+"шаблону: драйвер://имя-пользователя:пароль@хост/имя-базы-данных"
 
 msgid ""
 "Invalid connection string, a valid string usually follows: backend+driver://"
@@ -6653,6 +7092,10 @@ msgstr "Некорректное выражение"
 #, python-format
 msgid "Invalid filter operation type: %(op)s"
 msgstr "Недопустимый тип фильтрации: %(op)s"
+
+#, fuzzy
+msgid "Invalid formula expression"
+msgstr "Некорректное выражение"
 
 msgid "Invalid geodetic string"
 msgstr "Некорректная геодезическая строка"
@@ -6767,7 +7210,13 @@ msgstr "Ошибка 1000 - Источник данных слишком вел�
 msgid "Issue 1001 - The database is under an unusual load."
 msgstr "Ошибка 1001 - Нетипичная загрузка базы данных"
 
-msgid "It’s not recommended to truncate axis in Bar chart."
+msgid ""
+"It won't be removed even if empty. It won't be shown in chart editing "
+"view if empty."
+msgstr ""
+
+#, fuzzy
+msgid "It’s not recommended to truncate Y axis in Bar chart."
 msgstr "Не рекомендуется урезать интервал оси в столбчатой диаграмме"
 
 msgid "JAN"
@@ -6849,14 +7298,15 @@ msgstr "Ключи для таблицы"
 msgid "Kilometers"
 msgstr "Километры"
 
-msgid "LIMIT"
-msgstr "ОГРАНИЧЕНИЕ"
-
 msgid "Label"
 msgstr "Метка"
 
 msgid "Label Contents"
 msgstr "Содержимое метки"
+
+#, fuzzy
+msgid "Label JavaScript config generator"
+msgstr "JavaScript-генератор всплывающих подсказок"
 
 msgid "Label Line"
 msgstr "Выноска"
@@ -6873,6 +7323,10 @@ msgstr "Метка уже существует"
 msgid "Label ascending"
 msgstr "По названию (А-Я)"
 
+#, fuzzy
+msgid "Label color"
+msgstr "Цвет заливки"
+
 msgid "Label descending"
 msgstr "По названию (Я-А)"
 
@@ -6884,6 +7338,18 @@ msgstr "Метка для вашего запроса"
 
 msgid "Label position"
 msgstr "Положение метки"
+
+#, fuzzy
+msgid "Label property name"
+msgstr "Имя оповещения"
+
+#, fuzzy
+msgid "Label size"
+msgstr "Выноска"
+
+#, fuzzy
+msgid "Label size unit"
+msgstr "По названию (А-Я)"
 
 msgid "Label threshold"
 msgstr "Порог метки"
@@ -6946,6 +7412,10 @@ msgid "Last name is required"
 msgstr "Фамилия обязательна к заполнению"
 
 msgid "Last quarter"
+msgstr "Последний квартал"
+
+#, fuzzy
+msgid "Last queried at"
 msgstr "Последний квартал"
 
 msgid "Last run"
@@ -7065,6 +7535,10 @@ msgstr "Like"
 msgid "Like (case insensitive)"
 msgstr "Like (без учета регистра)"
 
+#, fuzzy
+msgid "Limit"
+msgstr "ОГРАНИЧЕНИЕ"
+
 msgid "Limit type"
 msgstr "Тип ограничения"
 
@@ -7113,6 +7587,9 @@ msgstr ""
 msgid "Line charts on a map"
 msgstr "Линейные диаграммы на карте"
 
+msgid "Line charts on a map"
+msgstr "Линейные диаграммы на карте"
+
 msgid "Line interpolation as defined by d3.js"
 msgstr "Линейная интерполяция, определенная в d3.js"
 
@@ -7140,8 +7617,15 @@ msgstr "Столбец с линиями"
 msgid "Lines encoding"
 msgstr "Кодирование линий"
 
-msgid "Link Copied!"
-msgstr "Ссылка скопирована"
+#, fuzzy
+msgid "List"
+msgstr "Последний"
+
+msgid "List Groups"
+msgstr "Список групп"
+
+msgid "List Roles"
+msgstr "Список ролей"
 
 msgid "List Groups"
 msgstr "Список групп"
@@ -7184,6 +7668,13 @@ msgstr "Данные загружены в кэш"
 
 msgid "Loaded from cache"
 msgstr "Загружено из кэша"
+
+msgid "Loading deck.gl layers..."
+msgstr ""
+
+#, fuzzy
+msgid "Loading timezones..."
+msgstr "Загрузка..."
 
 msgid "Loading..."
 msgstr "Загрузка..."
@@ -7393,6 +7884,9 @@ msgstr "Максимальный размер шрифта"
 msgid "Maximum Radius"
 msgstr "Максимальный радиус"
 
+msgid "Maximum folder nesting depth reached"
+msgstr ""
+
 msgid "Maximum number of features to fetch from service"
 msgstr "Максимальное количество объектов для загрузки из сервиса"
 
@@ -7448,7 +7942,8 @@ msgstr "Скорость передачи данных в байтах - дво�
 
 msgid "Memory transfer rate in bytes - decimal (1024B => 1.024kB/s)"
 msgstr ""
-"Скорость передачи данных в байтах - десятичная система (1024 Б => 1.024 кБ/с)"
+"Скорость передачи данных в байтах - десятичная система (1024 Б => 1.024 "
+"кБ/с)"
 
 msgid "Menu actions trigger"
 msgstr "Вызов меню действий"
@@ -7465,19 +7960,24 @@ msgstr "Параметры метаданных"
 msgid "Metadata has been synced"
 msgstr "Метаданные синхронизированы"
 
+#, fuzzy
+msgid "Meters"
+msgstr "метры"
+
 msgid "Method"
 msgstr "Метод"
 
 msgid ""
-"Method to compute the displayed value. \"Overall value\" calculates a single "
-"metric across the entire filtered time period, ideal for non-additive metrics "
-"like ratios, averages, or distinct counts. Other methods operate over the time "
-"series data points."
+"Method to compute the displayed value. \"Overall value\" calculates a "
+"single metric across the entire filtered time period, ideal for non-"
+"additive metrics like ratios, averages, or distinct counts. Other methods"
+" operate over the time series data points."
 msgstr ""
-"Метод вычисления отображаемого значения. «Общее значение» вычисляет единую меру "
-"за весь отфильтрованный временной период, что идеально подходит для неаддитивных "
-"показателей, таких как коэффициенты, средние значения или уникальные подсчеты. "
-"Другие методы работают с точками временного ряда."
+"Метод вычисления отображаемого значения. «Общее значение» вычисляет "
+"единую меру за весь отфильтрованный временной период, что идеально "
+"подходит для неаддитивных показателей, таких как коэффициенты, средние "
+"значения или уникальные подсчеты. Другие методы работают с точками "
+"временного ряда."
 
 msgid "Metric"
 msgstr "Мера"
@@ -7557,18 +8057,22 @@ msgstr ""
 "возвращается к первой мере (где это уместно)."
 
 msgid ""
-"Metric used to define how the top series are sorted if a series or row limit is "
-"present. If undefined reverts to the first metric (where appropriate)."
+"Metric used to define how the top series are sorted if a series or row "
+"limit is present. If undefined reverts to the first metric (where "
+"appropriate)."
 msgstr ""
-"Мера, используемая для определения того, как сортируются верхние категории, если "
-"присутствует ограничение по категории или строке. Если не определено, "
-"возвращается к первой мере (где это уместно)."
+"Мера, используемая для определения того, как сортируются верхние "
+"категории, если присутствует ограничение по категории или строке. Если не"
+" определено, возвращается к первой мере (где это уместно)."
 
 msgid "Metrics"
 msgstr "Меры"
 
 msgid "Metrics / Dimensions"
 msgstr "Меры / Измерения"
+
+msgid "Metrics folder can only contain metric items"
+msgstr ""
 
 msgid "Metrics to show in the tooltip."
 msgstr "Меры для отображения во всплывающей подсказке."
@@ -7703,6 +8207,10 @@ msgstr "Месяцев %s"
 msgid "More"
 msgstr "Подробнее"
 
+#, fuzzy
+msgid "More Options"
+msgstr "Настройки карты"
+
 msgid "More filters"
 msgstr "Еще фильтры"
 
@@ -7806,7 +8314,7 @@ msgstr "Назовите тег"
 msgid "Name your database"
 msgstr "Назовите базу данных"
 
-msgid "Name your dynamic group by"
+msgid "Name your folder and to edit it later, click on the folder name"
 msgstr ""
 
 msgid "Native filter column is required"
@@ -7832,6 +8340,10 @@ msgstr "Произошла ошибка при получении источни
 
 msgid "Network error."
 msgstr "Ошибка сети"
+
+#, fuzzy
+msgid "New"
+msgstr "Сейчас"
 
 msgid "New chart"
 msgstr "Новая диаграмма"
@@ -7881,6 +8393,10 @@ msgstr "Нет результатов"
 
 msgid "No Rules yet"
 msgstr "Пока нет правил"
+
+#, fuzzy
+msgid "No SQL query found"
+msgstr "SQL-запрос"
 
 msgid "No Tags created"
 msgstr "Теги не созданы"
@@ -7934,6 +8450,9 @@ msgstr "Нет доступных баз данных"
 msgid "No databases match your search"
 msgstr "Нет баз данных, удовлетворяющих вашему поиску"
 
+msgid "No deck.gl multi layer charts found in this dashboard."
+msgstr ""
+
 msgid "No description available."
 msgstr "Описание отсутствует"
 
@@ -7970,6 +8489,10 @@ msgstr "Нет данных"
 msgid "No matching records found"
 msgstr "Совпадений не найдено"
 
+#, fuzzy
+msgid "No matching results found"
+msgstr "Совпадений не найдено"
+
 msgid "No records found"
 msgstr "Записи не найдены"
 
@@ -7993,6 +8516,12 @@ msgstr ""
 "По этому запросу не было возвращено данных. Если вы ожидали увидеть результаты, "
 "убедитесь, что все фильтры настроены правильно и источник данных содержит записи "
 "для заданного временного интервала."
+
+msgid "No roles"
+msgstr "Нет ролей"
+
+msgid "No roles yet"
+msgstr "Пока нет ролей"
 
 msgid "No roles"
 msgstr "Нет ролей"
@@ -8040,11 +8569,11 @@ msgstr "Не найден валидатор, сконфигурированны
 
 #, python-format
 msgid ""
-"No validator named %(validator_name)s found (configured for the %(engine_spec)s "
-"engine)"
+"No validator named %(validator_name)s found (configured for the "
+"%(engine_spec)s engine)"
 msgstr ""
-"Не найден валидатор с именем %(validator_name)s (сконфигурированный для драйвера "
-"%(engine_spec)s)"
+"Не найден валидатор с именем %(validator_name)s (сконфигурированный для "
+"драйвера %(engine_spec)s)"
 
 msgid "Node label position"
 msgstr "Расположение меток"
@@ -8158,8 +8687,8 @@ msgid ""
 "               you can enter either only min or max."
 msgstr ""
 "Диапазон значений для цветового градиента от красного к синему.\n"
-"               Инвертируйте значения для перехода от синего к красному. Для "
-"получения чистого красного или синего\n"
+"               Инвертируйте значения для перехода от синего к красному. "
+"Для получения чистого красного или синего\n"
 "               укажите только min или max значения."
 
 msgid "Number format"
@@ -8193,8 +8722,8 @@ msgid ""
 "Number of periods to compare against. You can use negative numbers to compare "
 "from the beginning of the time range."
 msgstr ""
-"Количество периодов для сравнения. Можно использовать отрицательные числа для "
-"сравнения с начала временного диапазона."
+"Количество периодов для сравнения. Можно использовать отрицательные числа"
+" для сравнения с начала временного диапазона."
 
 msgid "Number of periods to ratio against"
 msgstr "Количество периодов для сравнения"
@@ -8228,6 +8757,10 @@ msgstr "Числовой столбец для расчета гистограм
 
 msgid "Numerical range"
 msgstr "Числовой диапазон"
+
+#, fuzzy
+msgid "OAuth2 client information"
+msgstr "Дополнительная информация"
 
 msgid "OCT"
 msgstr "ОКТ"
@@ -8266,8 +8799,8 @@ msgid ""
 "One or many controls to group by. If grouping, latitude and longitude columns "
 "must be present."
 msgstr ""
-"Один или несколько параметров для группировки. При группировке обязательны "
-"столбцы с широтой и долготой."
+"Один или несколько параметров для группировки. При группировке "
+"обязательны столбцы с широтой и долготой."
 
 msgid "One or many controls to pivot as columns"
 msgstr "Один или несколько параметров для отображения в виде сводных столбцов"
@@ -8420,14 +8953,15 @@ msgid "Ordering"
 msgstr "Упорядочивание"
 
 msgid ""
-"Orders the query result that generates the source data for this chart. If a "
-"series or row limit is reached, this determines what data are truncated. If "
-"undefined, defaults to the first metric (where appropriate)."
+"Orders the query result that generates the source data for this chart. If"
+" a series or row limit is reached, this determines what data are "
+"truncated. If undefined, defaults to the first metric (where "
+"appropriate)."
 msgstr ""
-"Определяет порядок сортировки результатов запроса, которые используются как "
-"исходные данные для этой диаграммы. При достижении лимита строк/серий определяет, "
-"какие данные будут отсечены. Если не задано, по умолчанию используется первая "
-"мера (где применимо)."
+"Определяет порядок сортировки результатов запроса, которые используются "
+"как исходные данные для этой диаграммы. При достижении лимита строк/серий"
+" определяет, какие данные будут отсечены. Если не задано, по умолчанию "
+"используется первая мера (где применимо)."
 
 msgid "Orientation"
 msgstr "Ориентация"
@@ -8557,7 +9091,8 @@ msgstr ""
 
 msgid "PDF download failed, please refresh and try again."
 msgstr ""
-"Произошла ошибка скачивания PDF-файла. Обновите страницу и попробуйте заново."
+"Произошла ошибка скачивания PDF-файла. Обновите страницу и попробуйте "
+"заново."
 
 msgid "Page"
 msgstr "Страница"
@@ -8618,8 +9153,8 @@ msgid ""
 "Partitions whose height to parent height proportions are below this value are "
 "pruned"
 msgstr ""
-"Разделы, у которых отношение высоты к родительской высоте ниже этого значения, "
-"будут удалены"
+"Разделы, у которых отношение высоты к родительской высоте ниже этого "
+"значения, будут удалены"
 
 msgid "Password"
 msgstr "Пароль"
@@ -8712,6 +9247,9 @@ msgstr "Лицо или группа, которые утвердили этот
 msgid "Person or group that has certified this metric"
 msgstr "Лицо или группа, которые утвердили этот показатель"
 
+msgid "Personal info"
+msgstr ""
+
 msgid "Physical"
 msgstr "Физический"
 
@@ -8732,9 +9270,6 @@ msgstr "Выберите имя для базы данных"
 
 msgid "Pick a nickname for how the database will display in Superset."
 msgstr "Выберите имя для базы данных, которое будет отображаться в Superset"
-
-msgid "Pick a set of deck.gl charts to layer on top of one another"
-msgstr "Выберите набор deck.gl-визуализаций для многослойного отображения"
 
 msgid "Pick a title for you annotation."
 msgstr "Выберите название для аннотации"
@@ -8775,6 +9310,9 @@ msgstr "Закрепить слева"
 
 msgid "Pin Right"
 msgstr "Закрепить справа"
+
+msgid "Pin to the result panel"
+msgstr ""
 
 msgid "Pivot Mode"
 msgstr "Режим сводной таблицы"
@@ -8838,6 +9376,9 @@ msgstr ""
 msgid "Please choose a valid value"
 msgstr "Пожалуйста, выберите корректное значение"
 
+msgid "Please choose a valid value"
+msgstr "Пожалуйста, выберите корректное значение"
+
 msgid "Please choose at least one groupby"
 msgstr "Выберите хотя бы одно поле в [Группировать по]"
 
@@ -8852,10 +9393,6 @@ msgstr "Пожалуйста, подтвердите ваш пароль"
 
 msgid "Please enter a SQLAlchemy URI to test"
 msgstr "Введите SQLAlchemy URI для проверки"
-
-#, fuzzy
-msgid "Please enter a name"
-msgstr "Введите имя оповещения"
 
 msgid "Please enter a valid email"
 msgstr "Пожалуйста, введите корректный email"
@@ -8905,14 +9442,6 @@ msgstr "Сохраните диаграмму перед тем, как созд
 msgid "Please save your dashboard first, then try creating a new email report."
 msgstr "Сохраните дашборд перед тем, как создавать новую рассылку"
 
-#, fuzzy
-msgid "Please select a column"
-msgstr "Выберите столбец"
-
-#, fuzzy
-msgid "Please select a dataset"
-msgstr "Выберите датасет"
-
 msgid "Please select at least one role or group"
 msgstr "Пожалуйста, выберите хотя бы одну роль или группу"
 
@@ -8921,7 +9450,8 @@ msgstr "Для продолжения выберите датасет и тип 
 
 #, python-format
 msgid ""
-"Please specify the Dataset ID for the ``%(name)s`` metric in the Jinja macro."
+"Please specify the Dataset ID for the ``%(name)s`` metric in the Jinja "
+"macro."
 msgstr "Укажите ID датасета для меры ``%(name)s`` в Jinja-макросе."
 
 msgid "Please use 3 different metric labels"
@@ -8935,9 +9465,9 @@ msgid ""
 "together as a line. This chart is useful for comparing multiple metrics across "
 "all of the samples or rows in the data."
 msgstr ""
-"Отображает меры для каждой строки данных по вертикали, соединяя их линией. Данный "
-"тип диаграммы полезен для сравнения нескольких показателей между всеми образцами "
-"или строками данных."
+"Отображает меры для каждой строки данных по вертикали, соединяя их "
+"линией. Данный тип диаграммы полезен для сравнения нескольких показателей"
+" между всеми образцами или строками данных."
 
 msgid "Plugins"
 msgstr "Плагины"
@@ -9078,6 +9608,14 @@ msgstr "Пароль приватного ключа"
 msgid "Proceed"
 msgstr "Продолжить"
 
+#, python-format
+msgid "Processing export for %s"
+msgstr ""
+
+#, fuzzy
+msgid "Processing export..."
+msgstr "Экспорт в CSV"
+
 msgid "Progress"
 msgstr "Прогресс"
 
@@ -9134,6 +9672,10 @@ msgstr "Запрос Б"
 msgid "Query History"
 msgstr "История запросов"
 
+#, fuzzy
+msgid "Query State"
+msgstr "Запрос А"
+
 msgid "Query cannot be loaded."
 msgstr "Не удалось загрузить запрос."
 
@@ -9169,6 +9711,10 @@ msgstr "Запрос прерван"
 
 msgid "Query was stopped."
 msgstr "Запрос был прерван"
+
+#, fuzzy
+msgid "Queued"
+msgstr "запросы"
 
 msgid "RGB Color"
 msgstr "Цвет RGB"
@@ -9326,6 +9872,10 @@ msgstr "Дата регистрации"
 msgid "Registration hash"
 msgstr "Хеш регистрации"
 
+#, fuzzy
+msgid "Registration successful"
+msgstr "Хеш регистрации"
+
 msgid "Regular"
 msgstr "Обычный"
 
@@ -9335,11 +9885,11 @@ msgid ""
 "roles defined in the filter, and can be used to define what users can see if no "
 "RLS filters within a filter group apply to them."
 msgstr ""
-"Обычные фильтры добавляют условия WHERE к запросам, если пользователь принадлежит "
-"к роли, указанной в фильтре. Базовые фильтры применяются ко всем запросам, кроме "
-"ролей, определенных в фильтре, и могут использоваться для определения того, что "
-"пользователи могут видеть, если к ним не применяются фильтры RLS в группе "
-"фильтров."
+"Обычные фильтры добавляют условия WHERE к запросам, если пользователь "
+"принадлежит к роли, указанной в фильтре. Базовые фильтры применяются ко "
+"всем запросам, кроме ролей, определенных в фильтре, и могут "
+"использоваться для определения того, что пользователи могут видеть, если "
+"к ним не применяются фильтры RLS в группе фильтров."
 
 msgid "Relational"
 msgstr "Относительный"
@@ -9367,12 +9917,6 @@ msgstr "Удалить системную темную тему"
 
 msgid "Remove System Default Theme"
 msgstr "Удалить системную светлую тему"
-
-msgid "Remove as system dark theme"
-msgstr "Отменить системную темную тему"
-
-msgid "Remove as system default theme"
-msgstr "Отменить системную светлую тему"
 
 msgid "Remove cross-filter"
 msgstr "Удалить кросс-фильтр"
@@ -9407,11 +9951,11 @@ msgid "Render columns in HTML format"
 msgstr "Отобразить колонки в HTML"
 
 msgid ""
-"Renders table cells as HTML when applicable. For example, HTML <a> tags will be "
-"rendered as hyperlinks."
+"Renders table cells as HTML when applicable. For example, HTML <a> tags "
+"will be rendered as hyperlinks."
 msgstr ""
-"Преобразует ячейки таблицы в HTML, где это возможно. Например, теги <a> будут "
-"отображены как гиперссылки."
+"Преобразует ячейки таблицы в HTML, где это возможно. Например, теги <a> "
+"будут отображены как гиперссылки."
 
 msgid "Replace"
 msgstr "Заменить"
@@ -9547,6 +10091,9 @@ msgstr "Сбросить"
 msgid "Reset Columns"
 msgstr "Сбросить столбцы"
 
+msgid "Reset all folders to default"
+msgstr ""
+
 msgid "Reset columns"
 msgstr "Сбросить столбцы"
 
@@ -9558,6 +10105,14 @@ msgstr "Сброс пароля"
 
 msgid "Reset state"
 msgstr "Сбросить текущее состояние"
+
+#, fuzzy
+msgid "Reset to default folders?"
+msgstr "Обновить значения по умолчанию"
+
+#, fuzzy
+msgid "Resize"
+msgstr "Сбросить"
 
 msgid "Resource already has an attached report."
 msgstr "Для этого компонента уже создан отчет"
@@ -9580,6 +10135,10 @@ msgstr "Results backend не нестроен"
 
 msgid "Results backend needed for asynchronous queries is not configured."
 msgstr "Сервер, необходимый для асинхронных запросов, не настроен"
+
+#, fuzzy
+msgid "Retry"
+msgstr "Автор"
 
 msgid "Retry fetching results"
 msgstr "Повторить запрос"
@@ -9607,6 +10166,10 @@ msgstr "Формат правой оси"
 
 msgid "Right Axis Metric"
 msgstr "Мера для правой оси"
+
+#, fuzzy
+msgid "Right Panel"
+msgstr "Правое значение"
 
 msgid "Right axis metric"
 msgstr "Мера для правой оси"
@@ -9638,8 +10201,8 @@ msgid ""
 "access permissions apply."
 msgstr ""
 "Список ролей, определяющий доступ к дашборду. Если предоставить доступ к "
-"дашборду, то будут отключены проверки доступа к датасетам. Если роли не заданы, "
-"применяются обычные права доступа."
+"дашборду, то будут отключены проверки доступа к датасетам. Если роли не "
+"заданы, применяются обычные права доступа."
 
 msgid ""
 "Roles is a list which defines access to the dashboard. Granting a role access to "
@@ -9689,9 +10252,17 @@ msgid "Row Level Security"
 msgstr "RLS"
 
 msgid ""
-"Row Limit: percentages are calculated based on the subset of data retrieved, "
-"respecting the row limit. All Records: Percentages are calculated based on the "
-"total dataset, ignoring the row limit."
+"Row Limit: percentages are calculated based on the subset of data "
+"retrieved, respecting the row limit. All Records: Percentages are "
+"calculated based on the total dataset, ignoring the row limit."
+msgstr ""
+"Лимит строк: проценты рассчитываются на основе подмножества полученных "
+"данных с учетом ограничения строк. Все записи: проценты рассчитываются на"
+" основе полного набора данных, игнорируя ограничение строк."
+
+msgid ""
+"Row containing the headers to use as column names (0 is first line of "
+"data)."
 msgstr ""
 "Лимит строк: проценты рассчитываются на основе подмножества полученных данных с "
 "учетом ограничения строк. Все записи: проценты рассчитываются на основе полного "
@@ -9701,6 +10272,9 @@ msgid "Row containing the headers to use as column names (0 is first line of dat
 msgstr ""
 "Номер строки, содержащей заголовки для использования в качестве имен столбцов "
 "(начиная с 0). Оставьте пустым, если заголовки отсутствуют."
+
+msgid "Row height"
+msgstr "Высота строки"
 
 msgid "Row height"
 msgstr "Высота строки"
@@ -9842,6 +10416,10 @@ msgstr "Параметры SSH-туннеля некорректны"
 
 msgid "SSH Tunneling is not enabled"
 msgstr "Подключение через туннель SSH выключено"
+
+#, fuzzy
+msgid "SSL"
+msgstr "SQL"
 
 msgid "SSL Mode \"require\" will be used."
 msgstr "Будет использовано принудительное шифрование SSL"
@@ -10060,6 +10638,10 @@ msgstr "Поиск по мерам и столбцам"
 msgid "Search all charts"
 msgstr "Поиск по всем диаграммам"
 
+#, fuzzy
+msgid "Search all metrics & columns"
+msgstr "Поиск по мерам и столбцам"
+
 msgid "Search box"
 msgstr "Строка поиска"
 
@@ -10132,9 +10714,6 @@ msgstr "Подробнее"
 msgid "See query details"
 msgstr "Показать детали запроса"
 
-msgid "See table schema"
-msgstr "Таблица"
-
 msgid "Select"
 msgstr "Выбрать"
 
@@ -10145,8 +10724,8 @@ msgid "Select All"
 msgstr "Выбрать все"
 
 #, fuzzy
-msgid "Select Column"
-msgstr "Выберите столбец"
+msgid "Select Database and Schema"
+msgstr "Выберите базу данных"
 
 msgid "Select Delivery Method"
 msgstr "Выберите способ отправки"
@@ -10212,6 +10791,9 @@ msgstr ""
 msgid "Select a predefined CSS template to apply to your dashboard"
 msgstr "Выберите готовый CSS-шаблон для применения к вашему дашборду"
 
+msgid "Select a predefined CSS template to apply to your dashboard"
+msgstr "Выберите готовый CSS-шаблон для применения к вашему дашборду"
+
 msgid "Select a schema"
 msgstr "Выберите схему"
 
@@ -10237,6 +10819,10 @@ msgstr "Выберите тип визуализации"
 
 msgid "Select aggregate options"
 msgstr "Выберите настройки агрегации"
+
+#, fuzzy
+msgid "Select all"
+msgstr "Выбрать все"
 
 msgid "Select all data"
 msgstr "Выбрать все данные"
@@ -10275,6 +10861,10 @@ msgstr "Выберите столбцы, которые нужно показа�
 msgid "Select content type"
 msgstr "Выбрать тип контента"
 
+#, fuzzy
+msgid "Select currency code column"
+msgstr "Выберите столбец"
+
 msgid "Select current page"
 msgstr "Выбрать текущую страницу"
 
@@ -10303,6 +10893,10 @@ msgstr ""
 
 msgid "Select dataset source"
 msgstr "Выберите источник датасета"
+
+#, fuzzy
+msgid "Select datetime column"
+msgstr "Выберите столбец"
 
 msgid "Select dimension"
 msgstr "Выберите измерение"
@@ -10333,6 +10927,29 @@ msgstr "Выбрать формат"
 
 msgid "Select groups"
 msgstr "Выберите группы"
+
+msgid ""
+"Select layers in the order you want them stacked. First selected appears "
+"at the bottom.Layers let you combine multiple visualizations on one map. "
+"Each layer is a saved deck.gl chart (like scatter plots, polygons, or "
+"arcs) that displays different data or insights. Stack them to reveal "
+"patterns and relationships across your data."
+msgstr ""
+
+#, fuzzy
+msgid "Select layers to hide"
+msgstr "Выберите диаграмму"
+
+msgid ""
+"Select one or many metrics to display, that will be displayed in the "
+"percentages of total. Percentage metrics will be calculated only from "
+"data within the row limit. You can use an aggregation function on a "
+"column or write custom SQL to create a percentage metric."
+msgstr ""
+"Выберите одну или несколько мер, чтобы отобразить их в доле от итого. "
+"Процентные меры будут вычислены только на основе данных, уместившихся в "
+"лимит строк. Чтобы создать меру, также можно использовать агрегатную "
+"функцию или написать свой SQL."
 
 msgid ""
 "Select one or many metrics to display, that will be displayed in the percentages "
@@ -10385,14 +11002,14 @@ msgid "Select scheme"
 msgstr "Выберите схему"
 
 msgid ""
-"Select shape for computing values. \"FIXED\" sets all zoom levels to the same "
-"size. \"LINEAR\" increases sizes linearly based on specified slope. \"EXP\" "
-"increases sizes exponentially based on specified exponent"
+"Select shape for computing values. \"FIXED\" sets all zoom levels to the "
+"same size. \"LINEAR\" increases sizes linearly based on specified slope. "
+"\"EXP\" increases sizes exponentially based on specified exponent"
 msgstr ""
-"Выберите форму расчета значений. \"FIXED\" устанавливает одинаковый размер для "
-"всех уровней масштабирования. \"LINEAR\" линейно увеличивает размеры (зависит от "
-"заданного коэффициента). \"EXP\" экспоненциально увеличивает размеры (зависит от "
-"заданной степени)"
+"Выберите форму расчета значений. \"FIXED\" устанавливает одинаковый "
+"размер для всех уровней масштабирования. \"LINEAR\" линейно увеличивает "
+"размеры (зависит от заданного коэффициента). \"EXP\" экспоненциально "
+"увеличивает размеры (зависит от заданной степени)"
 
 msgid "Select subject"
 msgstr "Выберите тему"
@@ -10440,6 +11057,25 @@ msgstr "Выберите цвет индикации снижения значе
 #, fuzzy
 msgid "Select the dataset this group by will use"
 msgstr "Выбрать слой аннотации, который вы хотите использовать."
+
+msgid "Select the fixed color"
+msgstr "Выберите фиксированный цвет"
+
+msgid "Select the color used for values that indicate an increase in the chart"
+msgstr "Выберите цвет индикации роста значений на диаграмме"
+
+msgid "Select the color used for values that represent total bars in the chart"
+msgstr "Выберите цвет для итоговых столбцов на диаграмме"
+
+msgid "Select the color used for values ​​that indicate a decrease in the chart."
+msgstr "Выберите цвет индикации снижения значений на диаграмме."
+
+msgid ""
+"Select the column containing currency codes such as USD, EUR, GBP, etc. "
+"Used when building charts when 'Auto-detect' currency formatting is "
+"enabled. If this column is not set or if a chart metric contains multiple"
+" currencies, charts will fall back to neutral numeric formatting."
+msgstr ""
 
 msgid "Select the fixed color"
 msgstr "Выберите фиксированный цвет"
@@ -10537,10 +11173,6 @@ msgstr "Сервисный аккаунт"
 msgid "Service version"
 msgstr "Версия сервиса"
 
-#, python-format
-msgid "Set %s as default datetime column"
-msgstr "Назначить %s столбцом даты/времени по умолчанию"
-
 msgid "Set System Dark Theme"
 msgstr "Установить системную темную тему"
 
@@ -10548,14 +11180,12 @@ msgid "Set System Default Theme"
 msgstr "Установить системную светлую тему"
 
 #, fuzzy
-msgid "Set a default value for this filter"
-msgstr "Выберите разделитель для этих данных"
+msgid "Set as default dark theme"
+msgstr "Установить системную светлую тему"
 
-msgid "Set as system dark theme"
-msgstr "Установить в качестве системной темной темы"
-
-msgid "Set as system default theme"
-msgstr "Установить в качестве системной светлой темы"
+#, fuzzy
+msgid "Set as default light theme"
+msgstr "Установить системную светлую тему"
 
 msgid "Set auto-refresh"
 msgstr "Настроить автообновление"
@@ -10563,11 +11193,12 @@ msgstr "Настроить автообновление"
 msgid "Set filter mapping"
 msgstr "Установить действие фильтра"
 
-msgid "Set local theme for testing (preview only)"
+#, fuzzy
+msgid "Set local theme for testing"
 msgstr "Установить локальную тему для тестирования (только предпросмотр)"
 
-msgid "Set local theme. Will be applied to your session until unset."
-msgstr "Установить локальную тему для текущей сессии."
+msgid "Set local theme for testing (preview only)"
+msgstr "Установить локальную тему для тестирования (только предпросмотр)"
 
 msgid "Set refresh frequency for current session only."
 msgstr "Настроить периодичность обновления только для текущей сессии."
@@ -10576,17 +11207,23 @@ msgid "Set the automatic refresh frequency for this dashboard."
 msgstr "Настроить периодичность автообновления для этого дашборда."
 
 msgid ""
-"Set the automatic refresh frequency for this dashboard. The dashboard will reload "
-"its data at the specified interval."
+"Set the automatic refresh frequency for this dashboard. The dashboard "
+"will reload its data at the specified interval."
 msgstr ""
-"Установите периодичность автообновления для этого дашборда. Дашборд будет "
-"перезагружать свои данные с указанным интервалом."
+"Установите периодичность автообновления для этого дашборда. Дашборд будет"
+" перезагружать свои данные с указанным интервалом."
 
 msgid "Set up an email report"
 msgstr "Запланировать рассылку по почте"
 
 msgid "Set up basic details, such as name and description."
 msgstr "Укажите основную информацию, такую как имя и описание"
+
+msgid ""
+"Sets the default temporal column for this dataset. Automatically selected"
+" as the time column when building charts that require a time dimension "
+"and used in dashboard level time filters."
+msgstr ""
 
 msgid ""
 "Sets the hierarchy levels of the chart. Each level is\n"
@@ -10705,6 +11342,9 @@ msgstr "Показать верхние метки"
 msgid "Show Values"
 msgstr "Показать значения"
 
+msgid "Show X-axis"
+msgstr "Показать ось X"
+
 msgid "Show Y-axis"
 msgstr "Показать ось Y"
 
@@ -10724,6 +11364,10 @@ msgstr "Наложить гистограммы на ячейки"
 
 msgid "Show chart description"
 msgstr "Показать описание диаграммы"
+
+#, fuzzy
+msgid "Show chart query timestamps"
+msgstr "Показать метку времени"
 
 msgid "Show column headers"
 msgstr "Показывать заголовки столбцов"
@@ -10764,6 +11408,9 @@ msgstr "Показать легенду"
 
 msgid "Show less columns"
 msgstr "Показать меньше столбцов"
+
+msgid "Show min/max axis labels"
+msgstr "Показать минимум и максимум на оси"
 
 msgid "Show minor ticks on axes."
 msgstr "Показать промежуточные деления на оси"
@@ -10809,6 +11456,16 @@ msgstr "Показать значение в верхней части стол�
 
 msgid "Show total"
 msgstr "Показать общий итог"
+
+msgid ""
+"Show total aggregations of selected metrics. Note that row limit does not"
+" apply to the result."
+msgstr ""
+"Общие итоговые значения выбранных показателей. Обратите внимание, что "
+"ограничение количества строк не применяется к результату."
+
+msgid "Show value"
+msgstr "Показать значение"
 
 msgid ""
 "Show total aggregations of selected metrics. Note that row limit does not apply "
@@ -10912,6 +11569,10 @@ msgstr "Пропускать пустые строки, вместо их пер
 msgid "Skip rows"
 msgstr "Пропуск строк"
 
+#, fuzzy
+msgid "Skip rows is required"
+msgstr "Тип обязателен"
+
 msgid "Skip spaces after delimiter"
 msgstr "Пропускать пробелы после разделителя"
 
@@ -10957,8 +11618,8 @@ msgid "Something went wrong while saving the user info"
 msgstr "Ошибка при сохранении информации о пользователе"
 
 msgid ""
-"Something went wrong with embedded authentication. Check the dev console for "
-"details."
+"Something went wrong with embedded authentication. Check the dev console "
+"for details."
 msgstr "Ошибка встроенной аутентификации. Подробности в консоли разработчика."
 
 msgid "Something went wrong."
@@ -11057,6 +11718,10 @@ msgstr "Сортировать столбцы по"
 msgid "Sort descending"
 msgstr "По убыванию"
 
+#, fuzzy
+msgid "Sort display control values"
+msgstr "Сортировать отфильтрованные значения"
+
 msgid "Sort filter values"
 msgstr "Сортировать отфильтрованные значения"
 
@@ -11135,7 +11800,8 @@ msgstr "Стопка"
 
 msgid "Stack in groups, where each group corresponds to a dimension"
 msgstr ""
-"Распределить по группам, где каждая группа соответствует определенному измерению"
+"Распределить по группам, где каждая группа соответствует определенному "
+"измерению"
 
 msgid "Stack series"
 msgstr "Использовать накопление"
@@ -11336,6 +12002,10 @@ msgstr "Документация Superset Embedded SDK."
 msgid "Superset chart"
 msgstr "Диаграмма Superset"
 
+#, fuzzy
+msgid "Superset docs link"
+msgstr "Диаграмма Superset"
+
 msgid "Superset encountered an error while running a command."
 msgstr "Superset столкнулся с ошибкой во время выполнения команды"
 
@@ -11358,6 +12028,12 @@ msgstr ""
 "Швейцарский нож визуализации данных. Выбирайте между шаговой диаграммой, "
 "графиком, ступенчатым графиком и гистограммой. В этой диаграмме есть множество "
 "настроек."
+
+msgid "Switch to the next tab"
+msgstr "Переключиться на следующую вкладку"
+
+msgid "Switch to the previous tab"
+msgstr "Переключиться на предыдущую вкладку"
 
 msgid "Switch to the next tab"
 msgstr "Переключиться на следующую вкладку"
@@ -11395,6 +12071,18 @@ msgstr "Синтаксис"
 msgid "Syntax Error: %(qualifier)s input \"%(input)s\" expecting \"%(expected)s"
 msgstr ""
 "Синтаксическая ошибка: %(qualifier)s поле \"%(input)s\" ожидает \"%(expected)s"
+
+msgid "System"
+msgstr "Системная"
+
+msgid "System Theme - Read Only"
+msgstr "Системная тема (только чтение)"
+
+msgid "System dark theme removed"
+msgstr "Системная темная тема удалена"
+
+msgid "System default theme removed"
+msgstr "Системная светлая тема удалена"
 
 msgid "System"
 msgstr "Системная"
@@ -11449,18 +12137,15 @@ msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
 msgstr ""
-"Не удается найти таблицу \"%(table)s\". Проверьте подключение к базе данных, "
-"схему и название таблицы"
-
-msgid "Table actions"
-msgstr "Действия с таблицей"
+"Не удается найти таблицу \"%(table)s\". Проверьте подключение к базе "
+"данных, схему и название таблицы"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' strategy to "
 "append or replace or provide a different Table Name to use."
 msgstr ""
-"Таблица уже существует. Измените параметр 'если таблица уже существует' на "
-"'добавить' или 'заменить' либо укажите новое имя таблицы."
+"Таблица уже существует. Измените параметр 'если таблица уже существует' "
+"на 'добавить' или 'заменить' либо укажите новое имя таблицы."
 
 msgid "Table cache timeout"
 msgstr "Время жизни кэша таблицы"
@@ -11470,6 +12155,10 @@ msgstr "Столбцы таблицы"
 
 msgid "Table name"
 msgstr "Имя таблицы"
+
+#, fuzzy
+msgid "Table name is required"
+msgstr "Имя роли обязательно к заполнению"
 
 msgid "Table name undefined"
 msgstr "Имя таблицы не определено"
@@ -11550,13 +12239,14 @@ msgid "Template"
 msgstr "Шаблон"
 
 msgid ""
-"Template for cell titles. Use Handlebars templating syntax (a popular templating "
-"library that uses double curly brackets for variable substitution): {{row}}, "
-"{{column}}, {{rowLabel}}, {{columnLabel}}"
+"Template for cell titles. Use Handlebars templating syntax (a popular "
+"templating library that uses double curly brackets for variable "
+"substitution): {{row}}, {{column}}, {{rowLabel}}, {{columnLabel}}"
 msgstr ""
-"Шаблон для заголовков ячеек. Используйте синтаксис Handlebars (популярная "
-"библиотека шаблонов, использующая двойные фигурные скобки для подстановки "
-"переменных): {{row}}, {{column}}, {{rowLabel}}, {{columnLabel}}"
+"Шаблон для заголовков ячеек. Используйте синтаксис Handlebars (популярная"
+" библиотека шаблонов, использующая двойные фигурные скобки для "
+"подстановки переменных): {{row}}, {{column}}, {{rowLabel}}, "
+"{{columnLabel}}"
 
 msgid "Template parameters"
 msgstr "Параметры шаблона"
@@ -11565,23 +12255,26 @@ msgstr "Параметры шаблона"
 msgid "Template processing error: %(error)s"
 msgstr "Ошибка обработки шаблона: %(error)s"
 
+#, fuzzy, python-format
+msgid "Template processing failed: %(ex)s"
+msgstr "Ошибка обработки шаблона: %(error)s"
+
+msgid ""
+"Templated link, it's possible to include {{ metric }} or other values "
+"coming from the controls."
+msgstr ""
+"Шаблонная ссылка, можно включить {{ metric }} или другие значения, "
+"поступающие из элементов управления."
+
+msgid "Temporal X-Axis"
+msgstr "Временная ось X"
+
 msgid ""
 "Templated link, it's possible to include {{ metric }} or other values coming from "
 "the controls."
 msgstr ""
 "Шаблонная ссылка, можно включить {{ metric }} или другие значения, поступающие из "
 "элементов управления."
-
-msgid "Temporal X-Axis"
-msgstr "Временная ось X"
-
-msgid ""
-"Terminate running queries when browser window closed or navigated to another "
-"page. Available for Presto, Hive, MySQL, Postgres and Snowflake databases."
-msgstr ""
-"Завершать выполнение запросов после закрытия браузерной вкладки или пользователь "
-"переключился на другую вкладку. Доступно для баз данных Presto, Hive, MySQL, "
-"Postgres и Snowflake."
 
 msgid "Test connection"
 msgstr "Проверить соединение"
@@ -11621,8 +12314,8 @@ msgid ""
 "The GeoJsonLayer takes in GeoJSON formatted data and renders it as interactive "
 "polygons, lines and points (circles, icons and/or texts)."
 msgstr ""
-"Диаграмма принимает данные в формате GeoJSON и отображает их в виде интерактивных "
-"полигонов, линий и точек (кругов, значков и/или текста)"
+"Диаграмма принимает данные в формате GeoJSON и отображает их в виде "
+"интерактивных полигонов, линий и точек (кругов, значков и/или текста)"
 
 msgid ""
 "The Sankey chart visually tracks the movement and transformation of values "
@@ -11635,7 +12328,8 @@ msgid ""
 msgstr ""
 "Диаграмма Sankey обеспечивает визуальное представление перемещения и "
 "трансформации величин\n"
-"          между стадиями системы. Этапы представлены узлами, связанными дугами,\n"
+"          между стадиями системы. Этапы представлены узлами, связанными "
+"дугами,\n"
 "          отображающими потоки. Высота узла пропорциональна значению "
 "соответствующей меры,\n"
 "          что обеспечивает наглядность распределения значений."
@@ -11647,8 +12341,9 @@ msgid "The X-axis is not on the filters list"
 msgstr "Ось X отсутствует в списке фильтров"
 
 msgid ""
-"The X-axis is not on the filters list which will prevent it from being used in "
-"time range filters in dashboards. Would you like to add it to the filters list?"
+"The X-axis is not on the filters list which will prevent it from being "
+"used in time range filters in dashboards. Would you like to add it to the"
+" filters list?"
 msgstr ""
 "Ось X отсутствует в списке фильтров, что не позволит использовать ее для "
 "фильтрации по времени в дашбордах. Хотите добавить ее в список фильтров?"
@@ -11666,8 +12361,8 @@ msgid ""
 "The category of source nodes used to assign colors. If a node is associated with "
 "more than one category, only the first will be used."
 msgstr ""
-"Категория исходных вершин предназначена для задания цветов. Если вершина связана "
-"более, чем с одной категорией, только первая будет использована."
+"Категория исходных вершин предназначена для задания цветов. Если вершина "
+"связана более, чем с одной категорией, только первая будет использована."
 
 msgid ""
 "The classic. Great for showing how much of a company each investor gets, what "
@@ -11694,6 +12389,10 @@ msgstr "Цвет изополосы"
 msgid "The color of the isoline"
 msgstr "Цвет изолинии"
 
+#, fuzzy
+msgid "The color of the point labels"
+msgstr "Цвет изолинии"
+
 msgid "The color scheme for rendering chart"
 msgstr "Цветовая схема диаграммы"
 
@@ -11708,12 +12407,12 @@ msgid "The color used when a value doesn't match any defined breakpoints."
 msgstr "Цвет для значений, не попадающих в заданные цветовые пороги."
 
 msgid ""
-"The colors of this chart might be overridden by custom label colors of the "
-"related dashboard.\n"
+"The colors of this chart might be overridden by custom label colors of "
+"the related dashboard.\n"
 "    Check the JSON metadata in the Advanced settings."
 msgstr ""
-"Цвета этой диаграммы могут быть переопределены пользовательскими настройками "
-"цветов в связанном дашборде.\n"
+"Цвета этой диаграммы могут быть переопределены пользовательскими "
+"настройками цветов в связанном дашборде.\n"
 "    Проверьте метаданные JSON в расширенных настройках."
 
 msgid "The column header label"
@@ -11793,13 +12492,16 @@ msgstr "Столбец или мера из датасета для отобра
 
 msgid ""
 "The dataset columns will be automatically synced\n"
-"              based on the changes in your SQL query. If your changes don't\n"
-"              impact the column definitions, you might want to skip this step."
+"              based on the changes in your SQL query. If your changes "
+"don't\n"
+"              impact the column definitions, you might want to skip this "
+"step."
 msgstr ""
 "Столбцы датасета будут автоматически синхронизированы\n"
-"              в соответствии с изменениями в вашем SQL-запросе. Если ваши "
-"изменения\n"
-"              не влияют на определения столбцов, вы можете пропустить этот шаг."
+"              в соответствии с изменениями в вашем SQL-запросе. Если ваши"
+" изменения\n"
+"              не влияют на определения столбцов, вы можете пропустить "
+"этот шаг."
 
 msgid ""
 "The dataset configuration exposed here\n"
@@ -11842,6 +12544,9 @@ msgstr ""
 msgid "The display name of your dashboard"
 msgstr "Отображаемое название вашего дашборда"
 
+msgid "The display name of your dashboard"
+msgstr "Отображаемое название вашего дашборда"
+
 msgid "The distance between cells, in pixels"
 msgstr "Расстояние между ячейками (в пикселях)"
 
@@ -11860,25 +12565,32 @@ msgstr "Объект engine_params вызывает sqlalchemy.create_engine"
 
 msgid "The exponent to compute all sizes from. \"EXP\" only"
 msgstr ""
-"Экспонента, используемая для вычисления всех размеров. Доступно только для \"EXP\""
+"Экспонента, используемая для вычисления всех размеров. Доступно только "
+"для \"EXP\""
 
 #, python-format
 msgid "The extension %(id)s could not be loaded."
 msgstr "Не удалось загрузить расширение %(id)s."
 
 msgid ""
-"The extent of the map on application start. FIT DATA automatically sets the "
-"extent so that all data points are included in the viewport. CUSTOM allows users "
-"to define the extent manually."
+"The extent of the map on application start. FIT DATA automatically sets "
+"the extent so that all data points are included in the viewport. CUSTOM "
+"allows users to define the extent manually."
 msgstr ""
-"Область отображения карты при запуске приложения. Режим \"АВТО\" устанавливает "
-"охват так, чтобы все точки данных были видны. Режим \"РУЧНОЙ\" позволяет "
-"пользователям задавать область вручную."
+"Область отображения карты при запуске приложения. Режим \"АВТО\" "
+"устанавливает охват так, чтобы все точки данных были видны. Режим "
+"\"РУЧНОЙ\" позволяет пользователям задавать область вручную."
+
+msgid "The feature property to use for point labels"
+msgstr ""
 
 #, python-format
 msgid ""
-"The following entries in `series_columns` are missing in `columns`: %(columns)s. "
-msgstr "Следующие столбцы в `series_columns` отсутствуют в `columns`: %(columns)s. "
+"The following entries in `series_columns` are missing in `columns`: "
+"%(columns)s. "
+msgstr ""
+"Следующие столбцы в `series_columns` отсутствуют в `columns`: "
+"%(columns)s. "
 
 #, python-format
 msgid ""
@@ -11887,10 +12599,14 @@ msgid ""
 "the dashboard\n"
 "                    from rendering: %s"
 msgstr ""
-"Следующим фильтрам установлен флаг \"Сделать первое значение фильтра значением по "
-"умолчанию\"\n"
+"Следующим фильтрам установлен флаг \"Сделать первое значение фильтра "
+"значением по умолчанию\"\n"
 "                    и они не могут быть загружены, что препятствует\n"
 "                    отображению дашборда: %s"
+
+#, fuzzy
+msgid "The font size of the point labels"
+msgstr "Отобразить указатель"
 
 msgid "The function to use when aggregating points into groups"
 msgstr "Функция, которую нужно использовать для объединения точек в группы"
@@ -11903,8 +12619,8 @@ msgstr "Группа успешно обновлена."
 
 msgid "The height of the current zoom level to compute all heights from"
 msgstr ""
-"Высота текущего уровня масштабирования, используемая для расчета всех остальных "
-"высот"
+"Высота текущего уровня масштабирования, используемая для расчета всех "
+"остальных высот"
 
 msgid ""
 "The histogram chart displays the distribution of a dataset by\n"
@@ -11915,10 +12631,12 @@ msgid ""
 "          insights into its shape, central tendency, and spread."
 msgstr ""
 "Гистограмма отображает распределение датасета,\n"
-"          показывая частоту или количество значений в различных диапазонах или "
-"бинах.\n"
-"          Она помогает визуализировать закономерности, кластеры и выбросы,\n"
-"          а также анализировать форму распределения, тенденцию и разброс данных."
+"          показывая частоту или количество значений в различных "
+"диапазонах или бинах.\n"
+"          Она помогает визуализировать закономерности, кластеры и "
+"выбросы,\n"
+"          а также анализировать форму распределения, тенденцию и разброс "
+"данных."
 
 #, python-format
 msgid "The host \"%(hostname)s\" might be down and can't be reached."
@@ -11945,6 +12663,17 @@ msgstr "Не удалось обнаружить хост"
 msgid "The id of the active chart"
 msgstr "ID активной диаграммы"
 
+msgid ""
+"The image URL of the icon to display for GeoJSON points. Note that the "
+"image URL must conform to the content security policy (CSP) in order to "
+"load correctly."
+msgstr ""
+
+msgid ""
+"The initial level (depth) of the tree. If set as -1 all nodes are "
+"expanded."
+msgstr ""
+
 msgid "The layer attribution"
 msgstr "Настройки слоя"
 
@@ -11954,25 +12683,27 @@ msgstr "Нижняя граница диапазона порогов для и�
 msgid ""
 "The maximum number of subdivisions of each group; lower values are pruned first"
 msgstr ""
-"Максимальное число подразделов для каждой группы; сначала удаляются подразделы с "
-"меньшими значениями"
+"Максимальное число подразделов для каждой группы; сначала удаляются "
+"подразделы с меньшими значениями"
 
 msgid "The maximum value of metrics. It is an optional configuration"
 msgstr "Максимальное значение мер. Это необязательная настройка"
 
 #, python-format
 msgid ""
-"The metadata_params in Extra field is not configured correctly. The key %(key)s "
-"is invalid."
+"The metadata_params in Extra field is not configured correctly. The key "
+"%(key)s is invalid."
 msgstr "Значение metadata_params настроено неверно. Ключ %(key)s содержит ошибку."
 
 #, python-brace-format
 msgid ""
-"The metadata_params in Extra field is not configured correctly. The key %{key}s "
-"is invalid."
+"The metadata_params in Extra field is not configured correctly. The key "
+"%{key}s is invalid."
 msgstr "Значение metadata_params настроено неверно. Ключ %{key}s содержит ошибку."
 
-msgid "The metadata_params object gets unpacked into the sqlalchemy.MetaData call."
+msgid ""
+"The metadata_params object gets unpacked into the sqlalchemy.MetaData "
+"call."
 msgstr "Объект metadata_params вызывает sqlalchemy.MetaData"
 
 msgid ""
@@ -11999,6 +12730,19 @@ msgstr "Имя столбца с геометрическими данными"
 msgid "The name of the layer as described in GetCapabilities"
 msgstr "Название слоя, как указано в GetCapabilities"
 
+msgid ""
+"The minimum value of metrics. It is an optional configuration. If not "
+"set, it will be the minimum value of the data"
+msgstr ""
+"Минимальное значение мер. Это необязательная настройка. Если не задано, "
+"будет использовано минимальное значение из данных"
+
+msgid "The name of the geometry column"
+msgstr "Имя столбца с геометрическими данными"
+
+msgid "The name of the layer as described in GetCapabilities"
+msgstr "Название слоя, как указано в GetCapabilities"
+
 msgid "The name of the rule must be unique"
 msgstr "Имя правила должно быть уникальным"
 
@@ -12016,24 +12760,9 @@ msgstr ""
 "дата/время. Может быть использовано для приведения часового пояса UTC к местному "
 "времени."
 
-#, python-format
-msgid ""
-"The number of results displayed is limited to %(rows)d by the configuration "
-"DISPLAY_MAX_ROW. Please add additional limits/filters or download to csv to see "
-"more rows up to the %(limit)d limit."
-msgstr ""
-"Количество отображаемых результатов ограничено %(rows)d переменной "
-"DISPLAY_MAX_ROW. Пожалуйста, добавьте дополнительные ограничения/фильтры или "
-"загрузите в CSV, чтобы увидеть больше строк до предела %(limit)d."
-
-#, python-format
-msgid ""
-"The number of results displayed is limited to %(rows)d. Please add additional "
-"limits/filters, download to csv, or contact an admin to see more rows up to the "
-"%(limit)d limit."
-msgstr ""
-"Количество отображаемых результатов ограничено %(rows)d. Чтобы увидеть больше "
-"строк (до %(limit)d), добавьте дополнительные фильтры или загрузите данные в CSV."
+#, fuzzy, python-format
+msgid "The number of results displayed is limited to %(rows)d."
+msgstr "Количество отображаемых строк ограничено до %(rows)d"
 
 #, python-format
 msgid "The number of rows displayed is limited to %(rows)d by the dropdown."
@@ -12075,6 +12804,19 @@ msgstr "Неверный пароль для базы данных"
 
 msgid "The password reset was successful"
 msgstr "Сброс пароля выполнен успешно"
+
+msgid ""
+"The passwords for the databases below are needed in order to import them "
+"together with the charts. Please note that the \"Secure Extra\" and "
+"\"Certificate\" sections of the database configuration are not present in"
+" export files, and should be added manually after the import if they are "
+"needed."
+msgstr ""
+"Для баз данных нужны пароли, чтобы импортировать их вместе с диаграммами."
+" Пожалуйста, обратите внимание, что разделы \"Безопасность\" и "
+"\"Утверждение\" в настройках конфигурации базы данных отсутствуют в "
+"экспортируемых файлов и должны быть добавлены вручную после импорта, если"
+" необходимо."
 
 msgid ""
 "The passwords for the databases below are needed in order to import them together "
@@ -12239,6 +12981,9 @@ msgstr ""
 msgid "The result size exceeds the allowed limit."
 msgstr "Размер результата превышает допустимый лимит."
 
+msgid "The result size exceeds the allowed limit."
+msgstr "Размер результата превышает допустимый лимит."
+
 msgid "The results backend no longer has the data from the query."
 msgstr "Сервер не сохранил данные из этого запроса"
 
@@ -12251,6 +12996,15 @@ msgstr ""
 msgid "The rich tooltip shows a list of all series for that point in time"
 msgstr ""
 "Расширенная всплывающая подсказка показывает список всех категорий для этой точки"
+
+msgid "The role has been created successfully."
+msgstr "Роль успешно создана."
+
+msgid "The role has been duplicated successfully."
+msgstr "Роль успешно продублирована."
+
+msgid "The role has been updated successfully."
+msgstr "Роль успешно обновлена."
 
 msgid "The role has been created successfully."
 msgstr "Роль успешно создана."
@@ -12302,12 +13056,17 @@ msgstr "Служебный URL-адрес слоя"
 msgid "The size of each cell in meters"
 msgstr "Размер ячейки (в метрах)"
 
+#, fuzzy
+msgid "The size of the point icons"
+msgstr "Толщина изолинии (пиксели)"
+
 msgid "The size of the square cell, in pixels"
 msgstr "Размер квадратной ячейки (в пикселях)"
 
 msgid "The slope to compute all sizes from. \"LINEAR\" only"
 msgstr ""
-"Наклон, используемый для вычисления всех размеров. Доступно только для \"LINEAR\""
+"Наклон, используемый для вычисления всех размеров. Доступно только для "
+"\"LINEAR\""
 
 msgid "The submitted payload failed validation."
 msgstr "Не удалось проверить формат загруженных данных"
@@ -12331,8 +13090,8 @@ msgid ""
 "The table \"%(table_name)s\" does not exist. A valid table must be used to run "
 "this query."
 msgstr ""
-"Таблица \"%(table_name)s\" не существует. Для выполнения запроса используйте "
-"существующую таблицу."
+"Таблица \"%(table_name)s\" не существует. Для выполнения запроса "
+"используйте существующую таблицу."
 
 msgid "The table was deleted or renamed in the database."
 msgstr "Таблица была удалена или переименована в базе данных"
@@ -12404,6 +13163,12 @@ msgstr "Тип слоя"
 
 msgid "The type of visualization to display"
 msgstr "Выберите тип визуализации"
+
+msgid "The unit for icon size"
+msgstr ""
+
+msgid "The unit for label size"
+msgstr ""
 
 msgid "The unit of measure for the specified point radius"
 msgstr "Единица измерения для указанного радиуса маркера"
@@ -12498,6 +13263,9 @@ msgstr ""
 msgid "There is currently no information to display."
 msgstr "В настоящее время нет никакой информации для отображения"
 
+msgid "There is currently no information to display."
+msgstr "В настоящее время нет никакой информации для отображения"
+
 msgid ""
 "There is no chart definition associated with this component, could it have been "
 "deleted?"
@@ -12523,6 +13291,20 @@ msgstr "Произошла ошибка при создании пользова
 msgid "There was an error duplicating the role. Please, try again."
 msgstr "Произошла ошибка при дублировании роли. Пожалуйста, попробуйте еще раз."
 
+msgid "There was an error creating the group. Please, try again."
+msgstr "Произошла ошибка при создании группы. Пожалуйста, попробуйте еще раз."
+
+msgid "There was an error creating the role. Please, try again."
+msgstr "Произошла ошибка при создании роли. Пожалуйста, попробуйте еще раз."
+
+msgid "There was an error creating the user. Please, try again."
+msgstr ""
+"Произошла ошибка при создании пользователя. Пожалуйста, попробуйте еще "
+"раз."
+
+msgid "There was an error duplicating the role. Please, try again."
+msgstr "Произошла ошибка при дублировании роли. Пожалуйста, попробуйте еще раз."
+
 msgid "There was an error fetching dataset"
 msgstr "Произошла ошибка при датасета: %s"
 
@@ -12535,9 +13317,6 @@ msgstr "Произошла ошибка при получении статуса
 
 msgid "There was an error fetching the filtered charts and dashboards:"
 msgstr "Произошла ошибка при получении отфильтрованных диаграмм и дашбордов:"
-
-msgid "There was an error generating the permalink."
-msgstr "Произошла ошибка при создании постоянной ссылки."
 
 msgid "There was an error loading the catalogs"
 msgstr "Произошла ошибка при загрузке каталогов"
@@ -12569,7 +13348,8 @@ msgstr "Произошла ошибка при обновлении роли. П
 
 msgid "There was an error updating the user. Please, try again."
 msgstr ""
-"Произошла ошибка при обновлении пользователя. Пожалуйста, попробуйте еще раз."
+"Произошла ошибка при обновлении пользователя. Пожалуйста, попробуйте еще "
+"раз."
 
 msgid "There was an error while fetching users"
 msgstr "Произошла ошибка при получении списка пользователей"
@@ -12617,10 +13397,6 @@ msgid "There was an issue deleting the selected layers: %s"
 msgstr "Произошла ошибка при удалении выбранных слоев: %s"
 
 #, python-format
-msgid "There was an issue deleting the selected queries: %s"
-msgstr "Произошла ошибка при удалении выбранных запросов: %s"
-
-#, python-format
 msgid "There was an issue deleting the selected templates: %s"
 msgstr "Произошла ошибка при удалении выбранных шаблонов: %s"
 
@@ -12656,18 +13432,15 @@ msgid "There was an issue exporting the selected datasets"
 msgstr "Произошла ошибка при удалении выбранных датасетов: %s"
 
 #, fuzzy
-msgid "There was an issue exporting the selected queries"
-msgstr "Произошла ошибка при удалении выбранных запросов: %s"
-
-#, fuzzy
 msgid "There was an issue exporting the selected themes"
 msgstr "Произошла ошибка при удалении выбранных шаблонов: %s"
 
 msgid "There was an issue favoriting this dashboard."
 msgstr "Произошла ошибка при добавлении этого дашборда в избранное"
 
-msgid "There was an issue fetching reports attached to this dashboard."
-msgstr "Произошла ошибка с получением рассылок, связанных с этим дашбордом"
+#, fuzzy, python-format
+msgid "There was an issue fetching reports."
+msgstr "Произошла ошибка при получении вашей диаграммы: %s"
 
 msgid "There was an issue fetching the favorite status of this dashboard."
 msgstr "Произошла ошибка с получением статуса избранного для этого дашборда"
@@ -12700,12 +13473,12 @@ msgid "These are the datasets this filter will be applied to."
 msgstr "Фильтр будет применен к этим датасетам"
 
 msgid ""
-"This JSON object is generated dynamically when clicking the save or overwrite "
-"button in the dashboard view. It is exposed here for reference and for power "
-"users who may want to alter specific parameters."
+"This JSON object is generated dynamically when clicking the save or "
+"overwrite button in the dashboard view. It is exposed here for reference "
+"and for power users who may want to alter specific parameters."
 msgstr ""
-"Этот JSON-объект генерируется автоматически при сохранении или перезаписи "
-"дашборда. Он размещен здесь справочно для опытных пользователей."
+"Этот JSON-объект генерируется автоматически при сохранении или перезаписи"
+" дашборда. Он размещен здесь справочно для опытных пользователей."
 
 #, python-format
 msgid "This action will permanently delete %s."
@@ -12758,10 +13531,11 @@ msgstr ""
 "Эта диаграмма может быть несовместима с этим фильтром (датасеты не совпадают)"
 
 msgid ""
-"This chart type is not supported when using an unsaved query as a chart source. "
+"This chart type is not supported when using an unsaved query as a chart "
+"source. "
 msgstr ""
-"Для этого типа диаграммы нельзя использовать несохраненный запрос в качестве "
-"источника. "
+"Для этого типа диаграммы нельзя использовать несохраненный запрос в "
+"качестве источника. "
 
 msgid "This column might be incompatible with current dataset"
 msgstr "Эта диаграмма может быть несовместима с этим датасетом"
@@ -12842,11 +13616,11 @@ msgid "This dashboard was saved successfully."
 msgstr "Дашборд сохранен"
 
 msgid ""
-"This database does not allow for DDL/DML, but the query mutates data. Please "
-"contact your administrator for more assistance."
+"This database does not allow for DDL/DML, but the query mutates data. "
+"Please contact your administrator for more assistance."
 msgstr ""
-"Эта база данных не поддерживает операции DDL/DML, однако запрос изменяет данные. "
-"Обратитесь к администратору."
+"Эта база данных не поддерживает операции DDL/DML, однако запрос изменяет "
+"данные. Обратитесь к администратору."
 
 msgid "This database is managed externally, and can't be edited in Superset"
 msgstr "Эта база данных управляется извне и не может быть изменена в Superset"
@@ -12861,10 +13635,19 @@ msgstr "Этот датасет управляется извне и не мож
 msgid "This defines the element to be plotted on the chart"
 msgstr "Элемент, который будет отражен на диаграмме"
 
-msgid "This email is already associated with an account. Please choose another one."
+msgid ""
+"This email is already associated with an account. Please choose another "
+"one."
 msgstr "Этот email уже привязан к учетной записи. Пожалуйста, укажите другой."
 
 msgid "This feature is experimental and may change or have limitations"
+msgstr ""
+"Эта функция является экспериментальной и может измениться или иметь "
+"ограничения"
+
+msgid ""
+"This field is used as a unique identifier to attach the calculated "
+"dimension to charts. It is also used as the alias in the SQL query."
 msgstr ""
 "Эта функция является экспериментальной и может измениться или иметь ограничения"
 
@@ -12875,27 +13658,59 @@ msgstr ""
 "Это поле используется как уникальный идентификатор измерения при добавлении его "
 "на диаграммы. Также оно используется в качестве алиаса в SQL-запросе."
 
-msgid ""
-"This field is used as a unique identifier to attach the metric to charts. It is "
-"also used as the alias in the SQL query."
-msgstr ""
-"Это поле используется как уникальный идентификатор меры при добавлении ее на "
-"диаграммы. Также оно используется в качестве алиаса в SQL-запросе."
-
 msgid "This filter already exist on the report"
 msgstr "Этот фильтр уже существует в отчете"
 
 msgid "This filter might be incompatible with current dataset"
 msgstr "Этот фильтр может быть несовместим с этим датасетом"
 
+msgid "This folder is currently empty"
+msgstr ""
+
+msgid "This folder only accepts columns"
+msgstr ""
+
+msgid "This folder only accepts metrics"
+msgstr ""
+
 msgid "This functionality is disabled in your environment for security reasons."
 msgstr "Эта функция отключена по соображениям безопасности"
+
+msgid ""
+"This is a default columns folder. Its name cannot be changed or removed. "
+"It can stay empty but will only accept column items."
+msgstr ""
+
+msgid ""
+"This is a default metrics folder. Its name cannot be changed or removed. "
+"It can stay empty but will only accept metric items."
+msgstr ""
 
 msgid "This is custom error message for a"
 msgstr ""
 
 msgid "This is custom error message for b"
 msgstr ""
+
+msgid ""
+"This is the condition that will be added to the WHERE clause. For "
+"example, to only return rows for a particular client, you might define a "
+"regular filter with the clause `client_id = 9`. To display no rows unless"
+" a user belongs to a RLS filter role, a base filter can be created with "
+"the clause `1 = 0` (always false)."
+msgstr ""
+
+#, fuzzy
+msgid "This is the default dark theme"
+msgstr "Системная темная тема"
+
+#, fuzzy
+msgid "This is the default folder"
+msgstr "Системная светлая тема"
+
+#, fuzzy
+msgid "This is the default light theme"
+msgstr "Системная светлая тема"
 
 msgid ""
 "This is the condition that will be added to the WHERE clause. For example, to "
@@ -12930,8 +13745,8 @@ msgid "This markdown component has an error. Please revert your recent changes."
 msgstr "Этот компонент содержит ошибки. Пожалуйста, отмените последние изменения."
 
 msgid ""
-"This may be due to the extension not being activated or the content not being "
-"available."
+"This may be due to the extension not being activated or the content not "
+"being available."
 msgstr ""
 "Это может быть связано с тем, что расширение не активировано или контент "
 "недоступен."
@@ -12949,8 +13764,8 @@ msgid "This option has been disabled by the administrator."
 msgstr "Эта функция отключена администратором."
 
 msgid ""
-"This page is intended to be embedded in an iframe, but it looks like that is not "
-"the case."
+"This page is intended to be embedded in an iframe, but it looks like that"
+" is not the case."
 msgstr "Ошибка: страница должна отображаться внутри iframe."
 
 msgid ""
@@ -12974,8 +13789,9 @@ msgid ""
 "intended. If you are the developer of this app, please check that the guest token "
 "is being generated correctly."
 msgstr ""
-"Сеанс был прерван, и некоторые элементы управления могут работать некорректно. "
-"Если вы разработчик этого приложения, проверьте правильность гостевого токена."
+"Сеанс был прерван, и некоторые элементы управления могут работать "
+"некорректно. Если вы разработчик этого приложения, проверьте правильность"
+" гостевого токена."
 
 msgid "This table already has a dataset"
 msgstr "Для этой таблицы уже есть датасет"
@@ -12986,6 +13802,15 @@ msgid ""
 msgstr ""
 "Для этой таблицы уже есть связанный датасет. Можно связать только один датасет с "
 "таблицей.\n"
+
+msgid "This theme is set locally"
+msgstr "Тема установлена локально"
+
+msgid "This theme is set locally for your session"
+msgstr "Тема установлена локально для вашей сессии"
+
+msgid "This username is already taken. Please choose another one."
+msgstr "Это имя пользователя уже занято. Пожалуйста, выберите другое."
 
 msgid "This theme is set locally"
 msgstr "Тема установлена локально"
@@ -13025,6 +13850,11 @@ msgstr ""
 
 msgid "This will remove your current embed configuration."
 msgstr "Это действие удалит текущую конфигурацию встраивания."
+
+msgid ""
+"This will reorganize all metrics and columns into default folders. Any "
+"custom folders will be removed."
+msgstr ""
 
 msgid "Threshold"
 msgstr "Порог"
@@ -13108,6 +13938,10 @@ msgstr "Столбец даты/времени"
 msgid "Time column \"%(col)s\" does not exist in dataset"
 msgstr "Столбец формата дата/время \"%(col)s\" не существует в датасете"
 
+#, fuzzy
+msgid "Time column chart customization plugin"
+msgstr "Плагин фильтрации по временному столбцу"
+
 msgid "Time column filter plugin"
 msgstr "Плагин фильтрации по временному столбцу"
 
@@ -13143,6 +13977,10 @@ msgstr "Формат даты/времени"
 
 msgid "Time grain"
 msgstr "Шаг времени"
+
+#, fuzzy
+msgid "Time grain chart customization plugin"
+msgstr "Ориентация диаграммы"
 
 msgid "Time grain filter plugin"
 msgstr "Плагин фильтрации по временным интервалам"
@@ -13182,8 +14020,8 @@ msgid ""
 "Time string is ambiguous. Please specify [%(human_readable)s ago] or "
 "[%(human_readable)s later]."
 msgstr ""
-"Временная строка неоднозначна. Пожалуйста, укажите [%(human_readable)s до] или "
-"[%(human_readable)s после]."
+"Временная строка неоднозначна. Пожалуйста, укажите [%(human_readable)s "
+"до] или [%(human_readable)s после]."
 
 msgid "Time-series Percent Change"
 msgstr "Процентное изменение (устарело)"
@@ -13225,17 +14063,34 @@ msgid "Title or Slug"
 msgstr "Название или читаемый URL"
 
 msgid ""
-"To enable multiple column sorting, hold down the ⇧ Shift key while clicking the "
-"column header."
+"To begin using your Google Sheets, you need to create a database first. "
+"Databases are used as a way to identify your data so that it can be "
+"queried and visualized. This database will hold all of your individual "
+"Google Sheets you choose to connect here."
 msgstr ""
-"Для сортировки по нескольким столбцам удерживайте клавишу ⇧ Shift при нажатии на "
-"заголовок столбца."
+
+msgid ""
+"To enable multiple column sorting, hold down the ⇧ Shift key while "
+"clicking the column header."
+msgstr ""
+"Для сортировки по нескольким столбцам удерживайте клавишу ⇧ Shift при "
+"нажатии на заголовок столбца."
+
+msgid "To entire row"
+msgstr ""
 
 msgid "To filter on a metric, use Custom SQL tab."
 msgstr "Для фильтрации по мере используйте вкладку Свой SQL."
 
 msgid "To get a readable URL for your dashboard"
 msgstr "Для получения читаемого URL-адреса дашборда"
+
+#, fuzzy
+msgid "To text color"
+msgstr "Цвет итогов"
+
+msgid "Token Request URI"
+msgstr ""
 
 msgid "Tool Panel"
 msgstr "Панель инструментов"
@@ -13339,9 +14194,6 @@ msgstr "Оповестить, если..."
 msgid "True"
 msgstr "Истина"
 
-msgid "Truncate Axis"
-msgstr "Настройка интервала оси"
-
 msgid "Truncate Cells"
 msgstr "Обрезать текст"
 
@@ -13352,8 +14204,8 @@ msgid "Truncate X Axis"
 msgstr "Ограничить ось X"
 
 msgid ""
-"Truncate X Axis. Can be overridden by specifying a min or max bound. Only "
-"applicable for numerical X axis."
+"Truncate X Axis. Can be overridden by specifying a min or max bound. Only"
+" applicable for numerical X axis."
 msgstr "Ограничивает ось X. Применимо только к числовой оси."
 
 msgid "Truncate Y Axis"
@@ -13448,6 +14300,11 @@ msgstr ""
 msgid "Unable to create chart without a query id."
 msgstr "Невозможно создать диаграмму без идентификатора запроса."
 
+msgid ""
+"Unable to create report: User email address is required but not found. "
+"Please ensure your user profile has a valid email address."
+msgstr ""
+
 msgid "Unable to decode value"
 msgstr "Не удалось декодировать значение"
 
@@ -13459,8 +14316,16 @@ msgid "Unable to find such a holiday: [%(holiday)s]"
 msgstr "Не удалось найти такой праздник: [%(holiday)s]"
 
 msgid ""
-"Unable to identify temporal column for date range time comparison.Please ensure "
-"your dataset has a properly configured time column."
+"Unable to identify temporal column for date range time comparison.Please "
+"ensure your dataset has a properly configured time column."
+msgstr ""
+"Не удалось определить временной столбец для сравнения по временному "
+"диапазону. Убедитесь, что в вашем датасете правильно настроен столбец "
+"времени."
+
+msgid ""
+"Unable to load columns for the selected table. Please select a different "
+"table."
 msgstr ""
 "Не удалось определить временной столбец для сравнения по временному диапазону. "
 "Убедитесь, что в вашем датасете правильно настроен столбец времени."
@@ -13504,12 +14369,19 @@ msgstr "Не удалось обработать SQL-запрос"
 msgid "Unable to read the file, please refresh and try again."
 msgstr "Не удалось прочитать файл. Обновите страницу и попробуйте заново."
 
+msgid "Unable to parse SQL"
+msgstr "Не удалось обработать SQL-запрос"
+
+msgid "Unable to read the file, please refresh and try again."
+msgstr "Не удалось прочитать файл. Обновите страницу и попробуйте заново."
+
 msgid "Unable to retrieve dashboard colors"
 msgstr "Не удалось получать цветовую схему дашборда"
 
 msgid "Unable to sync permissions for this database connection."
 msgstr ""
-"Не удалось синхронизировать права доступа для этого подключения к базе данных."
+"Не удалось синхронизировать права доступа для этого подключения к базе "
+"данных."
 
 msgid "Undefined"
 msgstr "Не определено"
@@ -13552,6 +14424,10 @@ msgstr "Неизвестно"
 #, python-format
 msgid "Unknown Doris server host \"%(hostname)s\"."
 msgstr "Неизвестный хост MySQL \"%(hostname)s\""
+
+#, fuzzy
+msgid "Unknown Error"
+msgstr "Неизвестная ошибка"
 
 #, python-format
 msgid "Unknown MySQL server host \"%(hostname)s\"."
@@ -13597,6 +14473,9 @@ msgstr "Небезопасное значение шаблона для ключ
 #, python-format
 msgid "Unsupported clause type: %(clause)s"
 msgstr "Неподдерживаемый оператор: %(clause)s"
+
+msgid "Unsupported file type. Please use CSV, Excel, or Columnar files."
+msgstr ""
 
 #, python-format
 msgid "Unsupported post processing operation: %(operation)s"
@@ -13695,11 +14574,12 @@ msgid "Use Area Proportions"
 msgstr "В пропорции площади"
 
 msgid ""
-"Use Handlebars syntax to create custom tooltips. Available variables are based on "
-"your tooltip contents selection above."
+"Use Handlebars syntax to create custom tooltips. Available variables are "
+"based on your tooltip contents selection above."
 msgstr ""
-"Используйте синтаксис Handlebars для создания пользовательских всплывающих "
-"подсказок. Доступные переменные основаны на выбранном выше содержимом подсказок."
+"Используйте синтаксис Handlebars для создания пользовательских "
+"всплывающих подсказок. Доступные переменные основаны на выбранном выше "
+"содержимом подсказок."
 
 msgid "Use a log scale"
 msgstr "Использовать логарифмическую шкалу"
@@ -13733,6 +14613,10 @@ msgstr "Использовать текущий масштаб"
 msgid "Use date formatting even when metric value is not a timestamp"
 msgstr "Отформатировать как дату, даже если мера представлена другим типом данных"
 
+#, fuzzy
+msgid "Use gradient"
+msgstr "Шаг времени"
+
 msgid "Use metrics as a top level group for columns or for rows"
 msgstr "Использовать меры как группы верхнего уровня для столбцов или строк"
 
@@ -13757,8 +14641,8 @@ msgid ""
 "Used internally to identify the plugin. Should be set to the package name from "
 "the pluginʼs package.json"
 msgstr ""
-"Используется внутри системы для идентификации плагина. Должно совпадать с именем "
-"пакета из package.json"
+"Используется внутри системы для идентификации плагина. Должно совпадать с"
+" именем пакета из package.json"
 
 msgid ""
 "Used to summarize a set of data by grouping together multiple statistics along "
@@ -13781,6 +14665,18 @@ msgstr "Регистрации пользователей"
 
 msgid "User doesn't have the proper permissions."
 msgstr "У пользователя нет надлежащего доступа"
+
+#, fuzzy
+msgid "User info"
+msgstr "Имя пользователя"
+
+#, fuzzy
+msgid "User must select a value before applying the chart customization"
+msgstr "Для использования фильтра нужно будет выбрать значение"
+
+#, fuzzy
+msgid "User must select a value before applying the customization"
+msgstr "Для использования фильтра нужно будет выбрать значение"
 
 msgid "User must select a value before applying the filter"
 msgstr "Для использования фильтра нужно будет выбрать значение"
@@ -13805,7 +14701,8 @@ msgstr "Пользователи"
 
 msgid "Users are not allowed to set a search path for security reasons."
 msgstr ""
-"Из соображений безопасности пользователям запрещено задавать путь для поиска."
+"Из соображений безопасности пользователям запрещено задавать путь для "
+"поиска."
 
 msgid ""
 "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data"
@@ -13834,6 +14731,23 @@ msgstr ""
 
 msgid "Valid SQL expression"
 msgstr "Корректное SQL-выражение"
+
+msgid "Validate your expression"
+msgstr "Проверьте ваше выражение"
+
+#, python-format
+msgid "Validating connectivity for %s"
+msgstr "Проверка подключения для %s"
+
+msgid "Validating..."
+msgstr "Проверка..."
+
+msgid "Valid SQL expression"
+msgstr "Корректное SQL-выражение"
+
+#, fuzzy
+msgid "Validate query"
+msgstr "Показать SQL-запрос"
 
 msgid "Validate your expression"
 msgstr "Проверьте ваше выражение"
@@ -13948,9 +14862,6 @@ msgstr "Показать ключи и индексы (%s)"
 msgid "View query"
 msgstr "Показать SQL-запрос"
 
-msgid "View theme"
-msgstr "Посмотреть тему"
-
 msgid "View theme properties"
 msgstr "Просмотреть свойства темы"
 
@@ -14010,7 +14921,9 @@ msgid ""
 msgstr ""
 "Визуализирует гео-данные, такие как 3D-здания, ландшафты или объекты в виде сетки"
 
-msgid "Visualize multiple levels of hierarchy using a familiar tree-like structure."
+msgid ""
+"Visualize multiple levels of hierarchy using a familiar tree-like "
+"structure."
 msgstr "Визуализирует несколько уровней иерархии, используя древовидную структуру"
 
 msgid ""
@@ -14060,8 +14973,8 @@ msgid ""
 "Visualizes many different time-series objects in a single chart. This chart is "
 "being deprecated and we recommend using the Time-series Chart instead."
 msgstr ""
-"Визуализирует множество временных рядов. Этот тип диаграммы устарел — рекомендуем "
-"использовать \"Таблицу временных рядов\"."
+"Визуализирует множество временных рядов. Этот тип диаграммы устарел — "
+"рекомендуем использовать \"Таблицу временных рядов\"."
 
 msgid ""
 "Visualizes the words in a column that appear the most often. Bigger font "
@@ -14096,6 +15009,9 @@ msgstr "Ожидание ответа от базы данных…"
 
 msgid "Want to add a new database?"
 msgstr "Хотите добавить новую базу данных?"
+
+msgid "Warehouse"
+msgstr ""
 
 msgid "Warning"
 msgstr "Предупреждение"
@@ -14138,7 +15054,8 @@ msgstr "Не удалось обнаружить столбец \"%(column_name)
 msgid "We have the following keys: %s"
 msgstr "У нас есть следующие ключи: %s"
 
-msgid "We were unable to active or deactivate this report."
+#, fuzzy
+msgid "We were unable to activate or deactivate this report."
 msgstr "Не удалось включить или выключить эту рассылку"
 
 msgid ""
@@ -14245,11 +15162,20 @@ msgstr ""
 "устанавливается в `.1%`"
 
 msgid "When a secondary metric is provided, a linear color scale is used."
-msgstr "Когда предоставляется вторичная мера, используется линейная цветовая схема."
+msgstr ""
+"Когда предоставляется вторичная мера, используется линейная цветовая "
+"схема."
 
 msgid "When checked, the map will zoom to your data after each query"
 msgstr ""
 "Если отмечено, карта будет масштабирована к вашим данным после каждого запроса"
+
+msgid ""
+"When enabled, the axis will display labels for the minimum and maximum "
+"values of your data"
+msgstr ""
+"Если этот параметр включен, на оси будут отображаться подписи для "
+"минимального и максимального значений данных"
 
 msgid "When enabled, users are able to visualize SQL Lab results in Explore."
 msgstr ""
@@ -14262,15 +15188,15 @@ msgstr ""
 "схема."
 
 msgid ""
-"When specifying SQL, the datasource acts as a view. Superset will use this "
-"statement as a subquery while grouping and filtering on the generated parent "
-"queries.If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
+"When specifying SQL, the datasource acts as a view. Superset will use "
+"this statement as a subquery while grouping and filtering on the "
+"generated parent queries.If changes are made to your SQL query, columns "
+"in your dataset will be synced when saving the dataset."
 msgstr ""
-"Когда указан SQL, источник данных работает как представление. При необходимости "
-"группировки и фильтрации Superset будет использовать это выражение в подзапросе. "
-"При внесении изменений в SQL-запрос столбцы в вашем датасете будут "
-"синхронизированы при сохранении."
+"Когда указан SQL, источник данных работает как представление. При "
+"необходимости группировки и фильтрации Superset будет использовать это "
+"выражение в подзапросе. При внесении изменений в SQL-запрос столбцы в "
+"вашем датасете будут синхронизированы при сохранении."
 
 msgid ""
 "When the secondary temporal columns are filtered, apply the same filter to the "
@@ -14280,8 +15206,18 @@ msgstr ""
 "дополнительным"
 
 msgid ""
-"When unchecked, colors from the selected color scheme will be used for time "
-"shifted series"
+"When unchecked, colors from the selected color scheme will be used for "
+"time shifted series"
+msgstr ""
+"Когда отключено, цвета из выбранной схемы будут использоваться для "
+"временных рядов со смещением"
+
+msgid ""
+"When using \"Autocomplete filters\", this can be used to improve "
+"performance of the query fetching the values. Use this option to apply a "
+"predicate (WHERE clause) to the query selecting the distinct values from "
+"the table. Typically the intent would be to limit the scan by applying a "
+"relative time filter on a partitioned or indexed time-related field."
 msgstr ""
 "Когда отключено, цвета из выбранной схемы будут использоваться для временных "
 "рядов со смещением"
@@ -14308,24 +15244,18 @@ msgstr ""
 "друга"
 
 msgid ""
-"When using this option, default value can't be set. Using this option may impact "
-"the load times for your dashboard."
+"When using this option, default value can’t be set. Using this option may"
+" impact the load times for your dashboard."
 msgstr ""
-"При использовании этой опции нельзя задать значение по умолчанию. Это может "
-"увеличить время загрузки дашборда."
-
-msgid ""
-"When using this option, default value can’t be set. Using this option may impact "
-"the load times for your dashboard."
-msgstr ""
-"При использовании этой опции нельзя задать значение по умолчанию. Это может "
-"увеличить время загрузки дашборда."
+"При использовании этой опции нельзя задать значение по умолчанию. Это "
+"может увеличить время загрузки дашборда."
 
 msgid "Whether the progress bar overlaps when there are multiple groups of data"
 msgstr "Накладывать индикатор прогресса при наличии нескольких групп данных"
 
 msgid ""
-"Whether to align background charts with both positive and negative values at 0"
+"Whether to align background charts with both positive and negative values"
+" at 0"
 msgstr "Общий ноль для гистограмм в ячейках"
 
 msgid "Whether to align positive and negative values in cell bar chart at 0"
@@ -14357,6 +15287,12 @@ msgstr "Отобразить пузырьки поверх стран"
 
 msgid "Whether to display in the chart"
 msgstr "Отображать ли на диаграмме"
+
+msgid "Whether to display the X Axis"
+msgstr "Отобразить ось X"
+
+msgid "Whether to display the Y Axis"
+msgstr "Отобразить ось Y"
 
 msgid "Whether to display the aggregate count"
 msgstr "Отобразить совокупное количество"
@@ -14441,11 +15377,11 @@ msgid "Whether to show as Nightingale chart."
 msgstr "Отобразить в виде диаграммы Найтингейл"
 
 msgid ""
-"Whether to show extra controls or not. Extra controls include things like making "
-"multiBar charts stacked or side by side."
+"Whether to show extra controls or not. Extra controls include things like"
+" making multiBar charts stacked or side by side."
 msgstr ""
-"Отобразить дополнительные элементы управления, включая режимы отображения "
-"столбцов: без накопления и с ним."
+"Отобразить дополнительные элементы управления, включая режимы отображения"
+" столбцов: без накопления и с ним."
 
 msgid "Whether to show minor ticks on the axis"
 msgstr "Отобразить промежуточные деления на оси"
@@ -14484,6 +15420,10 @@ msgstr "Элементы, которые нужно подсвечивать п�
 
 msgid "Whisker/outlier options"
 msgstr "Настройки усов/выбросов"
+
+#, fuzzy
+msgid "Why do I need to create a database?"
+msgstr "Хотите добавить новую базу данных?"
 
 msgid "Width"
 msgstr "Ширина"
@@ -14535,6 +15475,10 @@ msgstr "Метка оси X"
 
 msgid "X Axis Label Interval"
 msgstr "Интервал меток оси X"
+
+#, fuzzy
+msgid "X Axis Number Format"
+msgstr "Формат оси X"
 
 msgid "X Axis Title"
 msgstr "Название оси X"
@@ -14650,8 +15594,18 @@ msgstr "Да, перезаписать изменения"
 msgid "You are adding tags to %s %ss"
 msgstr "Вы применяете теги к %s %s"
 
-msgid "You are edting a query from the virtual dataset "
+#, fuzzy
+msgid "You are editing a query from the virtual dataset "
 msgstr "Вы редактируете запрос из виртуального датасета."
+
+msgid ""
+"You are importing one or more charts that already exist. Overwriting "
+"might cause you to lose some of your work. Are you sure you want to "
+"overwrite?"
+msgstr ""
+"Вы импортируете одну или несколько диаграмм, которые уже существуют. "
+"Перезапись может привести к потере части вашей работы. Вы уверены, что "
+"хотите перезаписать?"
 
 msgid ""
 "You are importing one or more charts that already exist. Overwriting might cause "
@@ -14714,6 +15668,34 @@ msgstr ""
 "цветовую схему.\n"
 "        Чтобы изменить цвета, откройте диаграмму отдельно от дашборда."
 
+msgid ""
+"You are importing one or more themes that already exist. Overwriting "
+"might cause you to lose some of your work. Are you sure you want to "
+"overwrite?"
+msgstr ""
+"Вы импортируете одну или несколько тем, которые уже существуют. "
+"Перезапись может привести к потере части вашей работы. Вы уверены, что "
+"хотите продолжить?"
+
+msgid ""
+"You are viewing this chart in a dashboard context with labels shared "
+"across multiple charts.\n"
+"        The color scheme selection is disabled."
+msgstr ""
+"Вы просматриваете эту диаграмму в составе дашборда, где подписи "
+"используются совместно для нескольких диаграмм.\n"
+"        Выбор цветовой схемы отключен."
+
+msgid ""
+"You are viewing this chart in the context of a dashboard that is directly"
+" affecting its colors.\n"
+"        To edit the color scheme, open this chart outside of the "
+"dashboard."
+msgstr ""
+"Вы просматриваете эту диаграмму в составе дашборда, который определяет ее"
+" цветовую схему.\n"
+"        Чтобы изменить цвета, откройте диаграмму отдельно от дашборда."
+
 msgid "You can"
 msgstr "Вы можете"
 
@@ -14732,7 +15714,8 @@ msgid ""
 "              Your filter selection will be saved and remain active until you "
 "choose to change it."
 msgstr ""
-"Вы можете отображать все доступные вам диаграммы или только созданные вами.\n"
+"Вы можете отображать все доступные вам диаграммы или только созданные "
+"вами.\n"
 "              Фильтр будет сохранен и останется активным до изменения."
 
 msgid "You can create a new chart or use existing ones from the panel on the right"
@@ -14749,8 +15732,8 @@ msgid ""
 "You cannot delete the last temporal filter as it's used for time range filters in "
 "dashboards."
 msgstr ""
-"Нельзя удалить последний временной фильтр, так как он используется для фильтрации "
-"по временным интервалам в дашбордах."
+"Нельзя удалить последний временной фильтр, так как он используется для "
+"фильтрации по временным интервалам в дашбордах."
 
 msgid "You cannot use 45° tick layout along with the time range filter"
 msgstr ""
@@ -14827,9 +15810,9 @@ msgid ""
 "You have used all %(historyLength)s undo slots and will not be able to fully undo "
 "subsequent actions. You may save your current state to reset the history."
 msgstr ""
-"Вы использовали все слоты отмены действий (%(historyLength)s). Дальнейшие "
-"изменения нельзя будет полностью отменить. Вы можете сохранить текущее состояние, "
-"чтобы сбросить историю."
+"Вы использовали все слоты отмены действий (%(historyLength)s). Дальнейшие"
+" изменения нельзя будет полностью отменить. Вы можете сохранить текущее "
+"состояние, чтобы сбросить историю."
 
 msgid ""
 "You must be a dataset owner in order to edit. Please reach out to a dataset owner "
@@ -14860,6 +15843,12 @@ msgid ""
 msgstr ""
 "Вы изменили датасеты. Все элементы управления с данными (столбцами, мерами), "
 "которые соответствуют новому датасету, были сохранены."
+
+msgid "Your changes will be lost if you leave without saving."
+msgstr ""
+
+msgid "Your account is activated. You can log in with your credentials."
+msgstr ""
 
 msgid "Your changes will be lost if you leave without saving."
 msgstr ""
@@ -14904,6 +15893,10 @@ msgstr "Ваш запрос был сохранен"
 
 msgid "Your report could not be deleted"
 msgstr "Не удается удалить рассылку"
+
+#, fuzzy
+msgid "Your user information"
+msgstr "Основная информация"
 
 msgid "ZIP file contains multiple file types"
 msgstr "ZIP-архив содержит файлы разных типов"
@@ -14952,16 +15945,19 @@ msgstr ""
 "[необязательно] Вторичная мера используется для определения цвета как доли по "
 "отношению к основной мере. Если не выбрано, цвет сопоставляется категории."
 
-msgid "[untitled]"
-msgstr "[без названия]"
+#, fuzzy
+msgid "[untitled customization]"
+msgstr "Ориентация диаграммы"
 
 msgid "`compare_columns` must have the same length as `source_columns`."
 msgstr ""
-"Параметр `compare_columns` должен иметь ту же длину, что и `source_columns`."
+"Параметр `compare_columns` должен иметь ту же длину, что и "
+"`source_columns`."
 
 msgid "`compare_type` must be `difference`, `percentage` or `ratio`"
 msgstr ""
-"`compare_type` должен соответствовать `difference`, `percentage` или `ratio`"
+"`compare_type` должен соответствовать `difference`, `percentage` или "
+"`ratio`"
 
 msgid "`confidence_interval` must be between 0 and 1 (exclusive)"
 msgstr "\"доверительный_интервал\" должен быть между 0 и 1 (не включая концы)"
@@ -14971,9 +15967,9 @@ msgid ""
 "with the aggregator. Non-numerical columns will be used to label points. Leave "
 "empty to get a count of points in each cluster."
 msgstr ""
-"`count` — это COUNT(*) при использовании группировки. Числовые столбцы будут "
-"агрегированы. Нечисловые столбцы используются для подписей точек. Оставьте пустым "
-"для подсчета точек в каждом кластере."
+"`count` — это COUNT(*) при использовании группировки. Числовые столбцы "
+"будут агрегированы. Нечисловые столбцы используются для подписей точек. "
+"Оставьте пустым для подсчета точек в каждом кластере."
 
 msgid "`operation` property of post processing object undefined"
 msgstr "Свойство `operation` не определено в объекте постобработки"
@@ -14983,6 +15979,9 @@ msgstr "Пакет \"prophet\" не установлен"
 
 msgid ""
 "`rename_columns` must have the same length as `columns` + `time_shift_columns`."
+msgstr ""
+"Параметр `rename_columns` должен иметь ту же длину, что и `columns` + "
+"`time_shift_columns`."
 msgstr ""
 "Параметр `rename_columns` должен иметь ту же длину, что и `columns` + "
 "`time_shift_columns`."
@@ -15087,9 +16086,6 @@ msgstr "диаграмм"
 
 msgid "choose WHERE or HAVING..."
 msgstr "выберите WHERE или HAVING..."
-
-msgid "clear all filters"
-msgstr "сбросить все фильтры"
 
 msgid "click here"
 msgstr "нажмите сюда"
@@ -15210,7 +16206,8 @@ msgstr "Deck.gl - Точечная карта"
 msgid "deck.gl Screen Grid"
 msgstr "Deck.gl - Screen Grid"
 
-msgid "deck.gl charts"
+#, fuzzy
+msgid "deck.gl layers (charts)"
 msgstr "Диаграммы deck.gl"
 
 msgid "deckGL"
@@ -15352,11 +16349,11 @@ msgstr "здесь"
 msgid "hour"
 msgstr "час"
 
+msgid "https://"
+msgstr ""
+
 msgid "in"
 msgstr "в"
-
-msgid "in modal"
-msgstr "в модальном окне"
 
 msgid "invalid email"
 msgstr "некорректный email"
@@ -15365,11 +16362,11 @@ msgid "is"
 msgstr "содержит"
 
 msgid ""
-"is expected to be a Mapbox/OSM URL (eg. mapbox://styles/...) or a tile server URL "
-"(eg. tile://http...)"
+"is expected to be a Mapbox/OSM URL (eg. mapbox://styles/...) or a tile "
+"server URL (eg. tile://http...)"
 msgstr ""
-"должен представлять собой URL Mapbox/OSM (mapbox://styles/...) или tile-сервера "
-"(tile://http...)"
+"должен представлять собой URL Mapbox/OSM (mapbox://styles/...) или "
+"tile-сервера (tile://http...)"
 
 msgid "is expected to be a number"
 msgstr "ожидается число"
@@ -15377,26 +16374,43 @@ msgstr "ожидается число"
 msgid "is expected to be an integer"
 msgstr "ожидается целое число"
 
-#, python-format
-msgid ""
-"is linked to %s charts that appear on %s dashboards and users have %s SQL Lab "
-"tabs using this database open. Are you sure you want to continue? Deleting the "
-"database will break those objects."
-msgstr ""
-"привязана к %s диаграмме(ам) на %s дашборде(ах), и пользователи имеют %s "
-"открытую(ых) вкладку(ок) в SQL Lab. Вы уверены, что хотите продолжить? Удаление "
-"базы данных приведет к неработоспособности этих объектов."
+#, fuzzy
+msgid "is false"
+msgstr "Ложь"
 
 #, python-format
 msgid ""
-"is linked to %s charts that appear on %s dashboards. Are you sure you want to "
-"continue? Deleting the dataset will break those objects."
+"is linked to %s charts that appear on %s dashboards and users have %s SQL"
+" Lab tabs using this database open. Are you sure you want to continue? "
+"Deleting the database will break those objects."
+msgstr ""
+"привязана к %s диаграмме(ам) на %s дашборде(ах), и пользователи имеют %s "
+"открытую(ых) вкладку(ок) в SQL Lab. Вы уверены, что хотите продолжить? "
+"Удаление базы данных приведет к неработоспособности этих объектов."
+
+#, python-format
+msgid ""
+"is linked to %s charts that appear on %s dashboards. Are you sure you "
+"want to continue? Deleting the dataset will break those objects."
 msgstr ""
 "привязан к %s диаграмме(ам) на %s дашборде(ах). Вы уверены, что хотите "
-"продолжить? Удаление датасета приведет к неработоспособности этих объектов."
+"продолжить? Удаление датасета приведет к неработоспособности этих "
+"объектов."
 
 msgid "is not"
 msgstr "не содержит"
+
+#, fuzzy
+msgid "is not null"
+msgstr "Is not null"
+
+#, fuzzy
+msgid "is null"
+msgstr "Is null"
+
+#, fuzzy
+msgid "is true"
+msgstr "Истина"
 
 msgid "key a-z"
 msgstr "по алфавиту А-Я"
@@ -15444,6 +16458,10 @@ msgstr "метры"
 
 msgid "metric"
 msgstr "мера"
+
+#, fuzzy
+msgid "metric type icon"
+msgstr "иконка для типа `numeric`"
 
 msgid "min"
 msgstr "минимум"
@@ -15535,8 +16553,8 @@ msgid ""
 "percentiles must be a list or tuple with two numeric values, of which the first "
 "is lower than the second value"
 msgstr ""
-"процентили должны быть списком или записью из двух чисел, первое из которых "
-"меньшее"
+"процентили должны быть списком или записью из двух чисел, первое из "
+"которых меньшее"
 
 msgid "permalink state not found"
 msgstr "состояние постоянной ссылки не найдено"
@@ -15562,9 +16580,6 @@ msgstr "предыдущий календарный год"
 
 msgid "quarter"
 msgstr "квартал"
-
-msgid "queries"
-msgstr "запросы"
 
 msgid "query"
 msgstr "запрос"
@@ -15602,6 +16617,9 @@ msgstr "выполняется"
 msgid "save"
 msgstr "сохранить"
 
+msgid "schema1,schema2"
+msgstr ""
+
 msgid "seconds"
 msgstr "секунд"
 
@@ -15613,8 +16631,8 @@ msgid ""
 "change: Show changes compared to the first data point in each series"
 msgstr ""
 "\"Категории\" - ряды не зависят друг от друга. \"Итого\" - все ряды "
-"масштабируются одинаково. \"Изменение\" - показывать изменения относительно "
-"первого значения в каждом ряду."
+"масштабируются одинаково. \"Изменение\" - показывать изменения "
+"относительно первого значения в каждом ряду."
 
 # Не переводить
 msgid "sql"
@@ -15654,6 +16672,9 @@ msgstr "успех"
 
 msgid "sum"
 msgstr "сумма"
+
+msgid "superset.example.com"
+msgstr ""
 
 msgid "syntax."
 msgstr "синтаксис."
@@ -15701,6 +16722,10 @@ msgstr ""
 
 msgid "use latest_partition template"
 msgstr "используйте шаблон latest_partition"
+
+#, fuzzy
+msgid "username"
+msgstr "Имя пользователя"
 
 msgid "value ascending"
 msgstr "по возрастанию значения"
@@ -15752,6 +16777,9 @@ msgstr "y: значения нормированны внутри каждой �
 
 msgid "year"
 msgstr "год"
+
+msgid "your-project-1234-a1"
+msgstr ""
 
 msgid "zoom area"
 msgstr "область масштабирования"

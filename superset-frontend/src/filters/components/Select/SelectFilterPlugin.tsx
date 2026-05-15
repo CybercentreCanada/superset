@@ -18,19 +18,19 @@
  */
 /* eslint-disable no-param-reassign */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { t } from '@apache-superset/core/translation';
 import {
   AppSection,
   DataMask,
   ensureIsArray,
   ExtraFormData,
-  GenericDataType,
   getColumnLabel,
   JsonObject,
   finestTemporalGrainFormatter,
-  t,
-  tn,
-  styled,
 } from '@superset-ui/core';
+import { tn } from '@apache-superset/core/translation';
+import { styled } from '@apache-superset/core/theme';
+import { GenericDataType } from '@apache-superset/core/common';
 import { debounce, isUndefined } from 'lodash';
 import { useImmerReducer } from 'use-immer';
 import {
@@ -151,7 +151,6 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
   const [col] = groupby;
   const [initialColtypeMap] = useState(coltypeMap);
   const [search, setSearch] = useState('');
-  const isChangedByUser = useRef(false);
   const prevDataRef = useRef(data);
   const [dataMask, dispatchDataMask] = useImmerReducer(reducer, {
     extraFormData: {},
@@ -296,7 +295,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
   }, [filterState.validateMessage, filterState.validateStatus]);
 
   const uniqueOptions = useMemo(() => {
-    const allOptions = new Set([...data.map(el => el[col])]);
+    const allOptions = new Set(data.map(el => el[col]));
     return [...allOptions].map((value: string) => ({
       label: labelFormatter(value, datatype),
       value,
@@ -400,16 +399,13 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
 
     // If data actually changed (e.g., due to parent filter), reset flag
     if (hasDataChanged) {
-      isChangedByUser.current = false;
       prevDataRef.current = data;
     }
   }, [data, col]);
 
   useEffect(() => {
     if (
-      isChangedByUser.current &&
-      filterState.value &&
-      filterState.value.every((value?: any) =>
+      filterState.value?.every((value?: any) =>
         data.some(row => row[col] === value),
       )
     )
@@ -438,7 +434,6 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
     formData,
     data,
     JSON.stringify(filterState.value),
-    isChangedByUser.current,
     clearAllTrigger,
   ]);
 
@@ -514,9 +509,10 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
           <Select
             name={formData.nativeFilterId}
             allowClear
+            autoClearSearchValue
             allowNewOptions={!searchAllOptions && creatable !== false}
             allowSelectAll={!searchAllOptions}
-            value={filterState.value || []}
+            value={multiSelect ? filterState.value || [] : filterState.value}
             disabled={isDisabled}
             getPopupContainer={
               showOverflow
@@ -533,7 +529,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
             onFocus={setFocusedFilter}
             onMouseEnter={setHoveredFilter}
             onMouseLeave={unsetHoveredFilter}
-            // @ts-ignore
+            // @ts-expect-error
             onChange={handleChange}
             ref={inputRef}
             loading={isRefreshing}

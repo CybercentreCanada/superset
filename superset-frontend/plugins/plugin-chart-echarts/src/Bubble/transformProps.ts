@@ -33,11 +33,8 @@ import {
 import { EchartsBubbleChartProps, EchartsBubbleFormData } from './types';
 import { DEFAULT_FORM_DATA, MINIMUM_BUBBLE_SIZE } from './constants';
 import { defaultGrid } from '../defaults';
-import {
-  getColtypesMapping,
-  getLegendProps,
-  getMinAndMaxFromBounds,
-} from '../utils/series';
+import { getLegendProps, getMinAndMaxFromBounds } from '../utils/series';
+import { resolveLegendLayout } from '../utils/legendLayout';
 import { Refs } from '../types';
 import { parseAxisBound } from '../utils/controls';
 import { getDefaultTooltip } from '../utils/tooltip';
@@ -137,6 +134,7 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
     legendOrientation,
     legendMargin,
     legendType,
+    legendSort,
     sliceId,
   }: EchartsBubbleFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const colorFn = CategoricalColorNamespace.getScale(colorScheme as string);
@@ -188,6 +186,20 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
   // end CCCS code
   const yAxisFormatter = getNumberFormatter(yAxisFormat);
   const tooltipSizeFormatter = getNumberFormatter(tooltipSizeFormat);
+  const legendData = Array.from(legends).sort((a: string, b: string) => {
+    if (!legendSort) return 0;
+    return legendSort === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+  });
+  const { effectiveLegendMargin, effectiveLegendType } = resolveLegendLayout({
+    chartHeight: height,
+    chartWidth: width,
+    legendItems: legendData,
+    legendMargin,
+    orientation: legendOrientation,
+    show: showLegend,
+    theme,
+    type: legendType,
+  });
 
   const [xAxisMin, xAxisMax] = (xAxisBounds || []).map(parseAxisBound);
   const [yAxisMin, yAxisMax] = (yAxisBounds || []).map(parseAxisBound);
@@ -197,7 +209,7 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
     legendOrientation,
     true,
     false,
-    legendMargin,
+    effectiveLegendMargin,
     true,
     'Left',
     convertInteger(yAxisTitleMargin),
@@ -251,8 +263,13 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
       type: logYAxis ? AxisType.Log : AxisType.Value,
     },
     legend: {
-      ...getLegendProps(legendType, legendOrientation, showLegend, theme),
-      data: Array.from(legends),
+      ...getLegendProps(
+        effectiveLegendType,
+        legendOrientation,
+        showLegend,
+        theme,
+      ),
+      data: legendData,
     },
     tooltip: {
       show: !inContextMenu,

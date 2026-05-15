@@ -17,7 +17,7 @@
 """Add folders column to datasets
 
 Revision ID: 94e7a3499973
-Revises: a06a82face61
+Revises: 74ad1125881c
 Create Date: 2025-03-03 20:52:24.585143
 
 """
@@ -29,7 +29,7 @@ from superset.migrations.shared.utils import add_columns, drop_columns
 
 # revision identifiers, used by Alembic.
 revision = "94e7a3499973"
-down_revision = "a06a82face61"
+down_revision = "74ad1125881c"
 
 
 def upgrade():

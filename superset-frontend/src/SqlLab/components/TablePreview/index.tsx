@@ -19,19 +19,14 @@
 import { type FC, useCallback, useMemo, useRef, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { nanoid } from 'nanoid';
+import { t } from '@apache-superset/core/translation';
+import { ClientErrorObject, getExtensionsRegistry } from '@superset-ui/core';
+import { Alert } from '@apache-superset/core/components';
+import { css, styled, useTheme } from '@apache-superset/core/theme';
 import {
-  ClientErrorObject,
-  css,
-  getExtensionsRegistry,
-  styled,
-  t,
-  useTheme,
-} from '@superset-ui/core';
-import {
-  // SafeMarkdown,
-  Alert,
+  SafeMarkdown,
   Breadcrumb,
-  // Card,
+  Card,
   Skeleton,
   Flex,
 } from '@superset-ui/core/components';
@@ -42,11 +37,12 @@ import { CopyToClipboard, FilterableTable } from 'src/components';
 import Tabs from '@superset-ui/core/components/Tabs';
 import {
   tableApiUtil,
-  // TableMetaData,
+  TableMetaData,
   useTableExtendedMetadataQuery,
   useTableMetadataQuery,
 } from 'src/hooks/apiResources';
 import { runTablePreviewQuery } from 'src/SqlLab/actions/sqlLab';
+import { PREVIEW_QUERY_LIMIT } from 'src/SqlLab/constants';
 import { ActionButton } from '@superset-ui/core/components/ActionButton';
 import ResultSet from '../ResultSet';
 import ShowSQL from '../ShowSQL';
@@ -69,8 +65,6 @@ const TABS_KEYS = {
   SAMPLE: 'sample',
 };
 const TAB_HEADER_HEIGHT = 80;
-const PREVIEW_TOP_ACTION_HEIGHT = 30;
-const PREVIEW_QUERY_LIMIT = 100;
 
 const Title = styled.div`
   ${({ theme }) => css`
@@ -80,43 +74,40 @@ const Title = styled.div`
     column-gap: ${theme.sizeUnit}px;
     font-size: ${theme.fontSizeLG}px;
     font-weight: ${theme.fontWeightStrong};
-    padding-top: ${theme.sizeUnit * 2}px;
-    padding-left: ${theme.sizeUnit * 4}px;
   `}
 `;
-// TODO Commented out to fix CCCS build - see https://cccs.atlassian.net/browse/CLDN-2699
-// const renderWell = (partitions: TableMetaData['partitions']) => {
-//   if (!partitions) {
-//     return null;
-//   }
-//   const { partitionQuery } = partitions;
-//   let partitionClipBoard;
-//   if (partitionQuery) {
-//     const tt = t('Copy partition query to clipboard');
-//     partitionClipBoard = (
-//       <CopyToClipboard
-//         text={partitionQuery}
-//         shouldShowText={false}
-//         tooltipText={tt}
-//         copyNode={<Icons.CopyOutlined iconSize="s" />}
-//       />
-//     );
-//   }
-//   const latest = Object.entries(partitions.latest || [])
-//     .map(([key, value]) => `${key}=${value}`)
-//     .join('/');
+const renderWell = (partitions: TableMetaData['partitions']) => {
+  if (!partitions) {
+    return null;
+  }
+  const { partitionQuery } = partitions;
+  let partitionClipBoard;
+  if (partitionQuery) {
+    const tt = t('Copy partition query to clipboard');
+    partitionClipBoard = (
+      <CopyToClipboard
+        text={partitionQuery}
+        shouldShowText={false}
+        tooltipText={tt}
+        copyNode={<Icons.CopyOutlined iconSize="s" />}
+      />
+    );
+  }
+  const latest = Object.entries(partitions.latest || [])
+    .map(([key, value]) => `${key}=${value}`)
+    .join('/');
 
-//   return (
-//     <Card size="small">
-//       <div>
-//         <small>
-//           {t('latest partition:')} {latest}
-//         </small>{' '}
-//         {partitionClipBoard}
-//       </div>
-//     </Card>
-//   );
-// };
+  return (
+    <Card size="small">
+      <div>
+        <small>
+          {t('latest partition:')} {latest}
+        </small>{' '}
+        {partitionClipBoard}
+      </div>
+    </Card>
+  );
+};
 
 const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
   const dispatch = useDispatch();
@@ -158,9 +149,7 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         schema: schema ?? '',
         table: tableName ?? '',
       },
-      // { skip: !dbId || !schema || !tableName },
-      // TODO hack to true because this breaks a lot for CCCS stuff - see https://cccs.atlassian.net/browse/CLDN-2699
-      { skip: true },
+      { skip: !dbId || !schema || !tableName },
     );
   const data = useMemo(
     () =>
@@ -188,8 +177,6 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
     dataPreviewQueryId: previewQueryId,
     ...tableMetadata,
     ...tableExtendedMetadata,
-    // hack to fix the SELECT * statements
-    selectStar: `SELECT * FROM ${tableMetadata?.name} LIMIT 100;`,
   };
   const refreshTableMetadata = () => {
     dispatch(
@@ -295,23 +282,17 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         flex-direction: column;
       `}
     >
-      <Breadcrumb
-        separator=">"
-        css={css`
-          padding-left: ${theme.sizeUnit * 4}px;
-        `}
-      >
+      <Breadcrumb separator=">">
         <Breadcrumb.Item>{backend}</Breadcrumb.Item>
         <Breadcrumb.Item>{databaseName}</Breadcrumb.Item>
         {catalog && <Breadcrumb.Item>{catalog}</Breadcrumb.Item>}
-        {schema && <Breadcrumb.Item>{schema}</Breadcrumb.Item>}
         <Breadcrumb.Item> </Breadcrumb.Item>
       </Breadcrumb>
-      <div style={{ display: 'none' }}>
+      <div style={{ display: 'none' }} aria-hidden="true">
         <CopyToClipboard
           copyNode={
             <button type="button" ref={copyStatementActionRef}>
-              invisible button
+              {t('Copy')}
             </button>
           }
           text={tableData.selectStar}
@@ -324,7 +305,7 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
             title={t('CREATE VIEW statement')}
             triggerNode={
               <button type="button" ref={showViewStatementActionRef}>
-                invisible button
+                {t('Show SQL')}
               </button>
             }
           />
@@ -332,6 +313,7 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
       </div>
       <Title>
         <Icons.InsertRowAboveOutlined iconSize="l" />
+        {schema ? `${schema}.` : ''}
         {tableName}
         {titleActions()}
       </Title>
@@ -339,9 +321,8 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
         <Skeleton active />
       ) : (
         <>
-          {/* TODO These two elements will crash the app sometimes - see https://cccs.atlassian.net/browse/CLDN-2699 */}
-          {/* {tableData.comment && <SafeMarkdown source={tableData.comment} />} */}
-          {/* {renderWell(tableData.partitions)} */}
+          {tableData.comment && <SafeMarkdown source={tableData.comment} />}
+          {renderWell(tableData.partitions)}
           <div
             css={css`
               flex: 1 1 auto;
@@ -374,9 +355,6 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
                         visualize={false}
                         csv={false}
                         cache
-                        height={
-                          height - TAB_HEADER_HEIGHT - PREVIEW_TOP_ACTION_HEIGHT
-                        }
                         displayLimit={PREVIEW_QUERY_LIMIT}
                         defaultQueryLimit={PREVIEW_QUERY_LIMIT}
                       />
@@ -438,9 +416,6 @@ const TablePreview: FC<Props> = ({ dbId, catalog, schema, tableName }) => {
                     `}
                     tabBarStyle={{ paddingLeft: theme.sizeUnit * 4 }}
                     items={tabItems}
-                    contentStyle={css`
-                      padding-left: ${theme.sizeUnit * 4}px;
-                    `}
                   />
                 );
               }}

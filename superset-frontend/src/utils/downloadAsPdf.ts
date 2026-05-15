@@ -19,8 +19,14 @@
 import { SyntheticEvent } from 'react';
 import domToPdf from 'dom-to-pdf';
 import { kebabCase } from 'lodash';
-import { logging, t } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
+import { logging } from '@apache-superset/core/utils';
 import { addWarningToast } from 'src/components/MessageToasts/actions';
+import getBootstrapData from 'src/utils/getBootstrapData';
+
+const pdfCompressionLevel = getBootstrapData().common.pdf_compression_level;
+
+const IMAGE_DOWNLOAD_QUALITY = 0.95;
 
 /**
  * generate a consistent file stem from a description and date
@@ -44,8 +50,9 @@ export default function downloadAsPdf(
   selector: string,
   description: string,
   isExactSelector = false,
+  theme?: SupersetTheme,
 ) {
-  return (event: SyntheticEvent) => {
+  return async (event: SyntheticEvent) => {
     const elementToPrint = isExactSelector
       ? document.querySelector(selector)
       : event.currentTarget.closest(selector);
@@ -54,10 +61,12 @@ export default function downloadAsPdf(
       return addWarningToast(
         t('PDF download failed, please refresh and try again.'),
       );
+      return;
     }
 
     const options = {
       margin: 10,
+      compression: pdfCompressionLevel,
       filename: `${generateFileStem(description)}.pdf`,
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2 },
@@ -70,5 +79,21 @@ export default function downloadAsPdf(
       .catch((e: Error) => {
         logging.error('PDF generation failed', e);
       });
+
+      cleanup();
+      cleanup = null;
+
+      const link = document.createElement('a');
+      link.download = `${generateFileStem(description)}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Creating image failed', error);
+      addWarningToast(
+        t('Image download failed, please refresh and try again.'),
+      );
+    } finally {
+      if (cleanup) cleanup();
+    }
   };
 }

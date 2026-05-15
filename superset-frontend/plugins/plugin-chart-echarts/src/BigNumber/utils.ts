@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+// Type augmentation for dayjs plugins
+import 'dayjs/plugin/utc';
 import {
   getTimeFormatter,
   getTimeFormatterForGranularity,
@@ -29,6 +29,7 @@ import {
   SMART_DATE_ID,
   TimeGranularity,
 } from '@superset-ui/core';
+import { extendedDayjs as dayjs } from '@superset-ui/core/utils/dates';
 
 dayjs.extend(utc);
 

@@ -59,6 +59,7 @@ from superset.extensions import (
     stats_logger_manager,
     talisman,
 )
+from superset.extensions.context import extension_context
 from superset.security import SupersetSecurityManager
 from superset.sql.parse import SQLGLOT_DIALECTS
 from superset.superset_typing import FlaskResponse
@@ -158,7 +159,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.cachekeys.api import CacheRestApi
         from superset.charts.api import ChartRestApi
         from superset.charts.data.api import ChartDataRestApi
-        from superset.clue.api import ClueRestApi
         from superset.css_templates.api import CssTemplateRestApi
         from superset.dashboards.api import DashboardRestApi
         from superset.dashboards.filter_state.api import DashboardFilterStateRestApi
@@ -173,6 +173,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.explore.api import ExploreRestApi
         from superset.explore.form_data.api import ExploreFormDataRestApi
         from superset.explore.permalink.api import ExplorePermalinkRestApi
+        from superset.extensions.view import ExtensionsView
         from superset.importexport.api import ImportExportRestApi
         from superset.queries.api import QueryRestApi
         from superset.queries.saved_queries.api import SavedQueryRestApi
@@ -207,6 +208,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.groups import GroupsListView
         from superset.views.log.api import LogRestApi
         from superset.views.logs import ActionLogView
+        from superset.views.redirect import RedirectView
         from superset.views.roles import RolesListView
         from superset.views.sql_lab.views import (
             SavedQueryView,
@@ -219,6 +221,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         )
         from superset.views.sqllab import SqllabView
         from superset.views.tags import TagModelView, TagView
+        from superset.views.tasks import TaskModelView
         from superset.views.themes import ThemeModelView
         from superset.views.user_info import UserInfoView
         from superset.views.user_registrations import UserRegistrationsView
@@ -232,13 +235,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.health import health_blueprint
 
         self.superset_app.register_blueprint(health_blueprint)
-
-        # --- CCCS CODE BLOCK
-        if (self.config.get("ENABLE_ALFRED")):
-            appbuilder.add_api(AlfredRestApi)
-        if (self.config.get("ENABLE_CLUE")):
-            appbuilder.add_api(ClueRestApi)
-        # --- END CCCS CODE BLOCK
 
         #
         # Setup API views
@@ -277,6 +273,17 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(SqlLabRestApi)
         appbuilder.add_api(SqlLabPermalinkRestApi)
         appbuilder.add_api(LogRestApi)
+
+        if feature_flag_manager.is_feature_enabled("ENABLE_EXTENSIONS"):
+            from superset.extensions.api import ExtensionsRestApi
+
+            appbuilder.add_api(ExtensionsRestApi)
+
+        if feature_flag_manager.is_feature_enabled("GLOBAL_TASK_FRAMEWORK"):
+            from superset.tasks.api import TaskRestApi
+
+            appbuilder.add_api(TaskRestApi)
+
         #
         # Setup regular views
         #
@@ -399,6 +406,29 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             category_icon="",
         )
 
+        appbuilder.add_view(
+            ExtensionsView,
+            "Extensions",
+            label=_("Extensions"),
+            category="Manage",
+            category_label=_("Manage"),
+            menu_cond=lambda: feature_flag_manager.is_feature_enabled(
+                "ENABLE_EXTENSIONS"
+            ),
+        )
+
+        appbuilder.add_view(
+            TaskModelView,
+            "Tasks",
+            label=_("Tasks"),
+            icon="fa-clock-o",
+            category="Manage",
+            category_label=_("Manage"),
+            menu_cond=lambda: feature_flag_manager.is_feature_enabled(
+                "GLOBAL_TASK_FRAMEWORK"
+            ),
+        )
+
         #
         # Setup views with no menu
         #
@@ -418,6 +448,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_view_no_menu(TaggedObjectsModelView)
         appbuilder.add_view_no_menu(TagView)
         appbuilder.add_view_no_menu(ReportView)
+        appbuilder.add_view_no_menu(RedirectView)
         appbuilder.add_view_no_menu(RoleRestAPI)
         appbuilder.add_view_no_menu(UserInfoView)
 
@@ -509,6 +540,66 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             icon="fa-lock",
         )
 
+    def init_core_dependencies(self) -> None:
+        """Initialize core dependency injection for direct import patterns."""
+        from superset.core.api.core_api_injection import (
+            initialize_core_api_dependencies,
+        )
+        from superset.core.mcp.core_mcp_injection import (
+            initialize_core_mcp_dependencies,
+        )
+
+        initialize_core_api_dependencies()
+        initialize_core_mcp_dependencies()
+
+    def init_all_dependencies_and_extensions(self) -> None:
+        """
+        Initialize all core dependencies and extensions.
+
+        Core dependencies are always initialized.
+        Extensions are only initialized if the ENABLE_EXTENSIONS feature flag
+        is enabled.
+        """
+        # Always initialize core dependencies
+        self.init_core_dependencies()
+
+        # Conditionally initialize extensions based on feature flag
+        if feature_flag_manager.is_feature_enabled("ENABLE_EXTENSIONS"):
+            self.init_extensions()
+
+    def init_extensions(self) -> None:
+        from superset.extensions.utils import (
+            eager_import,
+            get_extensions,
+            install_in_memory_importer,
+        )
+
+        try:
+            extensions = get_extensions()
+        except Exception:  # pylint: disable=broad-except  # noqa: S110
+            # If the db hasn't been initialized yet, an exception will be raised.
+            # It's fine to ignore this, as in this case there are no extensions
+            # present yet.
+            return
+
+        for extension in extensions.values():
+            if backend_files := extension.backend:
+                install_in_memory_importer(
+                    backend_files,
+                    source_base_path=extension.source_base_path,
+                )
+
+            backend = extension.manifest.backend
+
+            if backend and backend.entrypoint:
+                try:
+                    with extension_context(extension.manifest):
+                        eager_import(backend.entrypoint)
+
+                except Exception as ex:  # pylint: disable=broad-except  # noqa: S110
+                    # Surface exceptions during initialization of extensions
+                    print(ex)
+
     def init_app_in_ctx(self) -> None:
         """
         Runs init logic in the context of the app
@@ -520,6 +611,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         self.configure_async_queries()
         self.configure_ssh_manager()
         self.configure_stats_manager()
+        self.configure_task_manager()
 
         # Hook that provides administrators a handle on the Flask APP
         # after initialization
@@ -531,6 +623,8 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         self.superset_app.sync_config_to_db()
 
         self.init_views()
+
+        self.init_all_dependencies_and_extensions()
 
     def check_secret_key(self) -> None:
         def log_default_secret_key_warning() -> None:
@@ -567,7 +661,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 
     def register_request_handlers(self) -> None:
         """Register app-level request handlers"""
-        from flask import Response
+        from flask import request, Response
 
         @self.superset_app.after_request
         def apply_http_headers(response: Response) -> Response:
@@ -583,6 +677,25 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             for k, v in self.superset_app.config["DEFAULT_HTTP_HEADERS"].items():
                 if k not in response.headers:
                     response.headers[k] = v
+
+            # Allow service worker to control the root scope for PWA file handling
+            if (
+                request.path.endswith("service-worker.js")
+                and "Service-Worker-Allowed" not in response.headers
+            ):
+                response.headers["Service-Worker-Allowed"] = "/"
+
+            return response
+
+        @self.superset_app.after_request
+        def cleanup_analytics_memory(response: Response) -> Response:
+            """Force garbage collection after each request if feature flag enabled"""
+            if feature_flag_manager.is_feature_enabled(
+                "FORCE_GARBAGE_COLLECTION_AFTER_EVERY_REQUEST"
+            ):
+                import gc
+
+                gc.collect()
             return response
 
         @self.superset_app.context_processor
@@ -838,6 +951,13 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
     def configure_async_queries(self) -> None:
         if feature_flag_manager.is_feature_enabled("GLOBAL_ASYNC_QUERIES"):
             async_query_manager_factory.init_app(self.superset_app)
+
+    def configure_task_manager(self) -> None:
+        """Initialize the TaskManager for GTF realtime notifications."""
+        if feature_flag_manager.is_feature_enabled("GLOBAL_TASK_FRAMEWORK"):
+            from superset.tasks.manager import TaskManager
+
+            TaskManager.init_app(self.superset_app)
 
     def register_blueprints(self) -> None:
         # Register custom blueprints from config
