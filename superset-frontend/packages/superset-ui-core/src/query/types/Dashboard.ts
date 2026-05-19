@@ -163,7 +163,7 @@ export function isAppliedNativeFilterType(
 }
 
 export function isNativeFilter(
-  filterElement: Filter | Divider,
+  filterElement: Filter | Divider | ChartCustomization | ChartCustomizationDivider,
 ): filterElement is Filter {
   return filterElement.type === NativeFilterType.NativeFilter;
 }

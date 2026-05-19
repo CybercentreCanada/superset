@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: \n"
 "Language: pt_BR\n"
 "Language-Team: \n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -899,14 +899,6 @@ msgstr "Adicionar Recipientes BCC"
 msgid "Add CC Recipients"
 msgstr "recentes"
 
-#, fuzzy
-msgid "Add BCC Recipients"
-msgstr "Adicionar Recipientes BCC"
-
-#, fuzzy
-msgid "Add CC Recipients"
-msgstr "recentes"
-
 msgid "Add CSS template"
 msgstr "Adicionar modelo CSS"
 
@@ -1418,12 +1410,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr "Permitir que esse banco de dados seja explorado"
 
@@ -1482,10 +1468,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr "Ocorreu um erro"
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Ocorreu um erro durante a pesquisa de conjuntos de dados: %s"
 
 msgid "An error occurred"
 msgstr "Um erro ocorreu"
@@ -1979,10 +1961,6 @@ msgid "Are you sure you want to delete the selected roles?"
 msgstr "Tem certeza que deseja remover as camadas selecionadas?"
 
 #, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "Tem certeza que deseja remover as camadas selecionadas?"
-
-#, fuzzy
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "Tem certeza que deseja remover as camadas selecionadas?"
 
@@ -2132,25 +2110,11 @@ msgstr "Personalizar colunas"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "Personalizar colunas"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "Personalizar colunas"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "Modos de ordenação disponíveis:"
 
 msgid "Average"
 msgstr "Média"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr "Valor médio"
@@ -2988,10 +2952,6 @@ msgstr "Escolha do [Rótulo] deve estar em [Agrupar por]"
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "A escolha de [Raio do ponto] deve estar presente em [Agrupar por]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Escolha um gráfico ou painel, não ambos"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3913,9 +3873,6 @@ msgstr "Criando uma fonte de dados e criando uma nova guia"
 msgid "Creator"
 msgstr "Criador"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 msgid "Crimson"
 msgstr "Carmesim"
 
@@ -4166,21 +4123,6 @@ msgstr "Não foi possível atualizar o painel."
 
 #, fuzzy
 msgid "Dashboard chart customizations could not be updated."
-msgstr "Não foi possível atualizar o painel."
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "Não foi possível atualizar o painel."
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-#, fuzzy
-msgid "Dashboard cannot be favorited."
-msgstr "Não foi possível atualizar o painel."
-
-#, fuzzy
-msgid "Dashboard cannot be unfavorited."
 msgstr "Não foi possível atualizar o painel."
 
 #, fuzzy
@@ -4819,10 +4761,6 @@ msgstr "excluir"
 #, fuzzy
 msgid "Delete item"
 msgstr "Excluir modelo"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "excluir"
 
 #, fuzzy
 msgid "Delete role"
@@ -5507,7 +5445,7 @@ msgid "Edit Role"
 msgstr "modo de edição"
 
 #, fuzzy
-msgid "Edit Role"
+msgid "Edit Rule"
 msgstr "modo de edição"
 
 #, fuzzy
@@ -5570,10 +5508,6 @@ msgstr "modo de edição"
 #, fuzzy
 msgid "Edit tag"
 msgstr "Editar log"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "modo de edição"
 
 msgid "Edit template"
 msgstr "Editar modelo"
@@ -6002,14 +5936,6 @@ msgstr "Erro ao buscar gráficos"
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Erro ao renderizar consulta de conjunto de dados virtual: %(msg)s"
 
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "Erro ao buscar gráficos"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "Erro ao buscar gráficos"
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr "Erro: %(error)s"
@@ -6376,10 +6302,6 @@ msgstr "Falha ao verificar opções selecionadas: %s"
 
 msgid "Failed to start remote query on a worker."
 msgstr "Falha ao iniciar a consulta remota em um worker."
-
-#, fuzzy, python-format
-msgid "Failed to stop query."
-msgstr "Falha ao parar a consulta. %s"
 
 #, fuzzy
 msgid "Failed to stop query."
@@ -7120,11 +7042,6 @@ msgstr ""
 "valor da métrica"
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -7747,10 +7664,6 @@ msgstr "Última atualização %s"
 msgid "Last Updated %s by %s"
 msgstr "Última atualização %s por %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Valor alvo"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "Último valor disponível visto em %s"
@@ -8007,9 +7920,6 @@ msgstr "Último"
 #, fuzzy
 msgid "List Groups"
 msgstr "Número de divisão"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8534,10 +8444,6 @@ msgstr "Limiar mínimo em pontos percentuais para mostrar as etiquetas."
 msgid "Minimum value"
 msgstr "Valor mínimo"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "A data de início não pode ser maior do que a data de fim"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "Valor mínimo para o rótulo a apresentar no gráfico."
 
@@ -8557,9 +8463,6 @@ msgstr "Minuto"
 #, python-format
 msgid "Minutes %s"
 msgstr "Minutos %s"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11394,11 +11297,6 @@ msgstr "Selecione o esquema de cores"
 msgid "Select column"
 msgstr "Selecionar coluna"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-"Selecione os nomes das colunas a serem analisadas como datas na lista "
-"pendente"
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -11762,8 +11660,6 @@ msgid ""
 "Set the automatic refresh frequency for this dashboard. The dashboard "
 "will reload its data at the specified interval."
 msgstr ""
-"Defina linhas de cabeçalho e o número de linhas a serem lidas ou "
-"ignoradas."
 
 msgid "Set up an email report"
 msgstr "Configurar um relatório de e-mail"
@@ -14265,9 +14161,6 @@ msgstr ""
 msgid "This defines the element to be plotted on the chart"
 msgstr "Isso define o elemento a ser plotado no gráfico"
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This email is already associated with an account. Please choose another "
 "one."
@@ -14379,8 +14272,6 @@ msgstr "Essa métrica pode ser incompatível com o conjunto de dados atual"
 
 msgid "This name is already taken. Please choose another one."
 msgstr ""
-"Esta página foi projetada para ser incorporada em um iframe, mas é assim "
-"não é o caso."
 
 msgid "This option has been disabled by the administrator."
 msgstr "Esta opção foi desabilitada pelo administrador."
@@ -16552,9 +16443,6 @@ msgstr "Sua consulta foi salva"
 
 msgid "Your query was updated"
 msgstr "Sua consulta foi atualizada"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "Não foi possível excluir seu relatório"

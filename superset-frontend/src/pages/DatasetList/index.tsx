@@ -40,6 +40,7 @@ import {
   DatasetTypeLabel,
   Loading,
   List,
+  Button,
 } from '@superset-ui/core/components';
 import { DatasourceModal, GenericLink } from 'src/components';
 import {
@@ -70,6 +71,7 @@ import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
 import { useSelector } from 'react-redux';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
 import { WIDER_DROPDOWN_WIDTH } from 'src/components/ListView/utils';
+import getBootstrapData from 'src/utils/getBootstrapData';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -151,6 +153,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 }) => {
   const history = useHistory();
   const theme = useTheme();
+  const bootstrapData = getBootstrapData(); // CCCS prop
   const {
     state: {
       loading,
@@ -163,7 +166,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
     toggleBulkSelect,
     refreshData,
   } = useListViewResource<Dataset>('dataset', t('dataset'), addDangerToast);
-  const bootstrapData = getBootstrapData();
 
   const [datasetCurrentlyDeleting, setDatasetCurrentlyDeleting] = useState<
     | (Dataset & {
@@ -360,6 +362,38 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
         accessor: 'table_name',
         id: 'table_name',
       },
+      // -------- CCCS code block
+      {
+        Cell: ({
+          row: {
+            original: { extra },
+          },
+        }: any) => {
+          try {
+            const parsedExtra = JSON.parse(extra);
+            if (parsedExtra?.urn && bootstrapData.common.datahub_url) {
+              return (
+                <Button
+                  type="link"
+                  href={`${bootstrapData.common.datahub_url}dataset/${parsedExtra?.urn}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  icon={<Icons.Datahub viewBox="0 0 180 180" />}
+                  style={{ color: 'initial' }}
+                />
+              );
+            }
+          } catch {
+            // This is probably because the datahub icon does not exist
+            return null;
+          }
+          return null;
+        },
+        accessor: 'datahub_link',
+        disableSortBy: true,
+        size: 'xs',
+      },
+      // -------- end CCCS code block
       {
         Cell: ({
           row: {

@@ -15375,16 +15375,6 @@
             },
             "description": "Chart screenshot task created"
           },
-          "202": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChartCacheScreenshotResponseSchema"
-                }
-              }
-            },
-            "description": "Chart screenshot task created"
-          },
           "400": {
             "$ref": "#/components/responses/400"
           },
@@ -24345,11 +24335,6 @@
                     "dashboard_id": "string",
                     "uuid": "string"
                   }
-                }
-              },
-              "text/html": {
-                "schema": {
-                  "type": "string"
                 }
               },
               "text/html": {

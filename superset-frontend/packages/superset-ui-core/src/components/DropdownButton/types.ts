@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SpatialFormData, buildSpatialQuery } from '../spatialUtils';
+import { type ComponentProps } from 'react';
 
-export interface DeckGridFormData extends SpatialFormData {
-  extruded?: boolean;
-}
+import { Dropdown } from 'antd';
+import type { TooltipPlacement } from '../Tooltip/types';
 
-export default function buildQuery(formData: DeckGridFormData) {
-  return buildSpatialQuery(formData);
-}
+export type DropdownButtonProps = ComponentProps<typeof Dropdown.Button> & {
+  tooltip?: string;
+  tooltipPlacement?: TooltipPlacement;
+};

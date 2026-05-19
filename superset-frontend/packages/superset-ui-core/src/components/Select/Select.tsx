@@ -185,9 +185,7 @@ const Select = forwardRef(
       setStableMaxTagCount(maxTagCount);
     }, [maxTagCount, isDropdownVisible, oneLine]);
 
-    // Prevent maxTagCount change during click events to avoid click target disappearing
-    const [stableMaxTagCount, setStableMaxTagCount] = useState(maxTagCount);
-    const isOpeningRef = useRef(false);
+    const mappedMode = isSingleMode ? undefined : 'multiple';
 
     const sortSelectedFirst = useCallback(
       (a: AntdLabeledValue, b: AntdLabeledValue) =>

@@ -515,10 +515,6 @@ function FiltersConfigModal({
     [customizationState],
   );
 
-  useEffect(() => {
-    resetFilterChanges();
-  }, []);
-
   return (
     <BaseModalWrapper
       open={isOpen}

@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-"""metric currency should be JSON
 
 """
 MCP service test configuration.
@@ -23,7 +22,7 @@ Disables RBAC permission checks for integration tests.
 RBAC logic is tested directly in test_auth_rbac.py.
 """
 
-"""
+import pytest
 
 
 @pytest.fixture(autouse=True)

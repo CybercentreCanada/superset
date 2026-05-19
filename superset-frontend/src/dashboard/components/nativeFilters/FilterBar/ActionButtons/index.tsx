@@ -96,13 +96,6 @@ const clearAllButtonStyle = (theme: SupersetTheme, isVertical: boolean) => css`
   }
 `;
 
-const ButtonsContainer = styled.div<{ isVertical: boolean; width: number }>`
-  ${({ theme, isVertical, width }) => css`
-    ${containerStyle(theme)};
-    ${isVertical ? verticalStyle(theme, width) : horizontalStyle(theme)};
-  `}
-`;
-
 const ActionButtons = ({
   onApply,
   onClearAll,

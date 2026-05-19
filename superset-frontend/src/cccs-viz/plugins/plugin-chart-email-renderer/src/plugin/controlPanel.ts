@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
+import { ensureIsArray, validateNonEmpty } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 import {
   ControlPanelConfig,
   ControlPanelState,

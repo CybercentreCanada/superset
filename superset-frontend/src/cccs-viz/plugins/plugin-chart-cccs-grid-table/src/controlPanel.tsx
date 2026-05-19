@@ -21,8 +21,8 @@ import {
   QueryMode,
   isFeatureEnabled,
   FeatureFlag,
-  t,
 } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
 
 import DrillActionConfig from './JumpActionConfigControl';
@@ -93,8 +93,8 @@ const allColumnsControl: typeof sharedControls.groupby = {
   description: t('Columns to display'),
   allowAll: true,
   commaChoosesOption: false,
-  optionRenderer: c => <ColumnOption showType column={c} />,
-  valueRenderer: c => <ColumnOption column={c} />,
+  optionRenderer: (c: ColumnMeta) => <ColumnOption showType column={c} />,
+  valueRenderer: (c: ColumnMeta) => <ColumnOption column={c} />,
   valueKey: 'column_name',
   canCopy: true,
   canSelectAll: true,

@@ -2673,7 +2673,6 @@ class SupersetSecurityManager(  # pylint: disable=too-many-public-methods
                                 )
                             )
                         )
-                        or self.has_drill_by_access(form_data, dashboard_, datasource)
                     )
                     and self.can_access_dashboard(dashboard_)
                 )

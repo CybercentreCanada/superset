@@ -21,8 +21,6 @@ import { t } from '@apache-superset/core/translation';
 
 const VALIDE_OSM_URLS = ['https://tile.osm', 'https://tile.openstreetmap'];
 
-const VALIDE_OSM_URLS = ['https://tile.osm', 'https://tile.openstreetmap'];
-
 /**
  * Validate a [Mapbox styles URL](https://docs.mapbox.com/help/glossary/style-url/)
  * @param v

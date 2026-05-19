@@ -69,11 +69,6 @@ export const SingleQueryResultPane = ({
     [],
   );
 
-  const handleInputChange = useCallback(
-    (input: string) => setFilterText(input),
-    [],
-  );
-
   return (
     <ResultPaneContainer>
       <TableControls

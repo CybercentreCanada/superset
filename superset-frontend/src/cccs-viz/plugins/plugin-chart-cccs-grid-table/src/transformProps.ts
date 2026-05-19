@@ -1,12 +1,12 @@
 import {
   Column,
-  GenericDataType,
   Metric,
   NumberFormats,
   QueryFormColumn,
   TimeseriesDataRecord,
   getNumberFormatter,
 } from '@superset-ui/core';
+import { GenericDataType } from '@apache-superset/core/common';
 
 import { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import {

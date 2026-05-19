@@ -16,26 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps } from '@superset-ui/core';
-
-export default function transformProps(chartProps: ChartProps) {
-  const { width, height, formData, queriesData } = chartProps;
-  const {
-    linearColorScheme,
-    numberFormat,
-    selectCountry,
-    colorScheme,
-    sliceId,
-  } = formData;
-
+export const getColorControlsProps = (state: Record<string, any>) => {
+  const dashboardId = state?.form_data?.dashboardId;
   return {
-    width,
-    height,
-    data: queriesData[0].data,
-    country: selectCountry ? String(selectCountry).toLowerCase() : null,
-    linearColorScheme,
-    numberFormat,
-    colorScheme,
-    sliceId,
+    chartId: state?.slice?.slice_id,
+    dashboardId,
+    hasDashboardColorScheme:
+      !!dashboardId && !!state?.form_data?.dashboard_color_scheme,
+    hasCustomLabelsColor:
+      Object.keys(state?.form_data?.label_colors || {}).length > 0,
+    colorNamespace: state?.form_data?.color_namespace,
+    mapLabelsColors: state?.form_data?.map_label_colors || {},
+    sharedLabelsColors: state?.form_data?.shared_label_colors || [],
   };
 };

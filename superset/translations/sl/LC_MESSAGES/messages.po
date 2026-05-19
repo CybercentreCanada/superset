@@ -23,11 +23,11 @@ msgstr ""
 "Language: sl_SI\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 "
-"&& n%100<=4 ? 2 : 3)\n"
+"&& n%100<=4 ? 2 : 3);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -916,12 +916,6 @@ msgstr "Dodaj skrite (BCC) prejemnike"
 msgid "Add CC Recipients"
 msgstr "Dodaj prejemnike v vednost (CC)"
 
-msgid "Add BCC Recipients"
-msgstr "Dodaj skrite (BCC) prejemnike"
-
-msgid "Add CC Recipients"
-msgstr "Dodaj prejemnike v vednost (CC)"
-
 msgid "Add CSS template"
 msgstr "Dodaj CSS predlogo"
 
@@ -943,10 +937,6 @@ msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
 msgstr ""
-
-#, fuzzy
-msgid "Add Role"
-msgstr "Izključene vloge"
 
 #, fuzzy
 msgid "Add Role"
@@ -1419,14 +1409,6 @@ msgstr ""
 "Dovoli izvajanje DDL (Data Definition Language: CREATE, DROP, TRUNCATE, "
 "itd.) in DML (Data Modification Language: INSERT, UPDATE, DELETE, itd.)"
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-"Dovoli izvajanje DDL (Data Definition Language: CREATE, DROP, TRUNCATE, "
-"itd.) in DML (Data Modification Language: INSERT, UPDATE, DELETE, itd.)"
-
 msgid "Allow this database to be explored"
 msgstr "Dovoli raziskovanje te podatkovne baze"
 
@@ -1483,10 +1465,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr "Prišlo je do napake"
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Prišlo je do napake pri pridobivanju podatkovnih setov: %s"
 
 msgid "An error occurred"
 msgstr "Prišlo je do napake"
@@ -1964,10 +1942,6 @@ msgstr "Ali ste prepričani, da želite izbrisati izbrane sloje?"
 msgid "Are you sure you want to delete the selected roles?"
 msgstr "Ali ste prepričani, da želite izbrisati izbrana pravila?"
 
-#, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "Ali ste prepričani, da želite izbrisati izbrana pravila?"
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "Ali ste prepričani, da želite izbrisati izbrana pravila?"
 
@@ -2115,25 +2089,11 @@ msgstr "Prilagodi stolpce"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "Prilagodi stolpce"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "Prilagodi stolpce"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "Razpoložljivi načini razvrščanja:"
 
 msgid "Average"
 msgstr "Povprečje"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr "Povprečna vrednost"
@@ -2942,10 +2902,6 @@ msgstr "Izbira [Oznaka] mora biti prisotna v [Združevanje po]"
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "Izbran [Radij točk] mora biti prisoten v [Združevanje po]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Izberite grafikon ali nadzorno ploščo, ne obojega"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3833,9 +3789,6 @@ msgstr "Ustvarjanje podatkovnega vira in novega zavihka"
 msgid "Creator"
 msgstr "Avtor"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 msgid "Crimson"
 msgstr "Škrlatna"
 
@@ -4068,19 +4021,6 @@ msgstr "Nadzorne plošče ni mogoče odstraniti iz priljubljenih."
 #, fuzzy
 msgid "Dashboard chart customizations could not be updated."
 msgstr "Nadzorne plošče ni mogoče posodobiti."
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "Nadzorne plošče ni mogoče posodobiti."
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr "Nadzorne plošče ni mogoče kopirati zaradi neveljavnih parametrov."
-
-msgid "Dashboard cannot be favorited."
-msgstr "Nadzorne plošče ni mogoče dodati med priljubljene."
-
-msgid "Dashboard cannot be unfavorited."
-msgstr "Nadzorne plošče ni mogoče odstraniti iz priljubljenih."
 
 #, fuzzy
 msgid "Dashboard color configuration could not be updated."
@@ -4698,10 +4638,6 @@ msgstr "Izberite datoteko"
 #, fuzzy
 msgid "Delete item"
 msgstr "Izbriši predlogo"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "Izberite datoteko"
 
 #, fuzzy
 msgid "Delete role"
@@ -5398,10 +5334,6 @@ msgstr "Uredi vtičnik"
 msgid "Edit Role"
 msgstr "načinu urejanja"
 
-#, fuzzy
-msgid "Edit Role"
-msgstr "načinu urejanja"
-
 msgid "Edit Rule"
 msgstr "Uredi pravilo"
 
@@ -5464,10 +5396,6 @@ msgstr "načinu urejanja"
 #, fuzzy
 msgid "Edit tag"
 msgstr "Uredi oznako"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "načinu urejanja"
 
 msgid "Edit template"
 msgstr "Uredi predlogo"
@@ -5880,14 +5808,6 @@ msgstr "Napaka pri pridobivanju grafikonov"
 #, python-format
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Napaka pri izvajanju poizvedbe virtualnega podatkovnega seta: %(msg)s"
-
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "Napaka pri pridobivanju grafikonov"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "Napaka pri pridobivanju grafikonov"
 
 #, python-format
 msgid "Error: %(error)s"
@@ -6976,11 +6896,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr "Če je določena mera, bo razvrščanje izvedeno na podlagi vrednosti mere"
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr "Če je omogočeno, so vrednosti razvrščene padajoče, drugače pa naraščajoče."
@@ -7590,10 +7505,6 @@ msgstr "Zadnja posodobitev %s"
 msgid "Last Updated %s by %s"
 msgstr "Zadnja posodobitev %s, %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Ciljna vrednost"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "Zadnja razpoložljiva vrednost na %s"
@@ -7839,9 +7750,6 @@ msgstr "Zadnji"
 #, fuzzy
 msgid "List Groups"
 msgstr "Število razdelitev"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8362,10 +8270,6 @@ msgstr "Minimalni prag v odstotnih točkah za prikaz oznak."
 
 msgid "Minimum value"
 msgstr "Minimalna vrednost"
-
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "Začetni datum ne sme biti večji od končnega"
 
 msgid "Minimum value for label to be displayed on graph."
 msgstr "Najmanjša vrednost, za katero bo na grafikonu prikazana oznaka."
@@ -11140,11 +11044,6 @@ msgstr "Izberite barvno shemo"
 msgid "Select column"
 msgstr "Izberite stolpec"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-"S spustnega seznama izberite imena stolpcev, ki bodo obravnavani kot "
-"datumi."
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -11494,8 +11393,6 @@ msgid ""
 "Set the automatic refresh frequency for this dashboard. The dashboard "
 "will reload its data at the specified interval."
 msgstr ""
-"Izberite vrstice z glavo in število vrstic, ki bodo prebrane ali "
-"izpuščene."
 
 msgid "Set up an email report"
 msgstr "Nastavite e-poštno poročilo"
@@ -13932,9 +13829,6 @@ msgstr ""
 msgid "This defines the element to be plotted on the chart"
 msgstr "Določa element, ki bo izrisan na grafikonu"
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This email is already associated with an account. Please choose another "
 "one."
@@ -16147,9 +16041,6 @@ msgstr "Vaša poizvedba je shranjena"
 
 msgid "Your query was updated"
 msgstr "Vaša poizvedba je posodobljena"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "Vašega poročila ni mogoče izbrisati"

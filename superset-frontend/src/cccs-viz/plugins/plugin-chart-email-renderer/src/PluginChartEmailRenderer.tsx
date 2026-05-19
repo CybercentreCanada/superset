@@ -1,7 +1,8 @@
 /* eslint-disable theme-colors/no-literal-colors */
 import { useState, useMemo, useEffect } from 'react';
-import { SupersetClient, useTheme } from '@superset-ui/core';
+import { SupersetClient } from '@superset-ui/core';
 import { Card, Space } from '@superset-ui/core/components';
+import { useTheme } from '@apache-superset/core/theme';
 import { EmailRendererProps } from './types';
 import { QUERY_TIMEOUT_LIMIT } from '../../plugin-chart-cccs-grid-table/src/consts';
 

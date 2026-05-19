@@ -101,7 +101,7 @@ export interface Props {
 }
 
 export interface AdvancedDataTypesState {
-  values: any[];
+  values: any[]; // CCCS prop
   parsedAdvancedDataType: string;
   advancedDataTypeOperatorList: string[];
   errorMessage: string;
@@ -502,7 +502,6 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
       setComparator(props.adhocFilter.comparator);
     }
   }, [props.adhocFilter.comparator]);
-  const theme = useTheme();
 
   useEffect(() => {
     if (

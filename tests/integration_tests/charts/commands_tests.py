@@ -25,7 +25,6 @@ from flask import g  # noqa: F401
 from superset import db, security_manager
 from superset.commands.chart.create import CreateChartCommand
 from superset.commands.chart.exceptions import (
-    ChartForbiddenError,
     ChartNotFoundError,
     WarmUpCacheChartNotFoundError,
 )

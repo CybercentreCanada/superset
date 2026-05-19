@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: Shao Yu-Lung <bestlong168@gmail.com>\n"
 "Language: zh_TW\n"
 "Language-Team: zh_TW <bestlong168@gmail.com>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -662,6 +662,10 @@ msgid "A JavaScript function that generates an icon configuration object"
 msgstr ""
 
 #, fuzzy
+msgid "A comma separated list of columns that should be parsed as dates"
+msgstr "應作為日期解析的列的逗號分隔列表。"
+
+#, fuzzy
 msgid "A comma-separated list of schemas that files are allowed to upload to."
 msgstr "允許以逗號分割的 CSV 文件上傳"
 
@@ -857,14 +861,6 @@ msgstr "最近"
 msgid "Add CC Recipients"
 msgstr "最近"
 
-#, fuzzy
-msgid "Add BCC Recipients"
-msgstr "最近"
-
-#, fuzzy
-msgid "Add CC Recipients"
-msgstr "最近"
-
 msgid "Add CSS template"
 msgstr "新增 CSS 模板"
 
@@ -886,10 +882,6 @@ msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
 msgstr ""
-
-#, fuzzy
-msgid "Add Role"
-msgstr "排除角色"
 
 #, fuzzy
 msgid "Add Role"
@@ -1354,12 +1346,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr "允許瀏覽此資料庫"
 
@@ -1412,10 +1398,6 @@ msgstr "向資料庫傳递單個参數時必須指定引擎。"
 
 msgid "An error has occurred"
 msgstr "發生了一個錯誤"
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "獲取數據集時出錯：%s"
 
 msgid "An error occurred"
 msgstr "發生了一個錯誤"
@@ -1884,10 +1866,6 @@ msgid "Are you sure you want to delete the selected roles?"
 msgstr "確定要删除選定的圖層嗎？"
 
 #, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "確定要删除選定的圖層嗎？"
-
-#, fuzzy
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "確定要删除選定的圖層嗎？"
 
@@ -2039,26 +2017,12 @@ msgstr "自定義列"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "自定義列"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "自定義列"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "可用分類模式:"
 
 #, fuzzy
 msgid "Average"
 msgstr "平均值"
-
-msgid "Average (Mean)"
-msgstr ""
 
 #, fuzzy
 msgid "Average value"
@@ -2885,10 +2849,6 @@ msgstr "[標籤] 的選擇項必須出現在 [Group By]"
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "[點半徑] 的選擇項必須出現在 [Group By]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "選擇圖表或看板，不能都全部選擇"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3798,9 +3758,6 @@ msgstr "創建數據源，並弹出一個新的選項卡"
 msgid "Creator"
 msgstr "作者"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 #, fuzzy
 msgid "Crimson"
 msgstr "血红色"
@@ -4048,21 +4005,6 @@ msgstr "看板無法更新。"
 
 #, fuzzy
 msgid "Dashboard chart customizations could not be updated."
-msgstr "看板無法更新。"
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "看板無法更新。"
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-#, fuzzy
-msgid "Dashboard cannot be favorited."
-msgstr "看板無法更新。"
-
-#, fuzzy
-msgid "Dashboard cannot be unfavorited."
 msgstr "看板無法更新。"
 
 #, fuzzy
@@ -4672,10 +4614,6 @@ msgstr "删除"
 #, fuzzy
 msgid "Delete item"
 msgstr "删除模板"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "删除"
 
 #, fuzzy
 msgid "Delete role"
@@ -5334,10 +5272,6 @@ msgid "Edit Role"
 msgstr "編輯模式"
 
 #, fuzzy
-msgid "Edit Role"
-msgstr "編輯模式"
-
-#, fuzzy
 msgid "Edit Rule"
 msgstr "編輯規則"
 
@@ -5402,10 +5336,6 @@ msgstr "編輯模式"
 #, fuzzy
 msgid "Edit tag"
 msgstr "編輯標籤"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "編輯模式"
 
 msgid "Edit template"
 msgstr "編輯模板"
@@ -5832,14 +5762,6 @@ msgstr "獲取圖表時出錯"
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "保存查詢時出錯：%(msg)s"
 
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "獲取圖表時出錯"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "獲取圖表時出錯"
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr "錯誤：%(error)s"
@@ -6205,10 +6127,6 @@ msgstr "驗證選擇選項失敗：%s"
 
 msgid "Failed to start remote query on a worker."
 msgstr "無法啟動遠程查詢"
-
-#, fuzzy, python-format
-msgid "Failed to stop query."
-msgstr "停止查詢失敗。 %s"
 
 #, fuzzy
 msgid "Failed to stop query."
@@ -6954,11 +6872,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr "如果指定了度量，则將根据該度量值進行排序"
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -7585,10 +7498,6 @@ msgstr "最後更新 %s"
 msgid "Last Updated %s by %s"
 msgstr "最後由 %s 更新 %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "目標值"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "到 %s 最後一個可用值"
@@ -7844,9 +7753,6 @@ msgstr "最後一個"
 #, fuzzy
 msgid "List Groups"
 msgstr "數字"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8374,10 +8280,6 @@ msgstr "標籤顯示百分比最小閥值"
 msgid "Minimum value"
 msgstr "最小值"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "起始日期不能晚於结束日期"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "在圖形上顯示標籤的最小值。"
 
@@ -8397,9 +8299,6 @@ msgstr "分鐘"
 #, python-format
 msgid "Minutes %s"
 msgstr "%s分鐘"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11225,10 +11124,6 @@ msgstr "選擇颜色方案"
 msgid "Select column"
 msgstr "選擇列"
 
-#, fuzzy
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr "從下拉列表中選擇要分析的日期列名稱。"
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -11757,10 +11652,6 @@ msgstr "將數據點顯示為線條上的圆形標記"
 msgid "Show empty columns"
 msgstr "顯示空列"
 
-#, fuzzy, python-format
-msgid "Show entries per page"
-msgstr "顯示指標"
-
 #, fuzzy
 msgid "Show entries per page"
 msgstr "顯示指標"
@@ -11985,11 +11876,6 @@ msgstr ""
 
 msgid "Some roles do not exist"
 msgstr "看板"
-
-msgid ""
-"Something went wrong with embedded authentication. Check the dev console "
-"for details."
-msgstr ""
 
 #, fuzzy
 msgid "Something went wrong while saving the user info"
@@ -12786,15 +12672,6 @@ msgstr "配色方案由相關的看板决定。在看板属性中編輯配色方
 
 msgid "The color used when a value doesn't match any defined breakpoints."
 msgstr ""
-
-#, fuzzy
-msgid ""
-"The colors of this chart might be overridden by custom label colors of "
-"the related dashboard.\n"
-"    Check the JSON metadata in the Advanced settings."
-msgstr ""
-"此配色方案正被自定義標籤颜色覆盖。\n"
-"請在高級設定中檢查 JSON 元數據。"
 
 #, fuzzy
 msgid ""
@@ -13913,9 +13790,6 @@ msgstr ""
 msgid "This defines the element to be plotted on the chart"
 msgstr "這定義了要在圖表上繪制的元素"
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This email is already associated with an account. Please choose another "
 "one."
@@ -14391,10 +14265,6 @@ msgstr ""
 #, python-format
 msgid "Total (%(aggregatorName)s)"
 msgstr ""
-
-#, fuzzy, python-format
-msgid "Total (Sum)"
-msgstr "總計: %s"
 
 #, fuzzy
 msgid "Total color"
@@ -15839,19 +15709,6 @@ msgid ""
 "want to overwrite?"
 msgstr "您正在導入一個或多個已存在的查詢。覆盖可能會導致您丢失一些工作。您確定要覆盖嗎？"
 
-msgid ""
-"You are viewing this chart in a dashboard context with labels shared "
-"across multiple charts.\n"
-"        The color scheme selection is disabled."
-msgstr ""
-
-msgid ""
-"You are viewing this chart in the context of a dashboard that is directly"
-" affecting its colors.\n"
-"        To edit the color scheme, open this chart outside of the "
-"dashboard."
-msgstr ""
-
 #, fuzzy
 msgid ""
 "You are importing one or more themes that already exist. Overwriting "
@@ -16061,9 +15918,6 @@ msgstr "您的查詢已保存"
 
 msgid "Your query was updated"
 msgstr "您的查詢已更新"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "這個報告無法被删除"

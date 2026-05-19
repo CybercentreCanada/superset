@@ -36,8 +36,6 @@ import {
   isChartCustomization,
 } from 'src/dashboard/components/nativeFilters/FiltersConfigModal/utils';
 import { HYDRATE_DASHBOARD } from 'src/dashboard/actions/hydrate';
-import { SaveFilterChangesType } from 'src/dashboard/components/nativeFilters/FiltersConfigModal/types';
-import { isEqual } from 'lodash';
 import {
   HYDRATE_EXPLORE,
   HydrateExplore,

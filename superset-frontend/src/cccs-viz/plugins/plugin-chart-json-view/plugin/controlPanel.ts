@@ -22,7 +22,8 @@ import {
   ControlState,
   sharedControls,
 } from '@superset-ui/chart-controls';
-import { ensureIsArray, t, validateNonEmpty } from '@superset-ui/core';
+import { ensureIsArray, validateNonEmpty } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 
 const config: ControlPanelConfig = {
   /**

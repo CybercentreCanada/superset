@@ -357,7 +357,7 @@ class TestDatabaseApi(SupersetTestCase):
         if example_db.backend == "sqlite":
             return
 
-        modified_sqlalchemy_uri = "weird+db://foo:bar@localhost/test-db"
+        modified_sqlalchemy_uri = "postgresql://foo:bar@localhost/test-db"
 
         ssh_tunnel_properties = {
             "server_address": "123.132.123.1",
@@ -432,9 +432,6 @@ class TestDatabaseApi(SupersetTestCase):
         )
 
     @with_feature_flags(SSH_TUNNELING=True)
-    @mock.patch(
-        "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
-    )
     @mock.patch(
         "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
     )
@@ -518,7 +515,7 @@ class TestDatabaseApi(SupersetTestCase):
         if example_db.backend == "sqlite":
             return
 
-        modified_sqlalchemy_uri = "weird+db://foo:bar@localhost/test-db"
+        modified_sqlalchemy_uri = "postgresql://foo:bar@localhost/test-db"
 
         ssh_tunnel_properties = {
             "server_address": "123.132.123.1",
@@ -621,9 +618,6 @@ class TestDatabaseApi(SupersetTestCase):
         "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
     )
     @mock.patch(
-        "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
-    )
-    @mock.patch(
         "superset.commands.database.test_connection.TestConnectionDatabaseCommand.run",
     )
     @mock.patch("superset.models.core.Database.get_all_catalog_names")
@@ -700,9 +694,6 @@ class TestDatabaseApi(SupersetTestCase):
         db.session.commit()
 
     @with_feature_flags(SSH_TUNNELING=True)
-    @mock.patch(
-        "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
-    )
     @mock.patch(
         "superset.commands.database.sync_permissions.SyncPermissionsCommand.run",
     )

@@ -43,7 +43,6 @@ const setup = (overridesStore?: Store, initialState?: RootState) =>
     initialState,
     ...(overridesStore && { store: overridesStore }),
   });
-let pathStub = jest.spyOn(URI.prototype, 'path');
 
 beforeEach(() => {
   fetchMock.get('glob:*/api/v1/database/*', {});

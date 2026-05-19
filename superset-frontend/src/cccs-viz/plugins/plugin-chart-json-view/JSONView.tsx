@@ -1,4 +1,5 @@
-import { QueryFormData, SupersetTheme, css } from '@superset-ui/core';
+import { QueryFormData } from '@superset-ui/core';
+import { css, SupersetTheme } from '@apache-superset/core/theme';
 import { get, isEmpty, isObject } from 'lodash';
 import { ChangeEvent, memo, useCallback, useState } from 'react';
 import { JSONTree } from 'react-json-tree';

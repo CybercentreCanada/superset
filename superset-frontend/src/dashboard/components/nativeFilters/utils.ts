@@ -119,19 +119,17 @@ export function mergeExtraFormData(
       ...(isIterable(newExtraData) ? newExtraData : []),
     ];
     if (mergedValues.length) {
-      mergedExtra[key as OnlyKeyWithType<ExtraFormData, any[]>] = mergedValues;
+      mergedExtra[key] = mergedValues;
     }
   });
   EXTRA_FORM_DATA_OVERRIDE_KEYS.forEach((key: keyof ExtraFormDataOverride) => {
     const originalValue = originalExtra[key];
     if (originalValue !== undefined) {
-      mergedExtra[key as OnlyKeyWithType<ExtraFormData, typeof originalValue>] =
-        originalValue as TimeGranularity;
+      mergedExtra[key] = originalValue;
     }
-    const newValue = newExtra[key as keyof ExtraFormDataOverride];
+    const newValue = newExtra[key];
     if (newValue !== undefined) {
-      mergedExtra[key as OnlyKeyWithType<ExtraFormData, typeof newValue>] =
-        newValue as TimeGranularity;
+      mergedExtra[key] = newValue;
     }
   });
   return mergedExtra as ExtraFormData;

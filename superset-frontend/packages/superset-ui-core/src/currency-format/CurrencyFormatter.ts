@@ -25,8 +25,6 @@ import { AUTO_CURRENCY_SYMBOL, ISO_4217_REGEX } from './CurrencyFormats';
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 
-/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
-
 interface CurrencyFormatterConfig {
   d3Format?: string;
   currency: Currency;

@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import type { ReactNode } from 'react';
 
-export type Callback = (...args: any[]) => void;
+import { SVGProps, forwardRef } from 'react';
 
-export interface ConfirmStatusChangeProps {
-  title: ReactNode;
-  description: ReactNode;
-  onConfirm: Callback;
-  children: (showConfirm: Callback) => ReactNode;
-}
+const SvgrMock = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
+  (props, ref) => <svg ref={ref} {...props} />,
+);
+
+SvgrMock.displayName = 'SvgrMock';
+
+export const ReactComponent = SvgrMock;
+export default SvgrMock;
