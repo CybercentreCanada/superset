@@ -26,8 +26,6 @@ import getBootstrapData from 'src/utils/getBootstrapData';
 
 const pdfCompressionLevel = getBootstrapData().common.pdf_compression_level;
 
-const IMAGE_DOWNLOAD_QUALITY = 0.95;
-
 /**
  * generate a consistent file stem from a description and date
  *
@@ -50,9 +48,8 @@ export default function downloadAsPdf(
   selector: string,
   description: string,
   isExactSelector = false,
-  theme?: SupersetTheme,
 ) {
-  return async (event: SyntheticEvent) => {
+  return (event: SyntheticEvent) => {
     const elementToPrint = isExactSelector
       ? document.querySelector(selector)
       : event.currentTarget.closest(selector);
@@ -61,7 +58,6 @@ export default function downloadAsPdf(
       return addWarningToast(
         t('PDF download failed, please refresh and try again.'),
       );
-      return;
     }
 
     const options = {
@@ -79,21 +75,5 @@ export default function downloadAsPdf(
       .catch((e: Error) => {
         logging.error('PDF generation failed', e);
       });
-
-      cleanup();
-      cleanup = null;
-
-      const link = document.createElement('a');
-      link.download = `${generateFileStem(description)}.jpg`;
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error('Creating image failed', error);
-      addWarningToast(
-        t('Image download failed, please refresh and try again.'),
-      );
-    } finally {
-      if (cleanup) cleanup();
-    }
   };
 }

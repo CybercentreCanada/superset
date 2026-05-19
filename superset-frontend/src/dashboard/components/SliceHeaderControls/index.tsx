@@ -33,7 +33,6 @@ import {
   Behavior,
   isFeatureEnabled,
   FeatureFlag,
-  useTheme,
   getChartMetadataRegistry,
   VizType,
   BinaryQueryObjectFilterClause,

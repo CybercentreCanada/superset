@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Alert as AntdAlert } from 'antd';
-import type { AlertProps } from './types';
 
 // Re-export AG Grid types from @superset-ui/core for convenience
 import type { AgGridChartState } from '@superset-ui/core';

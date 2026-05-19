@@ -147,7 +147,7 @@ const QueryHistory = ({
         />
       )}
       {isFetching && <Skeleton active />}
-    </div>
+    </>
   ) : (
     <StyledEmptyStateWrapper>
       <EmptyState

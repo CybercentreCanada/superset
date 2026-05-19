@@ -32,7 +32,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -810,12 +810,6 @@ msgstr ""
 msgid "Add CC Recipients"
 msgstr ""
 
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
-msgstr ""
-
 msgid "Add CSS template"
 msgstr ""
 
@@ -1261,12 +1255,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr ""
 
@@ -1313,9 +1301,6 @@ msgid ""
 msgstr ""
 
 msgid "An error has occurred"
-msgstr ""
-
-msgid "An error has occurred while syncing virtual dataset columns"
 msgstr ""
 
 msgid "An error occurred"
@@ -1755,9 +1740,6 @@ msgstr ""
 msgid "Are you sure you want to delete the selected roles?"
 msgstr ""
 
-msgid "Are you sure you want to delete the selected roles?"
-msgstr ""
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr ""
 
@@ -1895,9 +1877,6 @@ msgid "Available sorting modes:"
 msgstr ""
 
 msgid "Average"
-msgstr ""
-
-msgid "Average (Mean)"
 msgstr ""
 
 msgid "Average value"
@@ -2644,9 +2623,6 @@ msgstr ""
 msgid "Choose a chart for displaying on the map"
 msgstr ""
 
-msgid "Choose a chart for displaying on the map"
-msgstr ""
-
 msgid "Choose a chart or dashboard not both"
 msgstr ""
 
@@ -3313,9 +3289,6 @@ msgstr ""
 msgid "Copy the current data"
 msgstr ""
 
-msgid "Copy the current data"
-msgstr ""
-
 msgid "Copy the identifier of the account you are trying to connect to."
 msgstr ""
 
@@ -3463,9 +3436,6 @@ msgid "Creating a data source and creating a new tab"
 msgstr ""
 
 msgid "Creator"
-msgstr ""
-
-msgid "Credentials uploaded"
 msgstr ""
 
 msgid "Crimson"
@@ -3687,18 +3657,6 @@ msgid "Dashboard cannot be unfavorited."
 msgstr ""
 
 msgid "Dashboard chart customizations could not be updated."
-msgstr ""
-
-msgid "Dashboard color configuration could not be updated."
-msgstr ""
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-msgid "Dashboard cannot be favorited."
-msgstr ""
-
-msgid "Dashboard cannot be unfavorited."
 msgstr ""
 
 msgid "Dashboard color configuration could not be updated."
@@ -4251,9 +4209,6 @@ msgid "Delete group"
 msgstr ""
 
 msgid "Delete item"
-msgstr ""
-
-msgid "Delete role"
 msgstr ""
 
 msgid "Delete role"
@@ -4864,9 +4819,6 @@ msgstr ""
 msgid "Edit Role"
 msgstr ""
 
-msgid "Edit Role"
-msgstr ""
-
 msgid "Edit Rule"
 msgstr ""
 
@@ -4922,9 +4874,6 @@ msgid "Edit role"
 msgstr ""
 
 msgid "Edit tag"
-msgstr ""
-
-msgid "Edit role"
 msgstr ""
 
 msgid "Edit template"
@@ -5304,12 +5253,6 @@ msgstr ""
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr ""
 
-msgid "Error while updating role!"
-msgstr ""
-
-msgid "Error while updating user!"
-msgstr ""
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr ""
@@ -5364,7 +5307,7 @@ msgstr ""
 msgid "Excel XML Export"
 msgstr ""
 
-msgid "Excel upload"
+msgid "Excel file format cannot be determined"
 msgstr ""
 
 msgid "Excel upload"
@@ -6302,11 +6245,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr ""
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -6383,9 +6321,7 @@ msgstr ""
 msgid "Import themes"
 msgstr ""
 
-msgid ""
-"In order to connect to non-public sheets you need to either provide a "
-"service account or configure an OAuth2 client."
+msgid "In"
 msgstr ""
 
 msgid "In Range"
@@ -6870,9 +6806,6 @@ msgstr ""
 msgid "Last Updated %s by %s"
 msgstr ""
 
-msgid "Last Value"
-msgstr ""
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr ""
@@ -7093,9 +7026,6 @@ msgid "List"
 msgstr ""
 
 msgid "List Groups"
-msgstr ""
-
-msgid "List Roles"
 msgstr ""
 
 msgid "List Roles"
@@ -7583,9 +7513,6 @@ msgstr ""
 msgid "Minimum value"
 msgstr ""
 
-msgid "Minimum value cannot be higher than maximum value"
-msgstr ""
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr ""
 
@@ -7603,9 +7530,6 @@ msgstr ""
 
 #, python-format
 msgid "Minutes %s"
-msgstr ""
-
-msgid "Missing OAuth2 token"
 msgstr ""
 
 msgid "Missing OAuth2 token"
@@ -10134,9 +10058,6 @@ msgstr ""
 msgid "Select channels"
 msgstr ""
 
-msgid "Select channels"
-msgstr ""
-
 msgid "Select chart"
 msgstr ""
 
@@ -10153,9 +10074,6 @@ msgid "Select color scheme"
 msgstr ""
 
 msgid "Select column"
-msgstr ""
-
-msgid "Select column names from a dropdown list that should be parsed as dates."
 msgstr ""
 
 msgid ""
@@ -11320,9 +11238,6 @@ msgstr ""
 msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
-msgstr ""
-
-msgid "Table actions"
 msgstr ""
 
 msgid ""
@@ -12584,9 +12499,6 @@ msgid ""
 msgstr ""
 
 msgid "This feature is experimental and may change or have limitations"
-msgstr ""
-
-msgid "This email is already associated with an account."
 msgstr ""
 
 msgid ""
@@ -14550,9 +14462,6 @@ msgstr ""
 msgid "Your query was updated"
 msgstr ""
 
-msgid "Your range is not within the dataset range"
-msgstr ""
-
 msgid "Your report could not be deleted"
 msgstr ""
 
@@ -14726,13 +14635,13 @@ msgstr ""
 msgid "chart"
 msgstr ""
 
+msgid "charts"
+msgstr ""
+
 msgid "choose WHERE or HAVING..."
 msgstr ""
 
 msgid "click here"
-msgstr ""
-
-msgid "close"
 msgstr ""
 
 msgid "close"
@@ -14791,6 +14700,9 @@ msgid "cumsum"
 msgstr ""
 
 msgid "dashboard"
+msgstr ""
+
+msgid "dashboards"
 msgstr ""
 
 msgid "database"

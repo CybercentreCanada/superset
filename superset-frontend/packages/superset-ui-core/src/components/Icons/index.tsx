@@ -56,6 +56,7 @@ const customIcons = [
   'Transparent',
   'TriangleDown',
   'Undo',
+  'Datahub',
 ] as const;
 
 type CustomIconType = Record<(typeof customIcons)[number], FC<IconType>>;

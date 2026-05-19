@@ -97,12 +97,6 @@ export type ResolvePermalinkUrlFn = (params: {
   key: string;
 }) => string | Promise<string>;
 
-export type ObserveDataMaskCallbackFn = (
-  dataMask: Record<string, any> & {
-    crossFiltersChanged: boolean;
-    nativeFiltersChanged: boolean;
-  },
-) => void;
 export type EmbeddedDashboard = {
   getScrollSize: () => Promise<Size>;
   unmount: () => void;

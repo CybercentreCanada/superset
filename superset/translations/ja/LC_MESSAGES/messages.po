@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: Yuri Umezaki <bungoume@gmail.com>\n"
 "Language: ja\n"
 "Language-Team: ja <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -851,12 +851,6 @@ msgstr "BCCの追加"
 msgid "Add CC Recipients"
 msgstr "CCの追加"
 
-msgid "Add BCC Recipients"
-msgstr "BCCの追加"
-
-msgid "Add CC Recipients"
-msgstr "CCの追加"
-
 msgid "Add CSS template"
 msgstr "CSSテンプレートを追加"
 
@@ -1310,12 +1304,6 @@ msgstr "データベースへのファイルのアップロードを許可する
 
 msgid "Allow node selections"
 msgstr "ノード選択を許可する"
-
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
 
 msgid ""
 "Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
@@ -1966,23 +1954,11 @@ msgstr "すべての列のサイズを自動調整する"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-msgid "Autosize Column"
-msgstr "列のサイズを自動調整する"
-
-msgid "Autosize all columns"
-msgstr "すべての列のサイズを自動調整する"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "利用可能な並べ替えモード"
 
 msgid "Average"
 msgstr "平均"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr "平均値"
@@ -2761,9 +2737,6 @@ msgstr "[グループ化]に[ラベル]の選択肢が存在する必要があ�
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "[グループ化]に[点半径]の選択肢が存在する必要があります。"
-
-msgid "Choose a chart for displaying on the map"
-msgstr "マップに表示するチャートを選択してください。"
 
 msgid "Choose a chart for displaying on the map"
 msgstr "マップに表示するチャートを選択してください。"
@@ -3622,9 +3595,6 @@ msgstr "データソースの作成と新しいタブの作成"
 msgid "Creator"
 msgstr "作成者"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 msgid "Crimson"
 msgstr "真紅"
 
@@ -3853,18 +3823,6 @@ msgstr "ダッシュボードをお気に入り解除できませんでした。
 #, fuzzy
 msgid "Dashboard chart customizations could not be updated."
 msgstr "ダッシュボードの色設定を更新できませんでした。"
-
-msgid "Dashboard color configuration could not be updated."
-msgstr "ダッシュボードの色設定を更新できませんでした。"
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-msgid "Dashboard cannot be favorited."
-msgstr "ダッシュボードをお気に入りにできませんでした。"
-
-msgid "Dashboard cannot be unfavorited."
-msgstr "ダッシュボードをお気に入り解除できませんでした。"
 
 msgid "Dashboard color configuration could not be updated."
 msgstr "ダッシュボードの色設定を更新できませんでした。"
@@ -4447,9 +4405,6 @@ msgstr "テンプレートを削除"
 msgid "Delete role"
 msgstr "ロールを削除"
 
-msgid "Delete role"
-msgstr "ロールを削除"
-
 msgid "Delete template"
 msgstr "テンプレートを削除"
 
@@ -4547,22 +4502,6 @@ msgstr "ロールを削除しました: %s"
 #, fuzzy, python-format
 msgid "Deleted user registration for user: %s"
 msgstr "ユーザー削除しました: %s"
-
-#, python-format
-msgid "Deleted user: %s"
-msgstr "ユーザー削除しました: %s"
-
-#, python-format
-msgid "Deleted users: %s"
-msgstr "ユーザー削除しました: %s"
-
-#, python-format
-msgid "Deleted role: %s"
-msgstr "ロールを削除しました: %s"
-
-#, python-format
-msgid "Deleted roles: %s"
-msgstr "ロールを削除しました: %s"
 
 #, python-format
 msgid "Deleted user: %s"
@@ -5091,9 +5030,6 @@ msgstr "プラグインの編集"
 msgid "Edit Role"
 msgstr "ロールの編集"
 
-msgid "Edit Role"
-msgstr "ロールの編集"
-
 msgid "Edit Rule"
 msgstr "ルールの編集"
 
@@ -5552,12 +5488,6 @@ msgstr "ロールの取得中にエラーが発生しました"
 #, python-format
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "仮想データセット クエリのレンダリング中にエラーが発生しました。: %(msg)s"
-
-msgid "Error while updating role!"
-msgstr "ロールの更新中にエラーが発生しました"
-
-msgid "Error while updating user!"
-msgstr "ユーザーの更新中にエラーが発生しました"
 
 #, python-format
 msgid "Error: %(error)s"
@@ -6604,11 +6534,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr "メトリックが指定されている場合、ソートはメトリック値に基づいて行われます"
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr "このコントロールが有効な場合、結果/値は降順で並べ替えられ、それ以外の場合は結果は昇順で並べ替えられます。"
@@ -7207,9 +7132,6 @@ msgstr "最終更新 %s"
 msgid "Last Updated %s by %s"
 msgstr "最終更新日: %s、作成者: %s"
 
-msgid "Last Value"
-msgstr "最終値"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "%s で確認された最後の利用可能な値"
@@ -7442,9 +7364,6 @@ msgstr "ラスト"
 #, fuzzy
 msgid "List Groups"
 msgstr "ユーザーリスト"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -7949,9 +7868,6 @@ msgstr "ラベルを表示するためのパーセントポイント単位の最
 msgid "Minimum value"
 msgstr "最小値"
 
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "最小値を最大値を超えてはいけません。"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "グラフに表示するラベルの最小値。"
 
@@ -7970,9 +7886,6 @@ msgstr "分"
 #, python-format
 msgid "Minutes %s"
 msgstr "分 %s"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -10624,9 +10537,6 @@ msgstr "配色を選択してください"
 msgid "Select column"
 msgstr "列を選択"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr "日付として解析する列の名前をドロップダウン・リストから選択する。"
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -11861,9 +11771,6 @@ msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
 msgstr "テーブル [%(table_name)s] が見つかりませんでした。データベース接続、スキーマ、テーブル名を再確認してください。"
-
-msgid "Table actions"
-msgstr "テーブルアクション"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
@@ -13225,9 +13132,6 @@ msgstr "このデータセットは外部で管理されており、Supersetで�
 
 msgid "This defines the element to be plotted on the chart"
 msgstr "これは、チャート上にプロットされる要素を定義します。"
-
-msgid "This email is already associated with an account."
-msgstr ""
 
 msgid ""
 "This email is already associated with an account. Please choose another "
@@ -15294,9 +15198,6 @@ msgstr "クエリが保存されました"
 
 msgid "Your query was updated"
 msgstr "クエリが更新されました"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "レポートを削除できませんでした"

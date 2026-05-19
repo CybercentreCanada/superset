@@ -21,7 +21,7 @@ import logging
 import uuid
 from typing import Any, TYPE_CHECKING
 
-from flask import current_app as app
+from flask import current_app
 
 from superset.commands.base import BaseCommand
 from superset.distributed_lock.utils import get_key

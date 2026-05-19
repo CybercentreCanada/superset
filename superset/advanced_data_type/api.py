@@ -105,7 +105,7 @@ class AdvancedDataTypeRestApi(BaseSupersetApi):
         bus_resp: AdvancedDataTypeResponse = addon.translate_type(
             {
                 "values": values,
-                "operator": operator,
+                "operator": operator, # CCCS addition
             }
         )
         return self.response(200, result=bus_resp)

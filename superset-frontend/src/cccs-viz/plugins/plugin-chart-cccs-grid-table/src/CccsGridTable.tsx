@@ -37,11 +37,12 @@ import { Icons, Input, ThemedAgGridReact } from '@superset-ui/core/components';
 import { AgGridReact } from '@superset-ui/core/components/ThemedAgGridReact';
 import {
   ensureIsArray,
-  Filter,
+  type Filter,
+  type Divider,
   isNativeFilter,
   SupersetClient,
-  useTheme,
 } from '@superset-ui/core';
+import { useTheme } from '@apache-superset/core/theme';
 
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import { saveAs } from 'file-saver';
@@ -337,7 +338,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
       state =>
         Object.values(state.nativeFilters.filters).filter(
           f =>
-            isNativeFilter(f) &&
+            isNativeFilter(f as Filter | Divider) &&
             f.filterType === 'filter_adhoc' &&
             f.chartsInScope?.includes(formData.sliceId),
         ) as Filter[],
@@ -434,7 +435,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
               selectedData.typeData.harmonized_email_id.size > RETENTION_LIMIT,
             icon: `<img src="${AlfredLogo}" class="ag-icon" />`,
             action: () => {
-              const email_ids = Array.from(
+              const emailIds = Array.from(
                 selectedData.typeData.harmonized_email_id,
               );
               const dates = [
@@ -459,7 +460,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
               );
 
               const endpoint = `/api/v1/alfred/retain-eml-record`;
-              const jsonPayload = { email_ids, dates };
+              const jsonPayload = { email_ids: emailIds, dates };
               SupersetClient.post({
                 endpoint,
                 jsonPayload,

@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -18,11 +18,11 @@
  */
 import type { ReactNode } from 'react';
 
-/**
- * Type definition for a validator function.
- * Returns an error message string if validation fails, or false if validation passes.
- */
-export type ValidatorFunction<V = unknown, S = unknown> = (
-  value: V,
-  state?: S,
-) => string | false;
+export type Callback = (...args: any[]) => void;
+
+export interface ConfirmStatusChangeProps {
+  title: ReactNode;
+  description: ReactNode;
+  onConfirm: Callback;
+  children: (showConfirm: Callback) => ReactNode;
+}

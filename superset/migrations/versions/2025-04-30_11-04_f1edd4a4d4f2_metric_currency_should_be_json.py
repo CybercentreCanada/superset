@@ -16,24 +16,31 @@
 # under the License.
 """metric currency should be JSON
 
-"""
-MCP service test configuration.
-
-Disables RBAC permission checks for integration tests.
-RBAC logic is tested directly in test_auth_rbac.py.
-"""
+Revision ID: f1edd4a4d4f2
+Revises: 378cecfdba9f
+Create Date: 2025-04-30 11:04:39.105229
 
 """
 
+from superset.migrations.shared.utils import (
+    cast_json_column_to_text,
+    cast_text_column_to_json,
+)
 
-@pytest.fixture(autouse=True)
-def disable_mcp_rbac(app):
-    """Disable RBAC permission checks for MCP integration tests.
+# revision identifiers, used by Alembic.
+revision = "f1edd4a4d4f2"
+down_revision = "378cecfdba9f"
 
-    The RBAC permission logic is tested directly in test_auth_rbac.py.
-    Integration tests use mock users that do not have real FAB roles,
-    so we disable RBAC to let them exercise tool logic.
+
+def upgrade():
     """
-    app.config["MCP_RBAC_ENABLED"] = False
-    yield
-    app.config.pop("MCP_RBAC_ENABLED", None)
+    Convert the currency column to JSON.
+    """
+    cast_text_column_to_json("sql_metrics", "currency")
+
+
+def downgrade():
+    """
+    Convert the currency column back to text.
+    """
+    cast_json_column_to_text("sql_metrics", "currency")

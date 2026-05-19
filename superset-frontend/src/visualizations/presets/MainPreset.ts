@@ -71,6 +71,12 @@ import {
   EchartsGanttChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
+  CccsGridTableChartPlugin,
+  EmailRendererChartPlugin,
+  JSONViewChartPlugin,
+} from 'src/cccs-viz/plugins/';
+import {
+  AdhocFilterPlugin,
   SelectFilterPlugin,
   RangeFilterPlugin,
   TimeFilterPlugin,
@@ -109,6 +115,10 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        new AdhocFilterPlugin().configure({ key: 'filter_adhoc' }),
+        new EmailRendererChartPlugin().configure({ key: 'email' }),
+        new JSONViewChartPlugin().configure({ key: 'json_view' }),
+        new CccsGridTableChartPlugin().configure({ key: 'cccs_grid' }),
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,

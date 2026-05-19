@@ -16,19 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@apache-superset/core/translation';
 import { Behavior, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
 
-export default class ChartCustomizationTimeGrainPlugin extends ChartPlugin {
+export default class FilterAdhocPlugin extends ChartPlugin {
   constructor() {
     const metadata = new ChartMetadata({
-      name: t('Time grain'),
-      description: t('Time grain chart customization plugin'),
-      behaviors: [Behavior.InteractiveChart, Behavior.ChartCustomization],
+      name: t('Adhoc filter'),
+      description: t('Adhoc filter plugin using AntD'),
+      behaviors: [Behavior.InteractiveChart, Behavior.NativeFilter],
+      enableNoResults: false,
       tags: [t('Experimental')],
       thumbnail,
     });
@@ -36,7 +37,7 @@ export default class ChartCustomizationTimeGrainPlugin extends ChartPlugin {
     super({
       buildQuery,
       controlPanel,
-      loadChart: () => import('./TimeGrainFilterPlugin'),
+      loadChart: () => import('./AdhocFilterPlugin'),
       metadata,
       transformProps,
     });

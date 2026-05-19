@@ -135,23 +135,6 @@ export default function RadioButtonControl({
             ?.label,
         )}
       </div>
-      {/* accessibility begin */}
-      <div
-        aria-live="polite"
-        style={{
-          position: 'absolute',
-          left: '-9999px',
-          height: '1px',
-          width: '1px',
-          overflow: 'hidden',
-        }}
-      >
-        {t(
-          '%s tab selected',
-          options.find(([val]) => val === currentValue)?.[1],
-        )}
-      </div>
-      {/* accessibility end */}
     </div>
   );
 }

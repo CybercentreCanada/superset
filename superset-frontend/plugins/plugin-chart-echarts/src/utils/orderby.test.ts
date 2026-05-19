@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -31,3 +30,4 @@ test('applies orderby for non-zero string row limit', () => {
   expect(applyOrderBy([['col', true]], '10')).toEqual({
     orderby: [['col', true]],
   });
+});

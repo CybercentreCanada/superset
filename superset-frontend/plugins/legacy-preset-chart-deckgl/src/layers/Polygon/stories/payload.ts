@@ -57,26 +57,3 @@ export default {
   colnames: ['contour', 'population', 'area'],
   coltypes: [0, 0, 0],
 };
-
-InteractiveProgressBar.args = {
-  ...commonArgs,
-  status: 'normal',
-};
-
-InteractiveProgressBar.argTypes = {
-  ...commonArgTypes,
-  status: {
-    control: {
-      type: 'select',
-    },
-    options: ['normal', 'success', 'exception', 'active'],
-  },
-};
-
-InteractiveProgressCircle.args = commonArgs;
-
-InteractiveProgressCircle.argTypes = commonArgTypes;
-
-InteractiveProgressDashboard.args = commonArgs;
-
-InteractiveProgressDashboard.argTypes = commonArgTypes;

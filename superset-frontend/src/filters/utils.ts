@@ -22,7 +22,7 @@ import {
   QueryObjectFilterClause,
   TimeFormatter,
   ExtraFormData,
-  AdhocFilter,
+  AdhocFilter, // CCCS addition
 } from '@superset-ui/core';
 import { GenericDataType } from '@apache-superset/core/common';
 import { FALSE_STRING, NULL_STRING, TRUE_STRING } from 'src/utils/common';
@@ -31,6 +31,7 @@ import {
   ExpressionTypes,
 } from '../explore/components/controls/FilterControl/types';
 
+// ---------- CCCS code block ----------
 export const getAdhocExtraFormData = (
   adhoc_filters: AdhocFilter[] = [],
   emptyFilter = false,
@@ -50,6 +51,7 @@ export const getAdhocExtraFormData = (
   }
   return extra;
 };
+// ---------- end CCCS code block ----------
 
 export const getSelectExtraFormData = (
   col: string,

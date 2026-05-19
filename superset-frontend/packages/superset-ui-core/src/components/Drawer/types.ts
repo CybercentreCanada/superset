@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import LoadingSvg from './loading.svg';
 
-export { LoadingSvg as Loading };
+import type { DrawerProps } from 'antd/es/drawer';
+
+export { DrawerProps };

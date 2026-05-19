@@ -242,7 +242,6 @@ export default function getInitialState({
             }
           });
         }
-        lastUpdatedActiveTab = tabHistory.slice(tabHistory.length - 1)[0] || '';
       }
     }
   } catch (error) {

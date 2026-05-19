@@ -272,8 +272,6 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
       } else {
         updateDataMask(values);
       }
-
-      isChangedByUser.current = true;
     },
     [updateDataMask, formData.nativeFilterId, clearAllTrigger],
   );

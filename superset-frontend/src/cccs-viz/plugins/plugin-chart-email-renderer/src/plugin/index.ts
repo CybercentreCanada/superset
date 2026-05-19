@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartMetadata, ChartPlugin, t } from '@superset-ui/core';
+import { ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
 import thumbnail from '../images/thumbnail.png';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';

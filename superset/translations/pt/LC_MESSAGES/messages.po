@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: Nuno Heli Beires <nuno.beires@douroeci.com>\n"
 "Language: pt\n"
 "Language-Team: \n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -440,12 +440,6 @@ msgstr ""
 #, fuzzy
 msgid "10 minute"
 msgstr "1 minuto"
-
-msgid "10/90 percentiles"
-msgstr ""
-
-msgid "10000"
-msgstr ""
 
 #, fuzzy
 msgid "10 seconds"
@@ -862,12 +856,6 @@ msgstr ""
 msgid "Add CC Recipients"
 msgstr ""
 
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
-msgstr ""
-
 #, fuzzy
 msgid "Add CSS template"
 msgstr "Modelos CSS"
@@ -889,9 +877,6 @@ msgstr ""
 msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
-msgstr ""
-
-msgid "Add Role"
 msgstr ""
 
 msgid "Add Role"
@@ -1372,12 +1357,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr ""
 
@@ -1428,10 +1407,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr ""
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Ocorreu um erro ao criar a origem dos dados"
 
 msgid "An error occurred"
 msgstr ""
@@ -1916,9 +1891,6 @@ msgstr ""
 msgid "Are you sure you want to delete the selected roles?"
 msgstr ""
 
-msgid "Are you sure you want to delete the selected roles?"
-msgstr ""
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr ""
 
@@ -2070,9 +2042,6 @@ msgstr ""
 #, fuzzy
 msgid "Average"
 msgstr "Gerir"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr ""
@@ -2888,10 +2857,6 @@ msgstr "A escolha do [Rótulo] deve estar presente em [Agrupar por]"
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "A escolha de [Ponto de Raio] deve estar presente em [Agrupar por]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Remover gráfico do dashboard"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3800,9 +3765,6 @@ msgstr "A criar uma nova origem de dados, a exibir numa nova aba"
 msgid "Creator"
 msgstr "Criador"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 #, fuzzy
 msgid "Crimson"
 msgstr "Acção"
@@ -4689,10 +4651,6 @@ msgstr "Carregue um modelo"
 msgid "Delete role"
 msgstr "Eliminar"
 
-#, fuzzy
-msgid "Delete role"
-msgstr "Eliminar"
-
 msgid "Delete template"
 msgstr "Carregue um modelo"
 
@@ -5349,7 +5307,7 @@ msgid "Edit Role"
 msgstr "Query vazia?"
 
 #, fuzzy
-msgid "Edit Role"
+msgid "Edit Rule"
 msgstr "Query vazia?"
 
 #, fuzzy
@@ -5839,14 +5797,6 @@ msgstr "O carregamento de dados falhou"
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Erro ao carregar a lista de base de dados"
 
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "O carregamento de dados falhou"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "O carregamento de dados falhou"
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr ""
@@ -5906,7 +5856,7 @@ msgstr "Janela de exibição"
 msgid "Excel XML Export"
 msgstr "Janela de exibição"
 
-msgid "Excel upload"
+msgid "Excel file format cannot be determined"
 msgstr ""
 
 msgid "Excel upload"
@@ -6952,11 +6902,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr ""
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -7577,10 +7522,6 @@ msgstr ""
 msgid "Last Updated %s by %s"
 msgstr "Última Alteração"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Latitude padrão"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr ""
@@ -7836,9 +7777,6 @@ msgstr "Limite de linha"
 #, fuzzy
 msgid "List Groups"
 msgstr "Número grande"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8365,10 +8303,6 @@ msgstr ""
 msgid "Minimum value"
 msgstr ""
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "Data de inicio não pode ser posterior à data de fim"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr ""
 
@@ -8389,9 +8323,6 @@ msgstr "minuto"
 #, fuzzy, python-format
 msgid "Minutes %s"
 msgstr "minuto"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11240,11 +11171,6 @@ msgstr "Esquema de cores lineares"
 msgid "Select column"
 msgstr "Coluna de tempo"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-"Selecione os nomes das colunas a serem tratadas como datas na lista "
-"pendente."
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -12540,10 +12466,6 @@ msgstr ""
 "Tabela [{}] não encontrada, por favor verifique conexão à base de dados, "
 "esquema e nome da tabela"
 
-#, fuzzy
-msgid "Table actions"
-msgstr "Coluna de tempo"
-
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
 "strategy to append or replace or provide a different Table Name to use."
@@ -13636,10 +13558,6 @@ msgid "There was an error retrieving dashboard tabs."
 msgstr "Desculpe, houve um erro ao gravar este dashbard: "
 
 #, fuzzy, python-format
-msgid "There was an error retrieving dashboard tabs."
-msgstr "Desculpe, houve um erro ao gravar este dashbard: "
-
-#, fuzzy, python-format
 msgid "There was an error saving the favorite status: %s"
 msgstr "Desculpe, houve um erro ao gravar este dashbard: "
 
@@ -13924,9 +13842,6 @@ msgstr ""
 
 msgid "This defines the element to be plotted on the chart"
 msgstr "Esta opção define o elemento a ser desenhado no gráfico"
-
-msgid "This email is already associated with an account."
-msgstr ""
 
 msgid ""
 "This email is already associated with an account. Please choose another "
@@ -14414,9 +14329,6 @@ msgstr ""
 
 #, python-format
 msgid "Total (%(aggregatorName)s)"
-msgstr ""
-
-msgid "Total (Sum)"
 msgstr ""
 
 #, fuzzy
@@ -14942,12 +14854,6 @@ msgstr ""
 
 msgid "User query"
 msgstr "partilhar query"
-
-msgid "User was successfully created!"
-msgstr ""
-
-msgid "User was successfully updated!"
-msgstr ""
 
 #, fuzzy
 msgid "User registrations"
@@ -16058,9 +15964,6 @@ msgstr "A sua query foi gravada"
 
 msgid "Your query was updated"
 msgstr "A sua query foi gravada"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 #, fuzzy
 msgid "Your report could not be deleted"

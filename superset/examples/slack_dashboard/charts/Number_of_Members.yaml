@@ -20,7 +20,6 @@ certified_by: null
 dataset_uuid: 7195db6b-2d17-7619-b7c7-26b15378df8c
 description: null
 params:
-  x_axis: clinical_stage
   adhoc_filters: []
   annotation_layers: []
   datasource: 31__table

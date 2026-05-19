@@ -102,30 +102,6 @@ function handleFilterChangesComplete(
   } as ExtendedNativeFiltersState;
 }
 
-function handleFilterChangesComplete(
-  state: NativeFiltersState,
-  filters: Filter[],
-) {
-  const modifiedFilters = { ...state.filters };
-  filters.forEach(filter => {
-    if (filter.chartsInScope != null && filter.tabsInScope != null) {
-      modifiedFilters[filter.id] = filter;
-    } else {
-      const existingFilter = modifiedFilters[filter.id];
-      modifiedFilters[filter.id] = {
-        ...filter,
-        chartsInScope: filter.chartsInScope ?? existingFilter?.chartsInScope,
-        tabsInScope: filter.tabsInScope ?? existingFilter?.tabsInScope,
-      };
-    }
-  });
-
-  return {
-    ...state,
-    filters: modifiedFilters,
-  } as NativeFiltersState;
-}
-
 export default function nativeFilterReducer(
   state: ExtendedNativeFiltersState = {
     filters: {},

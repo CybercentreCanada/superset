@@ -399,44 +399,6 @@ function DatabaseList({
     [shouldSyncPermsInAsyncMode, addInfoToast, addSuccessToast, addDangerToast],
   );
 
-  function handleDatabasePermSync(database: DatabaseObject) {
-    if (shouldSyncPermsInAsyncMode) {
-      addInfoToast(t('Validating connectivity for %s', database.database_name));
-    } else {
-      addInfoToast(t('Syncing permissions for %s', database.database_name));
-    }
-    SupersetClient.post({
-      endpoint: `/api/v1/database/${database.id}/sync_permissions/`,
-    }).then(
-      ({ response }) => {
-        // Sync request
-        if (response.status === 200) {
-          addSuccessToast(
-            t('Permissions successfully synced for %s', database.database_name),
-          );
-        }
-        // Async request
-        else {
-          addInfoToast(
-            t(
-              'Syncing permissions for %s in the background',
-              database.database_name,
-            ),
-          );
-        }
-      },
-      createErrorHandler(errMsg =>
-        addDangerToast(
-          t(
-            'An error occurred while syncing permissions for %s: %s',
-            database.database_name,
-            errMsg,
-          ),
-        ),
-      ),
-    );
-  }
-
   const initialSort = [{ id: 'changed_on_delta_humanized', desc: true }];
 
   const columns = useMemo(

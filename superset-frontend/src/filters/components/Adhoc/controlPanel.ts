@@ -18,6 +18,9 @@
  */
 import { ControlPanelConfig } from '@superset-ui/chart-controls';
 import { t } from '@apache-superset/core/translation';
+import { DEFAULT_FORM_DATA } from './types';
+
+const { enableEmptyFilter } = DEFAULT_FORM_DATA;
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -31,7 +34,7 @@ const config: ControlPanelConfig = {
             config: {
               type: 'CheckboxControl',
               label: t('Filter value is required'),
-              default: false,
+              default: enableEmptyFilter,
               renderTrigger: true,
               description: t(
                 'User must select a value before applying the filter',

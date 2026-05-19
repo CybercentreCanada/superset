@@ -69,6 +69,12 @@ export interface SelectControlProps {
   warning?: string;
   danger?: string;
   sortComparator?: (a: SelectOption, b: SelectOption) => number;
+  // CCCS props
+  allowSelectAll?: boolean;
+  canCopy?: boolean;
+  copyOnClick?: (a: any) => Promise<void>;
+  canSelectAll?: boolean;
+  promptTextCreator?: (label: string) => string;
 }
 
 const defaultProps = {
@@ -85,6 +91,13 @@ const defaultProps = {
   onFocus: () => {},
   showHeader: true,
   valueKey: 'value',
+  allowSelectAll: true,
+  promptTextCreator: (label: string) => `Create Option ${label}`,
+  canCopy: false,
+  copyOnClick: (v: any) => {
+    navigator.clipboard.writeText(v);
+  },
+  canSelectAll: false,
 };
 
 interface SelectControlState {
@@ -171,6 +184,8 @@ export default class SelectControl extends PureComponent<
 > {
   static defaultProps = defaultProps;
 
+  private selectRef: HTMLDivElement | null = null;
+
   constructor(props: SelectControlProps) {
     super(props);
     this.state = {
@@ -189,6 +204,25 @@ export default class SelectControl extends PureComponent<
       this.setState({ options });
     }
   }
+
+  // --------- CCCS code block
+  componentDidMount() {
+    if (this.selectRef) {
+      this.selectRef.addEventListener('copy', this.handleCopy.bind(this));
+      this.selectRef.addEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.selectRef) {
+      this.selectRef.removeEventListener('copy', this.handleCopy.bind(this));
+      this.selectRef.removeEventListener(
+        'keydown',
+        this.handleKeyDown.bind(this),
+      );
+    }
+  }
+  // --------- end CCCS code block
 
   // Beware: This is acting like an on-click instead of an on-change
   // (firing every time user chooses vs firing only if a new option is chosen).
@@ -217,6 +251,35 @@ export default class SelectControl extends PureComponent<
     }
     this.props.onChange?.(onChangeVal, []);
   }
+
+  // --------- CCCS code block
+  isMetaSelectAllOption(o: SelectOption) {
+    return o.meta && o.meta === true && o.label === 'Select all';
+  }
+
+  optionsIncludesSelectAll(o: SelectOption[]) {
+    return o.findIndex(o => this.isMetaSelectAllOption(o)) >= 0;
+  }
+
+  handleCopy() {
+    if (this.props.copyOnClick) {
+      this.props.copyOnClick(this.props.value);
+    }
+  }
+
+  selectAllOnClick() {
+    this.onChange(this.props.options);
+  }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey === false) {
+      return;
+    }
+    if (event.key === 'a') {
+      this.selectAllOnClick();
+    }
+  };
+  // --------- end CCCS code block
 
   getOptions(props: SelectControlProps) {
     return innerGetOptions(props);
@@ -259,22 +322,11 @@ export default class SelectControl extends PureComponent<
       tooltipOnClick,
       warning,
       danger,
+      // CCCS props
+      allowSelectAll,
+      canCopy,
+      canSelectAll,
     } = this.props;
-
-    const headerProps = {
-      name,
-      label,
-      description,
-      renderTrigger,
-      rightNode,
-      leftNode,
-      validationErrors,
-      onClick,
-      hovered,
-      tooltipOnClick,
-      warning,
-      danger,
-    };
 
     const getValue = () => {
       const currentValue =
@@ -291,8 +343,35 @@ export default class SelectControl extends PureComponent<
       return currentValue;
     };
 
+    const headerProps = {
+      name,
+      label,
+      description,
+      renderTrigger,
+      rightNode,
+      leftNode,
+      validationErrors,
+      onClick,
+      hovered,
+      tooltipOnClick,
+      warning,
+      danger,
+      // CCCS props
+      canCopy,
+      copyOnClick: () => {
+        if (this.props.copyOnClick) {
+          this.props.copyOnClick(getValue());
+        }
+      },
+      canSelectAll,
+      selectAllOnClick: () => {
+        this.onChange(this.props.options);
+      },
+    };
+
     const selectProps = {
       allowNewOptions: freeForm,
+      allowSelectAll,
       autoFocus,
       ariaLabel:
         ariaLabel || (typeof label === 'string' ? label : t('Select ...')),
@@ -336,6 +415,9 @@ export default class SelectControl extends PureComponent<
             align-items: center;
           }
         `}
+        ref={elem => {
+          this.selectRef = elem;
+        }}
       >
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         <Select {...(selectProps as any)} />

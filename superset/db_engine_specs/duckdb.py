@@ -275,35 +275,6 @@ class DuckDBEngineSpec(DuckDBParametersMixin, BaseEngineSpec):
         ),
     )
 
-    # DuckDB-specific column type mappings to ensure float/double types are recognized
-    column_type_mappings = (
-        (
-            re.compile(r"^hugeint", re.IGNORECASE),
-            types.BigInteger(),
-            GenericDataType.NUMERIC,
-        ),
-        (
-            re.compile(r"^ubigint", re.IGNORECASE),
-            types.BigInteger(),
-            GenericDataType.NUMERIC,
-        ),
-        (
-            re.compile(r"^uinteger", re.IGNORECASE),
-            types.Integer(),
-            GenericDataType.NUMERIC,
-        ),
-        (
-            re.compile(r"^usmallint", re.IGNORECASE),
-            types.SmallInteger(),
-            GenericDataType.NUMERIC,
-        ),
-        (
-            re.compile(r"^utinyint", re.IGNORECASE),
-            types.SmallInteger(),
-            GenericDataType.NUMERIC,
-        ),
-    )
-
     _time_grain_expressions = {
         None: "{col}",
         TimeGrain.SECOND: "DATE_TRUNC('second', {col})",

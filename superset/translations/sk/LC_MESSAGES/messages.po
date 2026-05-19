@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sk\n"
 "Language-Team: sk <LL@li.org>\n"
-"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -811,12 +811,6 @@ msgstr ""
 msgid "Add CC Recipients"
 msgstr ""
 
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
-msgstr ""
-
 msgid "Add CSS template"
 msgstr ""
 
@@ -1268,12 +1262,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr ""
 
@@ -1320,9 +1308,6 @@ msgid ""
 msgstr ""
 
 msgid "An error has occurred"
-msgstr ""
-
-msgid "An error has occurred while syncing virtual dataset columns"
 msgstr ""
 
 msgid "An error occurred"
@@ -1773,9 +1758,6 @@ msgstr ""
 msgid "Are you sure you want to delete the selected roles?"
 msgstr ""
 
-msgid "Are you sure you want to delete the selected roles?"
-msgstr ""
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr ""
 
@@ -1915,9 +1897,6 @@ msgstr ""
 #, fuzzy
 msgid "Average"
 msgstr "Spravovať"
-
-msgid "Average (Mean)"
-msgstr ""
 
 #, fuzzy
 msgid "Average value"
@@ -2682,9 +2661,6 @@ msgstr ""
 msgid "Choose a chart for displaying on the map"
 msgstr ""
 
-msgid "Choose a chart for displaying on the map"
-msgstr ""
-
 msgid "Choose a chart or dashboard not both"
 msgstr ""
 
@@ -3352,9 +3328,6 @@ msgstr ""
 msgid "Copy the current data"
 msgstr ""
 
-msgid "Copy the current data"
-msgstr ""
-
 msgid "Copy the identifier of the account you are trying to connect to."
 msgstr ""
 
@@ -3503,9 +3476,6 @@ msgid "Creating a data source and creating a new tab"
 msgstr ""
 
 msgid "Creator"
-msgstr ""
-
-msgid "Credentials uploaded"
 msgstr ""
 
 msgid "Crimson"
@@ -3732,18 +3702,6 @@ msgid "Dashboard cannot be unfavorited."
 msgstr ""
 
 msgid "Dashboard chart customizations could not be updated."
-msgstr ""
-
-msgid "Dashboard color configuration could not be updated."
-msgstr ""
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-msgid "Dashboard cannot be favorited."
-msgstr ""
-
-msgid "Dashboard cannot be unfavorited."
 msgstr ""
 
 msgid "Dashboard color configuration could not be updated."
@@ -4316,9 +4274,6 @@ msgstr ""
 msgid "Delete role"
 msgstr ""
 
-msgid "Delete role"
-msgstr ""
-
 msgid "Delete template"
 msgstr ""
 
@@ -4434,22 +4389,6 @@ msgstr ""
 
 #, python-format
 msgid "Deleted user registration for user: %s"
-msgstr ""
-
-#, fuzzy, python-format
-msgid "Deleted user: %s"
-msgstr "Uložené dotazy"
-
-#, python-format
-msgid "Deleted users: %s"
-msgstr ""
-
-#, python-format
-msgid "Deleted role: %s"
-msgstr ""
-
-#, python-format
-msgid "Deleted roles: %s"
 msgstr ""
 
 #, fuzzy, python-format
@@ -4960,9 +4899,6 @@ msgstr ""
 msgid "Edit Role"
 msgstr ""
 
-msgid "Edit Role"
-msgstr ""
-
 msgid "Edit Rule"
 msgstr ""
 
@@ -5419,12 +5355,6 @@ msgstr ""
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr ""
 
-msgid "Error while updating role!"
-msgstr ""
-
-msgid "Error while updating user!"
-msgstr ""
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr ""
@@ -5479,7 +5409,7 @@ msgstr ""
 msgid "Excel XML Export"
 msgstr ""
 
-msgid "Excel upload"
+msgid "Excel file format cannot be determined"
 msgstr ""
 
 msgid "Excel upload"
@@ -6426,11 +6356,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr ""
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -6507,9 +6432,7 @@ msgstr ""
 msgid "Import themes"
 msgstr ""
 
-msgid ""
-"In order to connect to non-public sheets you need to either provide a "
-"service account or configure an OAuth2 client."
+msgid "In"
 msgstr ""
 
 #, fuzzy
@@ -7004,10 +6927,6 @@ msgstr ""
 msgid "Last Updated %s by %s"
 msgstr ""
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Anotačná vrstva"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr ""
@@ -7233,9 +7152,6 @@ msgid "List"
 msgstr ""
 
 msgid "List Groups"
-msgstr ""
-
-msgid "List Roles"
 msgstr ""
 
 msgid "List Roles"
@@ -7727,9 +7643,6 @@ msgstr ""
 msgid "Minimum value"
 msgstr ""
 
-msgid "Minimum value cannot be higher than maximum value"
-msgstr ""
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr ""
 
@@ -7747,9 +7660,6 @@ msgstr ""
 
 #, python-format
 msgid "Minutes %s"
-msgstr ""
-
-msgid "Missing OAuth2 token"
 msgstr ""
 
 msgid "Missing OAuth2 token"
@@ -10366,9 +10276,6 @@ msgstr ""
 msgid "Select column"
 msgstr ""
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -11570,9 +11477,6 @@ msgstr "Datasety"
 msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
-msgstr ""
-
-msgid "Table actions"
 msgstr ""
 
 msgid ""
@@ -12846,9 +12750,6 @@ msgstr ""
 msgid "This feature is experimental and may change or have limitations"
 msgstr ""
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This field is used as a unique identifier to attach the calculated "
 "dimension to charts. It is also used as the alias in the SQL query."
@@ -13289,9 +13190,6 @@ msgstr ""
 
 #, python-format
 msgid "Total (%(aggregatorName)s)"
-msgstr ""
-
-msgid "Total (Sum)"
 msgstr ""
 
 #, fuzzy
@@ -14845,9 +14743,6 @@ msgstr ""
 msgid "Your query was updated"
 msgstr ""
 
-msgid "Your range is not within the dataset range"
-msgstr ""
-
 msgid "Your report could not be deleted"
 msgstr ""
 
@@ -15022,13 +14917,14 @@ msgstr "Spravovať"
 msgid "chart"
 msgstr ""
 
+#, fuzzy
+msgid "charts"
+msgstr "Grafy"
+
 msgid "choose WHERE or HAVING..."
 msgstr ""
 
 msgid "click here"
-msgstr ""
-
-msgid "close"
 msgstr ""
 
 msgid "close"
@@ -15088,6 +14984,10 @@ msgstr ""
 
 msgid "dashboard"
 msgstr ""
+
+#, fuzzy
+msgid "dashboards"
+msgstr "Importovať dashboard"
 
 msgid "database"
 msgstr ""

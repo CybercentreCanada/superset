@@ -166,8 +166,8 @@ export interface CommonBootstrapData {
   extra_sequential_color_schemes: SequentialSchemeConfig[];
   theme: BootstrapThemeDataConfig;
   menu_data: MenuData;
-  datahub_url: String;
-  advanced_data_types: Record<string, any>[];
+  datahub_url: string;
+  advanced_data_types: { id: string; verbose_name: string }[];
   d3_format: Partial<FormatLocaleDefinition>;
   d3_time_format: Partial<TimeLocaleDefinition>;
   pdf_compression_level: 'NONE' | 'FAST' | 'MEDIUM' | 'SLOW';

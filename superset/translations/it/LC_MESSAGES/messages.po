@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: Raffaele Spangaro <raffa@raffaelespangaro.it>\n"
 "Language: it\n"
 "Language-Team: Italiano <>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -439,12 +439,6 @@ msgstr ""
 msgid "10 minute"
 msgstr "10 minuti"
 
-msgid "10/90 percentiles"
-msgstr ""
-
-msgid "10000"
-msgstr ""
-
 #, fuzzy
 msgid "10 seconds"
 msgstr "JSON"
@@ -856,12 +850,6 @@ msgstr ""
 msgid "Add CC Recipients"
 msgstr ""
 
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
-msgstr ""
-
 msgid "Add CSS template"
 msgstr "Template CSS"
 
@@ -883,10 +871,6 @@ msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
 msgstr ""
-
-#, fuzzy
-msgid "Add Role"
-msgstr "Formato Datetime"
 
 #, fuzzy
 msgid "Add Role"
@@ -1353,12 +1337,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr ""
 
@@ -1407,10 +1385,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr ""
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Errore nel creare il datasource"
 
 msgid "An error occurred"
 msgstr ""
@@ -1891,9 +1865,6 @@ msgstr ""
 msgid "Are you sure you want to delete the selected roles?"
 msgstr ""
 
-msgid "Are you sure you want to delete the selected roles?"
-msgstr ""
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr ""
 
@@ -2045,9 +2016,6 @@ msgstr ""
 #, fuzzy
 msgid "Average"
 msgstr "Database"
-
-msgid "Average (Mean)"
-msgstr ""
 
 #, fuzzy
 msgid "Average value"
@@ -2857,10 +2825,6 @@ msgstr ""
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr ""
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Rimuovi il grafico dalla dashboard"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3758,9 +3722,6 @@ msgstr ""
 msgid "Creator"
 msgstr "Creatore"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 #, fuzzy
 msgid "Crimson"
 msgstr "Azione"
@@ -4631,10 +4592,6 @@ msgstr "Template CSS"
 msgid "Delete role"
 msgstr "Cancella"
 
-#, fuzzy
-msgid "Delete role"
-msgstr "Cancella"
-
 msgid "Delete template"
 msgstr ""
 
@@ -5275,7 +5232,7 @@ msgid "Edit Role"
 msgstr "Ricerca Query"
 
 #, fuzzy
-msgid "Edit Role"
+msgid "Edit Rule"
 msgstr "Ricerca Query"
 
 #, fuzzy
@@ -5341,10 +5298,6 @@ msgstr "Ricerca Query"
 #, fuzzy
 msgid "Edit tag"
 msgstr "Modifica"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "Ricerca Query"
 
 msgid "Edit template"
 msgstr "Template CSS"
@@ -5762,14 +5715,6 @@ msgstr "Errore nel recupero dati"
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Errore nel recupero dati"
 
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "Errore nel recupero dati"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "Errore nel recupero dati"
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr ""
@@ -5828,7 +5773,7 @@ msgstr "Importa"
 msgid "Excel XML Export"
 msgstr "Importa"
 
-msgid "Excel upload"
+msgid "Excel file format cannot be determined"
 msgstr ""
 
 msgid "Excel upload"
@@ -7478,10 +7423,6 @@ msgstr ""
 msgid "Last Updated %s by %s"
 msgstr "Ultima Modifica"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Valore del filtro"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr ""
@@ -7736,9 +7677,6 @@ msgstr "Altezza"
 #, fuzzy
 msgid "List Groups"
 msgstr "Numero Grande"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8261,10 +8199,6 @@ msgstr ""
 msgid "Minimum value"
 msgstr "Valore del filtro"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "La data di inizio non può essere dopo la data di fine"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr ""
 
@@ -8285,9 +8219,6 @@ msgstr "minuto"
 #, fuzzy, python-format
 msgid "Minutes %s"
 msgstr "minuto"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11097,11 +11028,6 @@ msgstr "Testa la Connessione"
 msgid "Select column"
 msgstr "Colonna del Tempo"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-"Selezionare i nomi delle colonne da elaborare come date dall'elenco a "
-"discesa."
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -12396,10 +12322,6 @@ msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
 msgstr ""
-
-#, fuzzy
-msgid "Table actions"
-msgstr "Colonna del Tempo"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
@@ -13736,9 +13658,6 @@ msgstr ""
 msgid "This feature is experimental and may change or have limitations"
 msgstr ""
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This field is used as a unique identifier to attach the calculated "
 "dimension to charts. It is also used as the alias in the SQL query."
@@ -14206,9 +14125,6 @@ msgstr ""
 
 #, python-format
 msgid "Total (%(aggregatorName)s)"
-msgstr ""
-
-msgid "Total (Sum)"
 msgstr ""
 
 #, fuzzy
@@ -14735,12 +14651,6 @@ msgstr ""
 
 msgid "User query"
 msgstr "condividi query"
-
-msgid "User was successfully created!"
-msgstr ""
-
-msgid "User was successfully updated!"
-msgstr ""
 
 #, fuzzy
 msgid "User registrations"
@@ -15839,9 +15749,6 @@ msgstr "La tua query è stata salvata"
 msgid "Your query was updated"
 msgstr "La tua query è stata salvata"
 
-msgid "Your range is not within the dataset range"
-msgstr ""
-
 #, fuzzy
 msgid "Your report could not be deleted"
 msgstr "La query non può essere caricata"
@@ -16028,6 +15935,10 @@ msgstr "Gestisci"
 msgid "chart"
 msgstr ""
 
+#, fuzzy
+msgid "charts"
+msgstr "Grafici"
+
 msgid "choose WHERE or HAVING..."
 msgstr ""
 
@@ -16099,6 +16010,10 @@ msgstr ""
 
 msgid "dashboard"
 msgstr ""
+
+#, fuzzy
+msgid "dashboards"
+msgstr "Elenco Dashboard"
 
 msgid "database"
 msgstr "Database"

@@ -153,12 +153,6 @@ test('Should render null when show:false', async () => {
   });
 });
 
-// Add cleanup after each test
-afterEach(async () => {
-  // Wait for any pending effects to complete
-  await new Promise(resolve => setTimeout(resolve, 0));
-});
-
 test('Should render when show:true', async () => {
   const props = createProps();
   renderModal(props);

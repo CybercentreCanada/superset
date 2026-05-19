@@ -357,19 +357,6 @@ module.exports = {
             ts: 'never',
             tsx: 'never',
           },
-          {
-            // this disallows wildcard imports from modules (but allows them for local files with `./` or `src/`)
-            selector:
-              'ImportNamespaceSpecifier[parent.source.value!=/^(\\.|src)/]',
-            message: 'Wildcard imports are not allowed',
-          },
-        ],
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: Object.values(restrictedImportsRules).filter(Boolean),
-            patterns: ['antd/*'],
-          },
         ],
       },
       settings: {
@@ -385,51 +372,6 @@ module.exports = {
           'error',
           { devDependencies: true },
         ],
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: [
-              restrictedImportsRules['no-moment'],
-              restrictedImportsRules['no-lodash-memoize'],
-              restrictedImportsRules['no-superset-theme'],
-            ],
-            patterns: [],
-          },
-        ],
-      },
-    },
-    {
-      files: ['plugins/**'],
-      rules: {
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: [
-              restrictedImportsRules['no-moment'],
-              restrictedImportsRules['no-lodash-memoize'],
-            ],
-            patterns: [],
-          },
-        ],
-      },
-    },
-    {
-      files: ['src/components/**', 'src/theme/**'],
-      rules: {
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: Object.values(restrictedImportsRules).filter(
-              r => r.name !== 'antd',
-            ),
-            patterns: [],
-          },
-        ],
-      },
-    },
-    {
-      files: ['packages/**'],
-      rules: {
         'no-restricted-imports': [
           'error',
           {
@@ -494,9 +436,7 @@ module.exports = {
       rules: {
         'import/no-extraneous-dependencies': [
           'error',
-          {
-            devDependencies: true,
-          },
+          { devDependencies: true },
         ],
         'prefer-promise-reject-errors': 0,
         'max-classes-per-file': 0,

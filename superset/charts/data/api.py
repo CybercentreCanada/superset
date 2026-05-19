@@ -404,6 +404,12 @@ class ChartDataRestApi(ChartRestApi):
         if result_type == ChartDataResultType.POST_PROCESSED:
             result = apply_client_processing(result, form_data, datasource)
 
+        if (form_data is not None and form_data.get("viz_type") == "cccs_grid"):
+            result["queries"][0]["agGridLicenseKey"] = config["AG_GRID_LICENSE_KEY"]
+            result["queries"][0]["assemblyLineUrl"] = config["ASSEMBLY_LINE_URL"]
+            result["queries"][0]["enableAlfred"] = config["ENABLE_ALFRED"]
+            result["queries"][0]["enableDownload"] = config["ENABLE_DOWNLOAD"]
+
         if result_format in ChartDataResultFormat.table_like():
             # Verify user has permission to export file
             if not security_manager.can_access("can_csv", "Superset"):

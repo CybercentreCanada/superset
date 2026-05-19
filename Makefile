@@ -59,6 +59,10 @@ update-py:
 	# Install external dependencies
 	pip install -r requirements/development.txt
 
+	# Install CCCS dependencies
+	pip install -r cccs-build/superset/analytical-platform-requirements.txt
+	pip install -r cccs-build/superset/requirements.txt
+
 	# Install Superset in editable (development) mode
 	pip install -e .
 

@@ -19,7 +19,12 @@
 import { FC, ReactNode } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { css, useTheme, SupersetTheme } from '@apache-superset/core/theme';
-import { FormLabel, InfoTooltip, Tooltip } from '@superset-ui/core/components';
+import {
+  Flex,
+  FormLabel,
+  InfoTooltip,
+  Tooltip,
+} from '@superset-ui/core/components';
 import { Icons } from '@superset-ui/core/components/Icons';
 
 type ValidationError = string;

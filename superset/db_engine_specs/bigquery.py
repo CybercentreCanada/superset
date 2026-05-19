@@ -59,11 +59,6 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
-    from sqlalchemy.sql.expression import Select
-
-logger = logging.getLogger(__name__)
-
 try:
     import google.auth
     from google.cloud import bigquery

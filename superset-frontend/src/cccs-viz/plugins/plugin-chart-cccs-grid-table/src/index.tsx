@@ -16,33 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { Behavior, ChartMetadata, ChartPlugin } from '@superset-ui/core';
 import { t } from '@apache-superset/core/translation';
-import { ChartMetadata, ChartPlugin } from '@superset-ui/core';
-import transformProps from './transformProps';
-import example from './images/example.jpg';
-import exampleDark from './images/example-dark.jpg';
+import { CccsTableChartProps, CccsTableFormData } from './types';
 import thumbnail from './images/thumbnail.png';
-import thumbnailDark from './images/thumbnail-dark.png';
+import example1 from './images/Table1.png';
+import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 
 const metadata = new ChartMetadata({
-  category: t('Correlation'),
-  description: t(
-    'Table that visualizes paired t-tests, which are used to understand statistical differences between groups.',
-  ),
-  exampleGallery: [{ url: example, urlDark: exampleDark }],
-  name: t('Paired t-test Table'),
-  tags: [t('Legacy'), t('Statistical'), t('Tabular')],
+  behaviors: [Behavior.InteractiveChart],
+  category: t('Table'),
+  description: t('CCCS Table: An AG Grid control for Aurora data.'),
+  name: t('CCCS Table'),
+  exampleGallery: [{ url: example1 }],
+  tags: [
+    t('CCCS'),
+    t('Table'),
+    t('Grid'),
+    t('Popular'),
+    t('Report'),
+    t('Tabular'),
+  ],
   thumbnail,
-  thumbnailDark,
-  useLegacyApi: true,
+  suppressContextMenu: true,
 });
 
-export default class PairedTTestChartPlugin extends ChartPlugin {
+export default class CccsTableChartPlugin extends ChartPlugin<
+  CccsTableFormData,
+  CccsTableChartProps
+> {
   constructor() {
     super({
-      loadChart: () => import('./PairedTTest'),
+      buildQuery,
+      controlPanel,
+      loadChart: () => import('./CccsGridTable'),
       metadata,
       transformProps,
     });

@@ -27,10 +27,10 @@ import {
   JsonResponse,
   SupersetApiError,
   SupersetClient,
-  t,
   useChangeEffect,
 } from '@superset-ui/core';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { t } from '@apache-superset/core/translation';
+import { useCallback, useState, useMemo } from 'react';
 import { useImmerReducer } from 'use-immer';
 import AdhocFilterControl from 'src/explore/components/controls/FilterControl/AdhocFilterControl';
 import AdhocFilter from 'src/explore/components/controls/FilterControl/AdhocFilter';
@@ -157,6 +157,7 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
 
   const labelString: (props: AdhocFilter) => string = (props: AdhocFilter) => {
     if (ensureIsArray(props.comparator).length >= 2) {
+      // @ts-ignore props.comparator needs a type. We'll have to contribute that upstream
       return `${props.subject} ${props.operator} (${props.comparator.join(
         ', ',
       )})`;
@@ -165,51 +166,55 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
   };
 
   const updateDataMask = useCallback(
-    (adhoc_filters: AdhocFilter[]) => {
+    (adhocFilters: AdhocFilter[]) => {
       const emptyFilter =
-        enableEmptyFilter && !inverseSelection && !adhoc_filters?.length;
+        enableEmptyFilter && !inverseSelection && !adhocFilters?.length;
+
+      const extraFormData = getAdhocExtraFormData(
+        // @ts-ignore
+        adhocFilters,
+        emptyFilter,
+        inverseSelection,
+      );
+
+      const nextFilterState = {
+        ...filterState,
+        label: adhocFilters?.length
+          ? (adhocFilters || [])
+              .map(f =>
+                f.sqlExpression ? String(f.sqlExpression) : labelString(f),
+              )
+              .join(', ')
+          : undefined,
+        value: adhocFilters?.length ? adhocFilters : undefined,
+        filters: adhocFilters?.length ? adhocFilters : undefined,
+      };
 
       dispatchDataMask({
         type: 'filterState',
         __cache: filterState,
-        extraFormData: getAdhocExtraFormData(
-          adhoc_filters,
-          emptyFilter,
-          inverseSelection,
-        ),
-        filterState: {
-          ...filterState,
-          label: adhoc_filters?.length
-            ? (adhoc_filters || [])
-                .map(f =>
-                  f.sqlExpression ? String(f.sqlExpression) : labelString(f),
-                )
-                .join(', ')
-            : undefined,
-          value: adhoc_filters?.length ? adhoc_filters : undefined,
-          filters: adhoc_filters?.length ? adhoc_filters : undefined,
-        },
+        extraFormData,
+        filterState: nextFilterState,
+      });
+
+      setDataMask({
+        ...dataMask,
+        extraFormData,
+        filterState: nextFilterState,
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       appSection,
+      dataMask,
       defaultToFirstItem,
       dispatchDataMask,
       enableEmptyFilter,
       inverseSelection,
       JSON.stringify(filterState),
       labelFormatter,
+      setDataMask,
     ],
   );
-
-  useEffect(() => {
-    updateDataMask(filterState.value);
-  }, [JSON.stringify(filterState.value)]);
-
-  useEffect(() => {
-    setDataMask(dataMask);
-  }, [JSON.stringify(dataMask)]);
 
   const formItemExtra = useMemo(() => {
     if (filterState.validateMessage) {
@@ -247,7 +252,7 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
             }}
             label={' '}
             value={filterState.filters || []}
-            ghostButton
+            // ghostButton // TODO did this do anything in 6.0?
           />
         </AdhocControlContainer>
       </StyledFormItem>

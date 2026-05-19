@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 import urllib
-from contextlib import nullcontext
 from typing import Any
 from urllib.parse import urlparse
 

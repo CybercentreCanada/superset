@@ -20,7 +20,8 @@
 
 import { useState } from 'react';
 import CustomListItem from 'src/explore/components/controls/CustomListItem';
-import { t, withTheme } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
+import { withTheme } from '@apache-superset/core/theme';
 import { AsyncEsmComponent } from '@superset-ui/core/components';
 import { List } from '@superset-ui/core/components/List';
 import { Icons } from '@superset-ui/core/components/Icons';

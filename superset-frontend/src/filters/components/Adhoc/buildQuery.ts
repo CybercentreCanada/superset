@@ -16,6 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import Row from './Row';
+import {
+  buildQueryContext,
+  QueryObject,
+  QueryObjectFilterClause,
+  BuildQuery,
+} from '@superset-ui/core';
+import { PluginFilterSelectQueryFormData } from './types';
 
-export default Row;
+const buildQuery: BuildQuery<PluginFilterSelectQueryFormData> = (
+  formData: PluginFilterSelectQueryFormData,
+) =>
+  buildQueryContext(formData, baseQueryObject => {
+    const { filters = [] } = baseQueryObject;
+    const extraFilters: QueryObjectFilterClause[] = [];
+    const query: QueryObject[] = [
+      {
+        ...baseQueryObject,
+        result_type: 'columns',
+        filters: filters.concat(extraFilters),
+      },
+    ];
+    return query;
+  });
+
+export default buildQuery;

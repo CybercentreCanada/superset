@@ -45,11 +45,6 @@ export const JsonModal: FC<JsonModalProps> = ({
   wrapContent = true,
 }) => {
   const jsonTreeTheme = useJsonTreeTheme();
-  const content = useMemo(
-    () =>
-      typeof jsonValue === 'object' ? JSON.stringify(jsonValue) : jsonValue,
-    [jsonValue],
-  );
 
   const content = useMemo(
     () =>

@@ -134,11 +134,6 @@ export const SamplesPane = ({
     [],
   );
 
-  const handleInputChange = useCallback(
-    (input: string) => setFilterText(input),
-    [],
-  );
-
   if (isLoading) {
     return <Loading />;
   }

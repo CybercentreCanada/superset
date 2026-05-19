@@ -63,11 +63,6 @@ export const checkIsValidateError = (dataMask: DataMaskStateWithId) => {
   return values.every(value => value.filterState?.validateStatus !== 'error');
 };
 
-export const checkIsValidateError = (dataMask: DataMaskStateWithId) => {
-  const values = Object.values(dataMask);
-  return values.every(value => value.filterState?.validateStatus !== 'error');
-};
-
 export const checkIsApplyDisabled = (
   dataMaskSelected: DataMaskStateWithId,
   dataMaskApplied: DataMaskStateWithId,

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { styled } from '@superset-ui/core';
+import { styled } from '@apache-superset/core/theme';
 
 export const AdhocControlContainer = styled.div<{
   validateStatus?: 'error' | 'warning' | 'info';
@@ -38,7 +38,11 @@ export const AdhocControlContainer = styled.div<{
       border: ${({ theme, validateStatus }) =>
         `1px solid ${
           validateStatus
-            ? (validateStatus === 'error' ? theme.colorError : validateStatus === 'warning' ? theme.colorWarning : theme.colorInfo)
+            ? validateStatus === 'error'
+              ? theme.colorError
+              : validateStatus === 'warning'
+                ? theme.colorWarning
+                : theme.colorInfo
             : theme.colorPrimary
         }`} !important;
       border-radius: ${({ theme }) => theme.borderRadius}px;
@@ -51,7 +55,11 @@ export const AdhocControlContainer = styled.div<{
       border: ${({ theme, validateStatus }) =>
         `1px solid ${
           validateStatus
-            ? (validateStatus === 'error' ? theme.colorError : validateStatus === 'warning' ? theme.colorWarning : theme.colorInfo)
+            ? validateStatus === 'error'
+              ? theme.colorError
+              : validateStatus === 'warning'
+                ? theme.colorWarning
+                : theme.colorInfo
             : theme.colorPrimary
         }`} !important;
       border-radius: ${({ theme }) => theme.borderRadius}px;

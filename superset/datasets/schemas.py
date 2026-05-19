@@ -282,11 +282,6 @@ class ImportMetricCurrencySchema(Schema):
     symbolPosition = fields.String(validate=Length(1, 128))  # noqa: N815
 
 
-class ImportMetricCurrencySchema(Schema):
-    symbol = fields.String(validate=Length(1, 128))
-    symbolPosition = fields.String(validate=Length(1, 128))  # noqa: N815
-
-
 class ImportV1MetricSchema(Schema):
     # pylint: disable=unused-argument
     @pre_load
@@ -296,9 +291,6 @@ class ImportV1MetricSchema(Schema):
         """
         if isinstance(data.get("extra"), str):
             data["extra"] = json.loads(data["extra"])
-
-        if isinstance(data.get("currency"), str):
-            data["currency"] = json.loads(data["currency"])
 
         return data
 

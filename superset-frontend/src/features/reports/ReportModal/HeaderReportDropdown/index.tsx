@@ -24,7 +24,6 @@ import {
   isFeatureEnabled,
   getExtensionsRegistry,
   usePrevious,
-  css,
 } from '@superset-ui/core';
 import { styled, css } from '@apache-superset/core/theme';
 import { MenuItem } from '@superset-ui/core/components/Menu';

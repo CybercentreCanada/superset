@@ -1,6 +1,7 @@
 import {
   DataMaskStateWithId,
-  Filter,
+  type Divider,
+  type Filter,
   ensureIsArray,
   isNativeFilter,
 } from '@superset-ui/core';
@@ -25,7 +26,9 @@ const useEmitGlobalFilter = () => {
   const adhocFilters = useSelector<RootState, Filter[]>(
     state =>
       Object.values(state.nativeFilters.filters).filter(
-        f => isNativeFilter(f) && f.filterType === 'filter_adhoc',
+        f =>
+          isNativeFilter(f as Filter | Divider) &&
+          f.filterType === 'filter_adhoc',
       ) as Filter[],
   );
   const dataMasks = useSelector<RootState, DataMaskStateWithId>(
@@ -98,7 +101,7 @@ const useEmitGlobalFilter = () => {
               };
             })
             .filter(f => {
-              const adhoc_filters = (filter.extraFormData?.adhoc_filters ||
+              const adhocFilters = (filter.extraFormData?.adhoc_filters ||
                 []) as any[];
               if (
                 colData?.[f.subject]?.type === 'JSON' ||
@@ -111,7 +114,7 @@ const useEmitGlobalFilter = () => {
               }
               const res =
                 f.subject !== 'undefined' &&
-                !adhoc_filters.some(
+                !adhocFilters.some(
                   a =>
                     a.subject === f.subject &&
                     a.operator === f.operator &&

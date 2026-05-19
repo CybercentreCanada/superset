@@ -1865,16 +1865,6 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
             value: target.value,
           })
         }
-        onEncryptedExtraInputChange={({
-          target,
-        }: {
-          target: HTMLInputElement;
-        }) =>
-          onChange(ActionType.EncryptedExtraInputChange, {
-            name: target.name,
-            value: target.value,
-          })
-        }
         onRemoveTableCatalog={(idx: number) => {
           setDB({
             type: ActionType.RemoveTableCatalogSheet,

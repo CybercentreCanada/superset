@@ -44,7 +44,7 @@ from superset.commands.dataset.exceptions import (
     DatasetUpdateFailedError,
     MultiCatalogDisabledValidationError,
 )
-from superset.connectors.sqla.models import SqlaTable, SqlMetric, TableColumn
+from superset.connectors.sqla.models import SqlaTable
 from superset.daos.dataset import DatasetDAO
 from superset.datasets.schemas import FolderSchema
 from superset.exceptions import SupersetParseError, SupersetSecurityException

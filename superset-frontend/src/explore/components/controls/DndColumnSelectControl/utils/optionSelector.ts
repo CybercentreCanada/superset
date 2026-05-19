@@ -23,7 +23,6 @@ import {
   ensureIsArray,
   QueryFormColumn,
   isPhysicalColumn,
-  t,
 } from '@superset-ui/core';
 
 const getColumnNameOrAdhocColumn = (

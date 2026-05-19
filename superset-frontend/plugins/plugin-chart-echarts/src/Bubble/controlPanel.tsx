@@ -160,14 +160,6 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'xAxisTimeFormat',
-            config: {
-              ...sharedControls.x_axis_time_format,
-            },
-          },
-        ],
-        [
-          {
             name: 'logXAxis',
             config: {
               type: 'CheckboxControl',
