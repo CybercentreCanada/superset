@@ -62,7 +62,7 @@ export const ExploreAlert = forwardRef(
       showIcon
     >
       {primaryButtonText && primaryButtonAction && (
-        <div>
+        <ButtonContainer>
           {secondaryButtonAction && secondaryButtonText && (
             <Button buttonStyle="secondary" onClick={secondaryButtonAction}>
               {secondaryButtonText}

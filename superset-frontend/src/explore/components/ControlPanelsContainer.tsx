@@ -98,11 +98,6 @@ const MATRIXIFY_INCOMPATIBLE_CHARTS = new Set([
   VizType.TimePivot,
 ]);
 
-const TABS_KEYS = {
-  DATA: 'DATA',
-  CUSTOMIZE: 'CUSTOMIZE',
-};
-
 export type ControlPanelsContainerProps = {
   exploreState: ExplorePageState['explore'];
   // Only setControlValue is used from actions in this component

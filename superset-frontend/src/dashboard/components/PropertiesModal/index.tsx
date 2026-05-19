@@ -35,7 +35,6 @@ import {
   getCategoricalSchemeRegistry,
   SupersetClient,
   getClientErrorObject,
-  css,
 } from '@superset-ui/core';
 
 import withToasts from 'src/components/MessageToasts/withToasts';
@@ -289,8 +288,6 @@ const PropertiesModal = ({
     }
     onHide();
   };
-
-  const handleOnCancel = () => onHide();
 
   const onColorSchemeChange = (
     colorScheme = '',

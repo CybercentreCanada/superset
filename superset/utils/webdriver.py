@@ -21,7 +21,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum
 from time import sleep
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from flask import current_app as app
 from packaging import version
@@ -676,9 +676,6 @@ class WebDriverSelenium(WebDriverProxy):
                     )
 
             img = element.screenshot_as_png
-        except Exception as ex:
-            logger.warning("exception in webdriver", exc_info=ex)
-            raise
         except TimeoutException:
             # Already logged at WARNING in the inner handlers above
             raise

@@ -24,11 +24,11 @@ msgstr ""
 "Language: uk\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -890,14 +890,6 @@ msgstr "недавні"
 msgid "Add CC Recipients"
 msgstr "недавні"
 
-#, fuzzy
-msgid "Add BCC Recipients"
-msgstr "недавні"
-
-#, fuzzy
-msgid "Add CC Recipients"
-msgstr "недавні"
-
 msgid "Add CSS template"
 msgstr "Додайте шаблон CSS"
 
@@ -919,10 +911,6 @@ msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
 msgstr ""
-
-#, fuzzy
-msgid "Add Role"
-msgstr "Виключені ролі"
 
 #, fuzzy
 msgid "Add Role"
@@ -1404,12 +1392,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr "Дозволити досліджувати цю базу даних"
 
@@ -1468,10 +1450,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr "Сталася помилка"
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Помилка сталася під час отримання наборів даних: %s"
 
 msgid "An error occurred"
 msgstr "Виникла помилка"
@@ -1946,10 +1924,6 @@ msgstr "Ви впевнені, що хочете видалити вибрані
 msgid "Are you sure you want to delete the selected roles?"
 msgstr "Ви впевнені, що хочете видалити вибрані правила?"
 
-#, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "Ви впевнені, що хочете видалити вибрані правила?"
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "Ви впевнені, що хочете видалити вибрані правила?"
 
@@ -2098,25 +2072,11 @@ msgstr "Налаштуйте стовпці"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "Налаштуйте стовпці"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "Налаштуйте стовпці"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "Доступні режими сортування:"
 
 msgid "Average"
 msgstr "Середній"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr "Середнє значення"
@@ -2942,10 +2902,6 @@ msgstr "Вибір [мітки] повинен бути присутнім у [�
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "Вибір [радіуса точки] повинен бути присутнім у [групі]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Виберіть діаграму або інформаційну панель, а не обидва"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3860,9 +3816,6 @@ msgstr "Створення джерела даних та створення н�
 msgid "Creator"
 msgstr "Творець"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 msgid "Crimson"
 msgstr "Малиновий"
 
@@ -4112,21 +4065,6 @@ msgstr "Не вдалося оновити інформаційну панель
 msgid "Dashboard color configuration could not be updated."
 msgstr "Не вдалося оновити інформаційну панель."
 
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-#, fuzzy
-msgid "Dashboard cannot be favorited."
-msgstr "Не вдалося оновити інформаційну панель."
-
-#, fuzzy
-msgid "Dashboard cannot be unfavorited."
-msgstr "Не вдалося оновити інформаційну панель."
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "Не вдалося оновити інформаційну панель."
-
 msgid "Dashboard could not be deleted."
 msgstr "Не вдалося видалити інформаційну панель."
 
@@ -4237,10 +4175,6 @@ msgstr ""
 #, fuzzy, python-format
 msgid "Data for %s"
 msgstr "Дані для %s"
-
-#, fuzzy
-msgid "Data imported"
-msgstr "Імпортний набір даних"
 
 #, fuzzy
 msgid "Data imported"
@@ -4755,10 +4689,6 @@ msgstr "видаляти"
 #, fuzzy
 msgid "Delete item"
 msgstr "Видалити шаблон"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "видаляти"
 
 #, fuzzy
 msgid "Delete role"
@@ -5451,10 +5381,6 @@ msgstr "Редагувати плагін"
 msgid "Edit Role"
 msgstr "режим редагування"
 
-#, fuzzy
-msgid "Edit Role"
-msgstr "режим редагування"
-
 msgid "Edit Rule"
 msgstr "Правило редагування"
 
@@ -5518,10 +5444,6 @@ msgstr "режим редагування"
 #, fuzzy
 msgid "Edit tag"
 msgstr "Редагувати журнал"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "режим редагування"
 
 msgid "Edit template"
 msgstr "Редагувати шаблон"
@@ -5944,14 +5866,6 @@ msgstr "Помилка під час отримання діаграм"
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Помилка під час надання віртуального запиту набору даних: %(msg)s"
 
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "Помилка під час отримання діаграм"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "Помилка під час отримання діаграм"
-
 #, python-format
 msgid "Error: %(error)s"
 msgstr "Помилка: %(error)s"
@@ -6312,10 +6226,6 @@ msgstr "Не вдалося перевірити вибрати параметр
 msgid "Failed to start remote query on a worker."
 msgstr "Не вдалося запустити віддалений запит на працівника."
 
-#, fuzzy, python-format
-msgid "Failed to stop query."
-msgstr "Не вдалося зупинити запит. %s"
-
 #, fuzzy
 msgid "Failed to stop query."
 msgstr "Не вдалося зупинити запит. %s"
@@ -6638,10 +6548,6 @@ msgstr "Примусово оновити"
 #, fuzzy
 msgid "Force refresh Slack channels list"
 msgstr "Примусово оновити список каналів Slack"
-
-#, fuzzy
-msgid "Force refresh Slack channels list"
-msgstr "Список схеми оновлення сили"
 
 #, fuzzy
 msgid "Force refresh catalog list"
@@ -7058,11 +6964,6 @@ msgid "If a metric is specified, sorting will be done based on the metric value"
 msgstr ""
 "Якщо вказано метрику, сортування буде здійснено на основі метричного "
 "значення"
-
-msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
 
 msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
@@ -7681,10 +7582,6 @@ msgstr "Останній оновлений %s"
 msgid "Last Updated %s by %s"
 msgstr "Останній оновлений %s на %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Цільове значення"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "Остання доступна вартість, що спостерігається на %s"
@@ -7940,9 +7837,6 @@ msgstr "Останній"
 #, fuzzy
 msgid "List Groups"
 msgstr "Розділений номер"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8469,10 +8363,6 @@ msgstr "Мінімальний поріг у відсотковому пункт
 msgid "Minimum value"
 msgstr "Мінімальне значення"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "З дати не може бути більшим, ніж на сьогоднішній день"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "Мінімальне значення для мітки для відображення на графі."
 
@@ -8492,9 +8382,6 @@ msgstr "Хвилина"
 #, python-format
 msgid "Minutes %s"
 msgstr "Хвилини %s"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11296,9 +11183,6 @@ msgstr "Виберіть кольорову гаму"
 msgid "Select column"
 msgstr "Виберіть стовпець"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr "Виберіть імена стовпців зі списку, що випадає, які слід розібрати як дати."
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -12607,10 +12491,6 @@ msgid ""
 msgstr ""
 "Таблицю [%(table)s] не вдається знайти, будь ласка, перевірте підключення"
 " до бази даних, схеми та назву таблиці"
-
-#, fuzzy
-msgid "Table actions"
-msgstr "Стовпці таблиці"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
@@ -14124,9 +14004,6 @@ msgstr "Цей набір даних керує зовні, і його не м�
 msgid "This defines the element to be plotted on the chart"
 msgstr "Це визначає елемент, який потрібно побудувати на діаграмі"
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This email is already associated with an account. Please choose another "
 "one."
@@ -14884,10 +14761,6 @@ msgstr "Неочікуваний часовий діапазон: %(error)s"
 #, fuzzy
 msgid "Ungroup By"
 msgstr "Група"
-
-#, fuzzy
-msgid "Unhide"
-msgstr "скасувати"
 
 #, fuzzy
 msgid "Unhide"
@@ -16385,9 +16258,6 @@ msgstr "Ваш запит був збережений"
 
 msgid "Your query was updated"
 msgstr "Ваш запит був оновлений"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "Ваш звіт не можна було видалити"

@@ -22,11 +22,11 @@ msgstr ""
 "Last-Translator: \n"
 "Language: ko\n"
 "Language-Team: ko <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -437,12 +437,6 @@ msgstr ""
 msgid "10 minute"
 msgstr "10분"
 
-msgid "10/90 percentiles"
-msgstr ""
-
-msgid "10000"
-msgstr ""
-
 #, fuzzy
 msgid "10 seconds"
 msgstr "30초"
@@ -841,12 +835,6 @@ msgid "Adaptive formatting"
 msgstr ""
 
 msgid "Add"
-msgstr ""
-
-msgid "Add BCC Recipients"
-msgstr ""
-
-msgid "Add CC Recipients"
 msgstr ""
 
 msgid "Add BCC Recipients"
@@ -1337,12 +1325,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr ""
 
@@ -1390,10 +1372,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr ""
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "데이터 베이스 목록을 가져오는 도중 에러가 발생하였습니다."
 
 msgid "An error occurred"
 msgstr ""
@@ -1873,9 +1851,6 @@ msgstr ""
 msgid "Are you sure you want to delete the selected roles?"
 msgstr ""
 
-msgid "Are you sure you want to delete the selected roles?"
-msgstr ""
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr ""
 
@@ -2026,9 +2001,6 @@ msgstr ""
 #, fuzzy
 msgid "Average"
 msgstr "Query 공유"
-
-msgid "Average (Mean)"
-msgstr ""
 
 #, fuzzy
 msgid "Average value"
@@ -2831,9 +2803,6 @@ msgid "Choice of [Label] must be present in [Group By]"
 msgstr ""
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
-msgstr ""
-
-msgid "Choose a chart for displaying on the map"
 msgstr ""
 
 msgid "Choose a chart for displaying on the map"
@@ -3731,9 +3700,6 @@ msgstr ""
 msgid "Creator"
 msgstr "생성자"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 #, fuzzy
 msgid "Crimson"
 msgstr "활동"
@@ -4589,10 +4555,6 @@ msgstr "템플릿 불러오기"
 msgid "Delete role"
 msgstr "삭제"
 
-#, fuzzy
-msgid "Delete role"
-msgstr "삭제"
-
 msgid "Delete template"
 msgstr "템플릿 불러오기"
 
@@ -5223,7 +5185,7 @@ msgid "Edit Role"
 msgstr "Query 검색"
 
 #, fuzzy
-msgid "Edit Role"
+msgid "Edit Rule"
 msgstr "Query 검색"
 
 #, fuzzy
@@ -5287,10 +5249,6 @@ msgstr "Query 검색"
 #, fuzzy
 msgid "Edit tag"
 msgstr "로그 수정"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "Query 검색"
 
 msgid "Edit template"
 msgstr "템플릿 불러오기"
@@ -5709,14 +5667,6 @@ msgstr "데이터 베이스 목록을 가져오는 도중 에러가 발생하였
 #, python-format
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr ""
-
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "데이터 베이스 목록을 가져오는 도중 에러가 발생하였습니다."
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "데이터 베이스 목록을 가져오는 도중 에러가 발생하였습니다."
 
 #, python-format
 msgid "Error: %(error)s"
@@ -7405,10 +7355,6 @@ msgstr ""
 msgid "Last Updated %s by %s"
 msgstr "마지막 수정"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "원본 값"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr ""
@@ -7657,9 +7603,6 @@ msgstr "구분자"
 #, fuzzy
 msgid "List Groups"
 msgstr "저장된 Query 수정"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8175,10 +8118,6 @@ msgstr ""
 msgid "Minimum value"
 msgstr "테이블 명"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "시작 날짜가 끝 날짜보다 클 수 없습니다"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr ""
 
@@ -8198,9 +8137,6 @@ msgstr "분"
 #, fuzzy, python-format
 msgid "Minutes %s"
 msgstr "분"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -10978,9 +10914,6 @@ msgstr ""
 msgid "Select column"
 msgstr "컬럼 목록"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr "드롭다운 목록에서 날짜로 처리할 열 이름을 선택합니다."
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -12263,10 +12196,6 @@ msgid ""
 "Table [%(table)s] could not be found, please double check your database "
 "connection, schema, and table name"
 msgstr ""
-
-#, fuzzy
-msgid "Table actions"
-msgstr "컬럼 수정"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
@@ -13599,9 +13528,6 @@ msgstr ""
 msgid "This feature is experimental and may change or have limitations"
 msgstr ""
 
-msgid "This email is already associated with an account."
-msgstr ""
-
 msgid ""
 "This field is used as a unique identifier to attach the calculated "
 "dimension to charts. It is also used as the alias in the SQL query."
@@ -14062,9 +13988,6 @@ msgstr ""
 
 #, python-format
 msgid "Total (%(aggregatorName)s)"
-msgstr ""
-
-msgid "Total (Sum)"
 msgstr ""
 
 #, fuzzy
@@ -14591,12 +14514,6 @@ msgstr ""
 
 msgid "User query"
 msgstr "Query 공유"
-
-msgid "User was successfully created!"
-msgstr ""
-
-msgid "User was successfully updated!"
-msgstr ""
 
 #, fuzzy
 msgid "User registrations"
@@ -15664,9 +15581,6 @@ msgstr ""
 msgid "Your query was updated"
 msgstr ""
 
-msgid "Your range is not within the dataset range"
-msgstr ""
-
 #, fuzzy
 msgid "Your report could not be deleted"
 msgstr "차트를 삭제할 수 없습니다."
@@ -15850,6 +15764,10 @@ msgstr "관리"
 msgid "chart"
 msgstr ""
 
+#, fuzzy
+msgid "charts"
+msgstr "차트"
+
 msgid "choose WHERE or HAVING..."
 msgstr ""
 
@@ -15920,6 +15838,10 @@ msgid "cumsum"
 msgstr ""
 
 msgid "dashboard"
+msgstr "대시보드"
+
+#, fuzzy
+msgid "dashboards"
 msgstr "대시보드"
 
 msgid "database"

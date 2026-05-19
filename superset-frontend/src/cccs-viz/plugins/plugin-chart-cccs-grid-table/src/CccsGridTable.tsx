@@ -40,8 +40,8 @@ import {
   Filter,
   isNativeFilter,
   SupersetClient,
-  useTheme,
 } from '@superset-ui/core';
+import { useTheme } from '@apache-superset/core/theme';
 
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import { saveAs } from 'file-saver';

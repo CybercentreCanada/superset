@@ -372,7 +372,6 @@ export const hydrateDashboard =
           directPathToChild,
           directPathLastUpdated: Date.now(),
           focusedFilterField: null,
-          focusedChart: null,
           expandedSlices: metadata?.expanded_slices || {},
           refreshFrequency: metadata?.refresh_frequency || 0,
           // dashboard viewers can set refresh frequency for the current visit,

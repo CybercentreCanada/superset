@@ -31,9 +31,3 @@ export default function transformProps(chartProps: ChartProps) {
     sliceId,
   };
 }
-
-export function AvatarGroup(props: AvatarGroupProps) {
-  return <AntdAvatar.Group {...props} />;
-}
-
-export type { AvatarProps, AvatarGroupProps };

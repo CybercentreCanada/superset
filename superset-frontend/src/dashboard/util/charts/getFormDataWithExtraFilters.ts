@@ -394,22 +394,9 @@ function processGroupByCustomizations(
   return groupByFormData;
 }
 
-const createFilterDataMapping = (
-  dataMask: DataMaskStateWithId,
-  filterIdsAppliedOnChart: string[],
-): { [filterId: string]: any[] } => {
-  const filterDataMapping: { [filterId: string]: any[] } = {};
-
-  filterIdsAppliedOnChart.forEach(filterId => {
-    const filterFormData = getExtraFormData(dataMask, [filterId]);
-    if (filterFormData.filters && filterFormData.filters.length > 0) {
-      filterDataMapping[filterId] = filterFormData.filters;
-    }
-  });
-
-  return filterDataMapping;
-};
-
+// this function merge chart's formData with dashboard filters value,
+// and generate a new formData which will be used in the new query.
+// filters param only contains those applicable to this chart.
 export default function getFormDataWithExtraFilters({
   chart,
   filters,

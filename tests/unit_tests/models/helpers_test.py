@@ -25,7 +25,7 @@ from unittest.mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.elements import ColumnElement
@@ -164,58 +164,6 @@ def test_values_for_column_with_rls_no_values(database: Database) -> None:
             "pandas.read_sql_query",
             return_value=pd.DataFrame({"column_values": []}),
         ),
-    ):
-        assert table.values_for_column("a") == []
-
-
-def test_values_for_column_with_rls(database: Database) -> None:
-    """
-    Test the `values_for_column` method with RLS enabled.
-    """
-    from sqlalchemy.sql.elements import TextClause
-
-    from superset.connectors.sqla.models import SqlaTable, TableColumn
-
-    table = SqlaTable(
-        database=database,
-        schema=None,
-        table_name="t",
-        columns=[
-            TableColumn(column_name="a"),
-        ],
-    )
-    with patch.object(
-        table,
-        "get_sqla_row_level_filters",
-        return_value=[
-            TextClause("a = 1"),
-        ],
-    ):
-        assert table.values_for_column("a") == [1]
-
-
-def test_values_for_column_with_rls_no_values(database: Database) -> None:
-    """
-    Test the `values_for_column` method with RLS enabled and no values.
-    """
-    from sqlalchemy.sql.elements import TextClause
-
-    from superset.connectors.sqla.models import SqlaTable, TableColumn
-
-    table = SqlaTable(
-        database=database,
-        schema=None,
-        table_name="t",
-        columns=[
-            TableColumn(column_name="a"),
-        ],
-    )
-    with patch.object(
-        table,
-        "get_sqla_row_level_filters",
-        return_value=[
-            TextClause("a = 2"),
-        ],
     ):
         assert table.values_for_column("a") == []
 

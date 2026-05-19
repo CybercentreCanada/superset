@@ -800,27 +800,6 @@ class Database(CoreDatabase, AuditMixinNullable, ImportExportMixin):  # pylint: 
         )
         return result_set.to_pandas_df()
 
-    @event_logger.log_this
-    def fetch_rows(self, cursor: Any, last: bool) -> list[tuple[Any, ...]] | None:
-        if not last:
-            cursor.fetchall()
-            return None
-
-        return self.db_engine_spec.fetch_data(cursor)
-
-    @event_logger.log_this
-    def load_into_dataframe(
-        self,
-        description: DbapiDescription,
-        data: list[tuple[Any, ...]],
-    ) -> pd.DataFrame:
-        result_set = SupersetResultSet(
-            data,
-            description,
-            self.db_engine_spec,
-        )
-        return result_set.to_pandas_df()
-
     def compile_sqla_query(
         self,
         qry: Select,

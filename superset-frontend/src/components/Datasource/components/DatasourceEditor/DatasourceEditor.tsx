@@ -77,6 +77,7 @@ import {
   resetDatabaseState,
 } from 'src/database/actions';
 import Mousetrap from 'mousetrap';
+import getBootstrapData from 'src/utils/getBootstrapData';
 import { clearDatasetCache } from 'src/utils/cachedSupersetGet';
 import { makeUrl } from 'src/utils/pathUtils';
 import {
@@ -102,7 +103,9 @@ import {
 } from '../../FoldersEditor/treeUtils';
 import FoldersEditor from '../../FoldersEditor';
 import { DatasourceFolder } from 'src/explore/components/DatasourcePanel/types';
+import SelectControl from 'src/explore/components/controls/SelectControl';
 
+const bootstrapData = getBootstrapData();
 const extensionsRegistry = getExtensionsRegistry();
 
 // Type definitions
@@ -622,19 +625,27 @@ function ColumnCollectionTable({
                 }
               />
             )}
-            {isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes) ? (
+            {isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes) && (
               <Field
                 fieldKey="advanced_data_type"
                 label={t('Advanced data type')}
                 control={
-                  <TextControl
-                    controlId="advanced_data_type"
+                  <SelectControl
+                    // controlId="advanced_data_type"
+                    ariaLabel={t('Select advanced data type')}
                     placeholder={t('Advanced Data type')}
+                    name="advanced_data_type"
+                    // allowClear
+                    // allowNewOptions
+                    options={bootstrapData?.common?.advanced_data_types?.map(
+                      v => ({
+                        value: v.id,
+                        label: v.verbose_name,
+                      }),
+                    )}
                   />
                 }
               />
-            ) : (
-              <></>
             )}
             <Field
               fieldKey="python_date_format"

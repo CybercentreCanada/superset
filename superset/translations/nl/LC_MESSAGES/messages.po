@@ -18,11 +18,11 @@ msgstr ""
 "Last-Translator: \n"
 "Language: nl\n"
 "Language-Team: Dutch\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -887,14 +887,6 @@ msgstr "recente"
 msgid "Add CC Recipients"
 msgstr "recente"
 
-#, fuzzy
-msgid "Add BCC Recipients"
-msgstr "recente"
-
-#, fuzzy
-msgid "Add CC Recipients"
-msgstr "recente"
-
 msgid "Add CSS template"
 msgstr "Voeg CSS template toe"
 
@@ -916,10 +908,6 @@ msgid ""
 "Add Query A and Query B identifiers to tooltips to help differentiate "
 "series"
 msgstr ""
-
-#, fuzzy
-msgid "Add Role"
-msgstr "Uitgesloten rollen"
 
 #, fuzzy
 msgid "Add Role"
@@ -1395,12 +1383,6 @@ msgid ""
 "DELETE, etc)"
 msgstr ""
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr "Toestaan dat deze database wordt verkend"
 
@@ -1458,10 +1440,6 @@ msgstr ""
 
 msgid "An error has occurred"
 msgstr "Er is een fout opgetreden"
-
-#, fuzzy, python-format
-msgid "An error has occurred while syncing virtual dataset columns"
-msgstr "Er is een fout opgetreden bij het ophalen van datasets: %s"
 
 msgid "An error occurred"
 msgstr "Er is een fout opgetreden"
@@ -1962,10 +1940,6 @@ msgstr "Weet je zeker dat je de geselecteerde lagen wilt verwijderen?"
 msgid "Are you sure you want to delete the selected roles?"
 msgstr "Weet u zeker dat u de geselecteerde regels wilt verwijderen?"
 
-#, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "Weet u zeker dat u de geselecteerde regels wilt verwijderen?"
-
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "Weet u zeker dat u de geselecteerde regels wilt verwijderen?"
 
@@ -2113,25 +2087,11 @@ msgstr "Kolommen aanpassen"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr ""
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "Kolommen aanpassen"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "Kolommen aanpassen"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "Beschikbare sorteer modi:"
 
 msgid "Average"
 msgstr "Gemiddeld"
-
-msgid "Average (Mean)"
-msgstr ""
 
 msgid "Average value"
 msgstr "Gemiddelde waarde"
@@ -2957,10 +2917,6 @@ msgstr "Keuze van [Label] moet aanwezig zijn in [Groep door]"
 
 msgid "Choice of [Point Radius] must be present in [Group By]"
 msgstr "Keuze van [Punt radius] moet aanwezig zijn in [Groep door]"
-
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Kies een grafiek of een dashboard, niet beide"
 
 #, fuzzy
 msgid "Choose a chart for displaying on the map"
@@ -3874,9 +3830,6 @@ msgstr "Een gegevensbron maken en een nieuw tabblad maken"
 msgid "Creator"
 msgstr "Maker"
 
-msgid "Credentials uploaded"
-msgstr ""
-
 msgid "Crimson"
 msgstr "Donkerrood"
 
@@ -4116,21 +4069,6 @@ msgstr "Dashboard kon niet worden bijgewerkt."
 
 #, fuzzy
 msgid "Dashboard chart customizations could not be updated."
-msgstr "Dashboard kon niet worden bijgewerkt."
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "Dashboard kon niet worden bijgewerkt."
-
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-#, fuzzy
-msgid "Dashboard cannot be favorited."
-msgstr "Dashboard kon niet worden bijgewerkt."
-
-#, fuzzy
-msgid "Dashboard cannot be unfavorited."
 msgstr "Dashboard kon niet worden bijgewerkt."
 
 #, fuzzy
@@ -4766,10 +4704,6 @@ msgstr "verwijder"
 #, fuzzy
 msgid "Delete item"
 msgstr "Verwijder template"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "verwijder"
 
 #, fuzzy
 msgid "Delete role"
@@ -5453,10 +5387,6 @@ msgstr "Bewerk Plugin"
 msgid "Edit Role"
 msgstr "bewerk modus"
 
-#, fuzzy
-msgid "Edit Role"
-msgstr "bewerk modus"
-
 msgid "Edit Rule"
 msgstr "Bewerk Regel"
 
@@ -5519,10 +5449,6 @@ msgstr "bewerk modus"
 #, fuzzy
 msgid "Edit tag"
 msgstr "Bewerk Tag"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "bewerk modus"
 
 msgid "Edit template"
 msgstr "Bewerk template"
@@ -5944,14 +5870,6 @@ msgstr "Fout bij het ophalen van grafieken"
 #, python-format
 msgid "Error while rendering virtual dataset query: %(msg)s"
 msgstr "Fout bij het renderen van de query van de virtuele dataset: %(msg)s"
-
-#, fuzzy
-msgid "Error while updating role!"
-msgstr "Fout bij het ophalen van grafieken"
-
-#, fuzzy
-msgid "Error while updating user!"
-msgstr "Fout bij het ophalen van grafieken"
 
 #, python-format
 msgid "Error: %(error)s"
@@ -7056,11 +6974,6 @@ msgstr ""
 " metrische waarde"
 
 msgid ""
-"If changes are made to your SQL query, columns in your dataset will be "
-"synced when saving the dataset."
-msgstr ""
-
-msgid ""
 "If enabled, this control sorts the results/values descending, otherwise "
 "it sorts the results ascending."
 msgstr ""
@@ -7676,10 +7589,6 @@ msgstr "Laatst bijgewerkt %s"
 msgid "Last Updated %s by %s"
 msgstr "Laatst bijgewerkt %s door %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Doel waarde"
-
 #, python-format
 msgid "Last available value seen on %s"
 msgstr "Laatst beschikbare waarde gezien op %s"
@@ -7930,9 +7839,6 @@ msgstr "Laatste"
 #, fuzzy
 msgid "List Groups"
 msgstr "Splits nummer"
-
-msgid "List Roles"
-msgstr ""
 
 msgid "List Roles"
 msgstr ""
@@ -8455,10 +8361,6 @@ msgstr "Minimale drempelwaarde in percentage voor het tonen van labels."
 msgid "Minimum value"
 msgstr "Minimale waarde"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "Van datum kan niet groter zijn dan tot datum"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "Minimale waarde van het label op grafiek."
 
@@ -8477,9 +8379,6 @@ msgstr "Minuut"
 #, python-format
 msgid "Minutes %s"
 msgstr "Minuten %s"
-
-msgid "Missing OAuth2 token"
-msgstr ""
 
 msgid "Missing OAuth2 token"
 msgstr ""
@@ -11269,11 +11168,6 @@ msgstr "Selecteer kleurschema"
 msgid "Select column"
 msgstr "Selecteer kolom"
 
-msgid "Select column names from a dropdown list that should be parsed as dates."
-msgstr ""
-"Selecteer de kolomnamen die moeten worden behandeld als datums in de "
-"vervolgkeuzelijst"
-
 msgid ""
 "Select columns that will be displayed in the table. You can multiselect "
 "columns."
@@ -12578,10 +12472,6 @@ msgid ""
 msgstr ""
 "Tabel [%(table_name)s] kon niet worden gevonden. Controleer de database-"
 "verbinding, schema en tabelnaam"
-
-#, fuzzy
-msgid "Table actions"
-msgstr "Tabel kolommen"
 
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
@@ -14119,9 +14009,6 @@ msgstr "Deze dataset wordt extern beheerd en kan niet worden bewerkt in Superset
 
 msgid "This defines the element to be plotted on the chart"
 msgstr "Dit definieert het element dat op de grafiek moet worden uitgezet"
-
-msgid "This email is already associated with an account."
-msgstr ""
 
 msgid ""
 "This email is already associated with an account. Please choose another "
@@ -16392,9 +16279,6 @@ msgstr "Uw zoekopdracht werd opgeslagen"
 
 msgid "Your query was updated"
 msgstr "Uw zoekopdracht werd bijgewerkt"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "Uw rapport kon niet worden verwijderd"

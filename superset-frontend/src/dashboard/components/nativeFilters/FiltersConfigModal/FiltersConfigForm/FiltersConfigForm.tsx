@@ -404,21 +404,6 @@ const FiltersConfigForm = (
     [],
   );
 
-  const formChanged = useCallback(() => {
-    form.setFields([
-      {
-        name: 'changed',
-        value: true,
-      },
-    ]);
-    handleModifyFilter();
-  }, [form, handleModifyFilter]);
-
-  const debouncedFormChanged = useCallback(
-    debounce(formChanged, Constants.SLOW_DEBOUNCE),
-    [],
-  );
-
   const { controlItems = {}, mainControlItems = {} } = formFilter
     ? getControlItemsMap({
         expanded,
@@ -1506,17 +1491,6 @@ const FiltersConfigForm = (
                                 ? ChartCustomizationType.ChartCustomization
                                 : NativeFilterType.NativeFilter
                             }
-                          >
-                            <Input.TextArea onChange={debouncedFormChanged} />
-                          </StyledFormItem>
-                          <FormItem
-                            name={[
-                              'filters',
-                              filterId,
-                              'defaultValueQueriesData',
-                            ]}
-                            hidden
-                            initialValue={null}
                           />
                           <FormItem
                             name={[

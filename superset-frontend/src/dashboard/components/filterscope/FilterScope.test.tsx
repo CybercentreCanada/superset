@@ -38,13 +38,6 @@ afterEach(async () => {
   await new Promise(resolve => setTimeout(resolve, 0));
 });
 
-// Add afterEach cleanup
-afterEach(async () => {
-  cleanup();
-  // Wait for any pending effects to complete
-  await new Promise(resolve => setTimeout(resolve, 0));
-});
-
 const ROOT_ID = 'ROOT_ID';
 const GRID = 'GRID';
 const TABS = 'TABS';

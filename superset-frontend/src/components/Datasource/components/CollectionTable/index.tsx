@@ -502,6 +502,7 @@ export default class CRUDCollection extends PureComponent<
           expandable={expandableConfig}
           size={TableSize.Middle}
           tableLayout="auto"
+          scroll={{ x: 'max-content' }} // CCCS addition
         />
       </>
     );

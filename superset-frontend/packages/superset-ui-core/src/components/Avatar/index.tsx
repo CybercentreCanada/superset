@@ -16,20 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps } from '@superset-ui/core';
 
-export default function transformProps(chartProps: ChartProps) {
-  const { width, height, formData, queriesData } = chartProps;
-  const { yAxisFormat, colorScheme, sliceId } = formData;
+import { Avatar as AntdAvatar } from 'antd';
+import type { AvatarProps, GroupProps as AvatarGroupProps } from './types';
 
-  return {
-    colorScheme,
-    data: queriesData[0].data,
-    height,
-    numberFormat: yAxisFormat,
-    width,
-    sliceId,
-  };
+export function Avatar(props: AvatarProps) {
+  return <AntdAvatar {...props} />;
 }
 
 export function AvatarGroup(props: AvatarGroupProps) {

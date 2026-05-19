@@ -229,23 +229,6 @@ class Datasource(BaseSupersetView):
             ):
                 return json_error_response(_("Forbidden"), status=403)
 
-        if security_manager.is_guest_user():
-            if not params["dashboard_id"]:
-                return json_error_response(_("Forbidden"), status=403)
-            dataset = DatasetDAO.find_by_id(
-                params["datasource_id"], skip_base_filter=True
-            )
-            dashboard = DashboardDAO.find_by_id(
-                params["dashboard_id"], skip_base_filter=True
-            )
-            if not (dashboard and dataset):
-                return self.response_404()
-            if not security_manager.can_drill_dataset_via_dashboard_access(
-                dataset,
-                dashboard,
-            ):
-                return json_error_response(_("Forbidden"), status=403)
-
         rv = get_samples(
             datasource_type=params["datasource_type"],
             datasource_id=params["datasource_id"],

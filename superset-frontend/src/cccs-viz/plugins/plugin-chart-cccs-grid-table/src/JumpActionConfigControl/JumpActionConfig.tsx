@@ -1,14 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import getBootstrapData from 'src/utils/getBootstrapData';
-import { Button } from '@superset-ui/core/components/Button';
-import {
-  t,
-  SupersetClient,
-  validateNonEmpty,
-  withTheme,
-  SupersetTheme,
-} from '@superset-ui/core';
+import { Button } from '@superset-ui/core/components';
+import { SupersetClient, validateNonEmpty } from '@superset-ui/core';
+import { t } from '@apache-superset/core/translation';
+import { withTheme } from '@apache-superset/core/theme';
 
 const bootstrapData = getBootstrapData();
 
@@ -23,7 +19,7 @@ interface Props {
   removeDrillActionConfig: () => boolean;
 }
 const useDashboardState = () => {
-  const [dashboardList, setDashboardList] = useState([]);
+  const [dashboards, setDashboards] = useState<any[]>([]);
 
   const [filterList, setFilterList] = useState([]);
 
@@ -31,13 +27,7 @@ const useDashboardState = () => {
     const endpoint = `/api/v1/dashboard`;
     SupersetClient.get({ endpoint })
       .then(({ json }) => {
-        const dashboards = json.result
-          .filter(
-            (e: any) =>
-              JSON.parse(e.json_metadata)?.native_filter_configuration,
-          )
-          .map((e: any) => ({ value: e.id, label: e.dashboard_title }));
-        setDashboardList(dashboards);
+        setDashboards(json.result || []);
       })
       .catch(error => console.error(error));
   }, []);
@@ -61,7 +51,7 @@ const useDashboardState = () => {
   }, []);
 
   return {
-    dashboardList,
+    dashboards,
     filterList,
     fetchDashboardList,
     fetchFilterList,
@@ -71,27 +61,33 @@ const useDashboardState = () => {
 const DrillActionConfig: React.FC<Props> = (props: Props) => {
   const { dashboardID, filters, advancedDataType, visiblePopoverIndex } = props;
 
-  const { dashboardList, filterList, fetchDashboardList, fetchFilterList } =
+  const { dashboards, filterList, fetchDashboardList, fetchFilterList } =
     useDashboardState();
 
-  const [selectedDashboardID, setSelectedDashboardID] =
-    useState<number>(dashboardID);
-
-  const [selectedFilters, setSelectedFilters] = useState(
-    filters?.map((filter: any) => filter.value) || [],
-  );
-
-  const [advancedDataTypeName, setAdvancedDataTypeName] =
-    useState<string>(advancedDataType);
-
-  const [state, setState] = useState({
-    isNew: !props.dashboardID,
+  const [selection, setSelection] = useState({
+    selectedDashboardID: dashboardID,
+    selectedFilters: filters?.map((filter: any) => filter.value) || [],
   });
 
+  const { selectedDashboardID, selectedFilters } = selection;
+
+  const dashboardList = useMemo(
+    () =>
+      (dashboards || [])
+        .filter(
+          (e: any) => JSON.parse(e.json_metadata)?.native_filter_configuration,
+        )
+        .map((e: any) => ({ value: e.id, label: e.dashboard_title })),
+    [dashboards],
+  );
+
+  const advancedDataTypeName = advancedDataType;
+
   useEffect(() => {
-    setSelectedFilters(filters?.map((filter: any) => filter.value) || []);
-    setSelectedDashboardID(dashboardID);
-    setAdvancedDataTypeName(advancedDataType);
+    setSelection({
+      selectedFilters: filters?.map((filter: any) => filter.value) || [],
+      selectedDashboardID: dashboardID,
+    });
   }, [dashboardID, filters, advancedDataType, visiblePopoverIndex]);
   useEffect(() => {
     fetchDashboardList();
@@ -130,20 +126,21 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
         name,
       };
       props.addDrillActionConfig(newDrillActionConfig);
-      setState({ ...state, isNew: false });
       props.close();
     }
   };
 
   const onDashboardChange = (v: any) => {
-    setSelectedDashboardID(v);
-    setSelectedFilters([]);
+    setSelection({
+      selectedDashboardID: v,
+      selectedFilters: [],
+    });
   };
   return (
     <div style={{ width: 400 }}>
       <div style={{ width: '9000', paddingBottom: 25 }}>
         <SelectControl
-          css={(theme: SupersetTheme) => ({ marginBottom: theme.sizeUnit * 4 })}
+          // css={(theme: SupersetTheme) => ({ marginBottom: theme.sizeUnit * 4 })}
           ariaLabel={t('Annotation layer value')}
           name="annotation-layer-value"
           label={t('Dashboard')}
@@ -155,7 +152,7 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
           onChange={onDashboardChange}
         />
         <SelectControl
-          style={{ length: '100%' }}
+          // style={{ length: '100%' }}
           ariaLabel="Advanced Data Type"
           name="advanced-data-type-value"
           label="Advanced Data Type"
@@ -170,7 +167,6 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
             }),
           )}
           value={advancedDataTypeName}
-          onChange={setAdvancedDataTypeName}
         />
         <SelectControl
           ariaLabel={t('Annotation layer value')}
@@ -182,7 +178,9 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
           placeholder=""
           options={filterList}
           value={selectedFilters}
-          onChange={setSelectedFilters}
+          onChange={(value: any) =>
+            setSelection(prev => ({ ...prev, selectedFilters: value }))
+          }
         />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

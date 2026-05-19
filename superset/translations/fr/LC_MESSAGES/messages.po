@@ -26,7 +26,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.15.0\n"
 
 msgid ""
 "\n"
@@ -929,12 +929,6 @@ msgstr "Ajouter un destinataire de la copie cachée (Cci)"
 msgid "Add CC Recipients"
 msgstr "Ajouter un destinataire de la copie (Cc)"
 
-msgid "Add BCC Recipients"
-msgstr "Ajouter un destinataire de la copie cachée (Cci)"
-
-msgid "Add CC Recipients"
-msgstr "Ajouter un destinataire de la copie (Cc)"
-
 msgid "Add CSS template"
 msgstr "Ajouter un modèle CSS"
 
@@ -957,10 +951,6 @@ msgid ""
 msgstr ""
 "Ajouter les identifiants des requêtes A et B aux infobulles pour mieux "
 "différencier les séries"
-
-#, fuzzy
-msgid "Add Role"
-msgstr "Rôles exclus"
 
 #, fuzzy
 msgid "Add Role"
@@ -1449,12 +1439,6 @@ msgstr ""
 "TRUNCATE, etc.) et DML (Data Modification Language : INSERT, UPDATE, "
 "DELETE, etc.)"
 
-msgid ""
-"Allow the execution of DDL (Data Definition Language: CREATE, DROP, "
-"TRUNCATE, etc.) and DML (Data Modification Language: INSERT, UPDATE, "
-"DELETE, etc)"
-msgstr ""
-
 msgid "Allow this database to be explored"
 msgstr "Autoriser cette base de données à être explorée"
 
@@ -1703,10 +1687,6 @@ msgstr ""
 "l’utilisateur·rice : %s"
 
 #, fuzzy
-msgid "An error occurred while formatting SQL"
-msgstr "Une erreur s'est produite lors de l'importation de %s : %s"
-
-#, fuzzy, python-format
 msgid "An error occurred while formatting SQL"
 msgstr "Une erreur s'est produite lors de l'importation de %s : %s"
 
@@ -2056,10 +2036,6 @@ msgid "Are you sure you want to delete the selected roles?"
 msgstr "Voulez-vous vraiment supprimer les règles sélectionnées?"
 
 #, fuzzy
-msgid "Are you sure you want to delete the selected roles?"
-msgstr "Voulez-vous vraiment supprimer les règles sélectionnées?"
-
-#, fuzzy
 msgid "Are you sure you want to delete the selected rules?"
 msgstr "Voulez-vous vraiment supprimer les règles sélectionnées?"
 
@@ -2230,26 +2206,12 @@ msgstr "Personnaliser les colonnes"
 msgid "Available Handlebars Helpers in Superset:"
 msgstr "Assistants Handlebars disponibles dans Superset :"
 
-#, fuzzy
-msgid "Autosize Column"
-msgstr "Personnaliser les colonnes"
-
-#, fuzzy
-msgid "Autosize all columns"
-msgstr "Personnaliser les colonnes"
-
-msgid "Available Handlebars Helpers in Superset:"
-msgstr ""
-
 msgid "Available sorting modes:"
 msgstr "Modes de tri disponibles :"
 
 #, fuzzy
 msgid "Average"
 msgstr "Partage de requête"
-
-msgid "Average (Mean)"
-msgstr ""
 
 #, fuzzy
 msgid "Average value"
@@ -2355,13 +2317,6 @@ msgstr "Style de la couche de base de la carte. Voir la documentation Mapbox : 
 
 msgid "Base slope"
 msgstr "Pente de base"
-
-#, fuzzy
-msgid "Base width"
-msgstr "Largeur de la ligne"
-
-msgid "Base slope"
-msgstr ""
 
 #, fuzzy
 msgid "Base width"
@@ -3152,10 +3107,6 @@ msgstr "Le choix de [Rayon du point] doit être présent dans [Grouper par]"
 msgid "Choose a chart for displaying on the map"
 msgstr "Choisissez un graphique ou un tableau de bord, pas les deux"
 
-#, fuzzy
-msgid "Choose a chart for displaying on the map"
-msgstr "Choisissez un graphique ou un tableau de bord, pas les deux"
-
 msgid "Choose a chart or dashboard not both"
 msgstr "Choisissez un graphique ou un tableau de bord, pas les deux"
 
@@ -3378,10 +3329,6 @@ msgstr "Cliquer pour ajouter un contour"
 
 #, fuzzy
 msgid "Click to add new breakpoint"
-msgstr "Cliquer pour éditer le l’étiquette"
-
-#, fuzzy
-msgid "Click to add new layer"
 msgstr "Cliquer pour éditer le l’étiquette"
 
 #, fuzzy
@@ -4382,21 +4329,6 @@ msgstr "Le tableau de bord n'a pas pu être mis à jour."
 msgid "Dashboard color configuration could not be updated."
 msgstr "Le tableau de bord n'a pas pu être mis à jour."
 
-msgid "Dashboard cannot be copied due to invalid parameters."
-msgstr ""
-
-#, fuzzy
-msgid "Dashboard cannot be favorited."
-msgstr "Le tableau de bord n'a pas pu être mis à jour."
-
-#, fuzzy
-msgid "Dashboard cannot be unfavorited."
-msgstr "Le tableau de bord n'a pas pu être mis à jour."
-
-#, fuzzy
-msgid "Dashboard color configuration could not be updated."
-msgstr "Le tableau de bord n'a pas pu être mis à jour."
-
 msgid "Dashboard could not be deleted."
 msgstr "Le tableau de bord n'a pas pu être supprimé."
 
@@ -5046,10 +4978,6 @@ msgstr "supprimer"
 #, fuzzy
 msgid "Delete item"
 msgstr "Supprimer template"
-
-#, fuzzy
-msgid "Delete role"
-msgstr "supprimer"
 
 #, fuzzy
 msgid "Delete role"
@@ -5777,16 +5705,12 @@ msgid "Edit Role"
 msgstr "mode edition"
 
 #, fuzzy
-msgid "Edit Role"
-msgstr "mode edition"
-
-#, fuzzy
 msgid "Edit Rule"
 msgstr "Modifier la règle"
 
 #, fuzzy
-msgid "Edit User"
-msgstr "Modifier la requête"
+msgid "Edit Tag"
+msgstr "Éditer le log"
 
 #, fuzzy
 msgid "Edit User"
@@ -5837,14 +5761,6 @@ msgstr "Modifier les propriétés"
 #, fuzzy
 msgid "Edit report"
 msgstr "Modifier le rapport par courriel"
-
-#, fuzzy
-msgid "Edit role"
-msgstr "mode edition"
-
-#, fuzzy
-msgid "Edit tag"
-msgstr "Éditer le log"
 
 #, fuzzy
 msgid "Edit role"
@@ -6679,10 +6595,6 @@ msgstr "Échec de la vérification des options de sélection : %s"
 
 msgid "Falling back to CSV; Excel export library not available."
 msgstr ""
-
-#, fuzzy
-msgid "False"
-msgstr "est faux"
 
 #, fuzzy
 msgid "False"
@@ -8139,10 +8051,6 @@ msgstr "Dernière mise à jour %s"
 msgid "Last Updated %s by %s"
 msgstr "Dernière mise à jour %s par %s"
 
-#, fuzzy
-msgid "Last Value"
-msgstr "Valeur cible"
-
 #, fuzzy, python-format
 msgid "Last available value seen on %s"
 msgstr "Dernière valeur disponible vue sur %s"
@@ -8969,10 +8877,6 @@ msgstr "Seuil minimum en points de pourcentage pour afficher les étiquettes."
 msgid "Minimum value"
 msgstr "Valeur minimale"
 
-#, fuzzy
-msgid "Minimum value cannot be higher than maximum value"
-msgstr "La date de début ne peut être supérieure à la date de fin"
-
 msgid "Minimum value for label to be displayed on graph."
 msgstr "Valeur minimale pour que l'étiquette soit affichée sur le graphique."
 
@@ -9243,10 +9147,6 @@ msgstr "Pas encore de %s"
 msgid "No Data"
 msgstr "Aucune donnée"
 
-#, fuzzy, python-format
-msgid "No Logs yet"
-msgstr "Pas encore de %s"
-
 #, fuzzy
 msgid "No Logs yet"
 msgstr "Pas encore de %s"
@@ -9265,10 +9165,6 @@ msgstr "Requête SQL"
 
 msgid "No Tags created"
 msgstr "Aucune balise créée"
-
-#, fuzzy
-msgid "No actions"
-msgstr "Annuler l'action"
 
 #, fuzzy
 msgid "No actions"
@@ -10181,10 +10077,6 @@ msgid "Percentage metric calculation"
 msgstr "Mesures de pourcentage"
 
 #, fuzzy
-msgid "Percentage metric calculation"
-msgstr "Mesures de pourcentage"
-
-#, fuzzy
 msgid "Percentage metrics"
 msgstr "Mesures de pourcentage"
 
@@ -10425,31 +10317,6 @@ msgstr "Nous avons les clés suivantes : %s"
 #, fuzzy
 msgid "Please provide a valid min or max value"
 msgstr "Veuillez fournir une plage valide"
-
-msgid "Please enter your email"
-msgstr ""
-
-#, fuzzy
-msgid "Please enter your first name"
-msgstr "Saisir le prénom de l'utilisateur"
-
-#, fuzzy
-msgid "Please enter your last name"
-msgstr "Saisir le nom de famille de l'utilisateur"
-
-#, fuzzy
-msgid "Please enter your password"
-msgstr "Veuillez confirmer"
-
-#, fuzzy
-msgid "Please enter your username"
-msgstr "Saisir le nom de l'utilisateur"
-
-msgid "Please provide a valid range"
-msgstr ""
-
-msgid "Please provide a value within range"
-msgstr ""
 
 msgid "Please re-enter the password."
 msgstr "Veuillez saisir à nouveau le mot de passe."
@@ -10734,9 +10601,6 @@ msgstr "Requête B"
 
 msgid "Query History"
 msgstr "Historiques des requêtes"
-
-msgid "Query data in SQL Lab"
-msgstr ""
 
 #, fuzzy
 msgid "Query State"
@@ -11331,11 +11195,15 @@ msgid "Roles"
 msgstr "Rôles"
 
 #, fuzzy
-msgid "Role name is required"
-msgstr "Le nom est obligatoire"
-
-msgid "Roles"
-msgstr "Rôles"
+msgid ""
+"Roles is a list which defines access to the dashboard. Granting a role "
+"access to a dashboard will bypass dataset level checks. If no roles are "
+"defined, regular access permissions apply."
+msgstr ""
+"Les rôles sont une liste qui définit l'accès au tableau de bord. En "
+"accordant à un rôle l'accès à un tableau de bord, les contrôles au niveau"
+" de l'ensemble de données seront contournés. Si aucun rôle n'est défini, "
+"les autorisations d'accès normales s'appliquent."
 
 #, fuzzy
 msgid ""
@@ -12694,9 +12562,6 @@ msgstr "Afficher les graduations secondaires sur les axes."
 msgid "Show only my charts"
 msgstr "Afficher uniquement mes graphiques"
 
-msgid "Show original SQL"
-msgstr ""
-
 #, fuzzy
 msgid "Show password."
 msgstr "Afficher le mot de passe."
@@ -13054,10 +12919,6 @@ msgstr "Trier les mesures"
 
 msgid "Sort order"
 msgstr "Ordre de tri"
-
-#, fuzzy
-msgid "Sort query by"
-msgstr "Exporter la requête"
 
 #, fuzzy
 msgid "Sort query by"
@@ -13492,10 +13353,6 @@ msgstr ""
 "La tableau [%(table_name)s] n'a pu être trouvé, vérifiez à nouveau votre "
 "connexion à votre base de données, le schéma et le nom du tableau"
 
-#, fuzzy
-msgid "Table actions"
-msgstr "Colonnex du tableau"
-
 msgid ""
 "Table already exists. You can change your 'if table already exists' "
 "strategy to append or replace or provide a different Table Name to use."
@@ -13796,16 +13653,6 @@ msgid "The color used when a value doesn't match any defined breakpoints."
 msgstr ""
 "La couleur utilisée lorsqu'une valeur ne correspond à aucun point d'arrêt"
 " défini."
-
-#, fuzzy
-msgid ""
-"The colors of this chart might be overridden by custom label colors of "
-"the related dashboard.\n"
-"    Check the JSON metadata in the Advanced settings."
-msgstr ""
-"Ce schéma de couleurs est remplacé par des couleurs d’étiquettes "
-"personnalisées.    Vérifiez les métadonnées JSON dans les paramètres "
-"avancés"
 
 #, fuzzy
 msgid ""
@@ -14425,9 +14272,6 @@ msgstr ""
 msgid "The result size exceeds the allowed limit."
 msgstr "La taille du résultat dépasse la limite autorisée."
 
-msgid "The result size exceeds the allowed limit."
-msgstr ""
-
 msgid "The results backend no longer has the data from the query."
 msgstr "Le programme dorsal des résultats n'a plus les données de la requête."
 
@@ -14632,10 +14476,6 @@ msgstr "L'unité de mesure pour le rayon de point spécifié"
 
 msgid "The upper limit of the threshold range of the Isoband"
 msgstr "La limite supérieure de la plage de seuil de l'isobande"
-
-#, fuzzy
-msgid "The user has been updated successfully."
-msgstr "Ce Tableau de Bord a été sauvegardé avec succès."
 
 #, fuzzy
 msgid "The user has been updated successfully."
@@ -16318,18 +16158,6 @@ msgid "Users"
 msgstr "Utilisateurs"
 
 #, fuzzy
-msgid "Username is required"
-msgstr "Le nom est obligatoire"
-
-#, fuzzy
-msgid "Username:"
-msgstr "Username"
-
-#, fuzzy
-msgid "Users"
-msgstr "série"
-
-#, fuzzy
 msgid "Users are not allowed to set a search path for security reasons."
 msgstr ""
 "%(dialect)s ne peut pas être utilisé comme source de données pour des "
@@ -16885,11 +16713,6 @@ msgstr ""
 "sélectionné seront utilisées pour les séries décalées dans le temps."
 
 msgid ""
-"When unchecked, colors from the selected color scheme will be used for "
-"time shifted series"
-msgstr ""
-
-msgid ""
 "When using \"Autocomplete filters\", this can be used to improve "
 "performance of the query fetching the values. Use this option to apply a "
 "predicate (WHERE clause) to the query selecting the distinct values from "
@@ -17316,10 +17139,6 @@ msgstr "Vous ajoutez des étiquettes à %s %s"
 msgid "You are editing a query from the virtual dataset "
 msgstr "Vous modifiez une requête provenant du jeu de données virtuel"
 
-#, fuzzy, python-format
-msgid "You are edting a query from the virtual dataset "
-msgstr ""
-
 msgid ""
 "You are importing one or more charts that already exist. Overwriting "
 "might cause you to lose some of your work. Are you sure you want to "
@@ -17364,19 +17183,6 @@ msgstr ""
 "Vous importez une ou plusieurs requêtes enregistrées qui existent déjà. "
 "L'écrasement pourrait vous faire perdre une partie de votre travail. "
 "Êtes-vous sûr de vouloir les écraser?"
-
-msgid ""
-"You are viewing this chart in a dashboard context with labels shared "
-"across multiple charts.\n"
-"        The color scheme selection is disabled."
-msgstr ""
-
-msgid ""
-"You are viewing this chart in the context of a dashboard that is directly"
-" affecting its colors.\n"
-"        To edit the color scheme, open this chart outside of the "
-"dashboard."
-msgstr ""
 
 #, fuzzy
 msgid ""
@@ -17625,9 +17431,6 @@ msgstr "Votre requête a été enregistrée"
 
 msgid "Your query was updated"
 msgstr "Votre requête a été mise à jour"
-
-msgid "Your range is not within the dataset range"
-msgstr ""
 
 msgid "Your report could not be deleted"
 msgstr "Votre rapport n'a pas pu être supprimée"

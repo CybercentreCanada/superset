@@ -24,7 +24,6 @@ import exampleDark from './images/example-dark.jpg';
 import thumbnail from './images/thumbnail.png';
 import thumbnailDark from './images/thumbnail-dark.png';
 import controlPanel from './controlPanel';
-import transformProps from './transformProps';
 
 const metadata = new ChartMetadata({
   category: t('Correlation'),
@@ -45,6 +44,7 @@ export default class PairedTTestChartPlugin extends ChartPlugin {
       loadChart: () => import('./PairedTTest'),
       metadata,
       transformProps,
+      controlPanel,
     });
   }
 }

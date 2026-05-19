@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SpatialFormData, buildSpatialQuery } from '../spatialUtils';
+import type { CollapseProps as AntdCollapseProps } from 'antd';
 
-export default function buildQuery(formData: SpatialFormData) {
-  return buildSpatialQuery(formData);
+export interface CollapseProps extends AntdCollapseProps {
+  animateArrows?: boolean;
+  modalMode?: boolean;
 }

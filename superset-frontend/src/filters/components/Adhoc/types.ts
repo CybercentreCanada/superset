@@ -22,10 +22,10 @@ import {
   ChartProps,
   DataRecord,
   FilterState,
-  GenericDataType,
   QueryFormData,
   ChartDataResponseResult,
 } from '@superset-ui/core';
+import { GenericDataType } from '@apache-superset/core/common';
 import { RefObject } from 'react';
 import { PluginFilterHooks, PluginFilterStylesProps } from '../types';
 

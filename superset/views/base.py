@@ -522,6 +522,20 @@ def cached_common_bootstrap_data(  # pylint: disable=unused-argument
         ],
         "menu_data": menu_data(g.user),
         "pdf_compression_level": app.config["PDF_COMPRESSION_LEVEL"],
+        # ---------- CCCS code block ----------
+        "datahub_url": app.config.get("DATAHUB_URL", ""),
+        "advanced_data_types": list(
+            map(
+                lambda v: {
+                    "id": v[0],
+                    "verbose_name": v[1].verbose_name,
+                    "description": v[1].description,
+                    "valid_data_types": v[1].valid_data_types,
+                },
+                app.config["ADVANCED_DATA_TYPES"].items(),
+            )
+        ),
+        # ---------- end CCCS code block ----------
     }
 
     bootstrap_data.update(app.config["COMMON_BOOTSTRAP_OVERRIDES_FUNC"](bootstrap_data))

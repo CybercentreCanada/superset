@@ -1026,7 +1026,6 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             rowSurfaceColor,
           );
           const StyledCell = styled.td`
-            color: ${theme.colorText};
             text-align: ${sharedStyle.textAlign};
             white-space: ${value instanceof Date ? 'nowrap' : undefined};
             position: relative;

@@ -48,6 +48,4 @@ export default class BulletChartPlugin extends ChartPlugin {
       controlPanel,
     });
   }
-
-  return chartIds;
 }

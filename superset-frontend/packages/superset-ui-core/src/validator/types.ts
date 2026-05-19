@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import type { ReactNode } from 'react';
 
 /**
  * Type definition for a validator function.

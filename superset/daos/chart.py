@@ -22,8 +22,6 @@ from typing import Dict, List
 
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 
-from flask_appbuilder.models.sqla.interface import SQLAInterface
-
 from superset.charts.filters import ChartFilter
 from superset.commands.chart.exceptions import ChartNotFoundError
 from superset.daos.base import BaseDAO
@@ -50,16 +48,6 @@ class ChartDAO(BaseDAO[Slice]):
         # Add custom fields for charts
         filterable.update(CHART_CUSTOM_FIELDS)
         return filterable
-
-    @staticmethod
-    def get_by_id_or_uuid(id_or_uuid: str) -> Slice:
-        query = db.session.query(Slice).filter(id_or_uuid_filter(id_or_uuid))
-        # Apply chart base filters
-        query = ChartFilter("id", SQLAInterface(Slice, db.session)).apply(query, None)
-        chart = query.one_or_none()
-        if not chart:
-            raise ChartNotFoundError()
-        return chart
 
     @staticmethod
     def get_by_id_or_uuid(id_or_uuid: str) -> Slice:

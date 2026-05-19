@@ -209,47 +209,6 @@ test('display no compatible schema found when schema api throws errors', async (
   ).toBeInTheDocument();
 });
 
-test('display no compatible schema found when schema api throws errors', async () => {
-  const reduxState = {
-    ...initialState,
-    sqlLab: {
-      ...initialState.sqlLab,
-      queryEditors: [
-        {
-          ...extraQueryEditor2,
-          dbId: 3,
-          schema: undefined,
-        },
-      ],
-    },
-  };
-  await renderAndWait(
-    {
-      ...mockedProps,
-      queryEditorId: extraQueryEditor2.id,
-      database: {
-        id: 3,
-        database_name: 'unauth_db',
-        backend: 'minervasql',
-      },
-    },
-    undefined,
-    reduxState,
-  );
-  await waitFor(() =>
-    expect(fetchMock.calls('glob:*/api/v1/database/3/schemas/?*')).toHaveLength(
-      1,
-    ),
-  );
-  const select = screen.getByRole('combobox', {
-    name: 'Select schema or type to search schemas',
-  });
-  userEvent.click(select);
-  expect(
-    await screen.findByText('No compatible schema found'),
-  ).toBeInTheDocument();
-});
-
 test('ignore schema api when current schema is deprecated', async () => {
   const invalidSchemaName = 'None';
   await renderAndWait(mockedProps, undefined, {

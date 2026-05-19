@@ -112,16 +112,6 @@ export type Extra = {
   dashboard?: DashboardState;
 };
 
-export type DashboardState = {
-  activeTabs?: Array<string>;
-  dataMask?: Object;
-  anchor?: string;
-};
-
-export type Extra = {
-  dashboard?: DashboardState;
-};
-
 export type Operator = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'not null';
 
 export type AlertObject = {
