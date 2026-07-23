@@ -343,6 +343,9 @@ const RightMenu = ({
   const RightMenuItemIconExtension = extensionsRegistry.get(
     'navbar.right-menu.item.icon',
   );
+  const RightMenuItemEnvironmentTagExtension = extensionsRegistry.get(
+    'navbar.right-menu.item.environment-tag',
+  );
 
   const handleDatabaseAdd = () => setQuery({ databaseAdded: true });
 
@@ -688,6 +691,9 @@ const RightMenu = ({
             </Tag>
           );
         })()}
+      {RightMenuItemEnvironmentTagExtension && (
+        <RightMenuItemEnvironmentTagExtension classification="pb" />
+      )}
       <Menu
         css={css`
           display: flex;
