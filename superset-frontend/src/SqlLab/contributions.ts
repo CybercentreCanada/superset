@@ -47,4 +47,7 @@ export const ViewLocations = {
     results: 'sqllab.results',
     queryHistory: 'sqllab.queryHistory',
   },
+  cccs: {
+    classificationTag: 'cccs.classificationTag',
+  },
 } as const;

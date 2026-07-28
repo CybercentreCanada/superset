@@ -237,10 +237,6 @@ export interface ExploreChartHeaderProps {
   triggerQuery: boolean;
 }
 
-export interface RightMenuItemEnvironmentTagProps {
-  classification: string;
-}
-
 export type Extensions = Partial<{
   'alertsreports.header.icon': ComponentType;
   'load.drillby.options': LoadDrillByOptions;
@@ -274,6 +270,4 @@ export type Extensions = Partial<{
   ][];
   'filter.dateFilterControl': ComponentType<DateFilterControlProps>;
   'explore.chart.header': ComponentType<ExploreChartHeaderProps>;
-  /* Custom CCCS components */
-  'navbar.right-menu.item.environment-tag': ComponentType<RightMenuItemEnvironmentTagProps>;
 }>;

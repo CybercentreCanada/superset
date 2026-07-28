@@ -66,6 +66,9 @@ import {
   RightMenuProps,
 } from './types';
 import { NAVBAR_MENU_POPUP_OFFSET } from './commonMenuData';
+import { ViewLocations } from 'src/SqlLab/contributions';
+import { resolveView, views } from 'src/core/views';
+import React from 'react';
 
 const extensionsRegistry = getExtensionsRegistry();
 
@@ -343,9 +346,10 @@ const RightMenu = ({
   const RightMenuItemIconExtension = extensionsRegistry.get(
     'navbar.right-menu.item.icon',
   );
-  const RightMenuItemEnvironmentTagExtension = extensionsRegistry.get(
-    'navbar.right-menu.item.environment-tag',
-  );
+
+  const classificationTag = views.getViews(
+    ViewLocations.cccs.classificationTag,
+  )?.[0];
 
   const handleDatabaseAdd = () => setQuery({ databaseAdded: true });
 
@@ -691,8 +695,10 @@ const RightMenu = ({
             </Tag>
           );
         })()}
-      {RightMenuItemEnvironmentTagExtension && (
-        <RightMenuItemEnvironmentTagExtension classification="pb" />
+      {classificationTag !== undefined && (
+        <React.Fragment key={classificationTag.id}>
+          {resolveView(classificationTag.id)}
+        </React.Fragment>
       )}
       <Menu
         css={css`
