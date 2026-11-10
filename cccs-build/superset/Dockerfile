@@ -1,13 +1,16 @@
 # Vault CA container import
 ARG VAULT_CA_CONTAINER=uchimera.azurecr.io/cccs/hogwarts/vault-ca:master_11376_a25c34e1
 FROM $VAULT_CA_CONTAINER AS vault_ca
-FROM uchimera.azurecr.io/cccs/superset-base:cccs-main_20260424193026_b14351
+FROM uchimera.azurecr.io/cccs/superset-base:cccs-6.1.0_20261110205235_b15591
 
 USER root
 
 COPY *requirements.txt /tmp/
 
 ARG BUILD_NUMBER=0-development
+
+# Get Trino and Postgres drivers (optional dependencies)
+RUN uv pip install .[postgres,trino,gevent]
 
 # Copy Vault CA certs
 COPY --from=vault_ca /usr/local/share/ca-certificates/ /usr/local/share/ca-certificates/
