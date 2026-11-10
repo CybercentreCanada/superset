@@ -13,6 +13,7 @@ rendererMap.set('IPV6', Ipv6ValueRenderer);
 rendererMap.set('DOMAIN', DomainValueRenderer);
 rendererMap.set('COUNTRY', CountryValueRenderer);
 rendererMap.set('JSON', JsonValueRenderer);
+rendererMap.set('JSONB', JsonValueRenderer);
 rendererMap.set('DATE', TimestampValueRenderer);
 rendererMap.set('DATETIME', TimestampValueRenderer);
 rendererMap.set('TIMESTAMP WITHOUT TIME ZONE', TimestampValueRenderer);

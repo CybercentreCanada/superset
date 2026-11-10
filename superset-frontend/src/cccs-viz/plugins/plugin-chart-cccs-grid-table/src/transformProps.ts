@@ -5,6 +5,7 @@ import {
   QueryFormColumn,
   TimeseriesDataRecord,
   getNumberFormatter,
+  isAdhocColumn,
 } from '@superset-ui/core';
 import { GenericDataType } from '@apache-superset/core/common';
 
@@ -19,8 +20,8 @@ import ExpandRowButtonRenderer from './renderers/ExpandRowButtonRenderer';
 
 const calcMetricColumnDefs = (
   metrics: any[],
-  percent_metrics: any[],
-  datasource_metrics: Metric[],
+  percentMetrics: any[],
+  datasourceMetrics: Metric[],
 ) => {
   const percentMetricValueFormatter = function (params: ValueFormatterParams) {
     return getNumberFormatter(NumberFormats.PERCENT_3_POINT).format(
@@ -29,7 +30,7 @@ const calcMetricColumnDefs = (
   };
 
   // Map of verbose names, key is metric name, value is verbose name
-  const metricVerboseNameMap = datasource_metrics.reduce(
+  const metricVerboseNameMap = datasourceMetrics.reduce(
     (metricMap, metric: Metric) => ({
       ...metricMap,
       [metric.metric_name]: metric.verbose_name,
@@ -75,8 +76,8 @@ const calcMetricColumnDefs = (
     columnDefs = columnDefs.concat(metricsColumnDefs);
   }
 
-  if (percent_metrics) {
-    const percentMetricsColumnDefs = percent_metrics.map((metric: any) => {
+  if (percentMetrics) {
+    const percentMetricsColumnDefs = percentMetrics.map((metric: any) => {
       const metricLabel = metric.label ? metric.label : metric;
       const metricHeader = metricVerboseNameMap[metric]
         ? metricVerboseNameMap[metric]
@@ -97,32 +98,20 @@ const calcMetricColumnDefs = (
 const calcColumnColumnDefs = (
   columns: QueryFormColumn[],
   defaultGroupBy: string[],
-  dataset_columns: Column[],
+  datasetColumns: Column[],
   orderByCols: any,
 ): ColDef[] => {
-  const columnDataMap = dataset_columns.reduce(
-    (columnMap, column: Column) => ({
-      ...columnMap,
-      [column.column_name]: {
-        type: column.type,
-        is_dttm: column.is_dttm,
-        type_generic: column.type_generic,
-        advanced_data_type: (column.advanced_data_type as string) ?? '',
-        verbose_name: column.verbose_name,
-        description: column.description,
-      },
-    }),
-    {} as { [index: string]: Column },
-  );
+  const columnDefs = columns.map((column: QueryFormColumn): ColDef => {
+    const columnName = isAdhocColumn(column) ? column.label : column;
+    const datasetColumn = datasetColumns.find(
+      col => col.column_name === columnName,
+    );
 
-  const columnDefs = columns.map((column: any): ColDef => {
-    const columnType = columnDataMap[column]?.type || '';
-    const isDate = !!columnDataMap[column]?.is_dttm;
-    const columnTypeGeneric = columnDataMap[column]?.type_generic || -1;
-    const advancedDataType = columnDataMap[column]?.advanced_data_type || '';
-    const columnHeader = columnDataMap[column]?.verbose_name
-      ? columnDataMap[column]?.verbose_name
-      : column;
+    const columnType = datasetColumn?.type || '';
+    const isDate = !!datasetColumn?.is_dttm;
+    const columnTypeGeneric = datasetColumn?.type_generic || -1;
+    const advancedDataType = datasetColumn?.advanced_data_type || '';
+    const columnHeader = datasetColumn?.verbose_name ?? columnName;
     const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
     const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
     const sort =
@@ -145,8 +134,8 @@ const calcColumnColumnDefs = (
       ? (params: any) =>
           params.value ? params.colDef.valueFormatter(params.value) : undefined
       : undefined;
-    const columnDescription = columnDataMap[column]?.description || '';
-    const autoHeight = columnType === 'JSON';
+    const columnDescription = datasetColumn?.description || '';
+    const autoHeight = ['JSON', 'JSONB'].includes(columnType);
     const rowGroupIndex = defaultGroupBy.findIndex(
       (element: any) => element === column,
     );
@@ -155,7 +144,7 @@ const calcColumnColumnDefs = (
     const maxWidth = 800;
 
     return {
-      field: column,
+      field: columnHeader,
       headerName: columnHeader,
       rowGroup,
       hide,
@@ -205,7 +194,7 @@ const transformProps = (
     jumpActionConfigs,
   }: CccsTableFormData = formData;
 
-  const datasource_metrics = datasource?.metrics as Metric[];
+  const datasourceMetrics = datasource?.metrics as Metric[];
   const data = queriesData[0].data as TimeseriesDataRecord[];
 
   const columns =
@@ -227,7 +216,7 @@ const transformProps = (
     calcMetricColumnDefs(
       metrics || [],
       percentMetrics || [],
-      datasource_metrics,
+      datasourceMetrics,
     ),
   );
 
