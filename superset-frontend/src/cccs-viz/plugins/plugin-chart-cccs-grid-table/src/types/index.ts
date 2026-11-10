@@ -89,8 +89,7 @@ export type CccsGridProps = {
   jumpActionConfigs?: any[];
 };
 
-export interface CccsGridChartDataResponseResult
-  extends ChartDataResponseResult {
+export interface CccsGridChartDataResponseResult extends ChartDataResponseResult {
   agGridLicenseKey: string;
   assemblyLineUrl: string;
   enableAlfred: boolean;
