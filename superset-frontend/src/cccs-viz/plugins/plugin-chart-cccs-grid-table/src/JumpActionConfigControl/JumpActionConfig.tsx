@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SelectControl from 'src/explore/components/controls/SelectControl';
 import getBootstrapData from 'src/utils/getBootstrapData';
 import { Button } from '@superset-ui/core/components';
@@ -18,58 +18,21 @@ interface Props {
   addDrillActionConfig: (drillactionConfig: any) => boolean;
   removeDrillActionConfig: () => boolean;
 }
-const useDashboardState = () => {
-  const [dashboards, setDashboards] = useState<any[]>([]);
-
-  const [filterList, setFilterList] = useState([]);
-
-  const fetchDashboardList = useCallback(() => {
-    const endpoint = `/api/v1/dashboard`;
-    SupersetClient.get({ endpoint })
-      .then(({ json }) => {
-        setDashboards(json.result || []);
-      })
-      .catch(error => console.error(error));
-  }, []);
-
-  const fetchFilterList = useCallback((dashboardId: number) => {
-    const endpoint = `/api/v1/dashboard/${dashboardId}`;
-    if (dashboardId < 0) return;
-    SupersetClient.get({ endpoint })
-      .then(({ json }) => {
-        const metadata = JSON.parse(json.result.json_metadata);
-
-        setFilterList(
-          metadata?.native_filter_configuration.map((e: any) => ({
-            value: e.id,
-            label: e.name,
-            column: e?.targets[0].column?.name || '',
-          })),
-        );
-      })
-      .catch(error => console.error(error));
-  }, []);
-
-  return {
-    dashboards,
-    filterList,
-    fetchDashboardList,
-    fetchFilterList,
-  };
-};
 
 const DrillActionConfig: React.FC<Props> = (props: Props) => {
   const { dashboardID, filters, advancedDataType, visiblePopoverIndex } = props;
 
-  const { dashboards, filterList, fetchDashboardList, fetchFilterList } =
-    useDashboardState();
+  const [dashboards, setDashboards] = useState<any[]>([]);
+  const [filterList, setFilterList] = useState<any[]>([]);
 
   const [selection, setSelection] = useState({
     selectedDashboardID: dashboardID,
     selectedFilters: filters?.map((filter: any) => filter.value) || [],
+    selectedAdvancedDataType: advancedDataType,
   });
 
-  const { selectedDashboardID, selectedFilters } = selection;
+  const { selectedDashboardID, selectedFilters, selectedAdvancedDataType } =
+    selection;
 
   const dashboardList = useMemo(
     () =>
@@ -81,27 +44,53 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
     [dashboards],
   );
 
-  const advancedDataTypeName = advancedDataType;
-
   useEffect(() => {
     setSelection({
       selectedFilters: filters?.map((filter: any) => filter.value) || [],
       selectedDashboardID: dashboardID,
+      selectedAdvancedDataType: advancedDataType,
     });
   }, [dashboardID, filters, advancedDataType, visiblePopoverIndex]);
-  useEffect(() => {
-    fetchDashboardList();
-  }, [fetchDashboardList]);
 
   useEffect(() => {
-    fetchFilterList(selectedDashboardID);
-  }, [fetchFilterList, selectedDashboardID]);
+    const endpoint = '/api/v1/jump_to_action/';
+    SupersetClient.get({ endpoint })
+      .then(({ json }) => {
+        setDashboards(json.result || []);
+      })
+      .catch(error => console.error(error));
+  }, []);
+
+  useEffect(() => {
+    if (selectedDashboardID === undefined || selectedDashboardID === null) {
+      setFilterList([]);
+      return;
+    }
+    let cancelled = false;
+    const endpoint = `/api/v1/dashboard/${selectedDashboardID}`;
+    SupersetClient.get({ endpoint })
+      .then(({ json }) => {
+        if (cancelled) return;
+        const metadata = JSON.parse(json.result.json_metadata);
+        setFilterList(
+          metadata?.native_filter_configuration?.map((e: any) => ({
+            value: e.id,
+            label: e.name,
+            column: e?.targets[0].column?.name || '',
+          })) ?? [],
+        );
+      })
+      .catch(error => console.error(error));
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDashboardID]);
 
   const isValidForm = () => {
     const errors = [
       validateNonEmpty(selectedDashboardID),
       validateNonEmpty(selectedFilters),
-      validateNonEmpty(advancedDataTypeName),
+      validateNonEmpty(selectedAdvancedDataType),
     ];
     return !errors.filter(x => x).length;
   };
@@ -112,8 +101,8 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
       );
       const advancedDataTypeNameLabel =
         bootstrapData?.common?.advanced_data_types.find(
-          (e: { id: string }) => e.id === advancedDataTypeName,
-        )?.verbose_name || advancedDataTypeName;
+          (e: { id: string }) => e.id === selectedAdvancedDataType,
+        )?.verbose_name || selectedAdvancedDataType;
       const selectedFiltersWithColumn = filterList.filter((filter: any) =>
         selectedFilters.includes(filter.value),
       );
@@ -122,7 +111,7 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
         dashboardID: selectedDashboardID,
         filters: selectedFiltersWithColumn,
         dashBoardName: element?.label || '',
-        advancedDataType: advancedDataTypeName,
+        advancedDataType: selectedAdvancedDataType,
         name,
       };
       props.addDrillActionConfig(newDrillActionConfig);
@@ -131,16 +120,16 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
   };
 
   const onDashboardChange = (v: any) => {
-    setSelection({
+    setSelection(prev => ({
+      ...prev,
       selectedDashboardID: v,
       selectedFilters: [],
-    });
+    }));
   };
   return (
     <div style={{ width: 400 }}>
-      <div style={{ width: '9000', paddingBottom: 25 }}>
+      <div style={{ paddingBottom: 25 }}>
         <SelectControl
-          // css={(theme: SupersetTheme) => ({ marginBottom: theme.sizeUnit * 4 })}
           ariaLabel={t('Annotation layer value')}
           name="annotation-layer-value"
           label={t('Dashboard')}
@@ -152,7 +141,6 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
           onChange={onDashboardChange}
         />
         <SelectControl
-          // style={{ length: '100%' }}
           ariaLabel="Advanced Data Type"
           name="advanced-data-type-value"
           label="Advanced Data Type"
@@ -166,7 +154,10 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
               label: v.verbose_name,
             }),
           )}
-          value={advancedDataTypeName}
+          value={selectedAdvancedDataType}
+          onChange={(value: any) =>
+            setSelection(prev => ({ ...prev, selectedAdvancedDataType: value }))
+          }
         />
         <SelectControl
           ariaLabel={t('Annotation layer value')}

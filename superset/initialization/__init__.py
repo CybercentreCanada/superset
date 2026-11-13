@@ -236,6 +236,9 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         self.superset_app.register_blueprint(health_blueprint)
 
         # ---------- CCCS code block ----------
+        from superset.jump_to_action.api import JumpToDashboardActionRestApi
+        appbuilder.add_api(JumpToDashboardActionRestApi)
+        
         from superset.alfred.api import AlfredRestApi
         from superset.clue.api import ClueRestApi
         if (self.config.get("ENABLE_ALFRED")):
