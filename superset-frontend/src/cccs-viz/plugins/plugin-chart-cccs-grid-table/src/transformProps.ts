@@ -144,7 +144,7 @@ const calcColumnColumnDefs = (
     const maxWidth = 800;
 
     return {
-      field: columnHeader,
+      field: columnName,
       headerName: columnHeader,
       rowGroup,
       hide,
