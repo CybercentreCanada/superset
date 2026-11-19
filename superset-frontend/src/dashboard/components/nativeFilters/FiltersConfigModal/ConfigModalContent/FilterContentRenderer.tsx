@@ -86,6 +86,7 @@ function FilterContentRenderer({
               <DividerConfigForm
                 componentId={id}
                 divider={filterConfigMap[id] as Divider}
+                onModifyItem={handleModifyItem}
               />
             ) : (
               <FiltersConfigForm
