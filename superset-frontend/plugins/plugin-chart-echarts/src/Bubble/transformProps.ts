@@ -19,6 +19,7 @@
 import type { EChartsCoreOption } from 'echarts/core';
 import type { ScatterSeriesOption } from 'echarts/charts';
 import { extent } from 'd3-array';
+import { GenericDataType } from '@apache-superset/core/common';
 import {
   CategoricalColorNamespace,
   getNumberFormatter,
@@ -26,11 +27,17 @@ import {
   getMetricLabel,
   NumberFormatter,
   tooltipHtml,
+  TimeFormatter,
+  getTimeFormatter,
 } from '@superset-ui/core';
 import { EchartsBubbleChartProps, EchartsBubbleFormData } from './types';
 import { DEFAULT_FORM_DATA, MINIMUM_BUBBLE_SIZE } from './constants';
 import { defaultGrid } from '../defaults';
-import { getLegendProps, getMinAndMaxFromBounds } from '../utils/series';
+import {
+  getColtypesMapping,
+  getLegendProps,
+  getMinAndMaxFromBounds,
+} from '../utils/series';
 import { resolveLegendLayout } from '../utils/legendLayout';
 import { Refs } from '../types';
 import { parseAxisBound } from '../utils/controls';
@@ -77,7 +84,7 @@ export function formatTooltip(
   xAxisLabel: string,
   yAxisLabel: string,
   sizeLabel: string,
-  xAxisFormatter: NumberFormatter,
+  xAxisFormatter: NumberFormatter | TimeFormatter,
   yAxisFormatter: NumberFormatter,
   tooltipSizeFormatter: NumberFormatter,
 ) {
@@ -99,6 +106,7 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
   const { height, width, hooks, queriesData, formData, inContextMenu, theme } =
     chartProps;
 
+  const [queryData] = queriesData;
   const { data = [] } = queriesData[0];
   const {
     x,
@@ -111,6 +119,7 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
     xAxisLabel: bubbleXAxisTitle,
     yAxisLabel: bubbleYAxisTitle,
     xAxisBounds,
+    xAxisTimeFormat,
     xAxisFormat,
     yAxisFormat,
     yAxisBounds,
@@ -136,10 +145,12 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
 
   const legends = new Set<string>();
   const series: ScatterSeriesOption[] = [];
+  const dataTypes = getColtypesMapping(queryData);
 
   const xAxisLabel: string = getMetricLabel(x);
   const yAxisLabel: string = getMetricLabel(y);
   const sizeLabel: string = getMetricLabel(size);
+  const xAxisDataType = dataTypes?.[xAxisLabel];
 
   const refs: Refs = {};
 
@@ -170,7 +181,13 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
 
   normalizeSymbolSize(series, maxBubbleSize);
 
-  const xAxisFormatter = getNumberFormatter(xAxisFormat);
+  // const xAxisFormatter = getNumberFormatter(xAxisFormat);
+  // CCCS code - format numbers or dates
+  const xAxisFormatter =
+    xAxisDataType === GenericDataType.Temporal
+      ? getTimeFormatter(xAxisTimeFormat)
+      : getNumberFormatter(xAxisFormat);
+  // end CCCS code
   const yAxisFormatter = getNumberFormatter(yAxisFormat);
   const tooltipSizeFormatter = getNumberFormatter(tooltipSizeFormat);
   const legendData = Array.from(legends).sort((a: string, b: string) => {
@@ -203,7 +220,14 @@ export default function transformProps(chartProps: EchartsBubbleChartProps) {
     convertInteger(xAxisTitleMargin),
   );
 
-  const xAxisType = logXAxis ? AxisType.Log : AxisType.Value;
+  // const xAxisType = logXAxis ? AxisType.Log : AxisType.Value;
+  // CCCS code - add temporal axis type
+  const xAxisType = logXAxis
+    ? AxisType.Log
+    : xAxisDataType === GenericDataType.Temporal
+      ? AxisType.Time
+      : AxisType.Value;
+  // end CCCS code
   const echartOptions: EChartsCoreOption = {
     series,
     xAxis: {
