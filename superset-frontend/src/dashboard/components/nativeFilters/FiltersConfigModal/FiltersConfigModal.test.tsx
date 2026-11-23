@@ -16,7 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Preset } from '@superset-ui/core';
+import {
+  ChartCustomizationType,
+  NativeFilterType,
+  Preset,
+} from '@superset-ui/core';
 import fetchMock from 'fetch-mock';
 import chartQueries from 'spec/fixtures/mockChartQueries';
 import { dashboardLayout } from 'spec/fixtures/mockDashboardLayout';
@@ -426,6 +430,73 @@ test('filters are draggable', async () => {
   const draggables = within(filterContainer).getAllByRole('tab');
   expect(draggables.length).toBe(3);
 });
+
+test.each(
+  [
+    {
+      id: 'NATIVE_FILTER_DIVIDER-1',
+      type: NativeFilterType.Divider,
+      configKey: 'native_filter_configuration',
+      changesKey: 'filterChanges',
+    },
+    {
+      id: 'CHART_CUSTOMIZATION_DIVIDER-1',
+      type: ChartCustomizationType.Divider,
+      configKey: 'chart_customization_config',
+      changesKey: 'customizationChanges',
+    },
+  ].flatMap(config =>
+    ['title', 'description'].map(field => ({ ...config, field })),
+  ),
+)(
+  'saves $type $field edits',
+  async ({ id, type, configKey, changesKey, field }) => {
+    const divider = {
+      id,
+      type,
+      title: 'Section title',
+      description: 'Section description',
+    };
+    const onSave = jest.fn();
+    const state = {
+      ...defaultState(),
+      dashboardInfo: {
+        metadata: { [configKey]: [divider] },
+      },
+    };
+    defaultRender(state, {
+      ...props,
+      createNewOnOpen: false,
+      initialFilterId: id,
+      onSave,
+    });
+
+    const saveButton = screen.getByRole('button', { name: SAVE_REGEX });
+    expect(saveButton).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(new RegExp(field, 'i')), {
+      target: { value: `Updated ${field}` },
+    });
+
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    await userEvent.click(saveButton);
+
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({
+        [changesKey]: {
+          modified: [
+            expect.objectContaining({
+              ...divider,
+              [field]: `Updated ${field}`,
+            }),
+          ],
+          deleted: [],
+          reordered: [],
+        },
+      }),
+    );
+  },
+);
 
 /*
   TODO

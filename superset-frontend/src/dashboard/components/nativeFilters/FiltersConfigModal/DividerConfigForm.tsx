@@ -25,6 +25,7 @@ import { CHART_CUSTOMIZATION_DIVIDER_PREFIX } from './utils';
 
 interface Props {
   componentId: string;
+  onModifyItem: (id: string) => void;
   divider?: {
     title: string;
     description: string;
@@ -36,7 +37,12 @@ const Container = styled.div`
   `}
 `;
 
-const DividerConfigForm: FC<Props> = ({ componentId, divider }) => {
+const DividerConfigForm: FC<Props> = ({
+  componentId,
+  divider,
+  onModifyItem,
+}) => {
+  const handleChange = () => onModifyItem(componentId);
   const isChartCustomization = componentId.startsWith(
     CHART_CUSTOMIZATION_DIVIDER_PREFIX,
   );
@@ -54,14 +60,14 @@ const DividerConfigForm: FC<Props> = ({ componentId, divider }) => {
           { required: true, message: t('Title is required'), whitespace: true },
         ]}
       >
-        <Input />
+        <Input onChange={handleChange} />
       </FormItem>
       <FormItem
         initialValue={divider ? divider.description : ''}
         label={t('Description')}
         name={['filters', componentId, 'description']}
       >
-        <Input.TextArea rows={4} />
+        <Input.TextArea rows={4} onChange={handleChange} />
       </FormItem>
       <FormItem
         hidden

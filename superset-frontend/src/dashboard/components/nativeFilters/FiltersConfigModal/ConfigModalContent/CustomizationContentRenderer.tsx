@@ -80,6 +80,7 @@ function CustomizationContentRenderer({
             {isDivider ? (
               <DividerConfigForm
                 componentId={id}
+                onModifyItem={handleModifyItem}
                 divider={
                   chartCustomizationConfigMap[id] as ChartCustomizationDivider
                 }
