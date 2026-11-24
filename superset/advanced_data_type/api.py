@@ -93,6 +93,7 @@ class AdvancedDataTypeRestApi(BaseSupersetApi):
         item = kwargs["rison"]
         advanced_data_type = item["type"]
         values = item["values"]
+        operator = item.get("operator")  # CCCS addition
         addon = app.config["ADVANCED_DATA_TYPES"].get(advanced_data_type)
         if not addon:
             return self.response(
@@ -102,11 +103,12 @@ class AdvancedDataTypeRestApi(BaseSupersetApi):
                     advanced_data_type=advanced_data_type,
                 ),
             )
-        bus_resp: AdvancedDataTypeResponse = addon.translate_type(
-            {
-                "values": values,
-                "operator": operator, # CCCS addition
-            }
+
+        # CCCS changes. I don't totally know what's going on here, but it works
+        bus_resp = (
+            addon.translate_filter({"operator": operator, "values": values})
+            if operator
+            else addon.translate_type({"values": values})
         )
         return self.response(200, result=bus_resp)
 
