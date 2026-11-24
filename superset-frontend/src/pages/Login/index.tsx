@@ -136,11 +136,12 @@ export default function Login() {
 
   const getAuthIconElement = (
     providerName: string,
+    iconName?: string, // CCCS change
   ): React.JSX.Element | undefined => {
     if (!providerName || typeof providerName !== 'string') {
       return undefined;
     }
-    const iconComponentName = `${capitalize(providerName)}Outlined`;
+    const iconComponentName = iconName ?? `${capitalize(providerName)}Outlined`; // CCCS change - because there's no "AzureOutlined" antd icon
     const IconComponent = (Icons as Record<string, React.ComponentType<any>>)[
       iconComponentName
     ];
@@ -189,7 +190,8 @@ export default function Login() {
                     href={buildProviderLoginUrl(provider.name)}
                     block
                     iconPosition="start"
-                    icon={getAuthIconElement(provider.name)}
+                    // icon={getAuthIconElement(provider.name)}
+                    icon={getAuthIconElement(provider.name, provider.icon)} // CCCS change
                   >
                     {t('Sign in with')} {capitalize(provider.name)}
                   </Button>
