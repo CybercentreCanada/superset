@@ -272,15 +272,16 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
     onComparatorChange,
     onDatePickerChange,
   } = useSimpleTabFilterProps(props);
-  const [comparator, setComparator] = useState(props.adhocFilter.comparator);
+  const { comparator } = props.adhocFilter;
   const comparatorInputRef = useRef<InputRef | null>(null);
   const [suggestions, setSuggestions] = useState<
     Record<'label' | 'value', any>[]
   >([]);
   const [loadingComparatorSuggestions, setLoadingComparatorSuggestions] =
     useState<boolean>(false);
-  const [hasFocusedComparator, setHasFocusedComparator] =
-    useState<boolean>(false);
+  const hasFocusedComparatorRef = useRef(false);
+  const comparatorSuggestionsAbortControllerRef =
+    useRef<AbortController | null>(null);
 
   const {
     advancedDataTypesState,
@@ -294,10 +295,52 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
       ? isOperatorRelevant(operator, subject) &&
         advancedDataTypesState.advancedDataTypeOperatorList.includes(operator)
       : isOperatorRelevant(operator, subject);
+  const validateAdvancedDataTypeValue = (
+    nextComparator: SelectValue,
+    nextOperatorId: Operators | undefined = props.adhocFilter.operatorId as
+      | Operators
+      | undefined,
+  ) => {
+    if (!isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)) {
+      return;
+    }
+
+    const requiresValue = !(
+      nextOperatorId && DISABLE_INPUT_OPERATORS.includes(nextOperatorId)
+    );
+
+    if (!requiresValue) {
+      props.validHandler(true);
+    }
+
+    const comparatorValue =
+      !requiresValue || nextComparator === undefined
+        ? ''
+        : typeof nextComparator === 'string'
+          ? nextComparator
+          : String(nextComparator);
+
+    fetchAdvancedDataTypeValueCallback(
+      comparatorValue,
+      advancedDataTypesState,
+      subjectAdvancedDataType,
+      requiresValue,
+    );
+  };
+
+  const handleOperatorChange = (nextOperatorId: Operators) => {
+    onOperatorChange(nextOperatorId);
+    validateAdvancedDataTypeValue(comparator as SelectValue, nextOperatorId);
+  };
+
+  const handleComparatorChange = (nextComparator: SelectValue) => {
+    onComparatorChange(nextComparator as string);
+    validateAdvancedDataTypeValue(nextComparator);
+  };
+
   const onInputComparatorChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    setComparator(value);
-    onComparatorChange(value);
+    handleComparatorChange(value);
   };
 
   const renderSubjectOptionLabel = (option: ColumnType) => (
@@ -328,8 +371,63 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
   };
 
   const handleSubjectChange = (subject: string) => {
-    setComparator(undefined);
+    setSuggestions([]);
     onSubjectChange(subject);
+  };
+
+  const datePicker = useDatePickerInAdhocFilter({
+    columnName:
+      typeof props.adhocFilter.subject === 'string'
+        ? props.adhocFilter.subject
+        : undefined,
+    timeRange:
+      props.adhocFilter.operator === Operators.TemporalRange
+        ? (props.adhocFilter.comparator as string | undefined)
+        : undefined,
+    datasource: props.datasource,
+    onChange: onDatePickerChange,
+  });
+
+  const refreshComparatorSuggestions = () => {
+    const { datasource } = props;
+    const col = props.adhocFilter.subject;
+    const having = props.adhocFilter.clause === Clauses.Having;
+
+    if (
+      datePicker ||
+      !col ||
+      !datasource ||
+      !datasource.filter_select ||
+      having
+    ) {
+      setSuggestions([]);
+      setLoadingComparatorSuggestions(false);
+      return;
+    }
+
+    comparatorSuggestionsAbortControllerRef.current?.abort();
+    const controller = new AbortController();
+    comparatorSuggestionsAbortControllerRef.current = controller;
+
+    setLoadingComparatorSuggestions(true);
+    SupersetClient.get({
+      signal: controller.signal,
+      endpoint: `/api/v1/datasource/${datasource.type}/${datasource.id}/column/${col}/values/`,
+    })
+      .then(({ json }) => {
+        setSuggestions(
+          json.result.map((suggestion: null | number | boolean | string) => ({
+            value: suggestion,
+            label: optionLabel(suggestion),
+          })),
+        );
+      })
+      .catch(() => {
+        setSuggestions([]);
+      })
+      .finally(() => {
+        setLoadingComparatorSuggestions(false);
+      });
   };
 
   let columns = props.options;
@@ -370,7 +468,7 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
       ).length,
     ),
     value: operatorId,
-    onChange: onOperatorChange,
+    onChange: handleOperatorChange,
     autoFocus: !!subjectSelectProps.value && !operator,
     ariaLabel: t('Select operator'),
   };
@@ -388,12 +486,17 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
         : ('single' as const),
     loading: loadingComparatorSuggestions,
     value: comparator as SelectValue,
-    onChange: onComparatorChange,
+    onChange: handleComparatorChange,
     notFoundContent: t('Type a value here'),
     disabled:
       operatorId !== undefined &&
       DISABLE_INPUT_OPERATORS.includes(operatorId as Operators),
     placeholder: createSuggestionsPlaceholder(),
+    onDropdownVisibleChange: (open: boolean) => {
+      if (open) {
+        refreshComparatorSuggestions();
+      }
+    },
   };
 
   const comparatorHasValue =
@@ -403,66 +506,6 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
       ? comparator.length > 0
       : String(comparator).length > 0);
   const labelText = comparatorHasValue ? createSuggestionsPlaceholder() : '';
-
-  const datePicker = useDatePickerInAdhocFilter({
-    columnName:
-      typeof props.adhocFilter.subject === 'string'
-        ? props.adhocFilter.subject
-        : undefined,
-    timeRange:
-      props.adhocFilter.operator === Operators.TemporalRange
-        ? (props.adhocFilter.comparator as string | undefined)
-        : undefined,
-    datasource: props.datasource,
-    onChange: onDatePickerChange,
-  });
-
-  useEffect(() => {
-    const refreshComparatorSuggestions = () => {
-      const { datasource } = props;
-      const col = props.adhocFilter.subject;
-      const having = props.adhocFilter.clause === Clauses.Having;
-
-      if (col && datasource && datasource.filter_select && !having) {
-        const controller = new AbortController();
-        const { signal } = controller;
-        if (loadingComparatorSuggestions) {
-          controller.abort();
-        }
-        setLoadingComparatorSuggestions(true);
-        SupersetClient.get({
-          signal,
-          endpoint: `/api/v1/datasource/${datasource.type}/${datasource.id}/column/${col}/values/`,
-        })
-          .then(({ json }) => {
-            setSuggestions(
-              json.result.map(
-                (suggestion: null | number | boolean | string) => ({
-                  value: suggestion,
-                  label: optionLabel(suggestion),
-                }),
-              ),
-            );
-            setLoadingComparatorSuggestions(false);
-          })
-          .catch(() => {
-            setSuggestions([]);
-            setLoadingComparatorSuggestions(false);
-          });
-      }
-    };
-
-    if (!datePicker) {
-      refreshComparatorSuggestions();
-    }
-    // loadingComparatorSuggestions intentionally omitted - set inside effect, would cause infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    props.adhocFilter.subject,
-    props.adhocFilter.clause,
-    props.datasource,
-    datePicker,
-  ]);
 
   useEffect(() => {
     if (isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)) {
@@ -480,43 +523,19 @@ const AdhocFilterEditPopoverSimpleTabContent: FC<Props> = props => {
   ]);
 
   useEffect(() => {
-    if (isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)) {
-      const comparatorValue =
-        comparator === undefined
-          ? ''
-          : typeof comparator === 'string'
-            ? comparator
-            : String(comparator);
-      fetchAdvancedDataTypeValueCallback(
-        comparatorValue,
-        advancedDataTypesState,
-        subjectAdvancedDataType,
-      );
-    }
-    // advancedDataTypesState intentionally omitted - set by the callback, would cause infinite API calls
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [comparator, subjectAdvancedDataType, fetchAdvancedDataTypeValueCallback]);
-
-  useEffect(() => {
-    if (isFeatureEnabled(FeatureFlag.EnableAdvancedDataTypes)) {
-      setComparator(props.adhocFilter.comparator);
-    }
-  }, [props.adhocFilter.comparator]);
-
-  useEffect(() => {
     if (
       shouldFocusComparator &&
-      !hasFocusedComparator &&
+      !hasFocusedComparatorRef.current &&
       comparatorInputRef.current
     ) {
       comparatorInputRef.current.focus();
-      setHasFocusedComparator(true);
+      hasFocusedComparatorRef.current = true;
     }
 
     if (!shouldFocusComparator) {
-      setHasFocusedComparator(false);
+      hasFocusedComparatorRef.current = false;
     }
-  }, [shouldFocusComparator, hasFocusedComparator]);
+  });
 
   const theme = useTheme();
 

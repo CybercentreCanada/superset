@@ -34,7 +34,12 @@ import {
   OPERATOR_ENUM_TO_OPERATOR_TYPE,
 } from 'src/explore/constants';
 import AdhocMetric from 'src/explore/components/controls/MetricControl/AdhocMetric';
-import { FeatureFlag, isFeatureEnabled } from '@superset-ui/core';
+import {
+  FeatureFlag,
+  isFeatureEnabled,
+  SupersetClient,
+  type JsonResponse,
+} from '@superset-ui/core';
 import fetchMock from 'fetch-mock';
 
 import { TestDataset, Dataset } from '@superset-ui/chart-controls';
@@ -146,9 +151,9 @@ jest.mock('@superset-ui/core', () => ({
 const mockedIsFeatureEnabled = isFeatureEnabled as jest.Mock;
 
 const ADVANCED_DATA_TYPE_ENDPOINT_VALID =
-  'glob:*/api/v1/advanced_data_type/convert?q=(type:type,values:!(v))';
+  'glob:*/api/v1/advanced_data_type/convert?q=(operator:%27%27,type:type,values:!(v))';
 const ADVANCED_DATA_TYPE_ENDPOINT_INVALID =
-  'glob:*/api/v1/advanced_data_type/convert?q=(type:type,values:!(e))';
+  'glob:*/api/v1/advanced_data_type/convert?q=(operator:%27%27,type:type,values:!(e))';
 
 fetchMock.get(ADVANCED_DATA_TYPE_ENDPOINT_VALID, {
   result: {
@@ -664,6 +669,123 @@ test('advanced data type operator list should update after API response', async 
       selector: '.ant-select-selection-item',
     }),
   ).toBeInTheDocument();
+});
+
+test.each([Operators.IsNull, Operators.IsNotNull])(
+  'loads advanced type operators when editing %s without validating a value',
+  async operatorId => {
+    const get = jest.spyOn(SupersetClient, 'get').mockResolvedValue({
+      response: new Response(),
+      json: {
+        result: {
+          display_value: '',
+          error_message: 'Value must not be empty',
+          valid_filter_operators: [Operators.Equals, Operators.In],
+          values: [],
+        },
+      },
+    });
+    const props = getAdvancedDataTypeTestProps({
+      adhocFilter: new AdhocFilter({
+        subject: 'advancedDataType',
+        operatorId,
+        operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[operatorId].operation,
+        clause: Clauses.Where,
+      }),
+      options: [
+        {
+          type: 'DOUBLE',
+          column_name: 'advancedDataType',
+          id: 5,
+          advanced_data_type: 'type',
+        },
+      ],
+    });
+
+    render(
+      <AdhocFilterEditPopoverSimpleTabContent
+        {...(props as unknown as Props)}
+      />,
+      { store },
+    );
+
+    await waitFor(() => expect(get).toHaveBeenCalled());
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'Select operator' }),
+    );
+    expect(await screen.findByText('Equal to (=)')).toBeInTheDocument();
+    expect(props.validHandler).not.toHaveBeenCalledWith(false);
+    expect(
+      screen.queryByText('Value must not be empty'),
+    ).not.toBeInTheDocument();
+    get.mockRestore();
+  },
+);
+
+test('ignores a stale value validation after switching to a nullary operator', async () => {
+  const pending: ((response: JsonResponse) => void)[] = [];
+  const get = jest
+    .spyOn(SupersetClient, 'get')
+    .mockImplementationOnce(() => new Promise(resolve => pending.push(resolve)))
+    .mockResolvedValue({
+      response: new Response(),
+      json: {
+        result: {
+          display_value: '',
+          error_message: 'Value must not be empty',
+          valid_filter_operators: [Operators.Equals],
+          values: [],
+        },
+      },
+    });
+  const props = getAdvancedDataTypeTestProps({
+    adhocFilter: new AdhocFilter({
+      subject: 'advancedDataType',
+      operatorId: Operators.Equals,
+      operator: '==',
+      comparator: 'invalid',
+      clause: Clauses.Where,
+    }),
+    options: [
+      {
+        type: 'DOUBLE',
+        column_name: 'advancedDataType',
+        id: 5,
+        advanced_data_type: 'type',
+      },
+    ],
+  });
+  const { rerender } = render(
+    <AdhocFilterEditPopoverSimpleTabContent {...(props as unknown as Props)} />,
+    { store },
+  );
+  await waitFor(() => expect(pending).toHaveLength(1));
+
+  rerender(
+    <AdhocFilterEditPopoverSimpleTabContent
+      {...(props as unknown as Props)}
+      adhocFilter={props.adhocFilter.duplicateWith({
+        operatorId: Operators.IsNull,
+        operator: 'IS NULL',
+      })}
+    />,
+  );
+  await waitFor(() => expect(get).toHaveBeenCalledTimes(2));
+  await act(async () => {
+    pending[0]({
+      response: new Response(),
+      json: {
+        result: {
+          display_value: '',
+          error_message: 'Invalid value',
+          valid_filter_operators: [],
+          values: [],
+        },
+      },
+    });
+  });
+  expect(props.validHandler).not.toHaveBeenCalledWith(false);
+  get.mockRestore();
 });
 
 test('dropdown should remain open when clicked after filter is configured', async () => {
