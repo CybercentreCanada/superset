@@ -1,40 +1,46 @@
 /* eslint-disable theme-colors/no-literal-colors */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { Alert } from '@apache-superset/core/components';
 import { SupersetClient } from '@superset-ui/core';
-import { Card, Space } from '@superset-ui/core/components';
-import { useTheme } from '@apache-superset/core/theme';
 import { EmailRendererProps } from './types';
 import { QUERY_TIMEOUT_LIMIT } from '../../plugin-chart-cccs-grid-table/src/consts';
 
 const RETRY_ATTEMPTS = 5;
 
 export default function PluginChartEmailRenderer(props: EmailRendererProps) {
-  const { url_parameter_value, parameter_prefix, errorMessage } = props;
-
-  const theme = useTheme();
+  const {
+    url_parameter_value: urlParameterValue,
+    parameter_prefix: parameterPrefix,
+    errorMessage,
+  } = props;
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
 
   const apiUrl = useMemo(
     () =>
       `/api/v1/clue/preview-eml/${
-        parameter_prefix ? encodeURIComponent(parameter_prefix) : ''
-      }${encodeURIComponent(url_parameter_value)}`,
-    [parameter_prefix, url_parameter_value],
+        parameterPrefix ? encodeURIComponent(parameterPrefix) : ''
+      }${encodeURIComponent(urlParameterValue)}`,
+    [parameterPrefix, urlParameterValue],
   );
 
-  useEffect(() => {
-    const fetchImage = async () => {
+  useCallback(async () => {
+    if (parameterPrefix) {
       let attempts = 0;
 
       while (attempts < RETRY_ATTEMPTS) {
+        setLoading(true);
         try {
           // eslint-disable-next-line no-await-in-loop
           const { json } = await SupersetClient.get({
             endpoint: apiUrl,
             timeout: QUERY_TIMEOUT_LIMIT,
+            // fetchRetryOptions: {
+            //   retries: RETRY_ATTEMPTS,
+            //   retryDelay: 3000,
+            // },
           });
 
           if (!json?.result.image) {
@@ -59,64 +65,28 @@ export default function PluginChartEmailRenderer(props: EmailRendererProps) {
           'An unexpected error has occurred.  The image cannot be fetched at this time.',
         );
       }
-    };
-    fetchImage();
+    }
   }, [apiUrl]);
 
   if (loading) {
     return (
-      <Card
-        style={{
-          padding: theme.paddingSM,
-          backgroundColor: theme.colorBgElevated,
-          borderColor: theme.colorBorderBg,
-        }}
-      >
-        <p
-          style={{
-            fontSize: theme.fontSizeLG,
-            color: theme.colorTextLightSolid,
-          }}
-        >
-          Loading...
-        </p>
-      </Card>
+      <Alert
+        type="info"
+        message="Loading..."
+        closable={false}
+        showIcon={false}
+      />
     );
   }
 
-  if (errorMessage) {
+  // Display fetching error if set, or validation message from transform props
+  if (imageError || errorMessage) {
     return (
-      <Card
-        style={{
-          padding: theme.paddingSM,
-          backgroundColor: theme.colorInfoBg,
-          borderColor: theme.colorInfoBorder,
-        }}
-      >
-        <p>
-          <strong>Info:</strong> {errorMessage}
-        </p>
-      </Card>
-    );
-  }
-
-  if (imageError) {
-    return (
-      <Card
-        style={{
-          padding: theme.paddingSM,
-          backgroundColor: theme.colorErrorBg,
-          borderColor: theme.colorErrorBorder,
-        }}
-      >
-        <Space align="center" direction="vertical" style={{ display: 'flex' }}>
-          <span
-            style={{ fontSize: theme.fontSizeLG, color: theme.colorErrorText }}
-          >
-            <strong>Error:</strong> {imageError}
-          </span>
-        </Space>
-      </Card>
+      <Alert
+        type="error"
+        message={imageError ?? errorMessage}
+        closable={false}
+      />
     );
   }
 
