@@ -19,6 +19,7 @@
 import * as redux from 'react-redux';
 import {
   act,
+  fireEvent,
   render,
   screen,
   userEvent,
@@ -43,10 +44,7 @@ import {
 import fetchMock from 'fetch-mock';
 
 import { TestDataset, Dataset } from '@superset-ui/chart-controls';
-import AdhocFilterEditPopoverSimpleTabContent, {
-  useSimpleTabFilterProps,
-  Props,
-} from '.';
+import AdhocFilterEditPopoverSimpleTabContent, { Props } from '.';
 import { Clauses, ExpressionTypes } from '../types';
 
 const simpleAdhocFilter = new AdhocFilter({
@@ -81,13 +79,6 @@ const sumValueAdhocMetric = new AdhocMetric({
   column: { type: 'VARCHAR(255)', column_name: 'source', id: 5 },
   aggregate: AGGREGATES.SUM,
   label: 'test-AdhocMetric',
-});
-
-const simpleCustomFilter = new AdhocFilter({
-  expressionType: ExpressionTypes.Simple,
-  subject: 'ds',
-  operator: 'LATEST PARTITION',
-  operatorId: Operators.LatestPartition,
 });
 
 const options = [
@@ -195,117 +186,69 @@ test('can render the simple tab form', () => {
   expect(() => setup()).not.toThrow();
 });
 
-test('shows boolean only operators when subject is boolean', () => {
-  const props = setup({
-    adhocFilter: new AdhocFilter({
-      expressionType: ExpressionTypes.Simple,
-      subject: 'value',
-      operatorId: undefined,
-      operator: undefined,
-      comparator: undefined,
-      clause: undefined,
-    }),
-    datasource: {
-      columns: [
-        {
-          id: 3,
-          column_name: 'value',
-          type: 'BOOL',
-        },
-      ],
-    },
-  });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
+const openOperatorMenu = async () => {
+  await userEvent.click(
+    screen.getByRole('combobox', { name: 'Select operator' }),
   );
-  [
-    Operators.IsTrue,
-    Operators.IsFalse,
-    Operators.IsNull,
-    Operators.IsFalse,
-  ].map(operator => expect(isOperatorRelevant(operator, 'value')).toBe(true));
-});
+};
 
-test('shows boolean only operators when subject is number', () => {
-  const props = setup({
-    adhocFilter: new AdhocFilter({
-      expressionType: ExpressionTypes.Simple,
-      subject: 'value',
-      operatorId: undefined,
-      operator: undefined,
-      comparator: undefined,
-      clause: undefined,
-    }),
-    datasource: {
-      columns: [
-        {
-          id: 3,
-          column_name: 'value',
-          type: 'INT',
-        },
-      ],
-    },
-  });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  [
-    Operators.IsTrue,
-    Operators.IsFalse,
-    Operators.IsNull,
-    Operators.IsNotNull,
-  ].map(operator => expect(isOperatorRelevant(operator, 'value')).toBe(true));
-});
+const selectOperator = async (label: string) => {
+  await openOperatorMenu();
+  await userEvent.click(await screen.findByText(label));
+};
 
-test('will convert from individual comparator to array if the operator changes to multi', () => {
+test.each(['BOOL', 'INT'])(
+  'shows boolean and null operators for %s columns',
+  async type => {
+    setup({
+      adhocFilter: new AdhocFilter({
+        expressionType: ExpressionTypes.Simple,
+        subject: 'value',
+        clause: Clauses.Where,
+      }),
+      datasource: {
+        columns: [{ id: 3, column_name: 'value', type }],
+      },
+    });
+    await openOperatorMenu();
+    expect(screen.getByText('Is true')).toBeInTheDocument();
+    expect(screen.getByText('Is false')).toBeInTheDocument();
+    expect(screen.getByText('Is null')).toBeInTheDocument();
+    expect(screen.getByText('Is not null')).toBeInTheDocument();
+  },
+);
+
+test('converts an individual comparator to an array for a multi operator', async () => {
   const props = setup();
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
+  await selectOperator('In');
+  expect(props.onChange).toHaveBeenLastCalledWith(
+    expect.objectContaining({ operatorId: Operators.In, comparator: ['10'] }),
   );
-  onOperatorChange(Operators.In);
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .comparator,
-  ).toEqual(['10']);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .operatorId,
-  ).toEqual(Operators.In);
 });
 
-test('will preserve boolean false comparator when converting to multi operator', () => {
-  const booleanFalseFilter = new AdhocFilter({
-    expressionType: ExpressionTypes.Simple,
-    subject: 'value',
-    operatorId: Operators.Equals,
-    operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[Operators.Equals].operation,
-    comparator: false,
-    clause: Clauses.Where,
+test('preserves a false comparator when converting to a multi operator', async () => {
+  const props = setup({
+    adhocFilter: new AdhocFilter({
+      expressionType: ExpressionTypes.Simple,
+      subject: 'value',
+      operatorId: Operators.Equals,
+      operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[Operators.Equals].operation,
+      comparator: false,
+      clause: Clauses.Where,
+    }),
   });
-  const props = setup({ adhocFilter: booleanFalseFilter });
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
+  await selectOperator('In');
+  expect(props.onChange).toHaveBeenLastCalledWith(
+    expect.objectContaining({ operatorId: Operators.In, comparator: [false] }),
   );
-  onOperatorChange(Operators.In);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .comparator,
-  ).toEqual([false]);
 });
 
-test('will convert from array to individual comparators if the operator changes from multi', () => {
+test('converts a multi comparator to an individual value', async () => {
   const props = setup({
     adhocFilter: simpleMultiAdhocFilter,
   });
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  onOperatorChange(Operators.LessThan);
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0],
-  ).toEqual(
+  await selectOperator('Less than (<)');
+  expect(props.onChange).toHaveBeenLastCalledWith(
     simpleMultiAdhocFilter.duplicateWith({
       operatorId: Operators.LessThan,
       operator: '<',
@@ -314,44 +257,39 @@ test('will convert from array to individual comparators if the operator changes 
   );
 });
 
-test('passes the new adhocFilter to onChange after onComparatorChange', () => {
+test('passes the new comparator to onChange', () => {
   const props = setup();
-  const { onComparatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
+  fireEvent.change(screen.getByTestId('adhoc-filter-simple-value'), {
+    target: { value: '20' },
+  });
+  expect(props.onChange).toHaveBeenLastCalledWith(
+    simpleAdhocFilter.duplicateWith({ comparator: '20' }),
   );
-  onComparatorChange('20');
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0],
-  ).toEqual(simpleAdhocFilter.duplicateWith({ comparator: '20' }));
 });
 
-test('will filter operators for table datasources', () => {
-  const props = setup({ datasource: { type: 'table' as const } });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  expect(isOperatorRelevant(Operators.Like, 'value')).toBe(true);
+test('shows LIKE for table datasources', async () => {
+  setup({ datasource: { type: 'table' as const } });
+  await openOperatorMenu();
+  expect(screen.getByText('Like')).toBeInTheDocument();
 });
 
-test('will show LATEST PARTITION operator', () => {
-  const props = setup({
+test('shows LATEST PARTITION only for the partition column', async () => {
+  setup({
     datasource: {
       type: 'table' as const,
       datasource_name: 'table1',
       schema: 'schema',
     },
-    adhocFilter: simpleCustomFilter,
+    adhocFilter: simpleAdhocFilter,
     partitionColumn: 'ds',
   });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  expect(isOperatorRelevant(Operators.LatestPartition, 'ds')).toBe(true);
-  expect(isOperatorRelevant(Operators.LatestPartition, 'value')).toBe(false);
+  await openOperatorMenu();
+  expect(
+    screen.queryByText('use latest_partition template'),
+  ).not.toBeInTheDocument();
 });
 
-test('will generate custom sqlExpression for LATEST PARTITION operator', () => {
+test('generates custom SQL when selecting LATEST PARTITION', async () => {
   const testAdhocFilter = new AdhocFilter({
     expressionType: ExpressionTypes.Simple,
     subject: 'ds',
@@ -365,14 +303,8 @@ test('will generate custom sqlExpression for LATEST PARTITION operator', () => {
     adhocFilter: testAdhocFilter,
     partitionColumn: 'ds',
   });
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  onOperatorChange(Operators.LatestPartition);
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0],
-  ).toEqual(
+  await selectOperator('use latest_partition template');
+  expect(props.onChange).toHaveBeenLastCalledWith(
     testAdhocFilter.duplicateWith({
       subject: 'ds',
       operator: 'LATEST PARTITION',
@@ -385,8 +317,8 @@ test('will generate custom sqlExpression for LATEST PARTITION operator', () => {
   );
 });
 
-test('will not display boolean operators when column type is string', () => {
-  const props = setup({
+test('does not display boolean operators for a string column', async () => {
+  setup({
     datasource: {
       type: 'table' as const,
       datasource_name: 'table1',
@@ -395,17 +327,13 @@ test('will not display boolean operators when column type is string', () => {
     },
     adhocFilter: simpleAdhocFilter,
   });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  const booleanOnlyOperators = [Operators.IsTrue, Operators.IsFalse];
-  booleanOnlyOperators.forEach(operator => {
-    expect(isOperatorRelevant(operator, 'value')).toBe(false);
-  });
+  await openOperatorMenu();
+  expect(screen.queryByText('Is true')).not.toBeInTheDocument();
+  expect(screen.queryByText('Is false')).not.toBeInTheDocument();
 });
 
-test('will display boolean operators when column is an expression', () => {
-  const props = setup({
+test('displays boolean operators when the column is an expression', async () => {
+  setup({
     datasource: {
       type: 'table' as const,
       datasource_name: 'table1',
@@ -419,76 +347,28 @@ test('will display boolean operators when column is an expression', () => {
     },
     adhocFilter: simpleAdhocFilter,
   });
-  const { isOperatorRelevant } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  const booleanOnlyOperators = [Operators.IsTrue, Operators.IsFalse];
-  booleanOnlyOperators.forEach(operator => {
-    expect(isOperatorRelevant(operator, 'value')).toBe(true);
+  await openOperatorMenu();
+  expect(screen.getByText('Is true')).toBeInTheDocument();
+  expect(screen.getByText('Is false')).toBeInTheDocument();
+});
+
+test.each([
+  [Operators.IsTrue, 'Is true'],
+  [Operators.IsFalse, 'Is false'],
+  [Operators.IsNull, 'Is null'],
+  [Operators.IsNotNull, 'Is not null'],
+])('clears the comparator for %s', async (operatorId, label) => {
+  const props = setup({
+    datasource: { columns: [{ column_name: 'value', type: 'INT' }] },
   });
-});
-
-test('sets comparator to undefined when operator is IS_TRUE', () => {
-  const props = setup();
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
+  await selectOperator(label);
+  expect(props.onChange).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      operatorId,
+      operator: OPERATOR_ENUM_TO_OPERATOR_TYPE[operatorId].operation,
+      comparator: undefined,
+    }),
   );
-  onOperatorChange(Operators.IsTrue);
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .operatorId,
-  ).toBe(Operators.IsTrue);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0].operator,
-  ).toBe('IS TRUE');
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .comparator,
-  ).toBe(undefined);
-});
-
-test('sets comparator to undefined when operator is IS_FALSE', () => {
-  const props = setup();
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  onOperatorChange(Operators.IsFalse);
-  expect(props.onChange.mock.calls.length === 1).toBe(true);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .operatorId,
-  ).toBe(Operators.IsFalse);
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0].operator,
-  ).toBe('IS FALSE');
-  expect(
-    props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-      .comparator,
-  ).toBe(undefined);
-});
-
-test('sets comparator to undefined when operator is IS_NULL or IS_NOT_NULL', () => {
-  const props = setup();
-  const { onOperatorChange } = useSimpleTabFilterProps(
-    props as unknown as Props,
-  );
-  [Operators.IsNull, Operators.IsNotNull].forEach(op => {
-    onOperatorChange(op);
-    expect(props.onChange.mock.calls.length > 0).toBe(true);
-    expect(
-      props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-        .operatorId,
-    ).toBe(op);
-    expect(
-      props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-        .operator,
-    ).toBe(OPERATOR_ENUM_TO_OPERATOR_TYPE[op].operation);
-    expect(
-      props.onChange.mock.calls[props.onChange.mock.calls.length - 1][0]
-        .comparator,
-    ).toBe(undefined);
-  });
 });
 
 test('should not call API when column has no advanced data type', async () => {
