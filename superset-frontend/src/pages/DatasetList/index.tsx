@@ -369,23 +369,20 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
             original: { extra },
           },
         }: any) => {
-          try {
+          if (bootstrapData.common.datahub_url) {
             const parsedExtra = JSON.parse(extra);
-            if (parsedExtra?.urn && bootstrapData.common.datahub_url) {
+            if (parsedExtra) {
               return (
                 <Button
-                  type="link"
+                  buttonStyle="secondary"
+                  shape="circle"
                   href={`${bootstrapData.common.datahub_url}dataset/${parsedExtra?.urn}`}
                   target="_blank"
                   rel="noreferrer"
-                  icon={<Icons.Datahub viewBox="0 0 180 180" />}
-                  style={{ color: 'initial' }}
+                  icon={<Icons.Datahub viewBox="0 0 108 108" />}
                 />
               );
             }
-          } catch {
-            // This is probably because the datahub icon does not exist
-            return null;
           }
           return null;
         },
