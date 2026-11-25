@@ -179,6 +179,8 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
 
       const nextFilterState = {
         ...filterState,
+        validateMessage: undefined,
+        validateStatus: undefined,
         label: adhocFilters?.length
           ? (adhocFilters || [])
               .map(f =>
@@ -217,15 +219,27 @@ export default function PluginFilterAdhoc(props: PluginFilterAdhocProps) {
   );
 
   const formItemExtra = useMemo(() => {
-    if (filterState.validateMessage) {
+    const message =
+      filterState.validateMessage ||
+      (filterState.validateStatus === 'error' &&
+      enableEmptyFilter &&
+      !filterState.filters?.length
+        ? t('Value is required')
+        : undefined);
+    if (message && filterState.validateStatus) {
       return (
         <StatusMessage status={filterState.validateStatus}>
-          {filterState.validateMessage}
+          {message}
         </StatusMessage>
       );
     }
     return undefined;
-  }, [filterState.validateMessage, filterState.validateStatus]);
+  }, [
+    enableEmptyFilter,
+    filterState.filters,
+    filterState.validateMessage,
+    filterState.validateStatus,
+  ]);
 
   return (
     <FilterPluginStyle height={height} width={width}>

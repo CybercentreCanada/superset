@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { ensureIsArray, SupersetClient } from '@superset-ui/core';
 import { debounce } from 'lodash';
@@ -36,19 +36,31 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
   const [subjectAdvancedDataType, setSubjectAdvancedDataType] = useState<
     string | undefined
   >();
+  const requestIdRef = useRef(0);
+
+  useEffect(
+    () => () => {
+      requestIdRef.current += 1;
+    },
+    [],
+  );
 
   const fetchAdvancedDataTypeValueCallback = useCallback(
     (
       comp: string | string[],
       advancedDataTypesState: AdvancedDataTypesState,
       subjectAdvancedDataType?: string,
+      requiresValue = true,
     ) => {
+      requestIdRef.current += 1;
+      const requestId = requestIdRef.current;
       const values = ensureIsArray(comp);
       if (!subjectAdvancedDataType) {
         setAdvancedDataTypesState(INITIAL_ADVANCED_DATA_TYPES_STATE);
         return;
       }
       debounce(() => {
+        if (requestId !== requestIdRef.current) return;
         const queryParams = rison.encode({
           type: subjectAdvancedDataType,
           values,
@@ -57,16 +69,18 @@ const useAdvancedDataTypes = (validHandler: (isValid: boolean) => void) => {
         const endpoint = `/api/v1/advanced_data_type/convert?q=${queryParams}`;
         SupersetClient.get({ endpoint })
           .then(({ json }) => {
+            if (requestId !== requestIdRef.current) return;
             setAdvancedDataTypesState({
               parsedAdvancedDataType: json.result.display_value,
               advancedDataTypeOperatorList: json.result.valid_filter_operators,
-              errorMessage: json.result.error_message,
+              errorMessage: requiresValue ? json.result.error_message : '',
               values: json.result.values,
             });
             // Changed due to removal of status field
-            validHandler(!json.result.error_message);
+            validHandler(!requiresValue || !json.result.error_message);
           })
           .catch(() => {
+            if (requestId !== requestIdRef.current) return;
             setAdvancedDataTypesState({
               parsedAdvancedDataType: '',
               advancedDataTypeOperatorList:
