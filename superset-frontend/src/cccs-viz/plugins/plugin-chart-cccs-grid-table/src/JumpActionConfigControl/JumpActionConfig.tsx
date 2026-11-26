@@ -5,6 +5,7 @@ import { Button } from '@superset-ui/core/components';
 import { SupersetClient, validateNonEmpty } from '@superset-ui/core';
 import { t } from '@apache-superset/core/translation';
 import { withTheme } from '@apache-superset/core/theme';
+import rison from 'rison';
 
 const bootstrapData = getBootstrapData();
 
@@ -53,7 +54,9 @@ const DrillActionConfig: React.FC<Props> = (props: Props) => {
   }, [dashboardID, filters, advancedDataType, visiblePopoverIndex]);
 
   useEffect(() => {
-    const endpoint = '/api/v1/jump_to_action/';
+    const endpoint = `/api/v1/jump_to_action/?q=${rison.encode({
+      page_size: 1000,
+    })}`;
     SupersetClient.get({ endpoint })
       .then(({ json }) => {
         setDashboards(json.result || []);
