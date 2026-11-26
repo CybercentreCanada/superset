@@ -96,76 +96,84 @@ const calcMetricColumnDefs = (
 };
 
 const calcColumnColumnDefs = (
-  columns: QueryFormColumn[],
+  columns: [QueryFormColumn, GenericDataType | undefined][],
   defaultGroupBy: string[],
   datasetColumns: Column[],
   orderByCols: any,
 ): ColDef[] => {
-  const columnDefs = columns.map((column: QueryFormColumn): ColDef => {
-    const columnName = isAdhocColumn(column) ? column.label : column;
-    const datasetColumn = datasetColumns.find(
-      col => col.column_name === columnName,
-    );
+  const columnDefs = columns.map(
+    ([column, coltype]: [
+      QueryFormColumn,
+      GenericDataType | undefined,
+    ]): ColDef => {
+      const columnName = isAdhocColumn(column) ? column.label : column;
+      const datasetColumn = datasetColumns.find(
+        col => col.column_name === columnName,
+      );
 
-    const columnType = datasetColumn?.type || '';
-    const isDate = !!datasetColumn?.is_dttm;
-    const columnTypeGeneric = datasetColumn?.type_generic || -1;
-    const advancedDataType = datasetColumn?.advanced_data_type || '';
-    const columnHeader = datasetColumn?.verbose_name ?? columnName;
-    const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
-    const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
-    const sort =
-      sortIndex > -1
-        ? orderByColsArray[sortIndex][1]
-          ? 'asc'
-          : 'desc'
+      const columnType = datasetColumn?.type || '';
+      const isDate = !!datasetColumn?.is_dttm;
+      const columnTypeGeneric = coltype ?? datasetColumn?.type_generic ?? -1;
+      const advancedDataType = datasetColumn?.advanced_data_type || '';
+      const columnHeader = datasetColumn?.verbose_name ?? columnName;
+      const orderByColsArray = orderByCols.map((c: string) => JSON.parse(c));
+      const sortIndex = orderByColsArray.map((c: any) => c[0]).indexOf(column);
+      const sort =
+        sortIndex > -1
+          ? orderByColsArray[sortIndex][1]
+            ? 'asc'
+            : 'desc'
+          : undefined;
+      const cellRenderer =
+        isDate || columnTypeGeneric === GenericDataType.Temporal
+          ? rendererMap.get('DATE')
+          : (rendererMap.get(advancedDataType.toUpperCase()) ??
+            rendererMap.get(columnType));
+      const valueFormatter =
+        advancedDataType.toUpperCase() in formatterMap
+          ? formatterMap.get(advancedDataType.toUpperCase())
+          : formatterMap.get(columnType);
+      const useValueFormatterForExport = !!valueFormatter;
+      const getQuickFilterText = valueFormatter
+        ? (params: any) =>
+            params.value
+              ? params.colDef.valueFormatter(params.value)
+              : undefined
         : undefined;
-    const cellRenderer =
-      isDate || columnTypeGeneric === GenericDataType.Temporal
-        ? rendererMap.get('DATE')
-        : (rendererMap.get(advancedDataType.toUpperCase()) ??
-          rendererMap.get(columnType));
-    const valueFormatter =
-      advancedDataType.toUpperCase() in formatterMap
-        ? formatterMap.get(advancedDataType.toUpperCase())
-        : formatterMap.get(columnType);
-    const useValueFormatterForExport = !!valueFormatter;
-    const getQuickFilterText = valueFormatter
-      ? (params: any) =>
-          params.value ? params.colDef.valueFormatter(params.value) : undefined
-      : undefined;
-    const columnDescription = datasetColumn?.description || '';
-    const autoHeight = ['JSON', 'JSONB'].includes(columnType);
-    const rowGroupIndex = defaultGroupBy.findIndex(
-      (element: any) => element === column,
-    );
-    const rowGroup = rowGroupIndex >= 0;
-    const hide = rowGroup;
-    const maxWidth = 800;
+      const columnDescription = datasetColumn?.description || '';
+      const autoHeight = ['JSON', 'JSONB'].includes(columnType);
+      const rowGroupIndex = defaultGroupBy.findIndex(
+        (element: any) => element === column,
+      );
+      const rowGroup = rowGroupIndex >= 0;
+      const hide = rowGroup;
+      const maxWidth = 800;
 
-    return {
-      field: columnName,
-      headerName: columnHeader,
-      rowGroup,
-      hide,
-      cellRenderer,
-      rowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
-      initialRowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
-      headerTooltip: columnDescription,
-      autoHeight,
-      maxWidth,
-      valueFormatter,
-      useValueFormatterForExport,
-      getQuickFilterText,
-      sort,
-      sortIndex: sortIndex > -1 ? sortIndex : undefined,
-      type: columnType,
-      context: {
-        isDateColumn: isDate || columnTypeGeneric === GenericDataType.Temporal,
-        advancedDataType,
-      },
-    };
-  });
+      return {
+        field: columnName,
+        headerName: columnHeader,
+        rowGroup,
+        hide,
+        cellRenderer,
+        rowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
+        initialRowGroupIndex: rowGroupIndex === -1 ? undefined : rowGroupIndex,
+        headerTooltip: columnDescription,
+        autoHeight,
+        maxWidth,
+        valueFormatter,
+        useValueFormatterForExport,
+        getQuickFilterText,
+        sort,
+        sortIndex: sortIndex > -1 ? sortIndex : undefined,
+        type: columnType,
+        context: {
+          isDateColumn:
+            isDate || columnTypeGeneric === GenericDataType.Temporal,
+          advancedDataType,
+        },
+      };
+    },
+  );
 
   return columnDefs;
 };
@@ -201,13 +209,15 @@ const transformProps = (
     formData.queryMode === 'raw'
       ? formData.columns || []
       : formData.groupby || [];
+  const columnsWithTypes: [QueryFormColumn, GenericDataType | undefined][] =
+    columns.map((column, idx) => [column, queriesData[0].coltypes[idx]]);
 
   const { metrics, percentMetrics } = formData;
 
   const defaultGroupBy = formData.defaultGroupBy ?? [];
 
   let columnDefs = calcColumnColumnDefs(
-    columns,
+    columnsWithTypes,
     defaultGroupBy,
     datasource?.columns as Column[],
     orderByCols,
