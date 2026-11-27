@@ -21,22 +21,23 @@ from typing import Any
 from flask import current_app as app, request, Response
 from flask.wrappers import Response
 from flask_appbuilder.api import BaseApi, expose, permission_name, protect, safe
-from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from marshmallow import ValidationError
-
 
 from superset.advanced_data_type.schemas import (
     AdvancedDataTypeSchema,
 )
 from superset.alfred.schemas import RetainToAlfredSchema
-from superset.constants import RouteMethod
-from superset.extensions import event_logger, security_manager
 from superset.alfred.utils import retain_eml_to_alfred
+from superset.constants import RouteMethod
+from superset.daos.datasource import DatasourceDAO
+from superset.extensions import event_logger, security_manager
+from superset.views.error_handling import handle_api_exception
 
 logger = logging.getLogger(__name__)
 
 config = app.config
+
 
 class AlfredRestApi(BaseApi):
     """
@@ -50,9 +51,8 @@ class AlfredRestApi(BaseApi):
 
     openapi_spec_tag = "Alfred"
     openapi_spec_component_schemas = (AdvancedDataTypeSchema,)
-    
-    add_model_schema = RetainToAlfredSchema()
 
+    add_model_schema = RetainToAlfredSchema()
 
     @protect()
     @safe
@@ -62,13 +62,14 @@ class AlfredRestApi(BaseApi):
         action=lambda self, *args, **kwargs: f"{self.__class__.__name__}.post",
         log_to_statsd=False,
     )
+    @handle_api_exception
     def post(self, **kwargs: Any) -> Response:
         """
-        Fetch the email metadata associated with the email IDs sent in the 
+        Fetch the email metadata associated with the email IDs sent in the
         request and send the data to alfred to create a staged retention
 
         Returns:
-            Response: 
+            Response:
                 200 Success, { result: "<alfred-url-for-staged-retention>"}
         """
         try:
@@ -79,30 +80,27 @@ class AlfredRestApi(BaseApi):
 
         if not request_payload:
             logger.error("no JSON payload in request")
-            return self.response_400('No JSON payload in request')
-        if 'email_ids' not in request_payload:
-            return self.response_400('No field named "email_ids" found in the JSON body of the request')
+            return self.response_400("No JSON payload in request")
+        if "email_ids" not in request_payload:
+            return self.response_400(
+                'No field named "email_ids" found in the JSON body of the request'
+            )
 
-        logger.info("Payload is %s", request_payload)
-        email_ids = request_payload['email_ids']
+        email_ids = request_payload["email_ids"]
         dates = None
-        if 'dates' in request_payload:
-            dates = request_payload['dates']
+        if "dates" in request_payload:
+            dates = request_payload["dates"]
 
-        alfred_url = os.environ.get("ALFRED_URL")
-        if not alfred_url:
-            logger.error("ALFRED_URL environment variable not set")
-            return self.response_400('ALFRED_URL environment variable not set')
+        datasource_id, datasource_type = request_payload["datasource"].rsplit("__", 1)
+        datasource = DatasourceDAO.get_datasource(datasource_type, datasource_id)
+        security_manager.raise_for_access(datasource=datasource)
+        database = datasource.database
+        if database.backend != "trino":
+            return self.response_400(message="The chart datasource must use Trino")
+
         user = current_user
         alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(
-            user.username,
-            os.environ.get("ALFRED_SCOPE"),
-            "azure"
+            user.username, os.environ.get("ALFRED_SCOPE")
         )
-        trino_token = security_manager.get_on_behalf_of_access_token_with_cache(
-            user.username,
-            os.environ.get("TRINO_SCOPE"),
-            "azure"
-        )
-        status, result = retain_eml_to_alfred(email_ids, alfred_url, alfred_token, trino_token, dates)
+        status, result = retain_eml_to_alfred(database, email_ids, alfred_token, dates)
         return self.response(status, result=result)

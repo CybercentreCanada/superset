@@ -52,8 +52,7 @@ class ClueRestApi(BaseSupersetApi):
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            config["CLUE_SCOPE"],
-            "azure"
+            config["CLUE_SCOPE"]
         )
         url = f'{config["CLUE_URL"]}api/v1/fetchers/email-preview/preview'
         headers = {
@@ -97,8 +96,7 @@ class ClueRestApi(BaseSupersetApi):
         user = current_user
         token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            config["CLUE_SCOPE"],
-            "azure"
+            config["CLUE_SCOPE"]
         )
         url =  f'{config["CLUE_URL"]}api/v1/fetchers/email-preview/download'
         headers = {
