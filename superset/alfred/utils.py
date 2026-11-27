@@ -129,7 +129,8 @@ def sanitize_results(data, warnings=None, safe_js_ints=False):
         return data
     return result
 
-def retain_eml_to_alfred(ids, alfred_url, alfred_token, trino_token, dates=None):
+def retain_eml_to_alfred(ids, alfred_token, trino_token, dates=None):
+    alfred_url = os.environ.get("ALFRED_URL")
     try:
         ids_string = ""
         datetimes = []
@@ -146,15 +147,9 @@ def retain_eml_to_alfred(ids, alfred_url, alfred_token, trino_token, dates=None)
                 except ValueError as ve:
                     logger.info(ve)
                     continue
-        if alfred_url:
-            logger.info(f'Found Alfred-url: "{alfred_url}" in arguments')
-        else:
-            raise Exception("No field 'alfred_url' found in request")
 
         trino_host = os.environ.get('TRINO_HOST')
-        if not trino_host:
-            logger.error("TRINO_HOST environment variable not set")
-            raise Exception('TRINO_HOST environment variable not set')
+
         logger.info(f"Establishing connection to trino at {trino_host}...")
         conn = connect(
             auth=JWTAuthentication(trino_token),
@@ -183,6 +178,7 @@ def retain_eml_to_alfred(ids, alfred_url, alfred_token, trino_token, dates=None)
             sql += ")"
         logger.info(f"Querying EML Data from trino at {trino_host}...")
         cur = conn.cursor()
+        logger.info(f"SQL query: {sql}")
         cur.execute(sql)
         logger.info(f"executed query {cur.query_id}")
         columns = list(map(lambda d: d[0], cur.description))

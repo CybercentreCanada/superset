@@ -23,6 +23,7 @@ from flask.wrappers import Response
 from flask_appbuilder.api import BaseApi, expose, permission_name, protect, safe
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+import jwt
 from marshmallow import ValidationError
 
 
@@ -89,20 +90,19 @@ class AlfredRestApi(BaseApi):
         if 'dates' in request_payload:
             dates = request_payload['dates']
 
-        alfred_url = os.environ.get("ALFRED_URL")
-        if not alfred_url:
-            logger.error("ALFRED_URL environment variable not set")
-            return self.response_400('ALFRED_URL environment variable not set')
         user = current_user
         alfred_token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            os.environ.get("ALFRED_SCOPE"),
-            "azure"
+            os.environ.get("ALFRED_SCOPE")
         )
         trino_token = security_manager.get_on_behalf_of_access_token_with_cache(
             user.username,
-            os.environ.get("TRINO_SCOPE"),
-            "azure"
+            os.environ.get("TRINO_SCOPE")
         )
-        status, result = retain_eml_to_alfred(email_ids, alfred_url, alfred_token, trino_token, dates)
+
+        # TODO remove this
+        decoded_jwt = jwt.decode(trino_token, options={"verify_signature": False})
+        logger.info(f"Decoded Trino token. Expiry: {decoded_jwt.get('exp')}, Subject: {decoded_jwt.get('sub')}, Audience: {decoded_jwt.get('aud')}")
+        
+        status, result = retain_eml_to_alfred(email_ids, alfred_token, trino_token, dates)
         return self.response(status, result=result)
