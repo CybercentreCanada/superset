@@ -460,7 +460,11 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
               );
 
               const endpoint = `/api/v1/alfred/retain-eml-record`;
-              const jsonPayload = { email_ids: emailIds, dates };
+              const jsonPayload = {
+                email_ids: emailIds,
+                dates,
+                datasource: formData.datasource,
+              };
               SupersetClient.post({
                 endpoint,
                 jsonPayload,

@@ -1,40 +1,28 @@
-from decimal import Decimal
-from marshmallow.validate import ValidationError
-import pandas as pd
-import traceback
-import jwt
-import os
-from superset.utils import core as utils
-from superset.exceptions import SupersetException
-
-
-from trino.dbapi import connect
-from trino.auth import JWTAuthentication
-from flask import request, make_response, current_app, current_app
-
-from hogwarts.auth.vault.vault_client import VaultClient
-
 # This will by default restrict this function to users with ALPR.
 # You can customize this by providing an azure group ID to the wrapper.
-
 import datetime
+import json
+import logging
+import os
+import traceback
+from contextlib import closing
+from datetime import datetime, timedelta
+from decimal import Decimal
+from typing import List, Union
 
+import pandas as pd
+from alfred_client import AlfredService
+from alfred_client.instance.JWTAuthInstance import JWTAuthInstance
+from alfred_client.model.retention import DataSetMapper
+from alfred_client.model.retention.DTOContractData import DataSetEntry
+from flask import current_app
+from marshmallow.validate import ValidationError
+from numpy import datetime64, ndarray
 from trino.types import NamedRowTuple
 
-from alfred_client import AlfredService
-from alfred_client.instance import InstanceUtil
-from alfred_client import RetentionInstance
-from alfred_client.model.retention import DataSetMapper
-from alfred_client.instance.AbstractInstance import AbstractInstance
-from alfred_client.instance.JWTAuthInstance import JWTAuthInstance
-from alfred_client.model.retention.DTOContractData import DataSetEntry
-
-import logging
-from datetime import datetime
-from datetime import timedelta
-from typing import List, Optional, Union
-import json
-from numpy import datetime64, ndarray
+from superset.exceptions import SupersetException
+from superset.models.core import Database
+from superset.utils import core as utils
 
 JS_MAX_SAFE_INTEGER = 9007199254740991
 
@@ -59,7 +47,7 @@ def create_retention(
     alfred_instance,
     metadata_system="Analytical Platform",
     token: str = None,
-) -> list:
+) -> str:
     """
     This method takes a list of JSON objects and sends it to the Alfred Retention UI.
 
@@ -127,14 +115,20 @@ def sanitize_results(data, warnings=None, safe_js_ints=False):
             )
             return str(data)
     elif isinstance(data, NamedRowTuple):
-        for key, value in zip(data._names, data):
+        for key, value in zip(data._names, data, strict=False):
             result[key] = sanitize_results(value, warnings, safe_js_ints)
     else:
         return data
     return result
 
 
-def retain_eml_to_alfred(username, eml_ids, alfred_token, trino_token, dates=None):
+def retain_eml_to_alfred(
+    database: Database,
+    eml_ids: list[str],
+    alfred_token: str,
+    dates: list[str] | None = None,
+) -> tuple[int, str]:
+    """Fetch EML metadata using the chart's database and stage an Alfred retention."""
     alfred_url = os.environ.get("ALFRED_URL")
     try:
         ids_string = ""
@@ -152,20 +146,6 @@ def retain_eml_to_alfred(username, eml_ids, alfred_token, trino_token, dates=Non
                 except ValueError as ve:
                     logger.info(ve)
                     continue
-
-        trino_host = os.environ.get("TRINO_HOST")
-
-        logger.info(f"Establishing connection to trino at {trino_host}...")
-        conn = connect(
-            host=trino_host,
-            port=443,
-            user=username,
-            auth=JWTAuthentication(trino_token),
-            source="Superset EML retention",
-            http_scheme="https",
-            catalog="hogwarts_pb",
-            legacy_prepared_statements=False,
-        )
 
         # strict list of columns to avoid unforseen errors with new columns added
         columns = [
@@ -246,17 +226,17 @@ def retain_eml_to_alfred(username, eml_ids, alfred_token, trino_token, dates=Non
                     sql += " OR "
                 sql += f"(time > TIMESTAMP '{datetimes[i].strftime('%Y-%m-%d')}' AND time < TIMESTAMP '{(datetimes[i] + timedelta(days=1)).strftime('%Y-%m-%d')}')"
             sql += ")"
-        logger.info(f"Querying EML Data from trino at {trino_host}...")
-        cur = conn.cursor()
-        logger.info(f"SQL query: {sql}")
-        cur.execute(sql)
-        logger.info(f"executed query {cur.query_id}")
-        columns = list(map(lambda d: d[0], cur.description))
-        results = cur.fetchmany(limit + 1)
+        logger.info("Querying EML Data using database %s...", database.database_name)
+        with database.get_sqla_engine(source=utils.QuerySource.CHART) as engine:
+            with closing(engine.raw_connection()) as conn:
+                with closing(conn.cursor()) as cur:
+                    logger.info(f"SQL query: {sql}")
+                    cur.execute(sql)
+                    columns = list(map(lambda d: d[0], cur.description))
+                    results = cur.fetchmany(limit + 1)
         logger.info("Received response...")
         processed_rows = []
         for row in results:
-
             processed_rows.append(sanitize_results(row))
 
         json_rows = pd.DataFrame.from_records(processed_rows, columns=columns).to_json(
