@@ -104,5 +104,5 @@ class AlfredRestApi(BaseApi):
         decoded_jwt = jwt.decode(trino_token, options={"verify_signature": False})
         logger.info(f"Decoded Trino token. Expiry: {decoded_jwt.get('exp')}, Subject: {decoded_jwt.get('sub')}, Audience: {decoded_jwt.get('aud')}")
         
-        status, result = retain_eml_to_alfred(email_ids, alfred_token, trino_token, dates)
+        status, result = retain_eml_to_alfred(user.username, email_ids, alfred_token, trino_token, dates)
         return self.response(status, result=result)

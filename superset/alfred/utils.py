@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 # limit to 100 emls retained at a time
 limit = 100
 
+
 def validate_json(value: Union[bytes, bytearray, str]) -> None:
     try:
         utils.validate_json(value)
@@ -87,19 +88,20 @@ def create_retention(
     # retention to be in the 'ready' state.
     out_data_set: List[DataSetEntry] = DataSetMapper().map_data_set(data_set)
     retention = alfred.create_retention(
-            f"Retention initiated from Superset - {datetime.now()}"
-        )
+        f"Retention initiated from Superset - {datetime.now()}"
+    )
     retention = alfred.add_retention_dataset(
-            retention.uri,
-            out_data_set,
-            metadata_system,
-            mapping_name="hogwarts.harmonized.eml_metadata"
-        )
+        retention.uri,
+        out_data_set,
+        metadata_system,
+        mapping_name="hogwarts.harmonized.eml_metadata",
+    )
 
     # Return the URL
     retention_url = f"{alfred_instance}/ui/{retention.uri}"
-    
+
     return retention_url
+
 
 def sanitize_results(data, warnings=None, safe_js_ints=False):
     result = dict()
@@ -120,7 +122,9 @@ def sanitize_results(data, warnings=None, safe_js_ints=False):
         if data <= JS_MAX_SAFE_INTEGER and data >= JS_MIN_SAFE_INTEGER:
             return data
         else:
-            warnings.append(f"int {data} was cast to string to avoid loss of precision.")
+            warnings.append(
+                f"int {data} was cast to string to avoid loss of precision."
+            )
             return str(data)
     elif isinstance(data, NamedRowTuple):
         for key, value in zip(data._names, data):
@@ -129,14 +133,15 @@ def sanitize_results(data, warnings=None, safe_js_ints=False):
         return data
     return result
 
-def retain_eml_to_alfred(ids, alfred_token, trino_token, dates=None):
+
+def retain_eml_to_alfred(username, eml_ids, alfred_token, trino_token, dates=None):
     alfred_url = os.environ.get("ALFRED_URL")
     try:
         ids_string = ""
         datetimes = []
-        if ids:
+        if eml_ids:
             logger.info(f'Found eml_ids: "{ids_string}" in arguments')
-            ids_string = "','".join(ids)
+            ids_string = "','".join(eml_ids)
         else:
             raise Exception("No field 'email_ids' found in request")
         if dates:
@@ -148,26 +153,91 @@ def retain_eml_to_alfred(ids, alfred_token, trino_token, dates=None):
                     logger.info(ve)
                     continue
 
-        trino_host = os.environ.get('TRINO_HOST')
+        trino_host = os.environ.get("TRINO_HOST")
 
         logger.info(f"Establishing connection to trino at {trino_host}...")
         conn = connect(
-            auth=JWTAuthentication(trino_token),
-            http_scheme="https",
             host=trino_host,
             port=443,
+            user=username,
+            auth=JWTAuthentication(trino_token),
+            source="Superset EML retention",
+            http_scheme="https",
             catalog="hogwarts_pb",
+            legacy_prepared_statements=False,
         )
 
         # strict list of columns to avoid unforseen errors with new columns added
-        columns = ['bcc', 'body', 'cc', 'classification', 'content_type', 'cpoints', 'department', 'direction', 'eml_path', 'files', '"from"', 'id', 'length', 'md5', 'message_id', 'ministerial_authorization', 'parent_id', 'reply_to', 'root_id', 'sensor', 'sha1', 'sha256', 'source_id', 'stream_id', 'subject', 'subparts', 'tag', 'time', 'to', 'urls', 'timeperiod_loadedby', 'raw_source', 'stream_name', 'stream_description', 'src_port', 'dst_port', 'src_ip_asn', 'dst_ip_asn', 'src_ip_country_code', 'dst_ip_local', 'src_ip_local', 'dst_ip_department', 'src_ip_department', 'zone', 'helo', 'mail_from', 'rcpt_to', 'in_reply_to', 'references', 'xmailer', 'received', 'dest_ip_country_code', 'zone_str', 'xoriginating_ip_v4', 'xoriginating_ip_department', 'xoriginating_ip_country_code', 'last_received_ip_v4', 'last_received_ip_department', 'last_received_ip_country_code', 'src_ip_v4', 'dst_ip_v4']
-        columns_string = ', '.join(columns)
-        sql = f'''
+        columns = [
+            "bcc",
+            "body",
+            "cc",
+            "classification",
+            "content_type",
+            "cpoints",
+            "department",
+            "direction",
+            "eml_path",
+            "files",
+            '"from"',
+            "id",
+            "length",
+            "md5",
+            "message_id",
+            "ministerial_authorization",
+            "parent_id",
+            "reply_to",
+            "root_id",
+            "sensor",
+            "sha1",
+            "sha256",
+            "source_id",
+            "stream_id",
+            "subject",
+            "subparts",
+            "tag",
+            "time",
+            "to",
+            "urls",
+            "timeperiod_loadedby",
+            "raw_source",
+            "stream_name",
+            "stream_description",
+            "src_port",
+            "dst_port",
+            "src_ip_asn",
+            "dst_ip_asn",
+            "src_ip_country_code",
+            "dst_ip_local",
+            "src_ip_local",
+            "dst_ip_department",
+            "src_ip_department",
+            "zone",
+            "helo",
+            "mail_from",
+            "rcpt_to",
+            "in_reply_to",
+            "references",
+            "xmailer",
+            "received",
+            "dest_ip_country_code",
+            "zone_str",
+            "xoriginating_ip_v4",
+            "xoriginating_ip_department",
+            "xoriginating_ip_country_code",
+            "last_received_ip_v4",
+            "last_received_ip_department",
+            "last_received_ip_country_code",
+            "src_ip_v4",
+            "dst_ip_v4",
+        ]
+        columns_string = ", ".join(columns)
+        sql = f"""
         SELECT {columns_string}
         FROM  hogwarts_pb.harmonized.eml_metadata
         WHERE id in ('{ids_string}')
-        '''
-        # Adding this where clause is intended to optimize the query. It is assumed that all the EMLs will be under the same date or close to the 
+        """
+        # Adding this where clause is intended to optimize the query. It is assumed that all the EMLs will be under the same date or close to the
         # same date so they are added in a separate where clause
         if datetimes:
             sql += " AND ("
