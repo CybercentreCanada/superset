@@ -5,10 +5,10 @@ import json
 import logging
 import os
 import traceback
-from contextlib import closing
+from contextlib import AbstractContextManager, closing
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import List, Union
+from typing import cast, List, Union
 
 import pandas as pd
 from alfred_client import AlfredService
@@ -18,6 +18,7 @@ from alfred_client.model.retention.DTOContractData import DataSetEntry
 from flask import current_app
 from marshmallow.validate import ValidationError
 from numpy import datetime64, ndarray
+from sqlalchemy.engine import Engine
 from trino.types import NamedRowTuple
 
 from superset.exceptions import SupersetException
@@ -227,12 +228,20 @@ def retain_eml_to_alfred(
                 sql += f"(time > TIMESTAMP '{datetimes[i].strftime('%Y-%m-%d')}' AND time < TIMESTAMP '{(datetimes[i] + timedelta(days=1)).strftime('%Y-%m-%d')}')"
             sql += ")"
         logger.info("Querying EML Data using database %s...", database.database_name)
-        with database.get_sqla_engine(source=utils.QuerySource.CHART) as engine:
-            with closing(engine.raw_connection()) as conn:
+        # The database getter annotates its yielded engine, not its context manager.
+        engine_context = cast(
+            AbstractContextManager[Engine],
+            database.get_sqla_engine(source=utils.QuerySource.CHART),
+        )
+        with engine_context as engine:
+            connection = engine.raw_connection()
+            if connection is None:
+                raise RuntimeError("Failed to establish the Trino database connection")
+            with closing(connection) as conn:
                 with closing(conn.cursor()) as cur:
-                    logger.info(f"SQL query: {sql}")
+                    logger.info("SQL query: %s", sql)
                     cur.execute(sql)
-                    columns = list(map(lambda d: d[0], cur.description))
+                    columns = [description[0] for description in cur.description]
                     results = cur.fetchmany(limit + 1)
         logger.info("Received response...")
         processed_rows = []
