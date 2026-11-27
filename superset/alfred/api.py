@@ -86,7 +86,6 @@ class AlfredRestApi(BaseApi):
                 'No field named "email_ids" found in the JSON body of the request'
             )
 
-        logger.info("Payload is %s", request_payload)
         email_ids = request_payload["email_ids"]
         dates = None
         if "dates" in request_payload:

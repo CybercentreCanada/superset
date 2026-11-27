@@ -441,7 +441,11 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                 ...new Set(
                   [
                     ...Object.entries(selectedData.typeData)
-                      .filter(k => k[0] === 'DATE' || k[0].includes('TIME'))
+                      .filter(
+                        k =>
+                          k[0].toUpperCase() === 'DATE' ||
+                          k[0].toUpperCase().includes('TIME'),
+                      )
                       .map(v => [...v[1]]) // spread the Set into an array
                       .flat(), // flatten the array of arrays into a single array
                   ].map((d: any) => {
@@ -461,7 +465,7 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
               const endpoint = `/api/v1/alfred/retain-eml-record`;
               const jsonPayload = {
                 email_ids: emailIds,
-                dates,
+                dates: dates,
                 datasource: formData.datasource,
               };
               SupersetClient.post({
