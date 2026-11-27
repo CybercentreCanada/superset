@@ -265,10 +265,9 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                     const colDef = column.getColDef();
 
                     const field = colDef.field ?? '';
-                    const dataType =
-                      colDef.context?.advancedDataType ??
-                      colDef.type ??
-                      'NoType';
+                    const dataType = colDef.context?.advancedDataType
+                      ? colDef.context?.advancedDataType
+                      : (colDef.type ?? 'NoType');
                     const value = row.data[field];
                     const unnested = ensureIsArray(unnestValue(value));
                     const formattedValue: any[] =
@@ -439,22 +438,22 @@ const CccsGridTableChart: FunctionComponent<CccsGridTransformedProps> = memo(
                 selectedData.typeData.harmonized_email_id,
               );
               const dates = [
-                ...Object.entries(selectedData.typeData)
-                  .filter(k => k[0].includes('TIME'))
-                  .map(v => v[1])
-                  .flat(),
-                ...(selectedData.typeData.DATE || []),
-                ...(selectedData.typeData.DATETIME || []),
-              ].map((d: string) => {
-                let date = new Date(Date.parse(d));
-                if (Number.isNaN(date.getTime())) {
-                  date = new Date(d);
-                }
-                const day = date.getDate();
-                const month = date.getMonth() + 1; // months are labelled 0-11;
-                const year = date.getFullYear();
-                return `${year}-${month}-${day}`;
-              });
+                ...new Set(
+                  [
+                    ...Object.entries(selectedData.typeData)
+                      .filter(k => k[0] === 'DATE' || k[0].includes('TIME'))
+                      .map(v => [...v[1]]) // spread the Set into an array
+                      .flat(), // flatten the array of arrays into a single array
+                  ].map((d: any) => {
+                    const date = new Date(d);
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1; // months are labelled 0-11;
+                    const year = date.getFullYear();
+                    return `${year}-${month}-${day}`;
+                  }),
+                ),
+              ];
+
               addInfoToast(
                 'Retention started. A new tab will open upon successful retention.',
               );

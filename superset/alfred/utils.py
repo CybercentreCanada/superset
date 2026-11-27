@@ -87,7 +87,7 @@ def create_retention(
     )
 
     # Return the URL
-    retention_url = f"{alfred_instance}/ui/{retention.uri}"
+    retention_url = f"{alfred_instance}/{retention.uri}"
 
     return retention_url
 
