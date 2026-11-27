@@ -239,11 +239,10 @@ def retain_eml_to_alfred(
                 raise RuntimeError("Failed to establish the Trino database connection")
             with closing(connection) as conn:
                 with closing(conn.cursor()) as cur:
-                    logger.info("SQL query: %s", sql)
                     cur.execute(sql)
+                    logger.info(f"executed query {cur.query_id}")
                     columns = [description[0] for description in cur.description]
                     results = cur.fetchmany(limit + 1)
-        logger.info("Received response...")
         processed_rows = []
         for row in results:
             processed_rows.append(sanitize_results(row))
@@ -253,13 +252,11 @@ def retain_eml_to_alfred(
         )
         data_to_map = json.loads(json_rows)
 
-        logger.info("Creating Retention...")
         retention_url = create_retention(
             data_to_map,
             alfred_url,
             token=alfred_token,
         )
-        logger.info("Completed Retention.")
 
         return 200, retention_url
 
